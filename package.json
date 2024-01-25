@@ -1,13 +1,18 @@
 {
   "type": "module",
   "name": "@coze/coze-js",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Coze Javascript library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "test": "jest --coverage --config=jest.config.cjs ./test/*",
