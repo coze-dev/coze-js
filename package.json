@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@coze/coze-js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Coze Javascript library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

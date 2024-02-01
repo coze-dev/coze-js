@@ -16,7 +16,7 @@ export class Coze {
   constructor(config: Partial<Config>) {
     this.config = {
       api_key: config?.api_key!,
-      endpoint: config?.endpoint ?? "https://bots.bytedance.net/open_api",
+      endpoint: config?.endpoint ?? "https://www.coze.cn/open_api",
     };
 
     this.fetch = fetch;
