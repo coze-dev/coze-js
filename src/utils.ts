@@ -1,4 +1,4 @@
-import type { Fetch } from "./interfaces.js";
+import type { Fetch } from "./v1.js";
 
 class ResponseError extends Error {
   constructor(

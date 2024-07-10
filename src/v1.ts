@@ -1,5 +1,11 @@
 export type Fetch = typeof fetch;
 
+export interface Config {
+  endpoint?: string;
+  api_key: string;
+  fetch?: Fetch;
+}
+
 export interface ChatV1Req {
   /**
    * 标识API背后的具体交互bot
@@ -29,7 +35,7 @@ export interface ChatV1Req {
   /**
    * 传递会话上下文
    */
-  chat_history?: ChatMessage[];
+  chat_history?: ChatV1Message[];
 
   /**
    * 扩展参数，目前暂未使用
@@ -44,7 +50,7 @@ export interface ChatV1Req {
   /**
    * 自定义变量，key=变量名，value=变量值
    */
-  custom_variables?: Record<string, string>;
+  custom_variables?: Record<string, any>;
 }
 
 /**
@@ -54,7 +60,7 @@ export interface ChatV1Resp {
   /**
    * 整个对话过程返回的消息
    */
-  messages: ChatMessage[];
+  messages: ChatV1Message[];
 
   /**
    * 当前对话的标识
@@ -80,7 +86,7 @@ export interface ChatV1StreamResp {
   /**
    * 增量返回的消息内容
    */
-  message: ChatMessage;
+  message: ChatV1Message;
 
   /**
    * 标识当前message是否结束
@@ -100,7 +106,7 @@ export interface ChatV1StreamResp {
   index: number;
 }
 
-export interface ChatMessage {
+export interface ChatV1Message {
   /**
    * 标识发送消息的角色：用户或机器人
    * - user：用户输入内容
@@ -128,10 +134,4 @@ export interface ChatMessage {
    * - 其他类型目前暂未上线，后续扩展
    */
   content_type: string;
-}
-
-export interface Config {
-  endpoint?: string;
-  api_key: string;
-  fetch?: Fetch;
 }

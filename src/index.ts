@@ -7,13 +7,8 @@ import {
   getMessages,
   type EventSourceMessage,
 } from "./parse.js";
-import type {
-  Fetch,
-  Config,
-  ChatV1Req,
-  ChatV1Resp,
-  ChatV1StreamResp,
-} from "./interfaces.js";
+import type { Fetch, Config } from "./v1.js";
+import type { ChatV2Req, ChatV2Resp, ChatV2StreamResp } from "./v2.js";
 
 export class Coze {
   private readonly config: Config;
@@ -33,23 +28,24 @@ export class Coze {
 
   private async processStreamableRequest(
     apiName: string,
-    request: ChatV1Req
-  ): Promise<ChatV1Resp | AsyncGenerator<ChatV1StreamResp>> {
+    request: ChatV2Req
+  ): Promise<ChatV2Resp | AsyncGenerator<ChatV2StreamResp>> {
     if (!this.config.api_key) {
       throw new Error('Missing "api_key" in config');
     }
 
     const body = { ...request };
     body.stream = body.stream ?? false;
-    body.conversation_id = body.conversation_id ?? uuidv4();
     body.user = body.user ?? uuidv4();
+
+    const conversation_id = request.conversation_id ?? uuidv4();
 
     const headers = {
       authorization: "Bearer " + this.config.api_key,
       "content-type": "application/json",
     };
 
-    const apiUrl = `${this.config.endpoint}${apiName}`;
+    const apiUrl = `${this.config.endpoint}${apiName}?conversation_id=${conversation_id}`;
     const response = await post(this.fetch, apiUrl, body, headers);
     if (!response.body) {
       throw new Error("Missing body");
@@ -90,18 +86,18 @@ export class Coze {
         }
       })();
     } else {
-      return (await response.json()) as ChatV1Resp;
+      return (await response.json()) as ChatV2Resp;
     }
   }
 
   chat(
-    request: ChatV1Req & { stream: true }
-  ): Promise<AsyncGenerator<ChatV1StreamResp>>;
-  chat(request: ChatV1Req & { stream?: false }): Promise<ChatV1Resp>;
+    request: ChatV2Req & { stream: true }
+  ): Promise<AsyncGenerator<ChatV2StreamResp>>;
+  chat(request: ChatV2Req & { stream?: false }): Promise<ChatV2Resp>;
 
   async chat(
-    request: ChatV1Req
-  ): Promise<ChatV1Resp | AsyncGenerator<ChatV1StreamResp>> {
+    request: ChatV2Req
+  ): Promise<ChatV2Resp | AsyncGenerator<ChatV2StreamResp>> {
     return this.processStreamableRequest("/v2/chat", request);
   }
 }
