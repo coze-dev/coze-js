@@ -1,6 +1,12 @@
 import "whatwg-fetch";
 import { v4 as uuidv4 } from "uuid";
-import { post, parseJSON } from "./utils.js";
+import { post } from "./utils.js";
+import {
+  getBytes,
+  getLines,
+  getMessages,
+  type EventSourceMessage,
+} from "./parse.js";
 import type {
   Fetch,
   Config,
@@ -16,7 +22,7 @@ export class Coze {
   constructor(config: Partial<Config>) {
     this.config = {
       api_key: config?.api_key!,
-      endpoint: config?.endpoint ?? "https://www.coze.cn/open_api",
+      endpoint: config?.endpoint ?? "https://api.coze.com/open_api",
     };
 
     this.fetch = fetch;
@@ -50,20 +56,35 @@ export class Coze {
     }
 
     if (body.stream) {
-      const itr = parseJSON<ChatV1StreamResp>(response.body);
-      return (async function* () {
-        for await (const message of itr) {
-          if ("error" in message) {
-            throw new Error((message as any).error);
-          }
-          // message will be done in the case of chat and generate
-          // message will be success in the case of a progress response (pull, push, create)
-          if ((message as any).done) {
-            return;
-          }
-          yield message;
+      const onId = () => {};
+      const onRetry = () => {};
+      let messageQueue: EventSourceMessage[] = [];
+      let resolveMessage: (() => void) | null = null;
+
+      const onMessage = (msg: EventSourceMessage) => {
+        messageQueue.push(msg);
+        if (resolveMessage) {
+          resolveMessage();
+          resolveMessage = null;
         }
-        throw new Error("Did not receive done or success response in stream.");
+      };
+
+      getBytes(response.body, getLines(getMessages(onId, onRetry, onMessage)));
+
+      return (async function* () {
+        while (true) {
+          if (messageQueue.length > 0) {
+            const msg: EventSourceMessage = messageQueue.shift()!;
+            // {event: 'done'}
+            // {event: 'message', message: '...' }
+            const streamResp = JSON.parse(msg.data);
+            yield streamResp as any;
+          } else {
+            await new Promise<void>((resolve) => {
+              resolveMessage = resolve;
+            });
+          }
+        }
       })();
     } else {
       return (await response.json()) as ChatV1Resp;
@@ -78,6 +99,6 @@ export class Coze {
   async chat(
     request: ChatV1Req
   ): Promise<ChatV1Resp | AsyncGenerator<ChatV1StreamResp>> {
-    return this.processStreamableRequest("/v1/chat", request);
+    return this.processStreamableRequest("/v2/chat", request);
   }
 }
