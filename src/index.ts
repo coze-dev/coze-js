@@ -74,11 +74,14 @@ export class Coze {
       return (async function* () {
         while (true) {
           if (messageQueue.length > 0) {
-            const msg: EventSourceMessage = messageQueue.shift()!;
-            // {event: 'done'}
-            // {event: 'message', message: '...' }
-            const streamResp = JSON.parse(msg.data);
-            yield streamResp as any;
+            for (let i = 0; i < messageQueue.length; i++) {
+              const msg: EventSourceMessage = messageQueue[i];
+              // {event: 'done'}
+              // {event: 'message', message: '...' }
+              const streamResp = JSON.parse(msg.data);
+              yield streamResp as any;
+            }
+            messageQueue = [];
           } else {
             await new Promise<void>((resolve) => {
               resolveMessage = resolve;
