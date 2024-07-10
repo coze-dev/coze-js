@@ -173,7 +173,7 @@ export function getMessages(
   };
 }
 
-function concat(a: Uint8Array, b: Uint8Array) {
+export function concat(a: Uint8Array, b: Uint8Array) {
   const res = new Uint8Array(a.length + b.length);
   res.set(a);
   res.set(b, a.length);

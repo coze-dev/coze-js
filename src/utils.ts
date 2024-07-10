@@ -1,6 +1,6 @@
 import type { Fetch } from "./v1.js";
 
-class ResponseError extends Error {
+export class ResponseError extends Error {
   constructor(
     public error: string,
     public status_code: number
@@ -47,7 +47,12 @@ export const post = async (
   headers?: HeadersInit
 ): Promise<Response> => {
   const isRecord = (input: any): input is Record<string, unknown> => {
-    return input !== null && typeof input === "object" && !Array.isArray(input);
+    return (
+      input !== null &&
+      typeof input === "object" &&
+      !Array.isArray(input) &&
+      !(input instanceof FormData)
+    );
   };
 
   const formattedData = isRecord(data) ? JSON.stringify(data) : data;
