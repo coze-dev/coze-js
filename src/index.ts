@@ -1,6 +1,6 @@
 import "whatwg-fetch";
 import { v4 as uuidv4 } from "uuid";
-import { post, formatAddtionalMessages } from "./utils.js";
+import { formatAddtionalMessages } from "./utils.js";
 import {
   getBytes,
   getLines,
@@ -42,70 +42,6 @@ export class Coze {
     this.fetch = fetch;
     if (config?.fetch != null) {
       this.fetch = config.fetch;
-    }
-  }
-
-  private async processStreamableRequest(
-    apiName: string,
-    request: ChatV2Req
-  ): Promise<ChatV2Resp | AsyncGenerator<ChatV2StreamResp>> {
-    if (!this.config.api_key) {
-      throw new Error('Missing "api_key" in config');
-    }
-
-    const body = { ...request };
-    body.stream = body.stream ?? false;
-    body.user = body.user ?? uuidv4();
-
-    const conversation_id = request.conversation_id ?? uuidv4();
-
-    const headers = {
-      authorization: "Bearer " + this.config.api_key,
-      "content-type": "application/json",
-    };
-
-    const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
-    const response = await post(this.fetch, apiUrl, body, headers);
-    if (!response.body) {
-      throw new Error("Missing body");
-    }
-
-    if (body.stream) {
-      const onId = () => {};
-      const onRetry = () => {};
-      let messageQueue: EventSourceMessage[] = [];
-      let resolveMessage: (() => void) | null = null;
-
-      const onMessage = (msg: EventSourceMessage) => {
-        messageQueue.push(msg);
-        if (resolveMessage) {
-          resolveMessage();
-          resolveMessage = null;
-        }
-      };
-
-      getBytes(response.body, getLines(getMessages(onId, onRetry, onMessage)));
-
-      return (async function* () {
-        while (true) {
-          if (messageQueue.length > 0) {
-            for (let i = 0; i < messageQueue.length; i++) {
-              const msg: EventSourceMessage = messageQueue[i];
-              // {event: 'done'}
-              // {event: 'message', message: '...' }
-              const streamResp = JSON.parse(msg.data);
-              yield streamResp as any;
-            }
-            messageQueue = [];
-          } else {
-            await new Promise<void>((resolve) => {
-              resolveMessage = resolve;
-            });
-          }
-        }
-      })();
-    } else {
-      return (await response.json()) as ChatV2Resp;
     }
   }
 

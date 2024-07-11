@@ -1,79 +1,43 @@
-import { post, ResponseError } from "../src/utils";
+import { formatAddtionalMessages } from "../src/utils";
 
-describe("post function", () => {
-  it("should send a POST request with correct data", async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ success: true }),
-    });
-
-    const url = "https://api.example.com/data";
-    const data = { key: "value" };
-    const headers = { "Content-Type": "application/json" };
-
-    await post(mockFetch, url, data, headers);
-
-    expect(mockFetch).toHaveBeenCalledWith(url, {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers,
-    });
+describe("formatAddtionalMessages", () => {
+  it("should return an empty array when input is undefined", () => {
+    expect(formatAddtionalMessages(undefined)).toEqual([]);
   });
 
-  it("should throw ResponseError for non-ok responses", async () => {
-    const errorMessage = "Bad Request";
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 400,
-      statusText: "Bad Request",
-      headers: {
-        get: jest.fn().mockReturnValue("application/json"),
-      },
-      json: jest.fn().mockResolvedValue({ error: errorMessage }),
-    });
-
-    const url = "https://api.example.com/data";
-    const data = { key: "value" };
-
-    await expect(post(mockFetch, url, data)).rejects.toThrow(ResponseError);
-    await expect(post(mockFetch, url, data)).rejects.toThrow(errorMessage);
+  it("should return an empty array when input is an empty array", () => {
+    expect(formatAddtionalMessages([])).toEqual([]);
   });
 
-  it("should handle non-JSON error responses", async () => {
-    const errorMessage = "Internal Server Error";
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 500,
-      statusText: "Internal Server Error",
-      headers: {
-        get: jest.fn().mockReturnValue("text/plain"),
-      },
-      text: jest.fn().mockResolvedValue(errorMessage),
-    });
-
-    const url = "https://api.example.com/data";
-    const data = { key: "value" };
-
-    await expect(post(mockFetch, url, data)).rejects.toThrow(ResponseError);
-    await expect(post(mockFetch, url, data)).rejects.toThrow(errorMessage);
+  it('should stringify content when content_type is "object_string" and content is an array', () => {
+    const input: any[] = [
+      { content_type: "object_string", content: [1, 2, 3] },
+    ];
+    const expected = [{ content_type: "object_string", content: "[1,2,3]" }];
+    expect(formatAddtionalMessages(input)).toEqual(expected);
   });
 
-  it("should handle BodyInit data", async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ success: true }),
-    });
+  it('should not modify content when content_type is not "object_string"', () => {
+    const input: any[] = [{ content_type: "text", content: "Hello" }];
+    expect(formatAddtionalMessages(input)).toEqual(input);
+  });
 
-    const url = "https://api.example.com/data";
-    const data = new FormData();
-    data.append("key", "value");
+  it('should not modify content when content_type is "object_string" but content is not an array', () => {
+    const input: any[] = [{ content_type: "object_string", content: "Hello" }];
+    expect(formatAddtionalMessages(input)).toEqual(input);
+  });
 
-    await post(mockFetch, url, data);
-
-    expect(mockFetch).toHaveBeenCalledWith(url, {
-      method: "POST",
-      body: data,
-      headers: undefined,
-    });
+  it("should handle mixed input correctly", () => {
+    const input: any[] = [
+      { content_type: "object_string", content: [1, 2, 3] },
+      { content_type: "text", content: "Hello" },
+      { content_type: "object_string", content: "World" },
+    ];
+    const expected = [
+      { content_type: "object_string", content: "[1,2,3]" },
+      { content_type: "text", content: "Hello" },
+      { content_type: "object_string", content: "World" },
+    ];
+    expect(formatAddtionalMessages(input)).toEqual(expected);
   });
 });
