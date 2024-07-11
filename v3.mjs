@@ -1,48 +1,97 @@
 import { Coze } from "@coze/coze-js";
+import { clearLine, cursorTo } from 'node:readline'
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
 const query = "北京新闻";
 
-const stream = true;
+const stream = false;
 const coze = new Coze({ api_key: apiKey });
 
-const v = await coze.chatV3Streaming({
-  user_id: 'user-123456',
-  bot_id: botId,
-  additional_messages: [
-    {
-      role: 'user',
-      content: query,
-      content_type: 'text',
-      type: 'query'
+async function sleep(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  })
+}
+
+if (stream) {
+  const v = await coze.chatV3Streaming({
+    user_id: 'user-123456',
+    bot_id: botId,
+    additional_messages: [
+      {
+        role: 'user',
+        content: query,
+        content_type: 'text',
+        type: 'query'
+      }
+    ]
+  });
+
+  for await (const part of v) {
+    if (part.event === 'conversation.chat.created') {
+      console.log('[START]');
     }
-  ]
-});
 
-for await (const part of v) {
-  if (part.event === 'conversation.chat.created') {
-    console.log('[START]');
+    else if (part.event === 'conversation.message.delta') {
+      process.stdout.write(part.data.content);
+    }
+
+    else if (part.event === 'conversation.message.completed') {
+      const { role, type, content } = part.data;
+      if (role === 'assistant' && type === 'answer') {
+        process.stdout.write("\n");
+      } else {
+        console.log("[%s]:[%s]:%s", role, type, content);
+      }
+    }
+
+    else if (part.event === 'conversation.chat.completed') {
+      console.log(part.data.usage);
+    }
+
+    else if (part.event === 'done') {
+      console.log(part.data);
+    }
   }
+} else {
+  const v = await coze.chatV3({
+    user_id: 'user-123456',
+    bot_id: botId,
+    additional_messages: [
+      {
+        role: 'user',
+        content: query,
+        content_type: 'text',
+        type: 'query'
+      }
+    ]
+  });
 
-  else if (part.event === 'conversation.message.delta') {
-    process.stdout.write(part.data.content);
-  }
-
-  else if (part.event === 'conversation.message.completed') {
-    const { role, type, content } = part.data;
-    if (role === 'assistant' && type === 'answer') {
-      process.stdout.write("\n");
+  const chat_id = v.id;
+  const conversation_id = v.conversation_id;
+  while (true) {
+    await sleep(100);
+    const chat = await coze.getChat({ chat_id, conversation_id });
+    if (chat.status === 'completed'
+      || chat.status === 'failed'
+      || chat.status === 'requires_action'
+    ) {
+      console.log(chat.usage);
+      break;
+    }
+    const messageList = await coze.getChatHistory({ chat_id, conversation_id });
+    if (messageList.length <= 0) {
+      process.stdout.write('.');
     } else {
-      console.log("[%s]:[%s]:%s", role, type, content);
+      clearLine(process.stdout, 0);
+      cursorTo(process.stdout, 0);
+      process.stdout.write('');
+      for (const item of messageList) {
+        // console.log(item);
+        console.log("[%s]:[%s]:%s", item.role, item.type, item.content);
+      }
     }
-  }
-
-  else if (part.event === 'conversation.chat.completed') {
-    console.log(part.data.usage);
-  }
-
-  else if (part.event === 'done') {
-    console.log(part.data);
   }
 }
+

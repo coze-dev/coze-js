@@ -526,6 +526,48 @@ export class Coze {
     return data;
   }
 
+  /**
+   * 查看对话的详细信息。
+   */
+  public async getChat({
+    conversation_id,
+    chat_id,
+  }: {
+    conversation_id: string;
+    chat_id: string;
+  }): Promise<ChatV3Resp> {
+    const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
+    const response = await this._GET(apiUrl);
+    const { data, code, msg } = await response.json();
+    if (code !== 0) {
+      const logId = response.headers.get("x-tt-logid");
+      throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+    }
+    return data;
+  }
+
+  /**
+   * 查看对话消息详情，查看指定对话中除 Query 以外的其他消息，包括模型回复、Bot 执行的中间结果等消息。
+   */
+  public async getChatHistory({
+    conversation_id,
+    chat_id,
+  }: {
+    conversation_id: string;
+    chat_id: string;
+  }): Promise<ChatV3Message[]> {
+    const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
+    const response = await this._POST(apiUrl, "{}");
+    const raw = await response.json();
+    // console.log(raw);
+    const { data, code, msg } = raw;
+    if (code !== 0) {
+      const logId = response.headers.get("x-tt-logid");
+      throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+    }
+    return data || [];
+  }
+
   private async _GET(apiUrl: string): Promise<Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
