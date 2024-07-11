@@ -21,7 +21,13 @@ import type {
   ObjectStringItem,
   ContentType,
 } from "./v2.js";
-import { ChatV3Message } from "./v3.js";
+import {
+  ChatV3Message,
+  ChatV3Req,
+  ChatV3Resp,
+  ChatV3StreamResp,
+  ChatV3StreamingEventType,
+} from "./v3.js";
 
 export class Coze {
   private readonly config: Config;
@@ -112,6 +118,97 @@ export class Coze {
     request: ChatV2Req
   ): Promise<ChatV2Resp | AsyncGenerator<ChatV2StreamResp>> {
     return this.processStreamableRequest("/open_api/v2/chat", request);
+  }
+
+  public async chatV3(
+    request: ChatV3Req
+  ): Promise<ChatV3Resp | AsyncGenerator<ChatV3StreamResp>> {
+    const {
+      bot_id,
+      user_id,
+      conversation_id,
+      // additional_messages,
+      stream,
+      custom_variables,
+      auto_save_history,
+      meta_data,
+    } = request;
+    const apiUrl =
+      "/v3/chat" +
+      (conversation_id ? `?conversation_id=${conversation_id}` : "");
+    const payload: ChatV3Req = {
+      bot_id,
+      user_id,
+      // additional_messages,
+      stream,
+      custom_variables,
+      auto_save_history,
+      meta_data,
+    };
+
+    if (Array.isArray(request.additional_messages)) {
+      const additional_messages: EnterMessage[] = [];
+      for (const item of request.additional_messages) {
+        if (
+          item.content_type === "object_string" &&
+          Array.isArray(item.content)
+        ) {
+          additional_messages.push({
+            ...item,
+            content: JSON.stringify(item.content),
+          });
+        } else {
+          additional_messages.push(item);
+        }
+      }
+      payload.additional_messages = additional_messages;
+    }
+
+    const response = await this._POST(apiUrl, JSON.stringify(payload));
+    if (stream) {
+      const onId = () => {};
+      const onRetry = () => {};
+      let messageQueue: {
+        event: ChatV3StreamingEventType;
+        data: ChatV3Resp | ChatV3Message | string;
+      }[] = [];
+      let resolveMessage: (() => void) | null = null;
+
+      const onMessage = (msg: EventSourceMessage) => {
+        messageQueue.push({
+          event: msg.event as ChatV3StreamingEventType,
+          data: msg.event === "done" ? "[DONE]" : JSON.parse(msg.data),
+        });
+        if (resolveMessage) {
+          resolveMessage();
+          resolveMessage = null;
+        }
+      };
+
+      getBytes(response.body!, getLines(getMessages(onId, onRetry, onMessage)));
+
+      return (async function* () {
+        while (true) {
+          if (messageQueue.length > 0) {
+            for (let i = 0; i < messageQueue.length; i++) {
+              yield messageQueue[i] as any;
+            }
+            messageQueue = [];
+          } else {
+            await new Promise<void>((resolve) => {
+              resolveMessage = resolve;
+            });
+          }
+        }
+      })();
+    } else {
+      const { data, code, msg } = await response.json();
+      if (code !== 0) {
+        const logId = response.headers.get("x-tt-logid");
+        throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+      }
+      return data as ChatV3Resp;
+    }
   }
 
   /**
