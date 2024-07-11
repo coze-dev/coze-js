@@ -67,30 +67,26 @@ console.log(a);
 const b = await coze.getBotInfo({ bot_id: botId });
 console.log(b);
 
-const v = await coze.chat({ query, bot_id: botId, stream });
+const v = await coze.chatV2Streaming({ query, bot_id: botId });
 
-if (stream) {
-  for await (const part of v) {
-    const message = part.message;
-    if (!message) {
-      console.error(part);
-      continue;
-    }
-
-    if (
-      message.role === "assistant" &&
-      message.type === "answer" &&
-      message.content_type === "text"
-    ) {
-      process.stdout.write(message.content);
-      if (part.is_finish) {
-        process.stdout.write("\n");
-      }
-    } else {
-      console.log("[%s]:[%s]:%s", message.role, message.type, message.content);
-    }
+for await (const part of v) {
+  const message = part.message;
+  if (!message) {
+    console.error(part);
+    continue;
   }
-} else {
-  console.log(v);
+
+  if (
+    message.role === "assistant" &&
+    message.type === "answer" &&
+    message.content_type === "text"
+  ) {
+    process.stdout.write(message.content);
+    if (part.is_finish) {
+      process.stdout.write("\n");
+    }
+  } else {
+    console.log("[%s]:[%s]:%s", message.role, message.type, message.content);
+  }
 }
 
