@@ -146,6 +146,8 @@ export interface ChatV2StreamResp {
    * 返回message的标识，一个index唯一对应一条message
    */
   index: number;
+
+  seq_id: number;
 }
 
 export interface BotInfo {

@@ -1,11 +1,11 @@
-import { Coze } from "@coze/coze-js";
+import { Coze } from "./dist/index2.js";
 import { clearLine, cursorTo } from 'node:readline'
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
 const query = "北京新闻";
 
-const stream = false;
+const stream = true;
 const coze = new Coze({ api_key: apiKey });
 
 async function sleep(ms) {
