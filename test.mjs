@@ -1,4 +1,4 @@
-import { Coze } from "@coze/coze-js";
+import { Coze } from "./dist/index.js";
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
@@ -51,7 +51,8 @@ console.log('%j', m2);
 const m3 = await coze.readMessage({ conversation_id: c2.id, message_id: m.id });
 console.log(m3);
 const m4 = await coze.updateMessage({
-  conversation_id: c2.id, message_id: m3.id,
+  conversation_id: c2.id,
+  message_id: m3.id,
   content: '121212121',
   content_type: 'text',
   meta_data: {
@@ -70,19 +71,20 @@ console.log(b);
 const v = await coze.chatV2Streaming({ query, bot_id: botId });
 
 for await (const part of v) {
-  const message = part.message;
-  if (!message) {
-    console.error(part);
-    continue;
+  const event = part.event;
+  if (event === 'done') {
+    console.log(part.data);
+    break;
   }
 
+  const { message, is_finish } = part.data;
   if (
     message.role === "assistant" &&
     message.type === "answer" &&
     message.content_type === "text"
   ) {
     process.stdout.write(message.content);
-    if (part.is_finish) {
+    if (is_finish) {
       process.stdout.write("\n");
     }
   } else {
@@ -90,3 +92,5 @@ for await (const part of v) {
   }
 }
 
+const v2 = await coze.chatV2({ query, bot_id: botId });
+console.log(v2);

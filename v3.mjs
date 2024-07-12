@@ -1,12 +1,10 @@
-import { Coze } from "./dist/index2.js";
 import { clearLine, cursorTo } from 'node:readline'
+import { Coze } from "./dist/index.js";
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
 const query = "北京新闻";
 
-const stream = true;
-const coze = new Coze({ api_key: apiKey });
 
 async function sleep(ms) {
   return new Promise(function (resolve) {
@@ -14,7 +12,10 @@ async function sleep(ms) {
   })
 }
 
-if (stream) {
+async function streamingChat() {
+  console.log('=== Streaming Chat ===');
+
+  const coze = new Coze({ api_key: apiKey });
   const v = await coze.chatV3Streaming({
     user_id: 'user-123456',
     bot_id: botId,
@@ -54,7 +55,12 @@ if (stream) {
       console.log(part.data);
     }
   }
-} else {
+}
+
+async function nonStreamingChat() {
+  console.log('=== Non-Streaming Chat ===');
+
+  const coze = new Coze({ api_key: apiKey });
   const v = await coze.chatV3({
     user_id: 'user-123456',
     bot_id: botId,
@@ -95,3 +101,9 @@ if (stream) {
   }
 }
 
+async function main() {
+  await streamingChat();
+  await nonStreamingChat();
+}
+
+main().catch(console.error);

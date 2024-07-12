@@ -111,44 +111,38 @@ export interface ChatV2Resp {
    * 当前对话的标识
    */
   conversation_id: string;
-
-  /**
-   * 状态码，非0标识对话过程出现错误
-   * - 对于非流式返回，只有code=0才会返回messages
-   */
-  code: number;
-
-  /**
-   * 状态信息，成功请求为"success"，错误请求为error信息
-   */
-  msg: string;
 }
 
-export interface ChatV2StreamResp {
-  /**
-   * 增量返回的消息内容
-   */
-  message: ChatV2Message;
+export type ChatV2StreamResp =
+  | {
+      event: "message";
+      data: {
+        /**
+         * 增量返回的消息内容
+         */
+        message: ChatV2Message;
 
-  /**
-   * 标识当前message是否结束
-   *
-   * message结束不一定代表整个流结束，bot返回的message会有不同的type，可见 ChatMessage 的介绍
-   */
-  is_finish?: boolean;
+        /**
+         * 标识当前message是否结束
+         *
+         * message结束不一定代表整个流结束，bot返回的message会有不同的type，可见 ChatMessage 的介绍
+         */
+        is_finish?: boolean;
 
-  /**
-   * 当前的会话id
-   */
-  conversation_id: string;
+        /**
+         * 当前的会话id
+         */
+        conversation_id: string;
 
-  /**
-   * 返回message的标识，一个index唯一对应一条message
-   */
-  index: number;
+        /**
+         * 返回message的标识，一个index唯一对应一条message
+         */
+        index: number;
 
-  seq_id: number;
-}
+        seq_id: number;
+      };
+    }
+  | { event: "done"; data: "DONE" };
 
 export interface BotInfo {
   /**

@@ -56,18 +56,12 @@ export class Coze {
     };
     const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
     const response = await this.makeRequest(apiUrl, "POST", payload);
-
     return response as ChatV2Resp;
   }
 
   public async chatV2Streaming(
     request: Omit<ChatV2Req, "stream">
-  ): Promise<
-    AsyncGenerator<
-      | { event: "message"; data: ChatV2StreamResp }
-      | { event: "done"; data: "DONE" }
-    >
-  > {
+  ): Promise<AsyncGenerator<ChatV2StreamResp>> {
     const { bot_id, query, chat_history, custom_variables } = request;
     const user = request.user ?? uuidv4();
     const conversation_id = request.conversation_id ?? uuidv4();
@@ -110,7 +104,7 @@ export class Coze {
 
     const response = await this.makeRequest(apiUrl, "POST", payload);
 
-    return response as ChatV3Resp;
+    return response.data as ChatV3Resp;
   }
 
   public async chatV3Streaming(
@@ -145,7 +139,7 @@ export class Coze {
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
     const apiUrl = `/v1/bot/get_online_info?bot_id=${bot_id}`;
     const response = await this.makeRequest(apiUrl, "GET");
-    return response as BotInfo;
+    return response.data as BotInfo;
   }
 
   public async listBots({
@@ -164,7 +158,7 @@ export class Coze {
   }> {
     const apiUrl = `/v1/space/published_bots_list?space_id=${space_id}&page_size=${page_size}&page_index=${page_index}`;
     const response = await this.makeRequest(apiUrl, "GET");
-    return { page_size, page_index, ...response };
+    return { page_size, page_index, ...response.data };
   }
 
   public async createConversation({
@@ -177,7 +171,7 @@ export class Coze {
     const apiUrl = `/v1/conversation/create`;
     const payload = this.formatConversationPayload(messages, meta_data);
     const response = await this.makeRequest(apiUrl, "POST", payload);
-    return response as Conversation;
+    return response.data as Conversation;
   }
 
   public async getConversation({
@@ -187,7 +181,7 @@ export class Coze {
   }): Promise<Conversation> {
     const apiUrl = `/v1/conversation/retrieve?conversation_id=${conversation_id}`;
     const response = await this.makeRequest(apiUrl, "GET");
-    return response as Conversation;
+    return response.data as Conversation;
   }
 
   public async createMessage({
@@ -211,7 +205,7 @@ export class Coze {
       meta_data,
     });
     const response = await this.makeRequest(apiUrl, "POST", payload);
-    return this.parseMessageContent(response);
+    return this.parseMessageContent(response.data);
   }
 
   public async listMessages({
@@ -251,7 +245,7 @@ export class Coze {
   }): Promise<ChatV3Message> {
     const apiUrl = `/v1/conversation/message/retrieve?conversation_id=${conversation_id}&message_id=${message_id}`;
     const response = await this.makeRequest(apiUrl, "GET");
-    return this.parseMessageContent(response);
+    return this.parseMessageContent(response.data);
   }
 
   public async updateMessage({
@@ -286,7 +280,7 @@ export class Coze {
   }): Promise<ChatV3Resp> {
     const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const response = await this.makeRequest(apiUrl, "GET");
-    return response as ChatV3Resp;
+    return response.data as ChatV3Resp;
   }
 
   public async getChatHistory({
@@ -298,15 +292,15 @@ export class Coze {
   }): Promise<ChatV3Message[]> {
     const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const response = await this.makeRequest(apiUrl, "POST", {});
-    return response || [];
+    return response.data || [];
   }
 
-  private async makeRequest(
+  private async makeRequest<T = any>(
     apiUrl: string,
     method: "GET" | "POST",
     body?: any,
     isStream: boolean = false
-  ): Promise<any> {
+  ): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
       authorization: `Bearer ${this.config.api_key}`,
@@ -323,12 +317,17 @@ export class Coze {
       return response;
     }
 
-    const { data, code, msg } = await response.json();
+    const { code, msg, ...payload } = await response.json();
     if (code !== 0) {
       const logId = response.headers.get("x-tt-logid");
       throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
     }
-    return data;
+
+    // data: {....}
+    // message: {....}
+    // data: [....], first_id: "....", last_id: "....", has_more: true
+    // ...
+    return payload;
   }
 
   private async handleStreamingResponse(
