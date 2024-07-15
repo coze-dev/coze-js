@@ -1,9 +1,9 @@
-export type Fetch = typeof fetch;
+import { fetch } from "undici";
 
 export interface Config {
   endpoint?: string;
   api_key: string;
-  fetch?: Fetch;
+  fetch?: typeof fetch;
 }
 
 export interface ChatV1Req {

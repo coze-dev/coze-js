@@ -1,13 +1,9 @@
-import "whatwg-fetch";
+import { fetch, Response } from "undici";
+import { ReadableStream } from "stream/web";
 import { v4 as uuidv4 } from "uuid";
 import { formatAddtionalMessages } from "./utils.js";
-import {
-  getBytes,
-  getLines,
-  getMessages,
-  EventSourceMessage,
-} from "./parse.js";
-import { Fetch, Config } from "./v1.js";
+import { getLines, getMessages, EventSourceMessage } from "./parse.js";
+import { Config } from "./v1.js";
 import {
   ChatV2Req,
   ChatV2Resp,
@@ -30,7 +26,7 @@ import {
 
 export class Coze {
   private readonly config: Config;
-  private readonly fetch: Fetch;
+  private readonly fetch: typeof fetch;
 
   constructor(config: Partial<Config>) {
     this.config = {
@@ -306,37 +302,54 @@ export class Coze {
       authorization: `Bearer ${this.config.api_key}`,
       "content-type": "application/json",
     };
-    const options: RequestInit = { method, headers };
+    const options: any = { method, headers };
     if (body) {
       options.body = JSON.stringify(body);
     }
 
-    const response = await this.fetch(fullUrl, options);
+    try {
+      const response = await this.fetch(fullUrl, options);
 
-    if (isStream) {
-      return response;
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, body: ${errorBody}`
+        );
+      }
+
+      if (isStream) {
+        return response;
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const { code, msg, ...payload } = (await response.json()) as any;
+        if (code !== 0) {
+          const logId = response.headers.get("x-tt-logid");
+          throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+        }
+
+        // data: {....}
+        // message: {....}
+        // data: [....], first_id: "....", last_id: "....", has_more: true
+        // ...
+        return payload as T;
+      } else {
+        return (await response.text()) as T;
+      }
+    } catch (error) {
+      throw error;
     }
-
-    const { code, msg, ...payload } = await response.json();
-    if (code !== 0) {
-      const logId = response.headers.get("x-tt-logid");
-      throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
-    }
-
-    // data: {....}
-    // message: {....}
-    // data: [....], first_id: "....", last_id: "....", has_more: true
-    // ...
-    return payload;
   }
 
-  private async handleStreamingResponse(
+  private async *handleStreamingResponse(
     response: Response
-  ): Promise<AsyncGenerator<any>> {
-    const messageQueue: any[] = [];
-    let resolveMessage: (() => void) | null = null;
+  ): AsyncGenerator<any, void, unknown> {
+    const messageQueue: { event: string | undefined; data: any }[] = [];
 
-    const onMessage = (msg: EventSourceMessage) => {
+    const parseMessageData = (
+      msg: EventSourceMessage
+    ): { event: string | undefined; data: any } => {
       // 兼容一下 v2 和 v3 的格式
       //
       // v2: https://www.coze.cn/docs/developer_guides/chat
@@ -352,54 +365,33 @@ export class Coze {
       // data: [DONE]
       let { data, event } = msg;
       if (event) {
-        // v3 格式
-        if (event === "done") {
-          data = "[DONE]";
-        } else {
-          data = JSON.parse(data);
-        }
+        data = event === "done" ? "[DONE]" : JSON.parse(data);
       } else {
-        // v2 格式
         const parsedData = JSON.parse(data);
         event = parsedData.event;
-        if (event === "done") {
-          data = "[DONE]";
-        } else {
+        data = event === "done" ? "[DONE]" : parsedData;
+        if (event !== "done") {
           delete parsedData.event;
-          data = parsedData;
         }
       }
-      messageQueue.push({ event, data });
-
-      if (resolveMessage) {
-        resolveMessage();
-        resolveMessage = null;
-      }
+      return { event, data };
     };
 
-    getBytes(
-      response.body!,
-      getLines(
-        getMessages(
-          () => {},
-          () => {},
-          onMessage
-        )
-      )
-    );
+    const onMessage = (msg: EventSourceMessage) => {
+      messageQueue.push(parseMessageData(msg));
+    };
 
-    return (async function* () {
-      while (true) {
-        if (messageQueue.length > 0) {
-          yield* messageQueue;
-          messageQueue.length = 0;
-        } else {
-          await new Promise<void>((resolve) => {
-            resolveMessage = resolve;
-          });
-        }
+    const noop = () => {};
+    const onLine = getMessages(noop, noop, onMessage);
+    const onChunk = getLines(onLine);
+    const body: ReadableStream<Uint8Array> = response.body!;
+
+    for await (const chunk of body) {
+      onChunk(chunk);
+      while (messageQueue.length > 0) {
+        yield messageQueue.shift()!;
       }
-    })();
+    }
   }
 
   private formatConversationPayload(

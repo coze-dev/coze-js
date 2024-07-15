@@ -1,5 +1,6 @@
 // COPYRIGHT is @microsoft/fetch-event-source
 // https://github.com/Azure/fetch-event-source/blob/main/src/parse.ts
+import { ReadableStream } from "stream/web";
 
 /**
  * Represents a message sent in an event stream
@@ -14,24 +15,6 @@ export interface EventSourceMessage {
   data: string;
   /** The reconnection interval (in milliseconds) to wait before retrying the connection */
   retry?: number;
-}
-
-/**
- * Converts a ReadableStream into a callback pattern.
- * @param stream The input ReadableStream.
- * @param onChunk A function that will be called on each new byte chunk in the stream.
- * @returns {Promise<void>} A promise that will be resolved when the stream closes.
- */
-export async function getBytes(
-  stream: ReadableStream<Uint8Array>,
-  onChunk: (arr: Uint8Array) => void
-) {
-  const reader = stream.getReader();
-  let result: ReadableStreamReadResult<Uint8Array>;
-  while (!(result = await reader.read()).done) {
-    onChunk(result.value);
-  }
-  reader.releaseLock();
 }
 
 const enum ControlChars {

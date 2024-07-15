@@ -12,15 +12,13 @@
     "moduleResolution": "node",
     "module": "ES2022",
     "outDir": "./dist",
-    "target": "ES6",
+    "target": "ES2022",
+    "types": ["node", "jest"],
   },
-
   "ts-node": {
     "swc": true,
     "esm": true,
   },
-
   "include": ["./src/**/*.ts"],
-
   "exclude": ["node_modules"],
 }

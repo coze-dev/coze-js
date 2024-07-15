@@ -55,6 +55,8 @@ async function streamingChat() {
       console.log(part.data);
     }
   }
+
+  console.log('=== End of Streaming Chat ===');
 }
 
 async function nonStreamingChat() {

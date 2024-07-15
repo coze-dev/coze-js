@@ -1,34 +1,6 @@
-import { getBytes, getLines, getMessages, concat } from "../src/parse";
+import { getLines, getMessages, concat } from "../src/parse";
 
 describe("EventSource Parsing Functions", () => {
-  describe("getBytes", () => {
-    it("should call onChunk for each chunk in the stream", async () => {
-      const mockStream = {
-        getReader: () => ({
-          read: jest
-            .fn()
-            .mockResolvedValueOnce({
-              value: new Uint8Array([1, 2, 3]),
-              done: false,
-            })
-            .mockResolvedValueOnce({
-              value: new Uint8Array([4, 5, 6]),
-              done: false,
-            })
-            .mockResolvedValueOnce({ done: true }),
-          releaseLock: jest.fn(),
-        }),
-      } as unknown as ReadableStream<Uint8Array>;
-
-      const onChunk = jest.fn();
-      await getBytes(mockStream, onChunk);
-
-      expect(onChunk).toHaveBeenCalledTimes(2);
-      expect(onChunk).toHaveBeenNthCalledWith(1, new Uint8Array([1, 2, 3]));
-      expect(onChunk).toHaveBeenNthCalledWith(2, new Uint8Array([4, 5, 6]));
-    });
-  });
-
   describe("getLines", () => {
     it("should parse chunks into lines", () => {
       const onLine = jest.fn();

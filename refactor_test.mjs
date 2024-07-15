@@ -3,7 +3,7 @@ import { Coze } from "./dist/index.js";
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
-const query = "Please read the following code carefully, understand them and then refactor them for better maintainability.\n"
+const query = "Please read the following code carefully, understand them and then refactor and optimize them for better maintainability.\n"
   + "Never change the code behavior, add necessary typings to the refactored code, reduce any type.\n\n"
   + "Keep the comments.\n\n"
   + "Only return the response don't give any explain.\n\n"
