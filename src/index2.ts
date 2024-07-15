@@ -98,14 +98,10 @@ export class Coze {
   }
 
   public async chatV3(request: Omit<ChatV3Req, "stream">): Promise<ChatV3Resp> {
-    const {
-      bot_id,
-      user_id,
-      custom_variables,
-      auto_save_history,
-      meta_data,
-      conversation_id,
-    } = request;
+    const user_id = request.user_id ?? uuidv4();
+    const additional_messages = request.additional_messages ?? [];
+    const auto_save_history = request.auto_save_history ?? true;
+    const { bot_id, custom_variables, meta_data, conversation_id } = request;
     const apiUrl = `/v3/chat${
       conversation_id ? `?conversation_id=${conversation_id}` : ""
     }`;
@@ -115,7 +111,7 @@ export class Coze {
       custom_variables,
       auto_save_history,
       meta_data,
-      additional_messages: formatAddtionalMessages(request.additional_messages),
+      additional_messages: formatAddtionalMessages(additional_messages),
       stream: false,
     };
 
@@ -131,14 +127,10 @@ export class Coze {
   public async chatV3Streaming(
     request: Omit<ChatV3Req, "stream">
   ): Promise<AsyncGenerator<ChatV3StreamResp>> {
-    const {
-      bot_id,
-      user_id,
-      custom_variables,
-      auto_save_history,
-      meta_data,
-      conversation_id,
-    } = request;
+    const user_id = request.user_id ?? uuidv4();
+    const additional_messages = request.additional_messages ?? [];
+    const auto_save_history = request.auto_save_history ?? true;
+    const { bot_id, custom_variables, meta_data, conversation_id } = request;
     const apiUrl = `/v3/chat${
       conversation_id ? `?conversation_id=${conversation_id}` : ""
     }`;
@@ -148,7 +140,7 @@ export class Coze {
       custom_variables,
       auto_save_history,
       meta_data,
-      additional_messages: formatAddtionalMessages(request.additional_messages),
+      additional_messages: formatAddtionalMessages(additional_messages),
       stream: true,
     };
 

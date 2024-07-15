@@ -17,7 +17,6 @@ async function streamingChat() {
 
   const coze = new Coze({ api_key: apiKey });
   const v = await coze.chatV3Streaming({
-    user_id: 'user-123456',
     bot_id: botId,
     additional_messages: [
       {
@@ -64,7 +63,6 @@ async function nonStreamingChat() {
 
   const coze = new Coze({ api_key: apiKey });
   const v = await coze.chatV3({
-    user_id: 'user-123456',
     bot_id: botId,
     additional_messages: [
       {
