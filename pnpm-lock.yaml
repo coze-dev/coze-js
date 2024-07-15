@@ -22,8 +22,8 @@ importers:
         specifier: ^29.2.2
         version: 29.5.11
       '@types/node':
-        specifier: ^18
-        version: 18.19.8
+        specifier: ^20
+        version: 20.14.10
       '@types/whatwg-fetch':
         specifier: ^0.0.33
         version: 0.0.33
@@ -38,16 +38,16 @@ importers:
         version: 8.56.0
       eslint-plugin-jest:
         specifier: ^27.1.4
-        version: 27.6.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(jest@29.7.0(@types/node@18.19.8))(typescript@4.9.5)
+        version: 27.6.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(jest@29.7.0(@types/node@20.14.10))(typescript@4.9.5)
       jest:
         specifier: ^29.3.0
-        version: 29.7.0(@types/node@18.19.8)
+        version: 29.7.0(@types/node@20.14.10)
       prettier:
         specifier: ^3.2.4
         version: 3.2.4
       ts-jest:
         specifier: ^29.0.3
-        version: 29.1.2(@babel/core@7.23.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.23.7))(jest@29.7.0(@types/node@18.19.8))(typescript@4.9.5)
+        version: 29.1.2(@babel/core@7.23.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.23.7))(jest@29.7.0(@types/node@20.14.10))(typescript@4.9.5)
       typescript:
         specifier: ^4.8.4
         version: 4.9.5
@@ -480,8 +480,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@18.19.8':
-    resolution: {integrity: sha512-g1pZtPhsvGVTwmeVoexWZLTQaOvXwoSq//pTL0DHeNzUDrFnir4fgETdhjhIxjVnN+hKOuh98+E1eMLnUXstFg==}
+  '@types/node@20.14.10':
+    resolution: {integrity: sha512-MdiXf+nDuMvY0gJKxyfZ7/6UFsETO7mGKF54MVD/ekJS6HdFtpZFBgrh6Pseu64XTb2MLyFPlbW6hj8HYRQNOQ==}
 
   '@types/semver@7.5.6':
     resolution: {integrity: sha512-dn1l8LaMea/IjDoHNd9J52uBbInB796CDffS6VdIxvqYCPSG0V0DzHp76GpaWnlhg88uYyPbXCDIowa86ybd5A==}
@@ -1961,7 +1961,7 @@ snapshots:
   '@jest/console@29.7.0':
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       jest-message-util: 29.7.0
       jest-util: 29.7.0
@@ -1974,14 +1974,14 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.9.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@18.19.8)
+      jest-config: 29.7.0(@types/node@20.14.10)
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
@@ -2006,7 +2006,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       jest-mock: 29.7.0
 
   '@jest/expect-utils@29.7.0':
@@ -2024,7 +2024,7 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -2046,7 +2046,7 @@ snapshots:
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
       '@jridgewell/trace-mapping': 0.3.22
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       collect-v8-coverage: 1.0.2
       exit: 0.1.2
@@ -2116,7 +2116,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       '@types/yargs': 17.0.32
       chalk: 4.1.2
 
@@ -2232,7 +2232,7 @@ snapshots:
 
   '@types/graceful-fs@4.1.9':
     dependencies:
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -2251,7 +2251,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@18.19.8':
+  '@types/node@20.14.10':
     dependencies:
       undici-types: 5.26.5
 
@@ -2534,13 +2534,13 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  create-jest@29.7.0(@types/node@18.19.8):
+  create-jest@29.7.0(@types/node@20.14.10):
     dependencies:
       '@jest/types': 29.6.3
       chalk: 4.1.2
       exit: 0.1.2
       graceful-fs: 4.2.11
-      jest-config: 29.7.0(@types/node@18.19.8)
+      jest-config: 29.7.0(@types/node@20.14.10)
       jest-util: 29.7.0
       prompts: 2.4.2
     transitivePeerDependencies:
@@ -2599,13 +2599,13 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-plugin-jest@27.6.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(jest@29.7.0(@types/node@18.19.8))(typescript@4.9.5):
+  eslint-plugin-jest@27.6.3(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(jest@29.7.0(@types/node@20.14.10))(typescript@4.9.5):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.56.0)(typescript@4.9.5)
       eslint: 8.56.0
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.56.0)(typescript@4.9.5))(eslint@8.56.0)(typescript@4.9.5)
-      jest: 29.7.0(@types/node@18.19.8)
+      jest: 29.7.0(@types/node@20.14.10)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -2918,7 +2918,7 @@ snapshots:
       '@jest/expect': 29.7.0
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       co: 4.6.0
       dedent: 1.5.1
@@ -2938,16 +2938,16 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@29.7.0(@types/node@18.19.8):
+  jest-cli@29.7.0(@types/node@20.14.10):
     dependencies:
       '@jest/core': 29.7.0
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
-      create-jest: 29.7.0(@types/node@18.19.8)
+      create-jest: 29.7.0(@types/node@20.14.10)
       exit: 0.1.2
       import-local: 3.1.0
-      jest-config: 29.7.0(@types/node@18.19.8)
+      jest-config: 29.7.0(@types/node@20.14.10)
       jest-util: 29.7.0
       jest-validate: 29.7.0
       yargs: 17.7.2
@@ -2957,7 +2957,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-config@29.7.0(@types/node@18.19.8):
+  jest-config@29.7.0(@types/node@20.14.10):
     dependencies:
       '@babel/core': 7.23.7
       '@jest/test-sequencer': 29.7.0
@@ -2982,7 +2982,7 @@ snapshots:
       slash: 3.0.0
       strip-json-comments: 3.1.1
     optionalDependencies:
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -3011,7 +3011,7 @@ snapshots:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -3021,7 +3021,7 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@types/graceful-fs': 4.1.9
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -3060,7 +3060,7 @@ snapshots:
   jest-mock@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       jest-util: 29.7.0
 
   jest-pnp-resolver@1.2.3(jest-resolve@29.7.0):
@@ -3095,7 +3095,7 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       emittery: 0.13.1
       graceful-fs: 4.2.11
@@ -3123,7 +3123,7 @@ snapshots:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       cjs-module-lexer: 1.2.3
       collect-v8-coverage: 1.0.2
@@ -3169,7 +3169,7 @@ snapshots:
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -3188,7 +3188,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -3197,17 +3197,17 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 18.19.8
+      '@types/node': 20.14.10
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@29.7.0(@types/node@18.19.8):
+  jest@29.7.0(@types/node@20.14.10):
     dependencies:
       '@jest/core': 29.7.0
       '@jest/types': 29.6.3
       import-local: 3.1.0
-      jest-cli: 29.7.0(@types/node@18.19.8)
+      jest-cli: 29.7.0(@types/node@20.14.10)
     transitivePeerDependencies:
       - '@types/node'
       - babel-plugin-macros
@@ -3529,11 +3529,11 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  ts-jest@29.1.2(@babel/core@7.23.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.23.7))(jest@29.7.0(@types/node@18.19.8))(typescript@4.9.5):
+  ts-jest@29.1.2(@babel/core@7.23.7)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.23.7))(jest@29.7.0(@types/node@20.14.10))(typescript@4.9.5):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
-      jest: 29.7.0(@types/node@18.19.8)
+      jest: 29.7.0(@types/node@20.14.10)
       jest-util: 29.7.0
       json5: 2.2.3
       lodash.memoize: 4.1.2

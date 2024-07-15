@@ -1,5 +1,7 @@
-import { fetch, Response } from "undici";
+import { fetch, FormData, File, Response } from "undici";
 import { ReadableStream } from "stream/web";
+import { readFile } from "node:fs/promises";
+import { basename } from "node:path";
 import { v4 as uuidv4 } from "uuid";
 import { getLines, getMessages, EventSourceMessage } from "./parse.js";
 import { formatAddtionalMessages } from "./utils.js";
@@ -22,6 +24,7 @@ import {
   ChatV3Req,
   ChatV3Resp,
   ChatV3StreamResp,
+  FileObject,
 } from "./v3.js";
 
 export class Coze {
@@ -318,6 +321,44 @@ export class Coze {
     return response.data || [];
   }
 
+  /**
+   * https://www.coze.cn/docs/developer_guides/upload_files
+   * @param filePath The file will be uploaded.
+   * @returns
+   */
+  public async uploadFile(filePath: string): Promise<FileObject> {
+    const fileBuffer = await readFile(filePath);
+    const file = new File([fileBuffer], basename(filePath));
+    const body = new FormData();
+    body.set("file", file, basename(filePath));
+
+    const apiUrl = `/v1/files/upload`;
+    const response = await this.makeRequest<{ data: FileObject }>(
+      apiUrl,
+      "POST",
+      body
+    );
+    return response.data;
+  }
+
+  /**
+   * https://www.coze.cn/docs/developer_guides/retrieve_files
+   * @param file_id The file id.
+   * @returns
+   */
+  public async readFileMeta({
+    file_id,
+  }: {
+    file_id: string;
+  }): Promise<FileObject> {
+    const apiUrl = `/v1/files/retrieve?file_id=${file_id}`;
+    const response = await this.makeRequest<{ data: FileObject }>(
+      apiUrl,
+      "GET"
+    );
+    return response.data;
+  }
+
   private async makeRequest(
     apiUrl: string,
     method: "GET" | "POST",
@@ -339,10 +380,13 @@ export class Coze {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
       authorization: `Bearer ${this.config.api_key}`,
-      "content-type": "application/json",
     };
     const options: any = { method, headers };
-    if (body) {
+    if (body instanceof FormData) {
+      // XXX: content-type: multipart/form-data; boundary=----formdata-undici-067154417494
+      options.body = body;
+    } else if (body) {
+      headers["content-type"] = "application/json";
       options.body = JSON.stringify(body);
     }
 

@@ -1,4 +1,10 @@
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Coze } from "./dist/index.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
@@ -67,6 +73,12 @@ console.log(a);
 
 const b = await coze.getBotInfo({ bot_id: botId });
 console.log(b);
+
+const f = await coze.uploadFile(join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'));
+console.log(f);
+
+const fm = await coze.readFileMeta({ file_id: f.id });
+console.log(fm);
 
 const v = await coze.chatV2Streaming({ query, bot_id: botId });
 

@@ -291,3 +291,25 @@ interface ToolCallType {
     argument: string;
   };
 }
+
+export interface FileObject {
+  /**
+   * 已上传的文件 ID。
+   */
+  id: string;
+
+  /**
+   * 文件的总字节数。
+   */
+  bytes: number;
+
+  /**
+   * 文件的上传时间，格式为 10 位的 Unixtime 时间戳，单位为秒（s）。
+   */
+  created_at: number;
+
+  /**
+   * 文件名称。
+   */
+  file_name: string;
+}
