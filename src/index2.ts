@@ -401,7 +401,7 @@ export class Coze {
   private async *handleStreamingResponse(
     response: Response
   ): AsyncGenerator<any, void, unknown> {
-    const messageQueue: { event: string | undefined; data: any }[] = [];
+    let latestMessage: { event: string | undefined; data: any } | null = null;
 
     const parseMessageData = (
       msg: EventSourceMessage
@@ -434,18 +434,18 @@ export class Coze {
     };
 
     const onMessage = (msg: EventSourceMessage) => {
-      messageQueue.push(parseMessageData(msg));
+      latestMessage = parseMessageData(msg);
     };
 
     const noop = () => {};
     const onLine = getMessages(noop, noop, onMessage);
     const onChunk = getLines(onLine);
     const body: ReadableStream<Uint8Array> = response.body!;
-
     for await (const chunk of body) {
       onChunk(chunk);
-      while (messageQueue.length) {
-        yield messageQueue.shift()!;
+      if (latestMessage) {
+        yield latestMessage;
+        latestMessage = null;
       }
     }
   }
