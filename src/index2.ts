@@ -452,7 +452,7 @@ export class Coze {
 
     for await (const chunk of body) {
       onChunk(chunk);
-      while (messageQueue.length > 0) {
+      while (messageQueue.length) {
         yield messageQueue.shift()!;
       }
     }
