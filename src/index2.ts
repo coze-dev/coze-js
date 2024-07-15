@@ -1,7 +1,6 @@
 import { fetch, Response } from "undici";
 import { ReadableStream } from "stream/web";
 import { v4 as uuidv4 } from "uuid";
-import { formatAddtionalMessages } from "./utils.js";
 import { getLines, getMessages, EventSourceMessage } from "./parse.js";
 import { Config } from "./v1.js";
 import {
@@ -23,6 +22,24 @@ import {
   ChatV3Resp,
   ChatV3StreamResp,
 } from "./v3.js";
+
+function formatAddtionalMessages(
+  additionalMessages: EnterMessage[] | undefined
+): EnterMessage[] {
+  if (!Array.isArray(additionalMessages)) {
+    return [];
+  }
+
+  return additionalMessages.map((item: EnterMessage): EnterMessage => {
+    if (item.content_type === "object_string" && Array.isArray(item.content)) {
+      return {
+        ...item,
+        content: JSON.stringify(item.content),
+      };
+    }
+    return item;
+  });
+}
 
 export class Coze {
   private readonly config: Config;
@@ -51,8 +68,12 @@ export class Coze {
       stream: false,
     };
     const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
-    const response = await this.makeRequest(apiUrl, "POST", payload);
-    return response as ChatV2Resp;
+    const response = await this.makeRequest<ChatV2Resp>(
+      apiUrl,
+      "POST",
+      payload
+    );
+    return response;
   }
 
   public async chatV2Streaming(
@@ -98,9 +119,13 @@ export class Coze {
       stream: false,
     };
 
-    const response = await this.makeRequest(apiUrl, "POST", payload);
+    const response = await this.makeRequest<{ data: ChatV3Resp }>(
+      apiUrl,
+      "POST",
+      payload
+    );
 
-    return response.data as ChatV3Resp;
+    return response.data;
   }
 
   public async chatV3Streaming(
@@ -134,8 +159,8 @@ export class Coze {
 
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
     const apiUrl = `/v1/bot/get_online_info?bot_id=${bot_id}`;
-    const response = await this.makeRequest(apiUrl, "GET");
-    return response.data as BotInfo;
+    const response = await this.makeRequest<{ data: BotInfo }>(apiUrl, "GET");
+    return response.data;
   }
 
   public async listBots({
@@ -153,7 +178,9 @@ export class Coze {
     total: number;
   }> {
     const apiUrl = `/v1/space/published_bots_list?space_id=${space_id}&page_size=${page_size}&page_index=${page_index}`;
-    const response = await this.makeRequest(apiUrl, "GET");
+    const response = await this.makeRequest<{
+      data: { total: number; space_bots: SimpleBot[] };
+    }>(apiUrl, "GET");
     return { page_size, page_index, ...response.data };
   }
 
@@ -166,8 +193,12 @@ export class Coze {
   } = {}): Promise<Conversation> {
     const apiUrl = `/v1/conversation/create`;
     const payload = this.formatConversationPayload(messages, meta_data);
-    const response = await this.makeRequest(apiUrl, "POST", payload);
-    return response.data as Conversation;
+    const response = await this.makeRequest<{ data: Conversation }>(
+      apiUrl,
+      "POST",
+      payload
+    );
+    return response.data;
   }
 
   public async getConversation({
@@ -176,8 +207,11 @@ export class Coze {
     conversation_id: string;
   }): Promise<Conversation> {
     const apiUrl = `/v1/conversation/retrieve?conversation_id=${conversation_id}`;
-    const response = await this.makeRequest(apiUrl, "GET");
-    return response.data as Conversation;
+    const response = await this.makeRequest<{ data: Conversation }>(
+      apiUrl,
+      "GET"
+    );
+    return response.data;
   }
 
   public async createMessage({
@@ -200,7 +234,11 @@ export class Coze {
       content_type,
       meta_data,
     });
-    const response = await this.makeRequest(apiUrl, "POST", payload);
+    const response = await this.makeRequest<{ data: ChatV3Message }>(
+      apiUrl,
+      "POST",
+      payload
+    );
     return this.parseMessageContent(response.data);
   }
 
@@ -240,7 +278,10 @@ export class Coze {
     message_id: string;
   }): Promise<ChatV3Message> {
     const apiUrl = `/v1/conversation/message/retrieve?conversation_id=${conversation_id}&message_id=${message_id}`;
-    const response = await this.makeRequest(apiUrl, "GET");
+    const response = await this.makeRequest<{ data: ChatV3Message }>(
+      apiUrl,
+      "GET"
+    );
     return this.parseMessageContent(response.data);
   }
 
@@ -263,7 +304,11 @@ export class Coze {
       content,
       content_type,
     });
-    const response = await this.makeRequest(apiUrl, "POST", payload);
+    const response = await this.makeRequest<{ message: ChatV3Message }>(
+      apiUrl,
+      "POST",
+      payload
+    );
     return this.parseMessageContent(response.message);
   }
 
@@ -275,8 +320,11 @@ export class Coze {
     chat_id: string;
   }): Promise<ChatV3Resp> {
     const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
-    const response = await this.makeRequest(apiUrl, "GET");
-    return response.data as ChatV3Resp;
+    const response = await this.makeRequest<{ data: ChatV3Resp }>(
+      apiUrl,
+      "GET"
+    );
+    return response.data;
   }
 
   public async getChatHistory({
@@ -287,10 +335,26 @@ export class Coze {
     chat_id: string;
   }): Promise<ChatV3Message[]> {
     const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
-    const response = await this.makeRequest(apiUrl, "POST", {});
+    const response = await this.makeRequest<{ data: ChatV3Message[] }>(
+      apiUrl,
+      "POST",
+      {}
+    );
     return response.data || [];
   }
 
+  private async makeRequest(
+    apiUrl: string,
+    method: "GET" | "POST",
+    body?: any,
+    isStream?: true
+  ): Promise<Response>;
+  private async makeRequest<T = any>(
+    apiUrl: string,
+    method: "GET" | "POST",
+    body?: any,
+    isStream?: false
+  ): Promise<T>;
   private async makeRequest<T = any>(
     apiUrl: string,
     method: "GET" | "POST",
@@ -432,7 +496,7 @@ export class Coze {
     return payload;
   }
 
-  private parseMessageContent(message: any): ChatV3Message {
+  private parseMessageContent(message: ChatV3Message): ChatV3Message {
     if (
       message.content_type === "object_string" &&
       typeof message.content === "string"
