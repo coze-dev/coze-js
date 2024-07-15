@@ -1,6 +1,5 @@
 // COPYRIGHT is @microsoft/fetch-event-source
 // https://github.com/Azure/fetch-event-source/blob/main/src/parse.ts
-import { ReadableStream } from "stream/web";
 
 /**
  * Represents a message sent in an event stream
