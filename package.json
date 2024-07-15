@@ -42,7 +42,6 @@
   },
   "dependencies": {
     "undici": "^6.19.2",
-    "uuid": "^9.0.1",
-    "whatwg-fetch": "^3.6.20"
+    "uuid": "^9.0.1"
   }
 }
