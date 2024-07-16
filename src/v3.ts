@@ -79,6 +79,26 @@ export interface ChatV3Req {
    * - 对于一问一答等不需要区分 conversation 的场合可不传该参数，系统会自动生成一个会话。
    */
   conversation_id?: string;
+
+  /**
+   * 通过快捷指令的方式调用 Plugin 或者 Workflow
+   */
+  tools?: {
+    /**
+     * 需要调用的 Plugin / Workflow ID
+     */
+    plugin_id: string;
+
+    /**
+     * 传递给 Plugin 或者 Workflow 的入参，通过 JSON.stringify 处理之后的内容
+     */
+    parameters: string;
+
+    /**
+     * 需要调用的 API 名称（对于 Workflow 而言，没有 api_name，可以忽略这个字段）
+     */
+    api_name: string;
+  }[];
 }
 export interface ChatV3Message {
   /**

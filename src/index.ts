@@ -85,9 +85,12 @@ export class Coze {
 
   public async chatV3(request: Omit<ChatV3Req, "stream">): Promise<ChatV3Resp> {
     const user_id = request.user_id ?? uuidv4();
-    const additional_messages = request.additional_messages ?? [];
+    const additional_messages = formatAddtionalMessages(
+      request.additional_messages ?? []
+    );
     const auto_save_history = request.auto_save_history ?? true;
-    const { bot_id, custom_variables, meta_data, conversation_id } = request;
+    const { bot_id, custom_variables, meta_data, conversation_id, tools } =
+      request;
     const apiUrl = `/v3/chat${
       conversation_id ? `?conversation_id=${conversation_id}` : ""
     }`;
@@ -97,9 +100,12 @@ export class Coze {
       custom_variables,
       auto_save_history,
       meta_data,
-      additional_messages: formatAddtionalMessages(additional_messages),
+      tools,
       stream: false,
     };
+    if (additional_messages.length) {
+      payload.additional_messages = additional_messages;
+    }
 
     const response = await this.makeRequest<{ data: ChatV3Resp }>(
       apiUrl,
@@ -114,9 +120,12 @@ export class Coze {
     request: Omit<ChatV3Req, "stream">
   ): Promise<AsyncGenerator<ChatV3StreamResp>> {
     const user_id = request.user_id ?? uuidv4();
-    const additional_messages = request.additional_messages ?? [];
+    const additional_messages = formatAddtionalMessages(
+      request.additional_messages ?? []
+    );
     const auto_save_history = request.auto_save_history ?? true;
-    const { bot_id, custom_variables, meta_data, conversation_id } = request;
+    const { bot_id, custom_variables, meta_data, conversation_id, tools } =
+      request;
     const apiUrl = `/v3/chat${
       conversation_id ? `?conversation_id=${conversation_id}` : ""
     }`;
@@ -126,9 +135,12 @@ export class Coze {
       custom_variables,
       auto_save_history,
       meta_data,
-      additional_messages: formatAddtionalMessages(additional_messages),
+      tools,
       stream: true,
     };
+    if (additional_messages.length) {
+      payload.additional_messages = additional_messages;
+    }
 
     const response = await this.makeRequest(apiUrl, "POST", payload, true);
 
@@ -408,6 +420,7 @@ export class Coze {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
       authorization: `Bearer ${this.config.api_key}`,
+      "agw-js-conv": "str",
     };
     const options: any = { method, headers };
     if (body instanceof FormData) {
@@ -420,6 +433,7 @@ export class Coze {
 
     try {
       const response = await this.fetch(fullUrl, options);
+      const contentType = response.headers.get("content-type");
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -429,10 +443,23 @@ export class Coze {
       }
 
       if (isStream) {
+        if (contentType && contentType.includes("application/json")) {
+          // 可能是出错了，因为 streaming 模式下，content-type 需要是 text/event-stream
+          // 有时候 API 返回的是
+          //   status_code: 200
+          //   content_type: application/json; charset=utf-8
+          //   body: {"code":4000,"msg":"Request parameter error"}
+          // 这种奇葩设计
+
+          const { code, msg } = (await response.json()) as any;
+          if (code !== 0) {
+            const logId = response.headers.get("x-tt-logid");
+            throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+          }
+        }
         return response;
       }
 
-      const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const { code, msg, ...payload } = (await response.json()) as any;
         if (code !== 0) {
