@@ -74,6 +74,9 @@ console.log(a);
 const b = await coze.getBotInfo({ bot_id: botId });
 console.log(b);
 
+const w = await coze.runWorkflow({ workflow_id: '7392068826772520978', parameters: { query } });
+console.log(w);
+
 const f = await coze.uploadFile(join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'));
 console.log(f);
 

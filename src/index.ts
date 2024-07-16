@@ -315,8 +315,7 @@ export class Coze {
     const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const response = await this.makeRequest<{ data: ChatV3Message[] }>(
       apiUrl,
-      "POST",
-      {}
+      "POST"
     );
     return response.data || [];
   }
@@ -357,6 +356,35 @@ export class Coze {
       "GET"
     );
     return response.data;
+  }
+
+  public async runWorkflow({
+    workflow_id,
+    parameters,
+    bot_id,
+    ext,
+  }: {
+    workflow_id: string;
+    bot_id?: string;
+    parameters?: Record<string, any>;
+    ext?: Record<string, string>;
+  }): Promise<{
+    cost: string;
+    token: number;
+    data: any;
+  }> {
+    const apiUrl = `/v1/workflow/run`;
+    const payload = { workflow_id, parameters, bot_id, ext };
+    const response = await this.makeRequest<{
+      data: string;
+      cost: string;
+      token: number;
+    }>(apiUrl, "POST", payload);
+    return {
+      cost: response.cost,
+      token: response.token,
+      data: JSON.parse(response.data),
+    };
   }
 
   private async makeRequest(
