@@ -1,16 +1,14 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Coze } from "./dist/index.js";
+import { Coze } from './dist/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
-const query = "北京新闻";
+const query = '北京新闻';
 
-const stream = true;
 const coze = new Coze({ api_key: apiKey });
 
 const c = await coze.createConversation({
@@ -18,22 +16,26 @@ const c = await coze.createConversation({
     {
       role: 'assistant',
       content_type: 'text',
-      content: "Hi, you are an assistant"
+      content: 'Hi, you are an assistant',
     },
     {
       role: 'user',
       content_type: 'object_string',
       content: [
         { type: 'text', text: '123' },
-        { type: 'image', file_url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png' }/*, { type: 'file', file_id: '{{file_id_1}}' }*/
-      ]
+        {
+          type: 'image',
+          file_url:
+            'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+        } /*, { type: 'file', file_id: '{{file_id_1}}' }*/,
+      ],
     },
   ],
   meta_data: {
     a: 'b',
     c: 'd',
     k: 'z',
-  }
+  },
 });
 console.log(c);
 const c2 = await coze.getConversation({ conversation_id: c.id });
@@ -44,12 +46,16 @@ const m = await coze.createMessage({
   role: 'user',
   content: [
     { type: 'text', text: '是的方式的是否' },
-    { type: 'image', file_url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png' }
+    {
+      type: 'image',
+      file_url:
+        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+    },
   ],
   meta_data: {
-    '想想': '111',
-    '🚗': 'eee'
-  }
+    想想: '111',
+    '🚗': 'eee',
+  },
 });
 console.log(m);
 const m2 = await coze.listMessages({ conversation_id: c2.id });
@@ -62,9 +68,9 @@ const m4 = await coze.updateMessage({
   content: '121212121',
   content_type: 'text',
   meta_data: {
-    'x': '1',
-    'b': '2'
-  }
+    x: '1',
+    b: '2',
+  },
 });
 console.log(m4);
 
@@ -74,10 +80,15 @@ console.log(a);
 const b = await coze.getBotInfo({ bot_id: botId });
 console.log(b);
 
-const w = await coze.runWorkflow({ workflow_id: '7392068826772520978', parameters: { query } });
+const w = await coze.runWorkflow({
+  workflow_id: '7392068826772520978',
+  parameters: { query },
+});
 console.log(w);
 
-const f = await coze.uploadFile(join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'));
+const f = await coze.uploadFile(
+  join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'),
+);
 console.log(f);
 
 const fm = await coze.readFileMeta({ file_id: f.id });
@@ -94,16 +105,16 @@ for await (const part of v) {
 
   const { message, is_finish } = part.data;
   if (
-    message.role === "assistant" &&
-    message.type === "answer" &&
-    message.content_type === "text"
+    message.role === 'assistant' &&
+    message.type === 'answer' &&
+    message.content_type === 'text'
   ) {
     process.stdout.write(message.content);
     if (is_finish) {
-      process.stdout.write("\n");
+      process.stdout.write('\n');
     }
   } else {
-    console.log("[%s]:[%s]:%s", message.role, message.type, message.content);
+    console.log('[%s]:[%s]:%s', message.role, message.type, message.content);
   }
 }
 
