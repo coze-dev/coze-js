@@ -69,11 +69,7 @@ async function nonStreamingChat() {
   while (true) {
     await sleep(100);
     const chat = await coze.getChat({ chat_id, conversation_id });
-    if (
-      chat.status === 'completed' ||
-      chat.status === 'failed' ||
-      chat.status === 'requires_action'
-    ) {
+    if (chat.status === 'completed' || chat.status === 'failed' || chat.status === 'requires_action') {
       console.log(chat.usage);
       break;
     }

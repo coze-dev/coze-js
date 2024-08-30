@@ -1,4 +1,4 @@
-import { fetch } from "undici";
+import { type fetch } from 'undici';
 
 export interface Config {
   endpoint?: string;
@@ -50,7 +50,7 @@ export interface ChatV1Req {
   /**
    * 自定义变量，key=变量名，value=变量值
    */
-  custom_variables?: Record<string, any>;
+  custom_variables?: Record<string, unknown>;
 }
 
 /**

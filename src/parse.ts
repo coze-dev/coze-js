@@ -29,9 +29,7 @@ const enum ControlChars {
  * @param onLine A function that will be called on each new EventSource line.
  * @returns A function that should be called for each incoming byte chunk.
  */
-export function getLines(
-  onLine: (line: Uint8Array, fieldLength: number) => void
-) {
+export function getLines(onLine: (line: Uint8Array, fieldLength: number) => void) {
   let buffer: Uint8Array | undefined;
   let position: number; // current read position
   let fieldLength: number; // length of the `field` portion of the line
@@ -69,12 +67,15 @@ export function getLines(
               fieldLength = position - lineStart;
             }
             break;
-          // @ts-ignore:7029 \r case below should fallthrough to \n:
-          case ControlChars.CarriageReturn:
+          case ControlChars.CarriageReturn: {
             discardTrailingNewline = true;
-          case ControlChars.NewLine:
             lineEnd = position;
             break;
+          }
+          case ControlChars.NewLine: {
+            lineEnd = position;
+            break;
+          }
         }
       }
 
@@ -108,11 +109,7 @@ export function getLines(
  * @param onMessage A function that will be called on each message.
  * @returns A function that should be called for each incoming line buffer.
  */
-export function getMessages(
-  onId: (id: string) => void,
-  onRetry: (retry: number) => void,
-  onMessage?: (msg: EventSourceMessage) => void
-) {
+export function getMessages(onId: (id: string) => void, onRetry: (retry: number) => void, onMessage?: (msg: EventSourceMessage) => void) {
   let message = newMessage();
   const decoder = new TextDecoder();
 
@@ -127,29 +124,32 @@ export function getMessages(
       // line is of format "<field>:<value>" or "<field>: <value>"
       // https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation
       const field = decoder.decode(line.subarray(0, fieldLength));
-      const valueOffset =
-        fieldLength + (line[fieldLength + 1] === ControlChars.Space ? 2 : 1);
+      const valueOffset = fieldLength + (line[fieldLength + 1] === ControlChars.Space ? 2 : 1);
       const value = decoder.decode(line.subarray(valueOffset));
 
       switch (field) {
-        case "data":
+        case 'data': {
           // if this message already has data, append the new value to the old.
           // otherwise, just set to the new value:
-          message.data = message.data ? message.data + "\n" + value : value; // otherwise,
+          message.data = message.data ? message.data + '\n' + value : value; // otherwise,
           break;
-        case "event":
+        }
+        case 'event': {
           message.event = value;
           break;
-        case "id":
+        }
+        case 'id': {
           onId((message.id = value));
           break;
-        case "retry":
+        }
+        case 'retry': {
           const retry = parseInt(value, 10);
           if (!isNaN(retry)) {
             // per spec, ignore non-integers
             onRetry((message.retry = retry));
           }
           break;
+        }
       }
     }
   };
@@ -168,9 +168,9 @@ function newMessage(): EventSourceMessage {
   // retry should be initialized to undefined so we return a consistent shape
   // to the js engine all the time: https://mathiasbynens.be/notes/shapes-ics#takeaways
   return {
-    data: "",
-    event: "",
-    id: "",
+    data: '',
+    event: '',
+    id: '',
     retry: undefined,
   };
 }

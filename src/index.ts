@@ -1,31 +1,25 @@
-import { fetch, FormData, File, Response } from "undici";
-import { ReadableStream } from "stream/web";
-import { readFile } from "node:fs/promises";
-import { basename } from "node:path";
-import { v4 as uuidv4 } from "uuid";
-import { getLines, getMessages, EventSourceMessage } from "./parse.js";
-import { formatAddtionalMessages } from "./utils.js";
-import { Config } from "./v1.js";
+import { fetch, FormData, File, type Response, type RequestInit } from 'undici';
+import { type ReadableStream } from 'stream/web';
+import { readFile } from 'node:fs/promises';
+import { basename } from 'node:path';
+import { v4 as uuidv4 } from 'uuid';
+import { getLines, getMessages, type EventSourceMessage } from './parse.js';
+import { formatAddtionalMessages } from './utils.js';
+import { type Config } from './v1.js';
 import {
-  ChatV2Req,
-  ChatV2Resp,
-  ChatV2StreamResp,
-  BotInfo,
-  SimpleBot,
-  EnterMessage,
-  MetaDataType,
-  Conversation,
-  RoleType,
-  ObjectStringItem,
-  ContentType,
-} from "./v2.js";
-import {
-  ChatV3Message,
-  ChatV3Req,
-  ChatV3Resp,
-  ChatV3StreamResp,
-  FileObject,
-} from "./v3.js";
+  type ChatV2Req,
+  type ChatV2Resp,
+  type ChatV2StreamResp,
+  type BotInfo,
+  type SimpleBot,
+  type EnterMessage,
+  type MetaDataType,
+  type Conversation,
+  type RoleType,
+  type ObjectStringItem,
+  type ContentType,
+} from './v2.js';
+import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
 
 export class Coze {
   private readonly config: Config;
@@ -33,14 +27,14 @@ export class Coze {
 
   constructor(config: Partial<Config>) {
     this.config = {
-      api_key: config?.api_key!,
-      endpoint: config?.endpoint ?? "https://api.coze.com",
+      api_key: config?.api_key as string,
+      endpoint: config?.endpoint ?? 'https://api.coze.com',
     };
 
     this.fetch = config?.fetch ?? fetch;
   }
 
-  public async chatV2(request: Omit<ChatV2Req, "stream">): Promise<ChatV2Resp> {
+  public async chatV2(request: Omit<ChatV2Req, 'stream'>): Promise<ChatV2Resp> {
     const { bot_id, query, chat_history, custom_variables } = request;
     const user = request.user ?? uuidv4();
     const conversation_id = request.conversation_id ?? uuidv4();
@@ -54,17 +48,11 @@ export class Coze {
       stream: false,
     };
     const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
-    const response = await this.makeRequest<ChatV2Resp>(
-      apiUrl,
-      "POST",
-      payload
-    );
+    const response = await this.makeRequest<ChatV2Resp>(apiUrl, 'POST', payload);
     return response;
   }
 
-  public async chatV2Streaming(
-    request: Omit<ChatV2Req, "stream">
-  ): Promise<AsyncGenerator<ChatV2StreamResp>> {
+  public async chatV2Streaming(request: Omit<ChatV2Req, 'stream'>): Promise<AsyncGenerator<ChatV2StreamResp>> {
     const { bot_id, query, chat_history, custom_variables } = request;
     const user = request.user ?? uuidv4();
     const conversation_id = request.conversation_id ?? uuidv4();
@@ -78,22 +66,17 @@ export class Coze {
       stream: true,
     };
     const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
-    const response = await this.makeRequest(apiUrl, "POST", payload, true);
+    const response = await this.makeRequest(apiUrl, 'POST', payload, true);
 
     return this.handleStreamingResponse(response);
   }
 
-  public async chatV3(request: Omit<ChatV3Req, "stream">): Promise<ChatV3Resp> {
+  public async chatV3(request: Omit<ChatV3Req, 'stream'>): Promise<ChatV3Resp> {
     const user_id = request.user_id ?? uuidv4();
-    const additional_messages = formatAddtionalMessages(
-      request.additional_messages ?? []
-    );
+    const additional_messages = formatAddtionalMessages(request.additional_messages ?? []);
     const auto_save_history = request.auto_save_history ?? true;
-    const { bot_id, custom_variables, meta_data, conversation_id, tools } =
-      request;
-    const apiUrl = `/v3/chat${
-      conversation_id ? `?conversation_id=${conversation_id}` : ""
-    }`;
+    const { bot_id, custom_variables, meta_data, conversation_id, tools } = request;
+    const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload: ChatV3Req = {
       bot_id,
       user_id,
@@ -107,28 +90,17 @@ export class Coze {
       payload.additional_messages = additional_messages;
     }
 
-    const response = await this.makeRequest<{ data: ChatV3Resp }>(
-      apiUrl,
-      "POST",
-      payload
-    );
+    const response = await this.makeRequest<{ data: ChatV3Resp }>(apiUrl, 'POST', payload);
 
     return response.data;
   }
 
-  public async chatV3Streaming(
-    request: Omit<ChatV3Req, "stream">
-  ): Promise<AsyncGenerator<ChatV3StreamResp>> {
+  public async chatV3Streaming(request: Omit<ChatV3Req, 'stream'>): Promise<AsyncGenerator<ChatV3StreamResp>> {
     const user_id = request.user_id ?? uuidv4();
-    const additional_messages = formatAddtionalMessages(
-      request.additional_messages ?? []
-    );
+    const additional_messages = formatAddtionalMessages(request.additional_messages ?? []);
     const auto_save_history = request.auto_save_history ?? true;
-    const { bot_id, custom_variables, meta_data, conversation_id, tools } =
-      request;
-    const apiUrl = `/v3/chat${
-      conversation_id ? `?conversation_id=${conversation_id}` : ""
-    }`;
+    const { bot_id, custom_variables, meta_data, conversation_id, tools } = request;
+    const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload: ChatV3Req = {
       bot_id,
       user_id,
@@ -142,26 +114,18 @@ export class Coze {
       payload.additional_messages = additional_messages;
     }
 
-    const response = await this.makeRequest(apiUrl, "POST", payload, true);
+    const response = await this.makeRequest(apiUrl, 'POST', payload, true);
 
     return this.handleStreamingResponse(response);
   }
 
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
     const apiUrl = `/v1/bot/get_online_info?bot_id=${bot_id}`;
-    const response = await this.makeRequest<{ data: BotInfo }>(apiUrl, "GET");
+    const response = await this.makeRequest<{ data: BotInfo }>(apiUrl, 'GET');
     return response.data;
   }
 
-  public async listBots({
-    space_id,
-    page_size = 20,
-    page_index = 1,
-  }: {
-    space_id: string;
-    page_size?: number;
-    page_index?: number;
-  }): Promise<{
+  public async listBots({ space_id, page_size = 20, page_index = 1 }: { space_id: string; page_size?: number; page_index?: number }): Promise<{
     space_bots: SimpleBot[];
     page_size: number;
     page_index: number;
@@ -170,7 +134,7 @@ export class Coze {
     const apiUrl = `/v1/space/published_bots_list?space_id=${space_id}&page_size=${page_size}&page_index=${page_index}`;
     const response = await this.makeRequest<{
       data: { total: number; space_bots: SimpleBot[] };
-    }>(apiUrl, "GET");
+    }>(apiUrl, 'GET');
     return { page_size, page_index, ...response.data };
   }
 
@@ -183,24 +147,13 @@ export class Coze {
   } = {}): Promise<Conversation> {
     const apiUrl = `/v1/conversation/create`;
     const payload = this.formatConversationPayload(messages, meta_data);
-    const response = await this.makeRequest<{ data: Conversation }>(
-      apiUrl,
-      "POST",
-      payload
-    );
+    const response = await this.makeRequest<{ data: Conversation }>(apiUrl, 'POST', payload);
     return response.data;
   }
 
-  public async getConversation({
-    conversation_id,
-  }: {
-    conversation_id: string;
-  }): Promise<Conversation> {
+  public async getConversation({ conversation_id }: { conversation_id: string }): Promise<Conversation> {
     const apiUrl = `/v1/conversation/retrieve?conversation_id=${conversation_id}`;
-    const response = await this.makeRequest<{ data: Conversation }>(
-      apiUrl,
-      "GET"
-    );
+    const response = await this.makeRequest<{ data: Conversation }>(apiUrl, 'GET');
     return response.data;
   }
 
@@ -224,24 +177,20 @@ export class Coze {
       content_type,
       meta_data,
     });
-    const response = await this.makeRequest<{ data: ChatV3Message }>(
-      apiUrl,
-      "POST",
-      payload
-    );
+    const response = await this.makeRequest<{ data: ChatV3Message }>(apiUrl, 'POST', payload);
     return this.parseMessageContent(response.data);
   }
 
   public async listMessages({
     conversation_id,
-    order = "desc",
+    order = 'desc',
     chat_id,
     before_id,
     after_id,
     limit = 50,
   }: {
     conversation_id: string;
-    order?: "desc" | "asc";
+    order?: 'desc' | 'asc';
     chat_id?: string;
     before_id?: string;
     after_id?: string;
@@ -256,22 +205,13 @@ export class Coze {
   }> {
     const apiUrl = `/v1/conversation/message/list?conversation_id=${conversation_id}`;
     const payload = { order, chat_id, before_id, after_id, limit };
-    const response = await this.makeRequest(apiUrl, "POST", payload);
+    const response = await this.makeRequest(apiUrl, 'POST', payload);
     return this.parseMessageListResponse(response);
   }
 
-  public async readMessage({
-    message_id,
-    conversation_id,
-  }: {
-    conversation_id: string;
-    message_id: string;
-  }): Promise<ChatV3Message> {
+  public async readMessage({ message_id, conversation_id }: { conversation_id: string; message_id: string }): Promise<ChatV3Message> {
     const apiUrl = `/v1/conversation/message/retrieve?conversation_id=${conversation_id}&message_id=${message_id}`;
-    const response = await this.makeRequest<{ data: ChatV3Message }>(
-      apiUrl,
-      "GET"
-    );
+    const response = await this.makeRequest<{ data: ChatV3Message }>(apiUrl, 'GET');
     return this.parseMessageContent(response.data);
   }
 
@@ -294,41 +234,19 @@ export class Coze {
       content,
       content_type,
     });
-    const response = await this.makeRequest<{ message: ChatV3Message }>(
-      apiUrl,
-      "POST",
-      payload
-    );
+    const response = await this.makeRequest<{ message: ChatV3Message }>(apiUrl, 'POST', payload);
     return this.parseMessageContent(response.message);
   }
 
-  public async getChat({
-    conversation_id,
-    chat_id,
-  }: {
-    conversation_id: string;
-    chat_id: string;
-  }): Promise<ChatV3Resp> {
+  public async getChat({ conversation_id, chat_id }: { conversation_id: string; chat_id: string }): Promise<ChatV3Resp> {
     const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
-    const response = await this.makeRequest<{ data: ChatV3Resp }>(
-      apiUrl,
-      "GET"
-    );
+    const response = await this.makeRequest<{ data: ChatV3Resp }>(apiUrl, 'GET');
     return response.data;
   }
 
-  public async getChatHistory({
-    conversation_id,
-    chat_id,
-  }: {
-    conversation_id: string;
-    chat_id: string;
-  }): Promise<ChatV3Message[]> {
+  public async getChatHistory({ conversation_id, chat_id }: { conversation_id: string; chat_id: string }): Promise<ChatV3Message[]> {
     const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
-    const response = await this.makeRequest<{ data: ChatV3Message[] }>(
-      apiUrl,
-      "POST"
-    );
+    const response = await this.makeRequest<{ data: ChatV3Message[] }>(apiUrl, 'POST');
     return response.data || [];
   }
 
@@ -341,14 +259,10 @@ export class Coze {
     const fileBuffer = await readFile(filePath);
     const file = new File([fileBuffer], basename(filePath));
     const body = new FormData();
-    body.set("file", file, basename(filePath));
+    body.set('file', file, basename(filePath));
 
     const apiUrl = `/v1/files/upload`;
-    const response = await this.makeRequest<{ data: FileObject }>(
-      apiUrl,
-      "POST",
-      body
-    );
+    const response = await this.makeRequest<{ data: FileObject }>(apiUrl, 'POST', body);
     return response.data;
   }
 
@@ -357,16 +271,9 @@ export class Coze {
    * @param file_id The file id.
    * @returns
    */
-  public async readFileMeta({
-    file_id,
-  }: {
-    file_id: string;
-  }): Promise<FileObject> {
+  public async readFileMeta({ file_id }: { file_id: string }): Promise<FileObject> {
     const apiUrl = `/v1/files/retrieve?file_id=${file_id}`;
-    const response = await this.makeRequest<{ data: FileObject }>(
-      apiUrl,
-      "GET"
-    );
+    const response = await this.makeRequest<{ data: FileObject }>(apiUrl, 'GET');
     return response.data;
   }
 
@@ -378,12 +285,12 @@ export class Coze {
   }: {
     workflow_id: string;
     bot_id?: string;
-    parameters?: Record<string, any>;
+    parameters?: Record<string, unknown>;
     ext?: Record<string, string>;
   }): Promise<{
     cost: string;
     token: number;
-    data: any;
+    data: unknown;
   }> {
     const apiUrl = `/v1/workflow/run`;
     const payload = { workflow_id, parameters, bot_id, ext };
@@ -391,7 +298,7 @@ export class Coze {
       data: string;
       cost: string;
       token: number;
-    }>(apiUrl, "POST", payload);
+    }>(apiUrl, 'POST', payload);
     return {
       cost: response.cost,
       token: response.token,
@@ -399,95 +306,70 @@ export class Coze {
     };
   }
 
-  private async makeRequest(
-    apiUrl: string,
-    method: "GET" | "POST",
-    body?: any,
-    isStream?: true
-  ): Promise<Response>;
-  private async makeRequest<T = any>(
-    apiUrl: string,
-    method: "GET" | "POST",
-    body?: any,
-    isStream?: false
-  ): Promise<T>;
-  private async makeRequest<T = any>(
-    apiUrl: string,
-    method: "GET" | "POST",
-    body?: any,
-    isStream: boolean = false
-  ): Promise<T | Response> {
+  private async makeRequest(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: true): Promise<Response>;
+  private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: false): Promise<T>;
+  private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream: boolean = false): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
       authorization: `Bearer ${this.config.api_key}`,
-      "agw-js-conv": "str",
+      'agw-js-conv': 'str',
     };
-    const options: any = { method, headers };
+    const options: RequestInit = { method, headers };
     if (body instanceof FormData) {
       // XXX: content-type: multipart/form-data; boundary=----formdata-undici-067154417494
       options.body = body;
     } else if (body) {
-      headers["content-type"] = "application/json";
+      headers['content-type'] = 'application/json';
       options.body = JSON.stringify(body);
     }
 
-    try {
-      const response = await this.fetch(fullUrl, options);
-      const contentType = response.headers.get("content-type");
+    const response = await this.fetch(fullUrl, options);
+    const contentType = response.headers.get('content-type');
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(
-          `HTTP error! status: ${response.status}, body: ${errorBody}`
-        );
-      }
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+    }
 
-      if (isStream) {
-        if (contentType && contentType.includes("application/json")) {
-          // 可能是出错了，因为 streaming 模式下，content-type 需要是 text/event-stream
-          // 有时候 API 返回的是
-          //   status_code: 200
-          //   content_type: application/json; charset=utf-8
-          //   body: {"code":4000,"msg":"Request parameter error"}
-          // 这种奇葩设计
+    if (isStream) {
+      if (contentType && contentType.includes('application/json')) {
+        // 可能是出错了，因为 streaming 模式下，content-type 需要是 text/event-stream
+        // 有时候 API 返回的是
+        //   status_code: 200
+        //   content_type: application/json; charset=utf-8
+        //   body: {"code":4000,"msg":"Request parameter error"}
+        // 这种奇葩设计
 
-          const { code, msg } = (await response.json()) as any;
-          if (code !== 0) {
-            const logId = response.headers.get("x-tt-logid");
-            throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
-          }
-        }
-        return response;
-      }
-
-      if (contentType && contentType.includes("application/json")) {
-        const { code, msg, ...payload } = (await response.json()) as any;
+        const { code, msg } = (await response.json()) as { code: number; msg: string };
         if (code !== 0) {
-          const logId = response.headers.get("x-tt-logid");
+          const logId = response.headers.get('x-tt-logid');
           throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
         }
-
-        // data: {....}
-        // message: {....}
-        // data: [....], first_id: "....", last_id: "....", has_more: true
-        // ...
-        return payload as T;
-      } else {
-        return (await response.text()) as T;
       }
-    } catch (error) {
-      throw error;
+      return response;
+    }
+
+    if (contentType && contentType.includes('application/json')) {
+      const { code, msg, ...payload } = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
+      if (code !== 0) {
+        const logId = response.headers.get('x-tt-logid');
+        throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+      }
+
+      // data: {....}
+      // message: {....}
+      // data: [....], first_id: "....", last_id: "....", has_more: true
+      // ...
+      return payload as T;
+    } else {
+      return (await response.text()) as T;
     }
   }
 
-  private async *handleStreamingResponse(
-    response: Response
-  ): AsyncGenerator<any, void, unknown> {
-    let latestMessage: { event: string | undefined; data: any } | null = null;
+  private async *handleStreamingResponse(response: Response): AsyncGenerator<unknown, void, unknown> {
+    let latestMessage: { event: string | undefined; data: unknown } | null = null;
 
-    const parseMessageData = (
-      msg: EventSourceMessage
-    ): { event: string | undefined; data: any } => {
+    const parseMessageData = (msg: EventSourceMessage): { event: string | undefined; data: unknown } => {
       // 兼容一下 v2 和 v3 的格式
       //
       // v2: https://www.coze.cn/docs/developer_guides/chat
@@ -503,12 +385,12 @@ export class Coze {
       // data: [DONE]
       let { data, event } = msg;
       if (event) {
-        data = event === "done" ? "[DONE]" : JSON.parse(data);
+        data = event === 'done' ? '[DONE]' : JSON.parse(data);
       } else {
         const parsedData = JSON.parse(data);
         event = parsedData.event;
-        data = event === "done" ? "[DONE]" : parsedData;
-        if (event !== "done") {
+        data = event === 'done' ? '[DONE]' : parsedData;
+        if (event !== 'done') {
           delete parsedData.event;
         }
       }
@@ -532,18 +414,12 @@ export class Coze {
     }
   }
 
-  private formatConversationPayload(
-    messages?: EnterMessage[],
-    meta_data?: MetaDataType
-  ): any {
-    const payload: any = {};
+  private formatConversationPayload(messages?: EnterMessage[], meta_data?: MetaDataType): Record<string, unknown> {
+    const payload: Record<string, unknown> = {};
     if (messages) {
-      payload.messages = messages.map((v) => ({
+      payload.messages = messages.map(v => ({
         ...v,
-        content:
-          v.content_type === "object_string" && Array.isArray(v.content)
-            ? JSON.stringify(v.content)
-            : v.content,
+        content: v.content_type === 'object_string' && Array.isArray(v.content) ? JSON.stringify(v.content) : v.content,
       }));
     }
     if (meta_data) {
@@ -562,25 +438,22 @@ export class Coze {
     content?: string | ObjectStringItem[];
     content_type?: ContentType;
     meta_data?: MetaDataType;
-  }): any {
-    const payload: any = { role, content, content_type, meta_data };
-    if (content_type === "object_string" && Array.isArray(content)) {
+  }): Record<string, unknown> {
+    const payload = { role, content, content_type, meta_data };
+    if (content_type === 'object_string' && Array.isArray(content)) {
       payload.content = JSON.stringify(content);
     }
     return payload;
   }
 
   private parseMessageContent(message: ChatV3Message): ChatV3Message {
-    if (
-      message.content_type === "object_string" &&
-      typeof message.content === "string"
-    ) {
+    if (message.content_type === 'object_string' && typeof message.content === 'string') {
       message.content = JSON.parse(message.content);
     }
     return message;
   }
 
-  private parseMessageListResponse(response: any): {
+  private parseMessageListResponse(response: Record<string, unknown>): {
     data: ChatV3Message[];
     pagination: {
       first_id: string;
@@ -591,10 +464,7 @@ export class Coze {
     const { data, first_id, last_id, has_more } = response;
     if (Array.isArray(data)) {
       data.forEach((item: ChatV3Message) => {
-        if (
-          item.content_type === "object_string" &&
-          typeof item.content === "string"
-        ) {
+        if (item.content_type === 'object_string' && typeof item.content === 'string') {
           item.content = JSON.parse(item.content);
         }
       });
