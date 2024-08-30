@@ -21,6 +21,8 @@ import {
 } from './v2.js';
 import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
 
+type ConversationResponse = { data: ChatV3Message[]; first_id: string; last_id: string; has_more: boolean };
+
 export class Coze {
   private readonly config: Config;
   private readonly fetch: typeof fetch;
@@ -68,7 +70,7 @@ export class Coze {
     const apiUrl = `/open_api/v2/chat?conversation_id=${conversation_id}`;
     const response = await this.makeRequest(apiUrl, 'POST', payload, true);
 
-    return this.handleStreamingResponse(response);
+    return this.handleStreamingResponse<ChatV2StreamResp>(response);
   }
 
   public async chatV3(request: Omit<ChatV3Req, 'stream'>): Promise<ChatV3Resp> {
@@ -205,7 +207,7 @@ export class Coze {
   }> {
     const apiUrl = `/v1/conversation/message/list?conversation_id=${conversation_id}`;
     const payload = { order, chat_id, before_id, after_id, limit };
-    const response = await this.makeRequest(apiUrl, 'POST', payload);
+    const response = await this.makeRequest<ConversationResponse>(apiUrl, 'POST', payload);
     return this.parseMessageListResponse(response);
   }
 
@@ -366,7 +368,7 @@ export class Coze {
     }
   }
 
-  private async *handleStreamingResponse(response: Response): AsyncGenerator<unknown, void, unknown> {
+  private async *handleStreamingResponse<T>(response: Response): AsyncGenerator<T, void, unknown> {
     let latestMessage: { event: string | undefined; data: unknown } | null = null;
 
     const parseMessageData = (msg: EventSourceMessage): { event: string | undefined; data: unknown } => {
@@ -453,7 +455,7 @@ export class Coze {
     return message;
   }
 
-  private parseMessageListResponse(response: Record<string, unknown>): {
+  private parseMessageListResponse(response: ConversationResponse): {
     data: ChatV3Message[];
     pagination: {
       first_id: string;
