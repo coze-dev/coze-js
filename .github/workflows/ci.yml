@@ -36,8 +36,8 @@ jobs:
           npm install -g pnpm@9.7.0
           pnpm install --frozen-lockfile
 
-      # - name: Lint
-      #   run: npm run lint
+      - name: Lint
+        run: npm run lint
 
       - name: Build
         run: npm run build

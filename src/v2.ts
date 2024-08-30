@@ -1,4 +1,4 @@
-import type { ChatV1Message } from "./v1.js";
+import type { ChatV1Message } from './v1.js';
 
 export type ChatV2Message = ChatV1Message;
 
@@ -16,7 +16,7 @@ export type MetaDataType = Record<string, string>;
  */
 export type BotModeType = 0 | 1;
 
-export type RoleType = "user" | "assistant";
+export type RoleType = 'user' | 'assistant';
 
 /**
  * 对于 `text` 类型，`content` 除了是普通的文本之外，也可能也是一个 JSON 的字符串。
@@ -46,23 +46,16 @@ export type RoleType = "user" | "assistant";
  * }
  * ```
  */
-export type ContentType = "text" | "object_string" | "card";
+export type ContentType = 'text' | 'object_string' | 'card';
 
-export type MessageType =
-  | "query"
-  | "answer"
-  | "function_call"
-  | "tool_output"
-  | "tool_response"
-  | "follow_up"
-  | "verbose";
+export type MessageType = 'query' | 'answer' | 'function_call' | 'tool_output' | 'tool_response' | 'follow_up' | 'verbose';
 
 export type ObjectStringItem =
-  | { type: "text"; text: string }
-  | { type: "file"; file_id: string }
-  | { type: "file"; file_url: string }
-  | { type: "image"; file_id: string }
-  | { type: "image"; file_url: string };
+  | { type: 'text'; text: string }
+  | { type: 'file'; file_id: string }
+  | { type: 'file'; file_url: string }
+  | { type: 'image'; file_id: string }
+  | { type: 'image'; file_url: string };
 
 export interface ChatV2Req {
   /**
@@ -98,7 +91,7 @@ export interface ChatV2Req {
   /**
    * Bot Prompt 配置了jinja语法的参数，通过这个字段传入
    */
-  custom_variables?: Record<string, any>;
+  custom_variables?: Record<string, unknown>;
 }
 
 export interface ChatV2Resp {
@@ -115,7 +108,7 @@ export interface ChatV2Resp {
 
 export type ChatV2StreamResp =
   | {
-      event: "message";
+      event: 'message';
       data: {
         /**
          * 增量返回的消息内容
@@ -142,7 +135,7 @@ export type ChatV2StreamResp =
         seq_id: number;
       };
     }
-  | { event: "done"; data: "DONE" };
+  | { event: 'done'; data: 'DONE' };
 
 export interface BotInfo {
   /**

@@ -1,8 +1,8 @@
-import { getLines, getMessages, concat } from "../src/parse";
+import { getLines, getMessages, concat } from '../src/parse';
 
-describe("EventSource Parsing Functions", () => {
-  describe("getLines", () => {
-    it("should parse chunks into lines", () => {
+describe('EventSource Parsing Functions', () => {
+  describe('getLines', () => {
+    it('should parse chunks into lines', () => {
       const onLine = jest.fn();
       const processChunk = getLines(onLine);
 
@@ -10,42 +10,34 @@ describe("EventSource Parsing Functions", () => {
       processChunk(new Uint8Array([69, 70, 58, 71, 72, 10])); // "EF:GH\n"
 
       expect(onLine).toHaveBeenCalledTimes(2);
-      expect(onLine).toHaveBeenNthCalledWith(
-        1,
-        new Uint8Array([65, 66, 58, 67, 68]),
-        2
-      );
-      expect(onLine).toHaveBeenNthCalledWith(
-        2,
-        new Uint8Array([69, 70, 58, 71, 72]),
-        2
-      );
+      expect(onLine).toHaveBeenNthCalledWith(1, new Uint8Array([65, 66, 58, 67, 68]), 2);
+      expect(onLine).toHaveBeenNthCalledWith(2, new Uint8Array([69, 70, 58, 71, 72]), 2);
     });
   });
 
-  describe("getMessages", () => {
-    it("should parse lines into EventSourceMessages", () => {
+  describe('getMessages', () => {
+    it('should parse lines into EventSourceMessages', () => {
       const onId = jest.fn();
       const onRetry = jest.fn();
       const onMessage = jest.fn();
       const processLine = getMessages(onId, onRetry, onMessage);
 
-      processLine(new TextEncoder().encode("event: update"), 5);
+      processLine(new TextEncoder().encode('event: update'), 5);
       processLine(new TextEncoder().encode('data: {"foo":"bar"}'), 4);
-      processLine(new TextEncoder().encode("id: 1"), 2);
+      processLine(new TextEncoder().encode('id: 1'), 2);
       processLine(new Uint8Array(0), 0);
 
       expect(onMessage).toHaveBeenCalledWith({
-        event: "update",
+        event: 'update',
         data: '{"foo":"bar"}',
-        id: "1",
+        id: '1',
         retry: undefined,
       });
     });
   });
 
-  describe("concat", () => {
-    it("should concatenate two Uint8Arrays", () => {
+  describe('concat', () => {
+    it('should concatenate two Uint8Arrays', () => {
       const a = new Uint8Array([1, 2, 3]);
       const b = new Uint8Array([4, 5, 6]);
       const result = concat(a, b);

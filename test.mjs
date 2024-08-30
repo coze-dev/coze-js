@@ -25,8 +25,7 @@ const c = await coze.createConversation({
         { type: 'text', text: '123' },
         {
           type: 'image',
-          file_url:
-            'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+          file_url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
         } /*, { type: 'file', file_id: '{{file_id_1}}' }*/,
       ],
     },
@@ -48,8 +47,7 @@ const m = await coze.createMessage({
     { type: 'text', text: '是的方式的是否' },
     {
       type: 'image',
-      file_url:
-        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
+      file_url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
     },
   ],
   meta_data: {
@@ -86,9 +84,7 @@ const w = await coze.runWorkflow({
 });
 console.log(w);
 
-const f = await coze.uploadFile(
-  join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'),
-);
+const f = await coze.uploadFile(join(__dirname, 'LCA_Disclosure_Data_FY2023_Q4.xlsx'));
 console.log(f);
 
 const fm = await coze.readFileMeta({ file_id: f.id });
@@ -104,11 +100,7 @@ for await (const part of v) {
   }
 
   const { message, is_finish } = part.data;
-  if (
-    message.role === 'assistant' &&
-    message.type === 'answer' &&
-    message.content_type === 'text'
-  ) {
+  if (message.role === 'assistant' && message.type === 'answer' && message.content_type === 'text') {
     process.stdout.write(message.content);
     if (is_finish) {
       process.stdout.write('\n');

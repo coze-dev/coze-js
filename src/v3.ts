@@ -1,21 +1,14 @@
-import type {
-  MetaDataType,
-  MessageType,
-  RoleType,
-  ObjectStringItem,
-  ContentType,
-  EnterMessage,
-} from "./v2.js";
+import type { MetaDataType, MessageType, RoleType, ObjectStringItem, ContentType, EnterMessage } from './v2.js';
 
 export type ChatV3StreamingEventType =
-  | "conversation.chat.created"
-  | "conversation.chat.in_progress"
-  | "conversation.message.delta"
-  | "conversation.message.completed"
-  | "conversation.chat.completed"
-  | "conversation.chat.failed"
-  | "conversation.chat.requires_action"
-  | "done";
+  | 'conversation.chat.created'
+  | 'conversation.chat.in_progress'
+  | 'conversation.message.delta'
+  | 'conversation.message.completed'
+  | 'conversation.chat.completed'
+  | 'conversation.chat.failed'
+  | 'conversation.chat.requires_action'
+  | 'done';
 
 export interface ChatV3Req {
   /**
@@ -167,18 +160,18 @@ export interface ChatV3Message {
 export type ChatV3StreamResp =
   | {
       event:
-        | "conversation.chat.created"
-        | "conversation.chat.in_progress"
-        | "conversation.chat.completed"
-        | "conversation.chat.failed"
-        | "conversation.chat.requires_action";
+        | 'conversation.chat.created'
+        | 'conversation.chat.in_progress'
+        | 'conversation.chat.completed'
+        | 'conversation.chat.failed'
+        | 'conversation.chat.requires_action';
       data: ChatV3Resp;
     }
   | {
-      event: "conversation.message.delta" | "conversation.message.completed";
+      event: 'conversation.message.delta' | 'conversation.message.completed';
       data: ChatV3Message;
     }
-  | { event: "done"; data: "[DONE]" };
+  | { event: 'done'; data: '[DONE]' };
 
 export interface ChatV3Resp {
   /**
@@ -199,12 +192,7 @@ export interface ChatV3Resp {
   /**
    * 会话的运行状态。取值为：
    */
-  status:
-    | "created"
-    | "in_progress"
-    | "completed"
-    | "failed"
-    | "requires_action";
+  status: 'created' | 'in_progress' | 'completed' | 'failed' | 'requires_action';
 
   /**
    * 对话创建的时间。格式为 10 位的 Unixtime 时间戳，单位为秒。
