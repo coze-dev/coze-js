@@ -1,4 +1,4 @@
-import { Coze } from '../src/index';
+import { Coze } from '../src/api';
 import { fetch } from 'undici';
 
 jest.mock('undici');

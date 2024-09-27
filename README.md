@@ -3,7 +3,7 @@
 ## chat (stream mode)
 
 ```js
-import { Coze } from "@coze/coze-js";
+import { CozeAPI } from "@coze/api";
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
@@ -12,8 +12,11 @@ const query = '北京新闻';
 async function streamingChat() {
   console.log('=== Streaming Chat ===');
 
-  const coze = new Coze({ api_key: apiKey });
-  const v = await coze.chatV3Streaming({
+  const client = new CozeAPI({
+    auth: new CozeAPI.TokenAuth(apiKey),
+  });
+
+  const v = await client.chat.stream({
     bot_id: botId,
     auto_save_history: false,
     additional_messages: [
@@ -52,7 +55,7 @@ async function streamingChat() {
 
 ```js
 import { clearLine, cursorTo } from 'node:readline';
-import { Coze } from "@coze/coze-js";
+import { CozeAPI } from "@coze/api";
 
 const apiKey = process.env.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID;
@@ -67,8 +70,11 @@ async function sleep(ms) {
 async function nonStreamingChat() {
   console.log('=== Non-Streaming Chat ===');
 
-  const coze = new Coze({ api_key: apiKey });
-  const v = await coze.chatV3({
+  const client = new CozeAPI({
+    auth: new CozeAPI.TokenAuth(apiKey),
+  });
+
+  const v = await client.chat.create({
     bot_id: botId,
     additional_messages: [
       {
@@ -83,16 +89,12 @@ async function nonStreamingChat() {
   const conversation_id = v.conversation_id;
   while (true) {
     await sleep(100);
-    const chat = await coze.getChat({ chat_id, conversation_id });
-    if (
-      chat.status === 'completed' ||
-      chat.status === 'failed' ||
-      chat.status === 'requires_action'
-    ) {
+    const chat = await client.chat.getChat({ chat_id, conversation_id });
+    if (chat.status === 'completed' || chat.status === 'failed' || chat.status === 'requires_action') {
       console.log(chat.usage);
       break;
     }
-    const messageList = await coze.getChatHistory({ chat_id, conversation_id });
+    const messageList = await client.chat.history({ chat_id, conversation_id });
     if (messageList.length <= 0) {
       process.stdout.write('.');
     } else {
@@ -100,7 +102,6 @@ async function nonStreamingChat() {
       cursorTo(process.stdout, 0);
       process.stdout.write('');
       for (const item of messageList) {
-        // console.log(item);
         console.log('[%s]:[%s]:%s', item.role, item.type, item.content);
       }
     }
