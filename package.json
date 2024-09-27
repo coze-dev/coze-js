@@ -1,6 +1,6 @@
 {
-  "name": "@coze/coze-js",
-  "version": "0.2.0",
+  "name": "@coze/api",
+  "version": "0.1.0",
   "description": "Coze Javascript library",
   "homepage": "https://github.com/coze-dev/coze-js",
   "repository": {
