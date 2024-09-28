@@ -1,0 +1,34 @@
+
+
+.header {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input {
+    width: 500px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+  button {
+    margin-left: 10px;
+    width: 100px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+}
+.content {
+  /** 实现内容垂直居中 **/
+  width: 612px;
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid black;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  white-space: pre-wrap;
+
+}

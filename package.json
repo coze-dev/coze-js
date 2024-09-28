@@ -9,23 +9,24 @@
   },
   "license": "MIT",
   "type": "module",
-  "exports": {
-    ".": "./dist/index.js"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/node/index.js",
+  "browser": "dist/web/index.js",
+  "types": "dist/node/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -b tsconfig.json",
+    "build": "rm -rf dist/node && tsc -b tsconfig.json",
+    "build:web": "rm -rf dist/web && tsc -b tsconfig.web.json && mv dist/web/shims/web/* dist/web/shims",
     "format": "prettier --write .",
     "preinstall": "npx only-allow pnpm",
     "lint": "eslint . --cache",
     "prepare": "husky",
     "prepublishOnly": "npm run build",
+    "start": "rm -rf dist/node && tsc -b -w tsconfig.json",
+    "start:web": "rm -rf dist/web && tsc -b -w tsconfig.web.json && mv dist/web/shims/web/* dist/web/shims",
     "test": "jest --coverage --config=jest.config.cjs ./test/*"
   },
   "dependencies": {

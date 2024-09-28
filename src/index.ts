@@ -4,7 +4,7 @@ import * as API from './resources/index.js';
 
 export interface ClientOptions {
   baseURL?: string;
-  auth: API.Auth;
+  authConfig: API.AuthOptions;
   fetch?: typeof fetch;
 }
 
@@ -12,12 +12,16 @@ export class CozeAPI {
   protected _config: ClientOptions;
   api: Coze;
   baseURL: string;
+  authConfig: API.AuthOptions;
+  auth: API.Auth;
 
   constructor(config: ClientOptions) {
     this._config = config;
     this.baseURL = config.baseURL || 'https://api.coze.com';
+    this.authConfig = config.authConfig;
 
-    this.api = new Coze({ api_key: config.auth.getToken() });
+    this.auth = API.getAuthInstance(this);
+    this.api = new Coze({ auth: this.auth, endpoint: this.baseURL });
   }
 
   bots: API.Bots = new API.Bots(this);
@@ -29,7 +33,6 @@ export class CozeAPI {
 
 export namespace CozeAPI {
   export import Auth = API.Auth;
-  export import TokenAuth = API.TokenAuth;
   export import Bots = API.Bots;
   export import Chat = API.Chat;
   export import Conversations = API.Conversations;

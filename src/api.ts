@@ -1,7 +1,4 @@
-import { fetch, FormData, File, type Response, type RequestInit } from 'undici';
-import { type ReadableStream } from 'stream/web';
-import { readFile } from 'node:fs/promises';
-import { basename } from 'node:path';
+import { fetch, FormData, type RequestInit, type Response } from './shims/index.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getLines, getMessages, type EventSourceMessage } from './parse.js';
 import { formatAddtionalMessages } from './utils.js';
@@ -18,6 +15,7 @@ import {
   type RoleType,
   type ObjectStringItem,
   type ContentType,
+  type OAuthTokenData,
 } from './v2.js';
 import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
 
@@ -27,13 +25,13 @@ export class Coze {
   private readonly config: Config;
   private readonly fetch: typeof fetch;
 
-  constructor(config: Partial<Config>) {
+  constructor(config: Config) {
     this.config = {
-      api_key: config?.api_key as string,
+      auth: config.auth,
       endpoint: config?.endpoint ?? 'https://api.coze.com',
     };
 
-    this.fetch = config?.fetch ?? fetch;
+    this.fetch = fetch;
   }
 
   public async chatV2(request: Omit<ChatV2Req, 'stream'>): Promise<ChatV2Resp> {
@@ -257,11 +255,11 @@ export class Coze {
    * @param filePath The file will be uploaded.
    * @returns
    */
-  public async uploadFile(filePath: string): Promise<FileObject> {
-    const fileBuffer = await readFile(filePath);
-    const file = new File([fileBuffer], basename(filePath));
+  public async uploadFile({ file }: { file: unknown }): Promise<FileObject> {
+    // const fileBuffer = await readFile(filePath);
+    // const file = new File([fileBuffer], basename(filePath));
     const body = new FormData();
-    body.set('file', file, basename(filePath));
+    body.set('file', file as Blob, 'filepath');
 
     const apiUrl = `/v1/files/upload`;
     const response = await this.makeRequest<{ data: FileObject }>(apiUrl, 'POST', body);
@@ -308,18 +306,43 @@ export class Coze {
     };
   }
 
+  public async getOAuthToken({
+    grant_type,
+    client_id,
+    redirect_uri,
+    code,
+  }: {
+    grant_type: string;
+    client_id: string;
+    redirect_uri: string;
+    code: string;
+  }): Promise<OAuthTokenData> {
+    const apiUrl = `/api/permission/oauth2/token`;
+
+    const payload = {
+      grant_type,
+      client_id,
+      redirect_uri,
+      code,
+    };
+
+    const response = await this.makeRequest<{ data: OAuthTokenData }>(apiUrl, 'POST', payload);
+    return response.data;
+  }
+
   private async makeRequest(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: true): Promise<Response>;
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: false): Promise<T>;
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream: boolean = false): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
-      authorization: `Bearer ${this.config.api_key}`,
-      'agw-js-conv': 'str',
+      authorization: `Bearer ${this.config.auth.getToken()}`,
+      // 'agw-js-conv': 'str',  FIXME: browser 下存在跨域问题，后续再看看
     };
     const options: RequestInit = { method, headers };
     if (body instanceof FormData) {
       // XXX: content-type: multipart/form-data; boundary=----formdata-undici-067154417494
-      options.body = body;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      options.body = body as any;
     } else if (body) {
       headers['content-type'] = 'application/json';
       options.body = JSON.stringify(body);
@@ -406,7 +429,10 @@ export class Coze {
     const noop = () => {};
     const onLine = getMessages(noop, noop, onMessage);
     const onChunk = getLines(onLine);
-    const body: ReadableStream<Uint8Array> = response.body!;
+    // FIXME any
+    // const body: ReadableStream<Uint8Array> = response.body!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body: any = response.body!;
     for await (const chunk of body) {
       onChunk(chunk);
       if (latestMessage) {

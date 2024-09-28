@@ -1,8 +1,9 @@
-import { type fetch } from 'undici';
+import { type fetch } from './shims/index.js';
+import type * as API from './resources/index.js';
 
 export interface Config {
   endpoint?: string;
-  api_key: string;
+  auth: API.Auth;
   fetch?: typeof fetch;
 }
 

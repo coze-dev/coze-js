@@ -362,3 +362,9 @@ export interface Conversation {
    */
   meta_data: MetaDataType;
 }
+
+export interface OAuthTokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+}

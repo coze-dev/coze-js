@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "module": "ES2022",
-    "outDir": "./dist/node",
+    "outDir": "./dist/web",
     "target": "ES2022",
     "types": ["node", "jest"],
   },

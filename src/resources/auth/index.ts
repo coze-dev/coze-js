@@ -1,23 +1,44 @@
-export abstract class Auth {
-  abstract tokenType: string;
+import { type CozeAPI } from '../../index.js';
+import { OAuthTokenAuth } from './oauth_token.js';
+import { PatTokenAuth } from './pat_token.js';
 
-  abstract getToken(): string;
-
-  protected authentication(headers: Headers) {
-    headers.set('Authorization', `${this.tokenType} ${this.getToken()}`);
-  }
-}
-
-export class TokenAuth extends Auth {
-  tokenType = 'Bearer';
+export type AuthType = 'pat_token' | 'oauth_token' | 'oauth_pkce' | 'jwt_token' | 'device_token';
+export type PatTokenOptions = {
+  type: 'pat_token';
   token: string;
+};
+export type OAuthTokenOptions = {
+  type: 'oauth_token';
+  redirectUrl: string;
+  clientId: string;
+  state: string;
+};
+export type OAuthPKCEOptions = {
+  type: 'oauth_pkce';
+  redirectUrl: string;
+  clientId: string;
+  state: string;
+};
+export type JWTTokenOptions = {
+  type: 'jwt_token';
+  token: string;
+};
+export type DeviceTokenOptions = {
+  type: 'device_token';
+  token: string;
+};
+export type AuthOptions = PatTokenOptions | OAuthTokenOptions | OAuthPKCEOptions | JWTTokenOptions | DeviceTokenOptions;
 
-  constructor(token: string) {
-    super();
-    this.token = token;
+export const getAuthInstance = (client: CozeAPI) => {
+  const config = client.authConfig;
+  switch (config.type) {
+    case 'pat_token':
+      return new PatTokenAuth(client);
+    case 'oauth_token':
+      return new OAuthTokenAuth(client);
+    default:
+      throw new Error('Invalid auth type');
   }
+};
 
-  getToken(): string {
-    return this.token;
-  }
-}
+export { Auth } from './auth.js';
