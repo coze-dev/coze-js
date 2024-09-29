@@ -1,11 +1,13 @@
+/* eslint-disable no-unused-vars */
 import { client, botId } from './client.mjs';
 import { clearLine, cursorTo } from 'node:readline';
 
-const query = '北京新闻';
+const query = '来一段有趣的代码';
 
 async function streamingChat() {
   const v = await client.chat.stream({
     bot_id: botId,
+    user_id: '123',
     auto_save_history: false,
     additional_messages: [
       {
@@ -15,7 +17,6 @@ async function streamingChat() {
       },
     ],
   });
-
   for await (const part of v) {
     if (part.event === 'conversation.chat.created') {
       console.log('[START]');
@@ -62,7 +63,7 @@ async function nonStreamingChat() {
   const conversation_id = v.conversation_id;
   while (true) {
     await sleep(100);
-    const chat = await client.chat.getChat({ chat_id, conversation_id });
+    const chat = await client.chat.retrieve({ chat_id, conversation_id });
     if (chat.status === 'completed' || chat.status === 'failed' || chat.status === 'requires_action') {
       console.log(chat.usage);
       break;
@@ -82,7 +83,7 @@ async function nonStreamingChat() {
 }
 
 async function main() {
-  await streamingChat();
+  // await streamingChat();
   await nonStreamingChat();
 }
 

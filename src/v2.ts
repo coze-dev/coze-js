@@ -368,3 +368,35 @@ export interface OAuthTokenData {
   refresh_token: string;
   expires_in: number;
 }
+
+export interface DeviceCodeData {
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
+}
+
+export interface DeviceTokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  error?: string;
+  error_description?: string;
+}
+
+export interface JWTTokenData {
+  access_token: string;
+  expires_in: number;
+}
+
+export interface JWTScope {
+  account_permission: {
+    permission_list: string[];
+  };
+  attribute_constraint: {
+    connector_bot_chat_attribute: {
+      bot_id_list: string[];
+    };
+  };
+}

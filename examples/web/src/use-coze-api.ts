@@ -1,22 +1,98 @@
-import { CozeAPI } from '@coze/api';
-import { useState } from 'react';
+import { CozeAPI, getOAuthToken, getAuthenticationUrl } from '@coze/api';
+import { useEffect, useState } from 'react';
+import { SettingConfig } from './Setting';
+import { getPKCEAuthenticationUrl } from '@coze/api/auth';
 
-const client = new CozeAPI({
-  authConfig: {
-    type: 'pat_token',
-    token: 'pat_xxx',
-  },
-  baseURL: 'https://api.coze.cn',
-});
+let client: CozeAPI;
+const redirectUrl = 'http://localhost:3000';
 
-const useCozeAPI = (botId: string) => {
+const useCozeAPI = () => {
   const [message, setMessage] = useState('');
+  const [isReady, setIsReady] = useState(false);
+  const [config, setConfig] = useState<SettingConfig>({
+    authType: 'pat_token',
+    token: '',
+    botId: '',
+    clientId: '',
+    clientSecret: '',
+    baseUrl: '',
+  });
 
-  console.log(message);
+  useEffect(() => {
+    const config = JSON.parse(sessionStorage.getItem('settingConfig') || '{}') as SettingConfig;
+
+    if (config && config.authType) {
+      if (config.authType === 'pat_token') {
+        initClient(config);
+      } else if (config.authType === 'oauth_token' || config.authType === 'oauth_pkce') {
+        if (config.token) {
+          initClient(config);
+          return;
+        }
+        // get code from url
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if (code) {
+          const codeVerifier = sessionStorage.getItem('codeVerifier') || '';
+          // get oauth token
+          getOAuthToken({
+            baseURL: config.baseUrl,
+            code,
+            clientId: config.clientId || '',
+            redirectUrl,
+            clientSecret: config.clientSecret || '',
+            codeVerifier: config.authType === 'oauth_pkce' ? codeVerifier : '',
+          })
+            .then(res => {
+              config.token = res.access_token;
+              sessionStorage.setItem('settingConfig', JSON.stringify(config));
+
+              initClient(config);
+            })
+            .finally(() => {
+              params.delete('code');
+              window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+            });
+        }
+      }
+    }
+  }, []);
+
+  async function initClient(config: SettingConfig) {
+    setConfig(config);
+
+    if (config.authType === 'oauth_token' && !config.token) {
+      window.location.href = getAuthenticationUrl({ baseURL: config.baseUrl, clientId: config.clientId || '', redirectUrl, state: '' });
+      return;
+    }
+
+    if (config.authType === 'oauth_pkce' && !config.token) {
+      const { url, codeVerifier } = await getPKCEAuthenticationUrl({
+        baseURL: config.baseUrl,
+        clientId: config.clientId || '',
+        redirectUrl,
+        state: '',
+      });
+      sessionStorage.setItem('codeVerifier', codeVerifier);
+      window.location.href = url;
+      return;
+    }
+
+    if (!config.token) {
+      return;
+    }
+
+    client = new CozeAPI({
+      token: config.token || '',
+      baseURL: config.baseUrl,
+    });
+    setIsReady(true);
+  }
 
   async function streamingChat(query: string) {
     const v = await client.chat.stream({
-      bot_id: botId,
+      bot_id: config.botId,
+      user_id: '1234567890',
       auto_save_history: true,
       additional_messages: [
         {
@@ -27,15 +103,23 @@ const useCozeAPI = (botId: string) => {
       ],
     });
 
+    let msg = '';
+
     for await (const part of v) {
+      if (typeof part === 'string') {
+        continue;
+      }
       if (part.event === 'conversation.chat.created') {
         console.log('[START]');
       } else if (part.event === 'conversation.message.delta') {
-        setMessage(prev => prev + part.data.content);
+        msg += part.data.content;
+
+        setMessage(msg);
       } else if (part.event === 'conversation.message.completed') {
         const { role, type, content } = part.data;
         if (role === 'assistant' && type === 'answer') {
-          setMessage(prev => prev + '\n');
+          msg += '\n';
+          setMessage(msg);
         } else {
           console.log('[%s]:[%s]:%s', role, type, content);
         }
@@ -53,7 +137,7 @@ const useCozeAPI = (botId: string) => {
     await streamingChat(query);
   };
 
-  return { message, sendMessage };
+  return { message, sendMessage, initClient, isReady };
 };
 
 export { useCozeAPI };

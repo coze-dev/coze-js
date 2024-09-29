@@ -12,7 +12,7 @@ export class Chat extends APIResource {
   }
 
   stream(params: StreamChatParams) {
-    return this._client.api.chatV3Streaming(params);
+    return this._client.api.chatV3Streaming2(params);
   }
 
   retrieve(params: RetrieveChatParams) {

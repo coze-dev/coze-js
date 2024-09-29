@@ -131,3 +131,5 @@ dist
 
 # Temp file
 *.xlsx
+*.pem
+

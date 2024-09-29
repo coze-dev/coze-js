@@ -16,8 +16,13 @@ import {
   type ObjectStringItem,
   type ContentType,
   type OAuthTokenData,
+  type DeviceCodeData,
+  type DeviceTokenData,
+  type JWTTokenData,
+  type JWTScope,
 } from './v2.js';
 import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
+import Stream from './stream.js';
 
 type ConversationResponse = { data: ChatV3Message[]; first_id: string; last_id: string; has_more: boolean };
 
@@ -27,7 +32,7 @@ export class Coze {
 
   constructor(config: Config) {
     this.config = {
-      auth: config.auth,
+      token: config.token,
       endpoint: config?.endpoint ?? 'https://api.coze.com',
     };
 
@@ -96,27 +101,36 @@ export class Coze {
   }
 
   public async chatV3Streaming(request: Omit<ChatV3Req, 'stream'>): Promise<AsyncGenerator<ChatV3StreamResp>> {
-    const user_id = request.user_id ?? uuidv4();
-    const additional_messages = formatAddtionalMessages(request.additional_messages ?? []);
-    const auto_save_history = request.auto_save_history ?? true;
-    const { bot_id, custom_variables, meta_data, conversation_id, tools } = request;
+    const { conversation_id, ...rest } = request;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload: ChatV3Req = {
-      bot_id,
-      user_id,
-      custom_variables,
-      auto_save_history,
-      meta_data,
-      tools,
+      ...rest,
       stream: true,
     };
-    if (additional_messages.length) {
-      payload.additional_messages = additional_messages;
-    }
 
     const response = await this.makeRequest(apiUrl, 'POST', payload, true);
 
     return this.handleStreamingResponse(response);
+  }
+
+  public async chatV3Streaming2(request: Omit<ChatV3Req, 'stream'>): Promise<Stream<ChatV3StreamResp>> {
+    const { conversation_id, ...rest } = request;
+    const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
+    const payload: ChatV3Req = {
+      ...rest,
+      stream: true,
+    };
+
+    const response = await this.makeRequest(apiUrl, 'POST', payload, true);
+
+    return new Stream<ChatV3StreamResp>(response.body as ReadableStream, (event, data) => {
+      if (event === 'done') {
+        return { event, data } as ChatV3StreamResp;
+      } else if (event === 'error') {
+        throw new Error(data as string);
+      }
+      return { event, data: JSON.parse(data) } as ChatV3StreamResp;
+    });
   }
 
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
@@ -311,11 +325,13 @@ export class Coze {
     client_id,
     redirect_uri,
     code,
+    code_verifier,
   }: {
     grant_type: string;
     client_id: string;
     redirect_uri: string;
     code: string;
+    code_verifier?: string;
   }): Promise<OAuthTokenData> {
     const apiUrl = `/api/permission/oauth2/token`;
 
@@ -324,10 +340,59 @@ export class Coze {
       client_id,
       redirect_uri,
       code,
+      code_verifier,
     };
 
-    const response = await this.makeRequest<{ data: OAuthTokenData }>(apiUrl, 'POST', payload);
-    return response.data;
+    return await this.makeRequest<OAuthTokenData>(apiUrl, 'POST', payload);
+  }
+
+  public async getDeviceCode({ client_id }: { client_id: string }): Promise<DeviceCodeData> {
+    const apiUrl = `/api/permission/oauth2/device/code`;
+
+    const payload = {
+      client_id,
+    };
+    return await this.makeRequest<DeviceCodeData>(apiUrl, 'POST', payload);
+  }
+
+  public async getDeviceToken({
+    grant_type,
+    client_id,
+    device_code,
+  }: {
+    grant_type: string;
+    client_id: string;
+    device_code: string;
+  }): Promise<DeviceTokenData> {
+    const apiUrl = `/api/permission/oauth2/token`;
+
+    const payload = {
+      grant_type,
+      client_id,
+      device_code,
+    };
+
+    return await this.makeRequest<DeviceTokenData>(apiUrl, 'POST', payload);
+  }
+
+  public async getJWTToken({
+    grant_type,
+    duration_seconds,
+    scope,
+  }: {
+    grant_type: string;
+    duration_seconds?: number;
+    scope?: JWTScope;
+  }): Promise<JWTTokenData> {
+    const apiUrl = `/api/permission/oauth2/token`;
+
+    const payload = {
+      grant_type,
+      duration_seconds,
+      scope,
+    };
+
+    return await this.makeRequest<JWTTokenData>(apiUrl, 'POST', payload);
   }
 
   private async makeRequest(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: true): Promise<Response>;
@@ -335,7 +400,7 @@ export class Coze {
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream: boolean = false): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
-      authorization: `Bearer ${this.config.auth.getToken()}`,
+      authorization: `Bearer ${this.config.token}`,
       // 'agw-js-conv': 'str',  FIXME: browser 下存在跨域问题，后续再看看
     };
     const options: RequestInit = { method, headers };
@@ -376,7 +441,7 @@ export class Coze {
 
     if (contentType && contentType.includes('application/json')) {
       const { code, msg, ...payload } = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
-      if (code !== 0) {
+      if (code !== 0 && code !== undefined) {
         const logId = response.headers.get('x-tt-logid');
         throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
       }

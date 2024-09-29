@@ -3,7 +3,7 @@ import type * as API from './resources/index.js';
 
 export interface Config {
   endpoint?: string;
-  auth: API.Auth;
+  token: string;
   fetch?: typeof fetch;
 }
 

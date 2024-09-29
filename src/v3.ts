@@ -8,6 +8,7 @@ export type ChatV3StreamingEventType =
   | 'conversation.chat.completed'
   | 'conversation.chat.failed'
   | 'conversation.chat.requires_action'
+  | 'error'
   | 'done';
 
 export interface ChatV3Req {
@@ -19,7 +20,7 @@ export interface ChatV3Req {
   /**
    * 标识当前与 Bot 交互的用户，由使用方在业务系统中自行定义、生成与维护。
    */
-  user_id?: string;
+  user_id: string;
 
   /**
    * 对话的附加信息。你可以通过此字段传入本次对话中用户的问题。数组长度限制为 100，即最多传入 100 条消息。

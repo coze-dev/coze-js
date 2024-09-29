@@ -1,4 +1,3 @@
-export * from './auth/index.js';
 export * from './bots/index.js';
 export * from './chat/index.js';
 export * from './conversions/index.js';
