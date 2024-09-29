@@ -6,6 +6,7 @@ const client = new CozeAPI({
     type: 'pat_token',
     token: 'pat_xxx',
   },
+  baseURL: 'https://api.coze.cn',
 });
 
 const useCozeAPI = (botId: string) => {

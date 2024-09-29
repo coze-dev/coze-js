@@ -6,10 +6,11 @@ const spaceId = process.env.COZE_SPACE_ID || '';
 const workflowId = process.env.COZE_WORKFLOW_ID || '';
 
 const client = new CozeAPI({
-  auth: {
+  authConfig: {
     type: 'pat_token',
     token: apiKey,
   },
+  baseURL: 'https://api.coze.cn',
 });
 
 export { client, botId, spaceId, workflowId };

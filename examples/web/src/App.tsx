@@ -3,7 +3,7 @@ import './App.css';
 import { useCozeAPI } from './use-coze-api';
 
 function App() {
-  const { message, sendMessage } = useCozeAPI('7372391044761223175');
+  const { message, sendMessage } = useCozeAPI('7393033746926796850');
 
   const [query, setQuery] = useState('');
 
