@@ -82,6 +82,17 @@ async function nonStreamingChat() {
   }
 }
 
+// TODO  test
+async function submitToolOutputs() {
+  const v = await client.chat.submitToolOutputs({
+    conversation_id: '123',
+    chat_id: '123',
+    tool_outputs: [{ id: '123', output: '123' }],
+    stream: false,
+  });
+  console.log('client.chat.submitToolOutputs', v);
+}
+
 async function main() {
   // await streamingChat();
   await nonStreamingChat();

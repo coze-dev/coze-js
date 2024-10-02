@@ -21,7 +21,7 @@ import {
   type JWTTokenData,
   type JWTScope,
 } from './v2.js';
-import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
+import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject, type ToolOutputType } from './v3.js';
 import Stream from './stream.js';
 import { WorkflowEvent, WorkflowEventType } from './resources/index.js';
 
@@ -101,20 +101,7 @@ export class Coze {
     return response.data;
   }
 
-  public async chatV3Streaming(request: Omit<ChatV3Req, 'stream'>): Promise<AsyncGenerator<ChatV3StreamResp>> {
-    const { conversation_id, ...rest } = request;
-    const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
-    const payload: ChatV3Req = {
-      ...rest,
-      stream: true,
-    };
-
-    const response = await this.makeRequest(apiUrl, 'POST', payload, true);
-
-    return this.handleStreamingResponse(response);
-  }
-
-  public async chatV3Streaming2(request: Omit<ChatV3Req, 'stream'>) {
+  public async chatV3Streaming(request: Omit<ChatV3Req, 'stream'>) {
     const { conversation_id, ...rest } = request;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload: ChatV3Req = {
@@ -432,6 +419,41 @@ export class Coze {
     };
 
     return await this.makeRequest<JWTTokenData>(apiUrl, 'POST', payload);
+  }
+
+  public async submitToolOutputs({
+    conversation_id,
+    chat_id,
+    tool_outputs,
+    stream,
+  }: {
+    conversation_id: string;
+    chat_id: string;
+    tool_outputs: ToolOutputType[];
+    stream: boolean;
+  }) {
+    const apiUrl = `/v3/chat/submit_tool_outputs?conversation_id=${conversation_id}&chat_id=${chat_id}`;
+    const payload = { tool_outputs, stream };
+    if (stream === false) {
+      const response = await this.makeRequest<{ data: ChatV3Resp }>(apiUrl, 'POST', payload);
+      return response.data;
+    } else {
+      const response = await this.makeRequest(apiUrl, 'POST', payload);
+      return new Stream<ChatV3StreamResp, { event: string; data: string }>(
+        response.body as ReadableStream,
+        {
+          event: 'event:',
+          data: 'data:',
+        },
+        message => {
+          if (message.event === 'done') {
+            return { event: message.event, data: message.data } as ChatV3StreamResp;
+          } else {
+            return { event: message.event, data: safeJsonParse(message.data) } as ChatV3StreamResp;
+          }
+        },
+      );
+    }
   }
 
   private async makeRequest(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: true): Promise<Response>;

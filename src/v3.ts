@@ -172,7 +172,8 @@ export type ChatV3StreamResp =
       event: 'conversation.message.delta' | 'conversation.message.completed';
       data: ChatV3Message;
     }
-  | { event: 'done'; data: '[DONE]' };
+  | { event: 'done'; data: '[DONE]' }
+  | { event: 'error'; data: { code: number; msg: string } };
 
 export interface ChatV3Resp {
   /**
@@ -321,4 +322,16 @@ export interface FileObject {
    * 文件名称。
    */
   file_name: string;
+}
+
+export interface ToolOutputType {
+  /**
+   * 上报运行结果的 ID。
+   */
+  tool_call_id: string;
+
+  /**
+   * 上报运行结果的输出。
+   */
+  output: string;
 }
