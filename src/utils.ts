@@ -15,3 +15,11 @@ export function formatAddtionalMessages(additionalMessages: EnterMessage[] | und
     return item;
   });
 }
+
+export function safeJsonParse(jsonString: string) {
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    return '';
+  }
+}

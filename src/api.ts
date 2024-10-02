@@ -1,7 +1,7 @@
 import { fetch, FormData, type RequestInit, type Response } from './shims/index.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getLines, getMessages, type EventSourceMessage } from './parse.js';
-import { formatAddtionalMessages } from './utils.js';
+import { formatAddtionalMessages, safeJsonParse } from './utils.js';
 import { type Config } from './v1.js';
 import {
   type ChatV2Req,
@@ -23,6 +23,7 @@ import {
 } from './v2.js';
 import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject } from './v3.js';
 import Stream from './stream.js';
+import { WorkflowEvent, WorkflowEventType } from './resources/index.js';
 
 type ConversationResponse = { data: ChatV3Message[]; first_id: string; last_id: string; has_more: boolean };
 
@@ -113,7 +114,7 @@ export class Coze {
     return this.handleStreamingResponse(response);
   }
 
-  public async chatV3Streaming2(request: Omit<ChatV3Req, 'stream'>): Promise<Stream<ChatV3StreamResp>> {
+  public async chatV3Streaming2(request: Omit<ChatV3Req, 'stream'>) {
     const { conversation_id, ...rest } = request;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload: ChatV3Req = {
@@ -123,14 +124,21 @@ export class Coze {
 
     const response = await this.makeRequest(apiUrl, 'POST', payload, true);
 
-    return new Stream<ChatV3StreamResp>(response.body as ReadableStream, (event, data) => {
-      if (event === 'done') {
-        return { event, data } as ChatV3StreamResp;
-      } else if (event === 'error') {
-        throw new Error(data as string);
-      }
-      return { event, data: JSON.parse(data) } as ChatV3StreamResp;
-    });
+    return new Stream<ChatV3StreamResp, { event: string; data: string }>(
+      response.body as ReadableStream,
+      {
+        event: 'event:',
+        data: 'data:',
+      },
+      message => {
+        if (message.event === 'done') {
+          return { event: message.event, data: message.data } as ChatV3StreamResp;
+        } else if (message.event === 'error') {
+          throw new Error(message.data as string);
+        }
+        return { event: message.event, data: JSON.parse(message.data) } as ChatV3StreamResp;
+      },
+    );
   }
 
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
@@ -316,8 +324,39 @@ export class Coze {
     return {
       cost: response.cost,
       token: response.token,
-      data: JSON.parse(response.data),
+      data: safeJsonParse(response.data),
     };
+  }
+
+  public async runWorkflowStream({
+    workflow_id,
+    parameters,
+    bot_id,
+    ext,
+  }: {
+    workflow_id: string;
+    bot_id?: string;
+    parameters?: Record<string, unknown>;
+    ext?: Record<string, string>;
+  }) {
+    const apiUrl = `/v1/workflow/stream_run`;
+    const payload = { workflow_id, parameters, bot_id, ext };
+    const response = await this.makeRequest(apiUrl, 'POST', payload, true);
+    return new Stream<WorkflowEvent, { id: string; event: string; data: string }>(
+      response.body as ReadableStream,
+      {
+        id: 'id:',
+        event: 'event:',
+        data: 'data:',
+      },
+      message => {
+        if (message.event === WorkflowEventType.DONE) {
+          return new WorkflowEvent(Number(message.id), WorkflowEventType.DONE);
+        } else {
+          return new WorkflowEvent(Number(message.id), WorkflowEventType.MESSAGE, safeJsonParse(message.data));
+        }
+      },
+    );
   }
 
   public async getOAuthToken({
