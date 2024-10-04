@@ -26,6 +26,8 @@ export class CozeAPI {
   conversations: API.Conversations = new API.Conversations(this);
   files: API.Files = new API.Files(this);
   workflows: API.Workflows = new API.Workflows(this);
+  workspaces: API.Workspaces = new API.Workspaces(this);
+  knowledge: API.Knowledge = new API.Knowledge(this);
 }
 
 export * from './auth.js';
@@ -37,4 +39,5 @@ export namespace CozeAPI {
   export import Messages = API.Messages;
   export import Files = API.Files;
   export import Workflows = API.Workflows;
+  export import Knowledge = API.Knowledge;
 }

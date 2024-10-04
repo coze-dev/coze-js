@@ -4,7 +4,7 @@ import { clearLine, cursorTo } from 'node:readline';
 
 const query = '来一段有趣的代码';
 
-async function streamingChat() {
+async function streamingChat(callback) {
   const v = await client.chat.stream({
     bot_id: botId,
     user_id: '123',
@@ -17,9 +17,11 @@ async function streamingChat() {
       },
     ],
   });
+
   for await (const part of v) {
     if (part.event === 'conversation.chat.created') {
       console.log('[START]');
+      callback && callback(part.data);
     } else if (part.event === 'conversation.message.delta') {
       process.stdout.write(part.data.content);
     } else if (part.event === 'conversation.message.completed') {
@@ -93,9 +95,21 @@ async function submitToolOutputs() {
   console.log('client.chat.submitToolOutputs', v);
 }
 
+async function streamingCancel() {
+  streamingChat(async v => {
+    sleep(1000);
+    const result = await client.chat.cancel({
+      conversation_id: v.conversation_id,
+      chat_id: v.id,
+    });
+    console.log('client.chat.cancel', result);
+  });
+}
+
 async function main() {
   // await streamingChat();
-  await nonStreamingChat();
+  // await nonStreamingChat();
+  streamingCancel();
 }
 
 main().catch(console.error);

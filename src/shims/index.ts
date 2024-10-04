@@ -1,3 +1,5 @@
-import { fetch, FormData, type RequestInit, type Response } from 'undici';
+import { fetch, FormData, type RequestInit, type Response, type File } from 'undici';
 
-export { fetch, FormData, type RequestInit, type Response };
+type FileLike = File;
+
+export { fetch, FormData, type RequestInit, type Response, type FileLike };

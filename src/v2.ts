@@ -226,6 +226,101 @@ export interface BotInfo {
   };
 }
 
+export interface CreateBotReq {
+  space_id: string;
+  /**
+   * Bot 的名称。
+   */
+  name: string;
+
+  /**
+   * Bot 的描述信息。
+   */
+  description?: string;
+
+  /**
+   * Bot 的头像地址。
+   */
+  icon_file_id?: string;
+
+  /**
+   * Bot 的提示词配置，参考 Prompt object 说明。
+   */
+  prompt_info?: {
+    /**
+     * Bot 配置的提示词。
+     */
+    prompt: string;
+  };
+
+  /**
+   * Bot 的开场白配置，参考 Onboarding object 说明。
+   */
+  onboarding_info?: {
+    /**
+     * Bot 配置的开场白内容。
+     */
+    prologue: string;
+
+    /**
+     * Bot 配置的推荐问题列表。未开启用户问题建议时，不返回此字段。
+     */
+    suggested_questions?: string[];
+  };
+}
+
+export interface UpdateBotReq {
+  bot_id: string;
+  /**
+   * Bot 的名称。
+   */
+  name?: string;
+
+  /**
+   * Bot 的描述信息。
+   */
+  description?: string;
+
+  /**
+   * Bot 的头像地址。
+   */
+  icon_file_id?: string;
+
+  /**
+   * Bot 的提示词配置，参考 Prompt object 说明。
+   */
+  prompt_info?: {
+    /**
+     * Bot 配置的提示词。
+     */
+    prompt: string;
+  };
+
+  /**
+   * Bot 的开场白配置，参考 Onboarding object 说明。
+   */
+  onboarding_info?: {
+    /**
+     * Bot 配置的开场白内容。
+     */
+    prologue: string;
+
+    /**
+     * Bot 配置的推荐问题列表。未开启用户问题建议时，不返回此字段。
+     */
+    suggested_questions?: string[];
+  };
+  knowledge?: KnowledgeInfo;
+}
+
+interface KnowledgeInfo {
+  dataset_ids?: string[];
+
+  auto_call?: boolean;
+
+  search_strategy?: number;
+}
+
 interface BotPlugin {
   /**
    * 插件唯一标识。

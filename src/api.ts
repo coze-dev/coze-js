@@ -1,4 +1,4 @@
-import { fetch, FormData, type RequestInit, type Response } from './shims/index.js';
+import { fetch, type FileLike, FormData, type RequestInit, type Response } from './shims/index.js';
 import { v4 as uuidv4 } from 'uuid';
 import { getLines, getMessages, type EventSourceMessage } from './parse.js';
 import { formatAddtionalMessages, safeJsonParse } from './utils.js';
@@ -20,10 +20,30 @@ import {
   type DeviceTokenData,
   type JWTTokenData,
   type JWTScope,
+  type CreateBotReq,
+  type UpdateBotReq,
 } from './v2.js';
-import { type ChatV3Message, type ChatV3Req, type ChatV3Resp, type ChatV3StreamResp, type FileObject, type ToolOutputType } from './v3.js';
+import {
+  type DocumentInfo,
+  type ChatV3Message,
+  type ChatV3Req,
+  type ChatV3Resp,
+  type ChatV3StreamResp,
+  type FileObject,
+  type ToolOutputType,
+  type DocumentBase,
+  type ChunkStrategy,
+  type UpdateRule,
+} from './v3.js';
 import Stream from './stream.js';
-import { WorkflowEvent, WorkflowEventType } from './resources/index.js';
+import {
+  WorkflowEvent,
+  type WorkflowEventError,
+  type WorkflowEventInterrupt,
+  type WorkflowEventMessage,
+  WorkflowEventType,
+} from './resources/index.js';
+import { type OpenSpaceData } from './resources/workspaces/index.js';
 
 type ConversationResponse = { data: ChatV3Message[]; first_id: string; last_id: string; has_more: boolean };
 
@@ -128,6 +148,24 @@ export class Coze {
     );
   }
 
+  public async createBot(body: CreateBotReq) {
+    const apiUrl = `/v1/bot/create`;
+    const response = await this.makeRequest<{ data: { bot_id: string } }>(apiUrl, 'POST', body);
+    return response.data;
+  }
+
+  public async updateBot(body: { bot_id: string; connector_ids: string[] }) {
+    const apiUrl = `/v1/bot/update`;
+    await this.makeRequest(apiUrl, 'POST', body);
+    return;
+  }
+
+  public async publishBot(body: UpdateBotReq) {
+    const apiUrl = `/v1/bot/publish`;
+    const response = await this.makeRequest<{ data: { bot_id: string; version: string } }>(apiUrl, 'POST', body);
+    return response.data;
+  }
+
   public async getBotInfo({ bot_id }: { bot_id: string }): Promise<BotInfo> {
     const apiUrl = `/v1/bot/get_online_info?bot_id=${bot_id}`;
     const response = await this.makeRequest<{ data: BotInfo }>(apiUrl, 'GET');
@@ -145,6 +183,50 @@ export class Coze {
       data: { total: number; space_bots: SimpleBot[] };
     }>(apiUrl, 'GET');
     return { page_size, page_index, ...response.data };
+  }
+
+  public async createKnowledgeDocument({
+    dataset_id,
+    document_bases,
+    chunk_strategy,
+  }: {
+    dataset_id: string;
+    document_bases: DocumentBase[];
+    chunk_strategy?: ChunkStrategy;
+  }) {
+    const apiUrl = `/open_api/knowledge/document/create`;
+    const payload = { dataset_id, document_bases, chunk_strategy };
+    const response = await this.makeRequest<{ document_infos: DocumentInfo[] }>(apiUrl, 'POST', payload);
+    return response.document_infos;
+  }
+
+  public async updateKnowledgeDocument({
+    document_id,
+    document_name,
+    update_rule,
+  }: {
+    document_id: string;
+    document_name?: string;
+    update_rule?: UpdateRule;
+  }) {
+    const apiUrl = `/open_api/knowledge/document/update`;
+    const payload = { document_id, document_name, update_rule };
+    await this.makeRequest(apiUrl, 'POST', payload);
+  }
+
+  public async deleteKnowledgeDocument({ document_ids }: { document_ids: string[] }) {
+    const apiUrl = `/open_api/knowledge/document/delete`;
+    const payload = { document_ids };
+    await this.makeRequest(apiUrl, 'POST', payload);
+  }
+
+  public async listKnowledge({ dataset_id, page = 1, page_size = 10 }: { dataset_id: string; page?: number; page_size?: number }) {
+    const apiUrl = `/open_api/knowledge/document/list?dataset_id=${dataset_id}&page=${page}&page_size=${page_size}`;
+    const response = await this.makeRequest<{
+      total: number;
+      document_infos: DocumentInfo[];
+    }>(apiUrl, 'GET');
+    return response;
   }
 
   public async createConversation({
@@ -218,6 +300,13 @@ export class Coze {
     return this.parseMessageListResponse(response);
   }
 
+  public async deleteMessage({ conversation_id, message_id }: { conversation_id: string; message_id: string }) {
+    const apiUrl = `/v1/conversation/message/delete`;
+    const payload = { conversation_id, message_id };
+    const response = await this.makeRequest<ChatV3Message[]>(apiUrl, 'POST', payload);
+    return response;
+  }
+
   public async readMessage({ message_id, conversation_id }: { conversation_id: string; message_id: string }): Promise<ChatV3Message> {
     const apiUrl = `/v1/conversation/message/retrieve?conversation_id=${conversation_id}&message_id=${message_id}`;
     const response = await this.makeRequest<{ data: ChatV3Message }>(apiUrl, 'GET');
@@ -264,11 +353,11 @@ export class Coze {
    * @param filePath The file will be uploaded.
    * @returns
    */
-  public async uploadFile({ file }: { file: unknown }): Promise<FileObject> {
+  public async uploadFile({ file }: { file: FileLike }): Promise<FileObject> {
     // const fileBuffer = await readFile(filePath);
     // const file = new File([fileBuffer], basename(filePath));
     const body = new FormData();
-    body.set('file', file as Blob, 'filepath');
+    body.set('file', file as Blob, file.name);
 
     const apiUrl = `/v1/files/upload`;
     const response = await this.makeRequest<{ data: FileObject }>(apiUrl, 'POST', body);
@@ -315,6 +404,13 @@ export class Coze {
     };
   }
 
+  public async listWorkSpaces({ page_num, page_size }: { page_num: number; page_size: number }) {
+    const apiUrl = `/v1/workspaces?page_num=${page_num}&page_size=${page_size}`;
+    const response = await this.makeRequest<string>(apiUrl, 'GET');
+    // TODO 返回的类型不是json格式的
+    return safeJsonParse(response)['data'] as OpenSpaceData;
+  }
+
   public async runWorkflowStream({
     workflow_id,
     parameters,
@@ -344,6 +440,27 @@ export class Coze {
         }
       },
     );
+  }
+
+  public async resumeWorkflow({
+    workflow_id,
+    event_id,
+    resume_data,
+    interrupt_type,
+  }: {
+    workflow_id: string;
+    event_id: string;
+    resume_data: string;
+    interrupt_type: number;
+  }) {
+    const apiUrl = `/v1/workflow/stream_resume`;
+    const payload = { workflow_id, event_id, resume_data, interrupt_type };
+    const response = await this.makeRequest<{
+      id: string;
+      event: WorkflowEventType;
+      data: WorkflowEventMessage | WorkflowEventInterrupt | WorkflowEventError | null;
+    }>(apiUrl, 'POST', payload);
+    return response.data;
   }
 
   public async getOAuthToken({
@@ -456,14 +573,29 @@ export class Coze {
     }
   }
 
+  public async cancelChat({ conversation_id, chat_id }: { conversation_id: string; chat_id: string }): Promise<ChatV3Resp> {
+    const apiUrl = `/v3/chat/cancel`;
+
+    const payload = {
+      conversation_id,
+      chat_id,
+    };
+
+    return await this.makeRequest<ChatV3Resp>(apiUrl, 'POST', payload);
+  }
+
   private async makeRequest(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: true): Promise<Response>;
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: false): Promise<T>;
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream: boolean = false): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
     const headers = {
       authorization: `Bearer ${this.config.token}`,
-      // 'agw-js-conv': 'str',  FIXME: browser 下存在跨域问题，后续再看看
+      'agw-js-conv': 'str',
     };
+    if (typeof window !== 'undefined') {
+      // FIXME: browser 下存在跨域问题，后续再看看
+      headers['agw-js-conv'] = 'str';
+    }
     const options: RequestInit = { method, headers };
     if (body instanceof FormData) {
       // XXX: content-type: multipart/form-data; boundary=----formdata-undici-067154417494

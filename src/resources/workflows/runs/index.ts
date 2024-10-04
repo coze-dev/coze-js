@@ -2,12 +2,17 @@ import { type Coze } from '../../../api.js';
 import { APIResource } from '../../resource.js';
 
 type RunWorkflowParams = Parameters<typeof Coze.prototype.runWorkflow>[0];
+type ResumeWorkflowParams = Parameters<typeof Coze.prototype.resumeWorkflow>[0];
 export class Runs extends APIResource {
   create(params: RunWorkflowParams) {
     return this._client.api.runWorkflow(params);
   }
   stream(params: RunWorkflowParams) {
     return this._client.api.runWorkflowStream(params);
+  }
+
+  resume(params: ResumeWorkflowParams) {
+    return this._client.api.resumeWorkflow(params);
   }
 }
 
@@ -37,7 +42,7 @@ interface WorkflowRunResult {
   data: string;
 }
 
-interface WorkflowEventMessage {
+export interface WorkflowEventMessage {
   // The content of the streamed output message.
   // 流式输出的消息内容。
   content: string;
@@ -69,7 +74,7 @@ interface WorkflowEventInterruptData {
   type: number;
 }
 
-interface WorkflowEventInterrupt {
+export interface WorkflowEventInterrupt {
   // The content of interruption event.
   // 中断控制内容。
   interrupt_data: WorkflowEventInterruptData;
@@ -79,7 +84,7 @@ interface WorkflowEventInterrupt {
   node_title: string;
 }
 
-interface WorkflowEventError {
+export interface WorkflowEventError {
   // Status code. 0 represents a successful API call. Other values indicate that the call has failed. You can
   // determine the detailed reason for the error through the error_message field.
   // 调用状态码。0 表示调用成功。其他值表示调用失败。你可以通过 error_message 字段判断详细的错误原因。

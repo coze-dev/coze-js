@@ -6,6 +6,7 @@ type StreamChatParams = Parameters<typeof Coze.prototype.chatV3Streaming>[0];
 type RetrieveChatParams = Parameters<typeof Coze.prototype.getChat>[0];
 type HistoryChatParams = Parameters<typeof Coze.prototype.getChatHistory>[0];
 type SubmitToolOutputsParams = Parameters<typeof Coze.prototype.submitToolOutputs>[0];
+type CancelChatParams = Parameters<typeof Coze.prototype.cancelChat>[0];
 
 export class Chat extends APIResource {
   create(params: CreateChatParams) {
@@ -22,6 +23,10 @@ export class Chat extends APIResource {
 
   history(params: HistoryChatParams) {
     return this._client.api.getChatHistory(params);
+  }
+
+  cancel(params: CancelChatParams) {
+    return this._client.api.cancelChat(params);
   }
 
   submitToolOutputs(params: SubmitToolOutputsParams) {

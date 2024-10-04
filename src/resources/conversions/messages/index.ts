@@ -5,7 +5,7 @@ type CreateMessageParams = Parameters<typeof Coze.prototype.createMessage>[0];
 type UpdateMessageParams = Parameters<typeof Coze.prototype.updateMessage>[0];
 type RetrieveMessageParams = Parameters<typeof Coze.prototype.readMessage>[0];
 type ListMessageParams = Parameters<typeof Coze.prototype.listMessages>[0];
-
+type DeleteMessageParams = Parameters<typeof Coze.prototype.deleteMessage>[0];
 export class Messages extends APIResource {
   create(params: CreateMessageParams) {
     return this._client.api.createMessage(params);
@@ -21,5 +21,9 @@ export class Messages extends APIResource {
 
   list(params: ListMessageParams) {
     return this._client.api.listMessages(params);
+  }
+
+  delete(params: DeleteMessageParams) {
+    return this._client.api.deleteMessage(params);
   }
 }

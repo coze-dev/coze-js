@@ -1,7 +1,7 @@
-import { CozeAPI, getOAuthToken, getAuthenticationUrl } from '@coze/api';
+import { CozeAPI, getOAuthToken, getAuthenticationUrl, getPKCEAuthenticationUrl } from '@coze/api';
 import { useEffect, useState } from 'react';
 import { SettingConfig } from './Setting';
-import { getPKCEAuthenticationUrl } from '@coze/api/auth';
+import { EnterMessage } from '@coze/api/v2';
 
 let client: CozeAPI;
 const redirectUrl = 'http://localhost:3000';
@@ -9,6 +9,8 @@ const redirectUrl = 'http://localhost:3000';
 const useCozeAPI = () => {
   const [message, setMessage] = useState('');
   const [isReady, setIsReady] = useState(false);
+  const [fileId, setFileId] = useState('');
+
   const [config, setConfig] = useState<SettingConfig>({
     authType: 'pat_token',
     token: '',
@@ -90,17 +92,33 @@ const useCozeAPI = () => {
   }
 
   async function streamingChat(query: string) {
-    const v = await client.chat.stream({
-      bot_id: config.botId,
-      user_id: '1234567890',
-      auto_save_history: true,
-      additional_messages: [
+    let messages: EnterMessage[];
+    if (fileId) {
+      messages = [
+        {
+          role: 'user',
+          content: [
+            { type: 'file', file_id: fileId },
+            { type: 'text', text: query },
+          ],
+          content_type: 'object_string',
+        },
+      ];
+    } else {
+      messages = [
         {
           role: 'user',
           content: query,
           content_type: 'text',
         },
-      ],
+      ];
+    }
+
+    const v = await client.chat.stream({
+      bot_id: config.botId,
+      user_id: '1234567890',
+      auto_save_history: true,
+      additional_messages: messages,
     });
 
     let msg = '';
@@ -137,7 +155,15 @@ const useCozeAPI = () => {
     await streamingChat(query);
   };
 
-  return { message, sendMessage, initClient, isReady };
+  const uploadFile = async (file: File) => {
+    setIsReady(false);
+    const res = await client.files.create({ file });
+    setFileId(res.id);
+    setIsReady(true);
+    console.log(res);
+  };
+
+  return { message, sendMessage, initClient, isReady, uploadFile };
 };
 
 export { useCozeAPI };

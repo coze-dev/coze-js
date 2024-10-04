@@ -335,3 +335,46 @@ export interface ToolOutputType {
    */
   output: string;
 }
+
+export interface DocumentInfo {
+  char_count: number;
+  chunk_strategy: ChunkStrategy;
+  create_time: number;
+  document_id: string;
+  format_type: number;
+  hit_count: number;
+  name: string;
+  size: number;
+  slice_count: number;
+  status: number;
+  type: string;
+  update_interval: number;
+  update_time: number;
+  update_type: number;
+}
+
+export interface ChunkStrategy {
+  chunk_type: string;
+  separator?: string;
+  max_tokens?: number;
+  remove_extra_spaces?: boolean;
+  remove_urls_emails?: boolean;
+}
+
+export interface DocumentBase {
+  name: string;
+  source_info: SourceInfo;
+  update_rule: UpdateRule;
+}
+
+export interface SourceInfo {
+  file_base64?: string;
+  file_type?: string;
+  web_url?: string;
+  document_source?: number;
+}
+
+export interface UpdateRule {
+  update_type: number;
+  update_interval: number;
+}

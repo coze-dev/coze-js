@@ -68,6 +68,12 @@ const updatedMessage = await client.conversations.messages.update({
 });
 console.log('client.conversations.messages.update', updatedMessage);
 
+const deletedMessage = await client.conversations.messages.delete({
+  conversation_id: updatedMessage.conversation_id,
+  message_id: updatedMessage.id,
+});
+console.log('client.conversations.messages.delete', deletedMessage);
+
 const messages = await client.conversations.messages.list({
   conversation_id: conversation.id,
 });
