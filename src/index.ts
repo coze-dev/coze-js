@@ -2,6 +2,7 @@
 import { Coze } from './api.js';
 import * as API from './resources/index.js';
 import { DEFAULT_BASE_URL } from './constant.js';
+import * as Errors from './error.js';
 export interface ClientOptions {
   baseURL?: string;
   token: string;
@@ -28,6 +29,15 @@ export class CozeAPI {
   workflows: API.Workflows = new API.Workflows(this);
   workspaces: API.Workspaces = new API.Workspaces(this);
   knowledge: API.Knowledge = new API.Knowledge(this);
+
+  static APIError = Errors.APIError;
+  static BadRequestError = Errors.BadRequestError;
+  static AuthenticationError = Errors.AuthenticationError;
+  static PermissionDeniedError = Errors.PermissionDeniedError;
+  static NotFoundError = Errors.NotFoundError;
+  static RateLimitError = Errors.RateLimitError;
+  static InternalServerError = Errors.InternalServerError;
+  static GatewayError = Errors.GatewayError;
 }
 
 export * from './auth.js';

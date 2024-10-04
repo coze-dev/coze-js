@@ -16,10 +16,10 @@ export function formatAddtionalMessages(additionalMessages: EnterMessage[] | und
   });
 }
 
-export function safeJsonParse(jsonString: string) {
+export function safeJsonParse(jsonString: string, defaultValue = '') {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
-    return '';
+    return defaultValue;
   }
 }

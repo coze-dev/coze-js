@@ -44,6 +44,7 @@ import {
   WorkflowEventType,
 } from './resources/index.js';
 import { type OpenSpaceData } from './resources/workspaces/index.js';
+import { APIError, type ErrorBody } from './error.js';
 
 type ConversationResponse = { data: ChatV3Message[]; first_id: string; last_id: string; has_more: boolean };
 
@@ -610,8 +611,13 @@ export class Coze {
     const contentType = response.headers.get('content-type');
 
     if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+      const text = await response.text();
+      throw APIError.generate(
+        response.status,
+        { code: response.status, msg: 'HTTP error!', error: { detail: text } } as ErrorBody,
+        'HTTP error!',
+        response.headers,
+      );
     }
 
     if (isStream) {
@@ -633,16 +639,12 @@ export class Coze {
     }
 
     if (contentType && contentType.includes('application/json')) {
-      const { code, msg, ...payload } = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
+      const result = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
+      const { code, msg, ...payload } = result;
       if (code !== 0 && code !== undefined) {
-        const logId = response.headers.get('x-tt-logid');
-        throw new Error(`code: ${code}, msg: ${msg}, logid: ${logId}`);
+        throw APIError.generate(response.status, result as ErrorBody, msg, response.headers);
       }
 
-      // data: {....}
-      // message: {....}
-      // data: [....], first_id: "....", last_id: "....", has_more: true
-      // ...
       return payload as T;
     } else {
       return (await response.text()) as T;
