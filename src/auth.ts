@@ -1,6 +1,5 @@
-import { Coze } from './api.js';
-import { type JWTScope, type OAuthTokenData } from './v2.js';
 import { DEFAULT_BASE_URL } from './constant.js';
+import { APIClient } from './core.js';
 
 export const getAuthenticationUrl = (config: { baseURL?: string; clientId: string; redirectUrl: string; state?: string }) => {
   const baseUrl = (config.baseURL ?? DEFAULT_BASE_URL).replace('https://api', 'https://www');
@@ -56,45 +55,96 @@ export const getOAuthToken = async (config: {
   clientSecret: string;
   codeVerifier?: string; // only for PKCE
 }): Promise<OAuthTokenData> => {
-  const api = new Coze({ token: config.clientSecret, endpoint: config.baseURL });
-  const result = await api.getOAuthToken({
+  const api = new APIClient({ token: config.clientSecret, baseURL: config.baseURL });
+  const apiUrl = `/api/permission/oauth2/token`;
+  const payload = {
     grant_type: 'authorization_code',
     client_id: config.clientId,
     redirect_uri: config.redirectUrl,
     code: config.code,
     code_verifier: config.codeVerifier,
-  });
+  };
+  const result = await api.post<unknown, OAuthTokenData>(apiUrl, payload);
 
   return result;
 };
 
 export const getDeviceCode = async (config: { baseURL?: string; clientId: string }) => {
-  const api = new Coze({ token: '', endpoint: config.baseURL });
-  const result = await api.getDeviceCode({
-    client_id: config.clientId,
-  });
+  const api = new APIClient({ token: '', baseURL: config.baseURL });
 
+  const apiUrl = `/api/permission/oauth2/device/code`;
+  const payload = {
+    client_id: config.clientId,
+  };
+
+  const result = await api.post<unknown, DeviceCodeData>(apiUrl, payload);
   return result;
 };
 
 export const getDeviceToken = async (config: { baseURL?: string; clientId: string; deviceCode: string }) => {
-  const api = new Coze({ token: '', endpoint: config.baseURL });
-  const result = await api.getDeviceToken({
+  const api = new APIClient({ token: '', baseURL: config.baseURL });
+
+  const apiUrl = `/api/permission/oauth2/token`;
+  const payload = {
     grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
     client_id: config.clientId,
     device_code: config.deviceCode,
-  });
+  };
+
+  const result = await api.post<unknown, DeviceTokenData>(apiUrl, payload);
 
   return result;
 };
 
 export const getJWTToken = async (config: { baseURL?: string; token: string; duration_seconds?: number; scope?: JWTScope }) => {
-  const api = new Coze({ token: config.token, endpoint: config.baseURL });
-  const result = await api.getJWTToken({
+  const api = new APIClient({ token: config.token, baseURL: config.baseURL });
+
+  const apiUrl = `/api/permission/oauth2/token`;
+  const payload = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     duration_seconds: config.duration_seconds,
     scope: config.scope,
-  });
+  };
+
+  const result = await api.post<unknown, JWTTokenData>(apiUrl, payload);
 
   return result;
 };
+
+export interface DeviceCodeData {
+  device_code: string;
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+  interval: number;
+}
+
+export interface OAuthTokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+}
+
+export interface DeviceTokenData {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  error?: string;
+  error_description?: string;
+}
+
+export interface JWTTokenData {
+  access_token: string;
+  expires_in: number;
+}
+
+export interface JWTScope {
+  account_permission: {
+    permission_list: string[];
+  };
+  attribute_constraint: {
+    connector_bot_chat_attribute: {
+      bot_id_list: string[];
+    };
+  };
+}

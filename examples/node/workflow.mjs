@@ -1,11 +1,26 @@
+/* eslint-disable no-unused-vars */
 import { client, botId, workflowId } from './client.mjs';
 
-const workflow = await client.workflows.runs.stream({
-  workflow_id: workflowId,
-  parameters: { query: 'JavaScript' },
-  bot_id: botId,
-});
+async function streamWorkflow() {
+  const workflow = await client.workflows.runs.stream({
+    workflow_id: workflowId,
+    parameters: { norco: 'JavaScript' },
+    bot_id: botId,
+  });
 
-for await (const event of workflow) {
-  console.log('event', event);
+  for await (const event of workflow) {
+    console.log('event', event);
+  }
 }
+
+async function nonStreamWorkflow() {
+  const workflow = await client.workflows.runs.create({
+    workflow_id: workflowId,
+    parameters: { norco: 'JavaScript' },
+    bot_id: botId,
+  });
+  console.log('workflow', workflow);
+}
+
+streamWorkflow();
+// nonStreamWorkflow();

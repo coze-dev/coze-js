@@ -19,6 +19,9 @@ async function streamingChat(callback) {
   });
 
   for await (const part of v) {
+    if (typeof part === 'string') {
+      return;
+    }
     if (part.event === 'conversation.chat.created') {
       console.log('[START]');
       callback && callback(part.data);
@@ -52,6 +55,7 @@ async function nonStreamingChat() {
 
   const v = await client.chat.create({
     bot_id: botId,
+    user_id: '123',
     additional_messages: [
       {
         role: 'user',
@@ -65,12 +69,12 @@ async function nonStreamingChat() {
   const conversation_id = v.conversation_id;
   while (true) {
     await sleep(100);
-    const chat = await client.chat.retrieve({ chat_id, conversation_id });
+    const chat = await client.chat.retrieve(conversation_id, chat_id);
     if (chat.status === 'completed' || chat.status === 'failed' || chat.status === 'requires_action') {
       console.log(chat.usage);
       break;
     }
-    const messageList = await client.chat.history({ chat_id, conversation_id });
+    const messageList = await client.chat.history(conversation_id, chat_id);
     if (messageList.length <= 0) {
       process.stdout.write('.');
     } else {
@@ -98,10 +102,7 @@ async function submitToolOutputs() {
 async function streamingCancel() {
   streamingChat(async v => {
     sleep(1000);
-    const result = await client.chat.cancel({
-      conversation_id: v.conversation_id,
-      chat_id: v.id,
-    });
+    const result = await client.chat.cancel(v.conversation_id, v.id);
     console.log('client.chat.cancel', result);
   });
 }

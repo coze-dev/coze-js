@@ -8,12 +8,12 @@ import { File } from 'undici';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const filePath = join(__dirname, 'test.pdf');
+const filePath = join(__dirname, 'test.docx');
 const fileBuffer = await readFile(filePath);
 const file = new File([fileBuffer], basename(filePath));
 
 const fileObj = await client.files.create({ file });
 console.log('client.files.create', fileObj);
 
-const file2 = await client.files.retrieve({ file_id: fileObj.id });
+const file2 = await client.files.retrieve(fileObj.id);
 console.log('client.files.retrieve', file2);

@@ -1,19 +1,67 @@
-import { type Coze } from '../../../api.js';
+import Stream from '../../../stream.js';
+import { safeJsonParse } from '../../../utils.js';
 import { APIResource } from '../../resource.js';
 
-type RunWorkflowParams = Parameters<typeof Coze.prototype.runWorkflow>[0];
-type ResumeWorkflowParams = Parameters<typeof Coze.prototype.resumeWorkflow>[0];
 export class Runs extends APIResource {
-  create(params: RunWorkflowParams) {
-    return this._client.api.runWorkflow(params);
+  async create(params: RunWorkflowReq) {
+    const apiUrl = `/v1/workflow/run`;
+    const response = await this._client.post<RunWorkflowReq, RunWorkflowData>(apiUrl, params);
+    return response;
   }
-  stream(params: RunWorkflowParams) {
-    return this._client.api.runWorkflowStream(params);
+  async stream(params: RunWorkflowReq) {
+    const apiUrl = `/v1/workflow/stream_run`;
+    const response = await this._client.post<RunWorkflowReq, Response>(apiUrl, params, true);
+
+    return new Stream<WorkflowEvent, { id: string; event: string; data: string }>(
+      response.body as ReadableStream,
+      {
+        id: 'id:',
+        event: 'event:',
+        data: 'data:',
+      },
+      message => {
+        if (message.event === WorkflowEventType.DONE) {
+          return new WorkflowEvent(Number(message.id), WorkflowEventType.DONE);
+        } else {
+          return new WorkflowEvent(Number(message.id), WorkflowEventType.MESSAGE, safeJsonParse(message.data));
+        }
+      },
+    );
   }
 
-  resume(params: ResumeWorkflowParams) {
-    return this._client.api.resumeWorkflow(params);
+  async resume(params: ResumeWorkflowReq) {
+    const apiUrl = `/v1/workflow/stream_resume`;
+    const response = await this._client.post<
+      ResumeWorkflowReq,
+      {
+        id: string;
+        event: WorkflowEventType;
+        data: WorkflowEventMessage | WorkflowEventInterrupt | WorkflowEventError | null;
+      }
+    >(apiUrl, params);
+    return response;
   }
+}
+
+export interface RunWorkflowReq {
+  workflow_id: string;
+  bot_id?: string;
+  parameters?: Record<string, unknown>;
+  ext?: Record<string, string>;
+}
+
+export interface RunWorkflowData {
+  data: string;
+  cost: string;
+  token: number;
+  debug_url: string;
+}
+
+export interface ResumeWorkflowReq {
+  workflow_id: string;
+  event_id: string;
+  resume_data: string;
+  interrupt_type: number;
 }
 
 export enum WorkflowEventType {

@@ -3,7 +3,7 @@ export class CozeError extends Error {}
 export class APIError extends CozeError {
   readonly status: number | undefined;
   readonly headers: Headers | undefined;
-  readonly error: ErrorBody | undefined;
+  readonly error: ErrorRes | undefined;
 
   readonly code: number | null | undefined;
   readonly msg: string | null | undefined;
@@ -11,7 +11,7 @@ export class APIError extends CozeError {
   readonly help_doc: string | null | undefined;
   readonly log_id: string | null | undefined;
 
-  constructor(status: number | undefined, error: ErrorBody | undefined, message: string | undefined, headers: Headers | undefined) {
+  constructor(status: number | undefined, error: ErrorRes | undefined, message: string | undefined, headers: Headers | undefined) {
     super(`${APIError.makeMessage(status, error, message, headers)}`);
     this.status = status;
     this.headers = headers;
@@ -24,12 +24,7 @@ export class APIError extends CozeError {
     this.help_doc = error?.['error']?.['help_doc'];
   }
 
-  private static makeMessage(
-    status: number | undefined,
-    errorBody: ErrorBody | undefined,
-    message: string | undefined,
-    headers: Headers | undefined,
-  ) {
+  private static makeMessage(status: number | undefined, errorBody: ErrorRes | undefined, message: string | undefined, headers: Headers | undefined) {
     if (!errorBody && message) {
       return message;
     }
@@ -67,7 +62,7 @@ export class APIError extends CozeError {
     return '(no status code or body)';
   }
 
-  static generate(status: number | undefined, errorResponse: ErrorBody | undefined, message: string | undefined, headers: Headers | undefined) {
+  static generate(status: number | undefined, errorResponse: ErrorRes | undefined, message: string | undefined, headers: Headers | undefined) {
     if (!status) {
       return new APIConnectionError({ cause: castToError(errorResponse) });
     }
@@ -155,7 +150,7 @@ export const castToError = (err: unknown): Error => {
   return new Error(err as string);
 };
 
-export interface ErrorBody {
+export interface ErrorRes {
   code: number;
   msg?: string;
   error?: {
