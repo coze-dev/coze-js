@@ -1,5 +1,6 @@
-import { Coze } from '../src/api';
+import { CozeAPI } from '../src/index';
 import { fetch } from 'undici';
+import { type EnterMessage } from '../src/resources';
 
 jest.mock('undici');
 jest.mock('uuid', () => ({
@@ -8,37 +9,37 @@ jest.mock('uuid', () => ({
 
 describe('formatHost Function Tests', () => {
   it('default', () => {
-    const coze = new Coze({ api_key: 'x' });
-    expect(coze.chatV2).toBeInstanceOf(Function);
-    expect(coze.chatV2Streaming).toBeInstanceOf(Function);
-    expect(coze.chatV3).toBeInstanceOf(Function);
-    expect(coze.chatV3Streaming).toBeInstanceOf(Function);
+    const coze = new CozeAPI({ token: 'test-api-key' });
+    expect(coze.chat.stream).toBeInstanceOf(Function);
+    expect(coze.chat.create).toBeInstanceOf(Function);
   });
 });
 
 describe('Coze', () => {
-  let coze: Coze;
+  let coze: CozeAPI;
 
   beforeEach(() => {
-    coze = new Coze({ api_key: 'test-api-key' });
+    coze = new CozeAPI({ token: 'test-api-key' });
   });
 
-  describe('chatV2', () => {
+  describe('chat.stream', () => {
     it('should make a request with correct parameters', async () => {
       const mockResponse = { some: 'data' };
       (fetch as jest.Mock).mockResolvedValue({
         ok: true,
         headers: { get: () => 'application/json' },
-        json: () => Promise.resolve({ code: 0, ...mockResponse }),
+        json: () => Promise.resolve({ code: 0, data: mockResponse }),
       });
 
-      const result = await coze.chatV2({
+      const result = await coze.chat.create({
+        conversation_id: 'mocked-uuid',
         bot_id: 'test-bot-id',
-        query: 'test query',
+        user_id: 'test-user-id',
+        additional_messages: [{ role: 'user', content: 'test query' }],
       });
 
       expect(fetch).toHaveBeenCalledWith(
-        'https://api.coze.com/open_api/v2/chat?conversation_id=mocked-uuid',
+        'https://api.coze.com/v3/chat?conversation_id=mocked-uuid',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -47,8 +48,8 @@ describe('Coze', () => {
           }),
           body: JSON.stringify({
             bot_id: 'test-bot-id',
-            user: 'mocked-uuid',
-            query: 'test query',
+            user_id: 'test-user-id',
+            additional_messages: [{ role: 'user', content: 'test query' }],
             stream: false,
           }),
         }),
@@ -57,7 +58,7 @@ describe('Coze', () => {
     });
   });
 
-  describe('getBotInfo', () => {
+  describe('bots.retrieve', () => {
     it('should make a GET request with correct parameters', async () => {
       const mockResponse = { data: { name: 'TestBot' } };
       (fetch as jest.Mock).mockResolvedValue({
@@ -66,7 +67,7 @@ describe('Coze', () => {
         json: () => Promise.resolve({ code: 0, ...mockResponse }),
       });
 
-      const result = await coze.getBotInfo({ bot_id: 'test-bot-id' });
+      const result = await coze.bots.retrieve({ bot_id: 'test-bot-id' });
 
       expect(fetch).toHaveBeenCalledWith(
         'https://api.coze.com/v1/bot/get_online_info?bot_id=test-bot-id',
@@ -81,7 +82,7 @@ describe('Coze', () => {
     });
   });
 
-  describe('createConversation', () => {
+  describe('conversations.create', () => {
     it('should format payload correctly', async () => {
       const mockResponse = { data: { id: 'conv-id' } };
       (fetch as jest.Mock).mockResolvedValue({
@@ -90,7 +91,7 @@ describe('Coze', () => {
         json: () => Promise.resolve({ code: 0, ...mockResponse }),
       });
 
-      const messages: any[] = [
+      const messages: EnterMessage[] = [
         { role: 'user', content: 'Hello', content_type: 'text' },
         {
           role: 'assistant',
@@ -100,7 +101,7 @@ describe('Coze', () => {
       ];
       const meta_data = { key: 'value' };
 
-      await coze.createConversation({ messages, meta_data });
+      await coze.conversations.create({ messages, meta_data });
 
       expect(fetch).toHaveBeenCalledWith(
         'https://api.coze.com/v1/conversation/create',
@@ -111,7 +112,7 @@ describe('Coze', () => {
               { role: 'user', content: 'Hello', content_type: 'text' },
               {
                 role: 'assistant',
-                content: JSON.stringify([{ type: 'text', text: 'Hi' }]),
+                content: [{ type: 'text', text: 'Hi' }],
                 content_type: 'object_string',
               },
             ],
