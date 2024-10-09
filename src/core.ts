@@ -64,9 +64,7 @@ export class APIClient {
     const contentType = response.headers.get('content-type');
 
     if (!response.ok) {
-      console.debug('request url:', fullUrl, 'body:', body);
       const text = await response.text();
-      console.debug('response:', text);
       throw APIError.generate(
         response.status,
         { code: response.status, msg: 'HTTP error!', error: { detail: text } } as ErrorRes,
@@ -117,7 +115,12 @@ export class APIClient {
     const queryString = Object.entries(param || {})
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
-    return this.makeRequest<Req, Rsp>(queryString ? `${apiUrl}?${queryString}` : apiUrl, 'GET', undefined, isStream);
+    return this.makeRequest<Req, Rsp>(
+      queryString ? `${apiUrl}${apiUrl.includes('?') ? '&' : '?'}${queryString}` : apiUrl,
+      'GET',
+      undefined,
+      isStream,
+    );
   }
 
   async put<Req, Rsp>(apiUrl: string, body?: Req, isStream?: boolean): Promise<Rsp> {

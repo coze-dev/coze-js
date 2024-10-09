@@ -15,7 +15,7 @@ export class APIError extends CozeError {
     super(`${APIError.makeMessage(status, error, message, headers)}`);
     this.status = status;
     this.headers = headers;
-    this.log_id = headers?.['x-log-id'];
+    this.log_id = headers?.get('x-tt-logid');
 
     this.error = error;
     this.code = error?.['code'];
@@ -49,8 +49,6 @@ export class APIError extends CozeError {
       if (help_doc) {
         list.push(`help doc: ${help_doc}`);
       }
-
-      console.log('headers', headers?.get('x-tt-logid'));
 
       return list.join(', ');
     }

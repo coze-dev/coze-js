@@ -8,7 +8,7 @@ export class APIResource {
     this._client = client;
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected _toFormData(body: any) {
+  protected _toFormData<T extends Record<string, any>>(body?: T | null) {
     const formData = new FormData();
     Object.entries(body || {}).map(([key, value]) => {
       if (key === 'file') {

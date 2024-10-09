@@ -1,7 +1,6 @@
 import { CozeAPI, getOAuthToken, getAuthenticationUrl, getPKCEAuthenticationUrl } from '@coze/api';
 import { useEffect, useState } from 'react';
 import { SettingConfig } from './Setting';
-import { EnterMessage } from '@coze/api/v2';
 
 let client: CozeAPI;
 const redirectUrl = 'http://localhost:3000';
@@ -92,7 +91,7 @@ const useCozeAPI = () => {
   }
 
   async function streamingChat(query: string) {
-    let messages: EnterMessage[];
+    let messages: any[];
     if (fileId) {
       messages = [
         {
@@ -157,10 +156,14 @@ const useCozeAPI = () => {
 
   const uploadFile = async (file: File) => {
     setIsReady(false);
-    const res = await client.files.create({ file });
-    setFileId(res.id);
-    setIsReady(true);
-    console.log(res);
+    try {
+      const res = await client.files.create({ file });
+      setFileId(res.id);
+      setIsReady(true);
+      console.log(res);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return { message, sendMessage, initClient, isReady, uploadFile };

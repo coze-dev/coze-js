@@ -85,7 +85,7 @@ export interface UpdateBotReq {
     prologue?: string;
     suggested_questions?: string[];
   };
-  knowledge: KnowledgeInfo;
+  knowledge?: KnowledgeInfo;
 }
 
 export interface PublishBotReq {

@@ -15,5 +15,5 @@ export class CozeAPI extends APIClient {
   workflows: API.Workflows = new API.Workflows(this);
   workspaces: API.Workspaces = new API.Workspaces(this);
 }
-
 export * from './auth.js';
+export * from './resources/index.js';

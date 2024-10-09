@@ -512,7 +512,10 @@ export type MetaDataType = Record<string, string>;
  */
 export type BotModeType = 0 | 1;
 
-export type RoleType = 'user' | 'assistant';
+export enum RoleType {
+  User = 'user',
+  Assistant = 'assistant',
+}
 
 /**
  * 对于 `text` 类型，`content` 除了是普通的文本之外，也可能也是一个 JSON 的字符串。

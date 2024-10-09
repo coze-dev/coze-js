@@ -6,8 +6,7 @@
   "scripts": {
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "start": "react-scripts start",
-    "test": "react-scripts test"
+    "start": "react-scripts start"
   },
   "browserslist": {
     "production": [

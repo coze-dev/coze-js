@@ -1,5 +1,6 @@
 import { DEFAULT_BASE_URL } from './constant.js';
 import { APIClient } from './core.js';
+import { crypto } from './shims/index.js';
 
 export const getAuthenticationUrl = (config: { baseURL?: string; clientId: string; redirectUrl: string; state?: string }) => {
   const baseUrl = (config.baseURL ?? DEFAULT_BASE_URL).replace('https://api', 'https://www');
