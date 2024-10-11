@@ -16,7 +16,8 @@ export class Files extends APIResource {
   }
 }
 export interface CreateFileReq {
-  file: FileLike;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  file: FileLike | any;
 }
 
 export interface FileObject {

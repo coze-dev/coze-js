@@ -12,7 +12,7 @@ export class APIResource {
     const formData = new FormData();
     Object.entries(body || {}).map(([key, value]) => {
       if (key === 'file') {
-        formData.set('file', value as FileLike, (value as FileLike).name);
+        formData.set('file', value, (value as FileLike).name);
       } else {
         formData.set(key, value);
       }

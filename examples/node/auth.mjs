@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { CozeAPI, getDeviceCode, getDeviceToken, getJWTToken } from '../../dist/node/index.js';
+import { CozeAPI, getDeviceCode, getDeviceToken, getJWTToken } from '../../dist/index.js';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 

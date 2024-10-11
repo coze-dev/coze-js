@@ -9,24 +9,50 @@
   },
   "license": "MIT",
   "type": "module",
-  "main": "dist/node/index.js",
-  "browser": "dist/web/index.js",
-  "types": "dist/node/index.d.ts",
+  "exports": {
+    "./dist/shims/web/index.js": {
+      "browser": {
+        "types": "./dist/shims/web/index.d.ts",
+        "require": "./dist/shims/web/index.js",
+        "default": "./dist/shims/web/index.js"
+      }
+    },
+    "./dist/shims/node/index.js": {
+      "node": {
+        "types": "./dist/shims/node/index.d.ts",
+        "require": "./dist/shims/node/index.js",
+        "default": "./dist/shims/node/index.js"
+      }
+    },
+    "./dist/shims/index.js": {
+      "browser": "./dist/shims/web/index.js",
+      "node": "./dist/shims/node/index.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "dist/index.js",
+  "browser": {
+    "@coze/api": ".",
+    "@coze/api/dist/shims/node/index.js": "./dist/shims/web/index.js"
+  },
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist/node && tsc -b tsconfig.json",
-    "build:web": "rm -rf dist/web && tsc -b tsconfig.web.json && mv dist/web/shims/web/* dist/web/shims",
+    "build": "rm -rf dist && tsc -b tsconfig.json",
     "format": "prettier --write .",
     "preinstall": "npx only-allow pnpm",
     "lint": "eslint . --cache",
     "prepare": "husky",
     "prepublishOnly": "npm run build",
     "start": "rm -rf dist/node && tsc -b -w tsconfig.json",
-    "start:web": "rm -rf dist/web && tsc -b -w tsconfig.web.json && mv dist/web/shims/web/* dist/web/shims",
     "test": "jest --coverage --config=jest.config.cjs ./test/*"
   },
   "dependencies": {

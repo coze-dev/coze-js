@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { client, spaceId } from './client.mjs';
-import { CozeAPI } from '../../dist/node/index.js';
+import { CozeAPI } from '../../dist/index.js';
 
 async function test_BadRequestError() {
   try {

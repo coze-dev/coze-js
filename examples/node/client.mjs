@@ -1,4 +1,4 @@
-import { CozeAPI } from '../../dist/node/index.js';
+import { CozeAPI } from '../../dist/index.js';
 
 const apiKey = process.env.COZE_API_KEY || '';
 const botId = process.env.COZE_BOT_ID || '';

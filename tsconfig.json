@@ -11,14 +11,18 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "module": "ES2022",
-    "outDir": "./dist/node",
+    "outDir": "./dist",
     "target": "ES2022",
     "types": ["node", "jest"],
+    "baseUrl": ".",
+    "paths": {
+      "@coze/api/dist/*": ["src/*"]
+    }
   },
   "ts-node": {
     "swc": true,
-    "esm": true,
+    "esm": true
   },
   "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules"]
 }
