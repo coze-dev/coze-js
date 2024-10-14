@@ -3,8 +3,22 @@ import { safeJsonParse } from '../../utils.js';
 import { APIResource, type ErrorData } from '../resource.js';
 
 export class Chat extends APIResource {
+  /**
+   * Call the Chat API to send messages to a published Coze agent. | 调用此接口发起一次对话，支持添加上下文
+   * @docs en:https://www.coze.com/docs/developer_guides/chat_v3?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/chat_v3?_lang=zh
+   * @param params - Required The parameters for creating a chat session. | 创建会话的参数。
+   * @param params.bot_id - Required The ID of the agent. | 要进行会话聊天的 Bot ID。
+   * @param params.user_id - Required The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
+   * @param params.additional_messages - Optional Additional messages for the conversation. | 对话的附加信息。
+   * @param params.custom_variables - Optional Variables defined in the Bot. | Bot 中定义的变量。
+   * @param params.auto_save_history - Optional Whether to automatically save the conversation history. | 是否自动保存历史对话记录。
+   * @param params.meta_data - Optional Additional metadata for the message. | 创建消息时的附加消息。
+   * @param params.conversation_id - Optional The ID of the conversation. | 标识对话发生在哪一次会话中。
+   * @param params.extra_params - Optional Extra parameters for the conversation. | 附加参数。
+   * @returns The data of the created chat. | 创建的对话数据。
+   */
   async create(params: CreateChatReq): Promise<CreateChatData> {
-    // TODO 这个接口需要特殊处理, 通常一个POST请求，URL不应该包含查询参数的
     const { conversation_id, ...rest } = params;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
@@ -15,8 +29,22 @@ export class Chat extends APIResource {
     return result.data;
   }
 
+  /**
+   * Call the Chat API to send messages to a published Coze agent with streaming response. | 调用此接口发起一次对话，支持流式响应。
+   * @docs en:https://www.coze.com/docs/developer_guides/chat_v3?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/chat_v3?_lang=zh
+   * @param params - Required The parameters for streaming a chat session. | 流式会话的参数。
+   * @param params.bot_id - Required The ID of the agent. | 要进行会话聊天的 Bot ID。
+   * @param params.user_id - Required The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
+   * @param params.additional_messages - Optional Additional messages for the conversation. | 对话的附加信息。
+   * @param params.custom_variables - Optional Variables defined in the Bot. | Bot 中定义的变量。
+   * @param params.auto_save_history - Optional Whether to automatically save the conversation history. | 是否自动保存历史对话记录。
+   * @param params.meta_data - Optional Additional metadata for the message. | 创建消息时的附加消息。
+   * @param params.conversation_id - Optional The ID of the conversation. | 标识对话发生在哪一次会话中。
+   * @param params.extra_params - Optional Extra parameters for the conversation. | 附加参数。
+   * @returns A stream of chat data. | 对话数据流。
+   */
   async stream(params: StreamChatReq): Promise<Stream<StreamChatData, { event: string; data: string }>> {
-    // TODO 这个接口需要特殊处理
     const { conversation_id, ...rest } = params;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
@@ -43,20 +71,42 @@ export class Chat extends APIResource {
     );
   }
 
+  /**
+   * Get the detailed information of the chat. | 查看对话的详细信息。
+   * @docs en:https://www.coze.com/docs/developer_guides/retrieve_chat?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/retrieve_chat?_lang=zh
+   * @param conversation_id - Required The ID of the conversation. | 会话 ID。
+   * @param chat_id - Required The ID of the chat. | 对话 ID。
+   * @returns The data of the retrieved chat. | 检索到的对话数据。
+   */
   async retrieve(conversation_id: string, chat_id: string): Promise<CreateChatData> {
-    // TODO 这个接口需要特殊处理, 通常一个POST请求，URL不应该包含查询参数的
     const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const result = await this._client.post<unknown, { data: CreateChatData }>(apiUrl);
     return result.data;
   }
 
+  /**
+   * Get the list of messages in a chat. | 获取对话中的消息列表。
+   * @docs en:https://www.coze.com/docs/developer_guides/chat_message_list?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/chat_message_list?_lang=zh
+   * @param conversation_id - Required The ID of the conversation. | 会话 ID。
+   * @param chat_id - Required The ID of the chat. | 对话 ID。
+   * @returns An array of chat messages. | 对话消息数组。
+   */
   async history(conversation_id: string, chat_id: string): Promise<ChatV3Message[]> {
-    // TODO 这个接口需要特殊处理, 通常一个POST请求，URL不应该包含查询参数的
     const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const result = await this._client.get<unknown, { data: ChatV3Message[] }>(apiUrl);
     return result.data;
   }
 
+  /**
+   * Cancel a chat session. | 取消对话会话。
+   * @docs en:https://www.coze.com/docs/developer_guides/cancel_chat?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/cancel_chat?_lang=zh
+   * @param conversation_id - Required The ID of the conversation. | 会话 ID。
+   * @param chat_id - Required The ID of the chat. | 对话 ID。
+   * @returns The data of the canceled chat. | 取消的对话数据。
+   */
   async cancel(conversation_id: string, chat_id: string): Promise<CreateChatData> {
     const apiUrl = `/v3/chat/cancel`;
     const payload = { conversation_id, chat_id };
@@ -64,8 +114,18 @@ export class Chat extends APIResource {
     return result.data;
   }
 
+  /**
+   * Submit tool outputs for a chat session. | 提交对话会话的工具输出。
+   * @docs en:https://www.coze.com/docs/developer_guides/chat_submit_tool_outputs?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/chat_submit_tool_outputs?_lang=zh
+   * @param params - Required Parameters for submitting tool outputs. | 提交工具输出的参数。
+   * @param params.conversation_id - Required The ID of the conversation. | 会话 ID。
+   * @param params.chat_id - Required The ID of the chat. | 对话 ID。
+   * @param params.tool_outputs - Required The outputs of the tool. | 工具的输出。
+   * @param params.stream - Optional Whether to use streaming response. | 是否使用流式响应。
+   * @returns The data of the submitted tool outputs or a stream of chat data. | 提交的工具输出数据或对话数据流。
+   */
   async submitToolOutputs(params: SubmitToolOutputsReq) {
-    // TODO 这个接口需要特殊处理
     const { conversation_id, chat_id, ...rest } = params;
     const apiUrl = `/v3/chat/submit_tool_outputs?conversation_id=${params.conversation_id}&chat_id=${params.chat_id}`;
     const payload = { ...rest };
@@ -293,7 +353,7 @@ export interface StreamChatReq {
   auto_save_history?: boolean;
 
   /**
-   * 创建消息时的附加消息，获取消息时也会返回此附加消息。
+   * 创建消息时的附加消息，获取消息时也会返回此附���消息。
    * 自定义键值对，应指定为 Map 对象格式。长度为 16 对键值对，其中键（key）的长度范围为 1～64 个字符，值（value）的长度范围为 1～512 个字符。
    */
   meta_data?: MetaDataType;
@@ -393,7 +453,7 @@ export interface ChatV3Message {
   /**
    * 消息的内容，支持纯文本、多模态（文本、图片、文件混合输入）、卡片等多种类型的内容。
    */
-  content: string | ObjectStringItem[];
+  content: string;
 
   /**
    * 消息内容的类型，取值包括：

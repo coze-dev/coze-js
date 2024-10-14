@@ -134,4 +134,5 @@ dist
 *.pem
 *.txt
 *.docx
+tmp-api-docs/
 

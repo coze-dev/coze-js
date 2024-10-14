@@ -2,27 +2,84 @@
 import { APIResource } from '../resource.js';
 
 export class Bots extends APIResource {
+  /**
+   * Create a new agent. | 调用接口创建一个新的智能体。
+   * @docs en:https://www.coze.com/docs/developer_guides/create_bot?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/create_bot?_lang=zh
+   * @param params - Required The parameters for creating a bot. | 创建 Bot 的参数。
+   * @param params.space_id - Required The Space ID of the space where the agent is located. | Bot 所在的空间的 Space ID。
+   * @param params.name - Required The name of the agent. It should be 1 to 20 characters long. | Bot 的名称。
+   * @param params.description - Optional The description of the agent. It can be 0 to 500 characters long. | Bot 的描述信息。
+   * @param params.icon_file_id - Optional The file ID for the agent's avatar. | 作为智能体头像的文件 ID。
+   * @param params.prompt_info - Optional The personality and reply logic of the agent. | Bot 的提示词配置。
+   * @param params.onboarding_info - Optional The settings related to the agent's opening remarks. | Bot 的开场白配置。
+   * @returns Information about the created bot. | 创建的 Bot 信息。
+   */
   async create(params: CreateBotReq): Promise<CreateBotData> {
     const apiUrl = '/v1/bot/create';
     const result = await this._client.post<CreateBotReq, { data: CreateBotData }>(apiUrl, params);
     return result.data;
   }
+
+  /**
+   * Update the configuration of an agent. | 调用接口修改智能体的配置。
+   * @docs en:https://www.coze.com/docs/developer_guides/update_bot?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/update_bot?_lang=zh
+   * @param params - Required The parameters for updating a bot. | 修改 Bot 的参数。
+   * @param params.bot_id - Required The ID of the agent that the API interacts with. | 待修改配置的智能体ID。
+   * @param params.name - Optional The name of the agent. | Bot 的名称。
+   * @param params.description - Optional The description of the agent. | Bot 的描述信息。
+   * @param params.icon_file_id - Optional The file ID for the agent's avatar. | 作为智能体头像的文件 ID。
+   * @param params.prompt_info - Optional The personality and reply logic of the agent. | Bot 的提示词配置。
+   * @param params.onboarding_info - Optional The settings related to the agent's opening remarks. | Bot 的开场白配置。
+   * @param params.knowledge - Optional Knowledge configurations of the agent. | Bot 的知识库配置。
+   * @returns Undefined | 无返回值
+   */
   async update(params: UpdateBotReq): Promise<undefined> {
     const apiUrl = '/v1/bot/update';
     const result = await this._client.post<UpdateBotReq, { data: undefined }>(apiUrl, params);
     return result.data;
   }
+
+  /**
+   * Get the agents published as API service. | 调用接口查看指定空间发布到 Agent as API 渠道的智能体列表。
+   * @docs en:https://www.coze.com/docs/developer_guides/published_bots_list?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/published_bots_list?_lang=zh
+   * @param params - Required The parameters for listing bots. | 列出 Bot 的参数。
+   * @param params.space_id - Required The ID of the space. | Bot 所在的空间的 Space ID。
+   * @param params.page_size - Optional Pagination size. | 分页大小。
+   * @param params.page_index - Optional Page number for paginated queries. | 分页查询时的页码。
+   * @returns List of published bots. | 已发布的 Bot 列表。
+   */
   async list(params: ListBotReq): Promise<ListBotData> {
     const apiUrl = '/v1/space/published_bots_list';
     const result = await this._client.get<ListBotReq, { data: ListBotData }>(apiUrl, params);
     return result.data;
   }
+
+  /**
+   * Publish the specified agent as an API service. | 调用接口创建一个新的智能体。
+   * @docs en:https://www.coze.com/docs/developer_guides/publish_bot?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/publish_bot?_lang=zh
+   * @param params - Required The parameters for publishing a bot. | 发布 Bot 的参数。
+   * @param params.bot_id - Required The ID of the agent that the API interacts with. | 要发布的智能体ID。
+   * @param params.connector_ids - Required The list of publishing channel IDs for the agent. | 智能体的发布渠道 ID 列表。
+   * @returns Undefined | 无返回值
+   */
   async publish(params: PublishBotReq): Promise<undefined> {
     const apiUrl = '/v1/bot/publish';
     const result = await this._client.post<PublishBotReq, { data: undefined }>(apiUrl, params);
     return result.data;
   }
 
+  /**
+   * Get the configuration information of the agent. | 获取指定智能体的配置信息。
+   * @docs en:https://www.coze.com/docs/developer_guides/get_metadata?_lang=en
+   * @docs zh:https://www.coze.cn/docs/developer_guides/get_metadata?_lang=zh
+   * @param params - Required The parameters for retrieving a bot. | 获取 Bot 的参数。
+   * @param params.bot_id - Required The ID of the agent that the API interacts with. | 要查看的智能体ID。
+   * @returns Information about the bot. | Bot 的配置信息。
+   */
   async retrieve(params: RetrieveBotReq): Promise<BotInfo> {
     const apiUrl = '/v1/bot/get_online_info';
     const result = await this._client.get<RetrieveBotReq, { data: BotInfo }>(apiUrl, params);

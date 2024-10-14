@@ -3,11 +3,31 @@ import { safeJsonParse } from '../../../utils.js';
 import { APIResource } from '../../resource.js';
 
 export class Runs extends APIResource {
+  /**
+   * Initiates a workflow run. | 启动工作流运行。
+   * @docs en: [English documentation link]
+   * @docs zh: [Chinese documentation link]
+   * @param params.workflow_id - Required The ID of the workflow to run. | 必选 要运行的工作流 ID。
+   * @param params.bot_id - Optional The ID of the bot associated with the workflow. | 可选 与工作流关联的机器人 ID。
+   * @param params.parameters - Optional Parameters for the workflow execution. | 可选 工作流执行的参数。
+   * @param params.ext - Optional Additional information for the workflow execution. | 可选 工作流执行的附加信息。
+   * @returns RunWorkflowData | 工作流运行数据
+   */
   async create(params: RunWorkflowReq) {
     const apiUrl = `/v1/workflow/run`;
     const response = await this._client.post<RunWorkflowReq, RunWorkflowData>(apiUrl, params);
     return response;
   }
+  /**
+   * Streams the workflow run events. | 流式传输工作流运行事件。
+   * @docs en: [English documentation link]
+   * @docs zh: [Chinese documentation link]
+   * @param params.workflow_id - Required The ID of the workflow to run. | 必选 要运行的工作流 ID。
+   * @param params.bot_id - Optional The ID of the bot associated with the workflow. | 可选 与工作流关联的机器人 ID。
+   * @param params.parameters - Optional Parameters for the workflow execution. | 可选 工作流执行的参数。
+   * @param params.ext - Optional Additional information for the workflow execution. | 可选 工作流执行的附加信息。
+   * @returns Stream<WorkflowEvent, { id: string; event: string; data: string }> | 工作流事件流
+   */
   async stream(params: RunWorkflowReq) {
     const apiUrl = `/v1/workflow/stream_run`;
     const response = await this._client.post<RunWorkflowReq, Response>(apiUrl, params, true);
@@ -28,6 +48,16 @@ export class Runs extends APIResource {
       },
     );
   }
+  /**
+   * Resumes a paused workflow run. | 恢复暂停的工作流运行。
+   * @docs en: [English documentation link]
+   * @docs zh: [Chinese documentation link]
+   * @param params.workflow_id - Required The ID of the workflow to resume. | 必选 要恢复的工作流 ID。
+   * @param params.event_id - Required The ID of the event to resume from. | 必选 要从中恢复的事件 ID。
+   * @param params.resume_data - Required Data needed to resume the workflow. | 必选 恢复工作流所需的数据。
+   * @param params.interrupt_type - Required The type of interruption to resume from. | 必选 要恢复的中断类型。
+   * @returns { id: string; event: WorkflowEventType; data: WorkflowEventMessage | WorkflowEventInterrupt | WorkflowEventError | null } | 恢复的工作流事件数据
+   */
 
   async resume(params: ResumeWorkflowReq) {
     const apiUrl = `/v1/workflow/stream_resume`;
