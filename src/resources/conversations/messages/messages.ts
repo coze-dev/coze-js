@@ -15,7 +15,6 @@ export class Messages extends APIResource {
    * @returns Information about the new message. | 消息详情。
    */
   async create(conversation_id: string, params: CreateMessageReq) {
-    // TODO 按照restful规范，conversion_id 应该放在path中，而不是query中
     const apiUrl = `/v1/conversation/message/create?conversation_id=${conversation_id}`;
     const response = await this._client.post<CreateMessageReq, { data: ChatV3Message }>(apiUrl, params);
     return response.data;
@@ -34,7 +33,6 @@ export class Messages extends APIResource {
    * @returns Information about the modified message. | 消息详情。
    */
   async update(conversation_id: string, message_id: string, params: UpdateMessageReq) {
-    // TODO 这个接口好奇怪，response 是 message 而不是 data
     const apiUrl = `/v1/conversation/message/modify?conversation_id=${conversation_id}&message_id=${message_id}`;
     const response = await this._client.post<UpdateMessageReq, { message: ChatV3Message }>(apiUrl, params);
     return response.message;

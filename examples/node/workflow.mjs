@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { client, botId, workflowId } from './client.mjs';
-
+import assert from 'assert';
 async function streamWorkflow() {
+  assert(botId, 'botId is required');
+  assert(workflowId, 'workflowId is required');
   const workflow = await client.workflows.runs.stream({
     workflow_id: workflowId,
     parameters: { norco: 'JavaScript' },
@@ -14,6 +16,8 @@ async function streamWorkflow() {
 }
 
 async function nonStreamWorkflow() {
+  assert(botId, 'botId is required');
+  assert(workflowId, 'workflowId is required');
   const workflow = await client.workflows.runs.create({
     workflow_id: workflowId,
     parameters: { norco: 'JavaScript' },

@@ -1,6 +1,8 @@
+import assert from 'assert';
 import { client, spaceId } from './client.mjs';
 
 async function main() {
+  assert(spaceId, 'spaceId is required');
   const bot = await client.bots.create({
     space_id: spaceId,
     name: 'test',

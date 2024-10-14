@@ -11,7 +11,6 @@ export class Files extends APIResource {
    * @returns Information about the new file. | 已上传的文件信息。
    */
   async create(params: CreateFileReq) {
-    // TODO file upload 需特殊处理
     const apiUrl = `/v1/files/upload`;
     const response = await this._client.post<FormData, { data: FileObject }>(apiUrl, this._toFormData(params));
     return response.data;

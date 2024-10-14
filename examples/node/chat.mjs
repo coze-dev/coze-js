@@ -1,10 +1,12 @@
 /* eslint-disable no-unused-vars */
 import { client, botId } from './client.mjs';
 import { clearLine, cursorTo } from 'node:readline';
+import assert from 'assert';
 
 const query = '来一段有趣的代码';
 
 async function streamingChat(callback) {
+  assert(botId, 'botId is required');
   const v = await client.chat.stream({
     bot_id: botId,
     user_id: '123',
@@ -51,6 +53,7 @@ async function sleep(ms) {
 }
 
 async function nonStreamingChat() {
+  assert(botId, 'botId is required');
   console.log('=== Non-Streaming Chat ===');
 
   const v = await client.chat.create({

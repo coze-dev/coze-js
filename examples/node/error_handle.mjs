@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { client, spaceId } from './client.mjs';
 import { CozeAPI } from '../../dist/index.js';
+import assert from 'assert';
 
 async function test_BadRequestError() {
   try {
@@ -40,6 +41,7 @@ async function test_AuthenticationError() {
 }
 
 async function test_PermissionDeniedError() {
+  assert(spaceId, 'spaceId is required');
   try {
     const bot = await client.bots.create({
       space_id: spaceId,
@@ -57,6 +59,7 @@ async function test_PermissionDeniedError() {
 }
 
 async function test_NotFoundError() {
+  assert(spaceId, 'spaceId is required');
   try {
     const client = new CozeAPI({
       baseURL: 'https://api.coze.cn/xxx',
