@@ -1,14 +1,19 @@
 import { DEFAULT_BASE_URL } from './constant.js';
 import { APIError, type ErrorRes } from './error.js';
-import * as API from './resources/index.js';
-import { fetch, type FileLike, FormData, type RequestInit, type Response, isBrowser } from './shims/index.js';
+import { fetch, FormData, type RequestInit, isBrowser } from './shims/index.js';
 import * as Errors from './error.js';
+import { fetchAPI, type StreamType } from './base/fetcher';
 
 export interface ClientOptions {
   baseURL?: string;
   token: string;
   timeout?: number; // TODO unsupport yet!
   fetch?: typeof fetch; // TODO unsupport yet!
+}
+interface ResponseType {
+  code: number;
+  msg?: string;
+  error?: ErrorRes;
 }
 
 export class APIClient {
@@ -59,7 +64,8 @@ export class APIClient {
     const fullUrl = `${this.baseURL}${apiUrl}`;
     const options = this.buildOptions(method, body);
 
-    const response = await this.fetch(fullUrl, options);
+    // const response = await this.fetch(fullUrl, options);
+    const { response, stream, output } = await fetchAPI<ResponseType | StreamType>(fullUrl, options);
 
     const contentType = response.headers.get('content-type');
 
@@ -82,22 +88,22 @@ export class APIClient {
         //   body: {"code":4000,"msg":"Request parameter error"}
         // 这种奇葩设计
 
-        const result = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
+        const result = (await response.json()) as ResponseType;
         const { code, msg } = result;
         if (code !== 0 && code !== undefined) {
           console.debug('request url:', fullUrl, 'body:', body);
           throw APIError.generate(response.status, result as ErrorRes, msg, response.headers);
         }
       }
-      return response as Rsp;
+      return stream as StreamType;
     }
 
     if (contentType && contentType.includes('application/json')) {
-      const result = (await response.json()) as { code: number; msg: string } & Record<string, unknown>;
-      const { code, msg } = result;
+      const result = await output();
+      const { code, msg } = result as ResponseType;
       if (code !== 0 && code !== undefined) {
         console.debug('request url:', fullUrl, 'body:', body);
-        throw APIError.generate(response.status, result as ErrorRes, msg, response.headers);
+        throw APIError.generate(response.status, output as unknown as ErrorRes, msg, response.headers);
       }
 
       return result as Rsp;
