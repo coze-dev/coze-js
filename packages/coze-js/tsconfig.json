@@ -1,24 +1,8 @@
 {
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@coze-infra/ts-config/tsconfig.node.json",
   "compilerOptions": {
-    "noImplicitAny": false,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "esModuleInterop": true,
-    "declaration": true,
-    "declarationMap": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "module": "ES2022",
-    "outDir": "./dist",
-    "target": "ES2022",
-    "types": ["node", "jest"],
+    "outDir": "./dist"
   },
-  "ts-node": {
-    "swc": true,
-    "esm": true,
-  },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"],
+  "references": [{ "path": "./tsconfig.build.json" },{"path": "./tsconfig.misc.json"}]
 }

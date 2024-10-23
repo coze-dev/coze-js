@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc.json",
+  "extends": ["./ts-standard-rules.json"],
+  "plugins": ["@typescript-eslint", "unicorn"],
+  "rules": {
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["default", "variableLike"],
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": ["class", "interface", "typeLike"],
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": ["variable"],
+        "format": ["UPPER_CASE", "camelCase", "PascalCase"],
+        "modifiers": ["global", "exported"]
+      },
+      {
+        "selector": "objectLiteralProperty",
+        "format": null
+      },
+      {
+        "selector": "enumMember",
+        "format": ["UPPER_CASE", "PascalCase"]
+      },
+      {
+        "selector": "typeProperty",
+        "format": ["camelCase", "snake_case"]
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "forbid"
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase", "snake_case"],
+        "modifiers": ["destructured"]
+      },
+      {
+        "selector": "variable",
+        "modifiers": ["destructured"],
+        "format": [
+          "camelCase",
+          "PascalCase",
+          "snake_case",
+          "strictCamelCase",
+          "StrictPascalCase",
+          "UPPER_CASE"
+        ]
+      },
+      {
+        "selector": "import",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "function",
+        "format": ["camelCase", "PascalCase"],
+        "leadingUnderscore": "forbid",
+        "trailingUnderscore": "forbid"
+      },
+      {
+        "selector": "variable",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"],
+        "leadingUnderscore": "allow"
+      }
+    ],
+    "unicorn/filename-case": [
+      "warn",
+      {
+        "cases": {
+          "kebabCase": true,
+          "snakeCase": true,
+          "pascalCase": true
+        },
+        "ignore": ["^(?!.*?\\.jsx$)(?!.*?\\.tsx$).+"]
+      }
+    ],
+    "max-lines-per-function": [
+      "warn",
+      {
+        "max": 300,
+        "IIFEs": true
+      }
+    ]
+  }
+}

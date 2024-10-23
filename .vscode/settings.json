@@ -29,12 +29,27 @@
   "files.exclude": {
     "**/.git": true,
     "**/.DS_Store": true,
-    "**/.swc": true
+    "**/.swc": true,
+    "**/.rush": true,
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
     "**/node_modules/*/**": true
+  },
+  "files.defaultLanguage": "plaintext",
+  "files.associations": {
+    ".babelrc": "json",
+    ".eslintrc": "jsonc",
+    ".eslintrc*.json": "jsonc",
+    ".stylelintrc": "javascript",
+    "stylelintrc": "jsonc",
+    "*.json": "jsonc",
+    "package.json": "json",
+    "README": "markdown",
+    "**/coverage/**/*.*": "plaintext",
+    "**/pnpm-lock.yaml": "plaintext",
+    "**/*.yml": "yaml"
   },
   "search.useIgnoreFiles": true,
   "files.eol": "\n",

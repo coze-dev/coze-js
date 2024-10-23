@@ -131,3 +131,33 @@ dist
 
 # Temp file
 *.xlsx
+
+
+node_modules
+
+.eslintcache
+
+common/temp
+
+# OS X temporary files
+.DS_Store
+
+# IntelliJ IDEA project files; if you want to commit IntelliJ settings, this recipe may be helpful:
+# https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+.idea/
+*.iml
+
+common/autoinstallers/*/.npmrc
+
+**/.rush/temp/
+*.lock
+
+# Heft temporary files
+.cache
+.heft
+
+.vercel/output
+rush-logs
+dist
+
+*.tsbuildinfo

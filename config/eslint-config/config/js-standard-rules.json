@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc.json",
+  "extends": ["./common-standard-rules.json"],
+  "plugins": ["unicorn", "react"],
+  "rules": {
+    "no-import-assign": "error",
+    "no-extra-semi": "error",
+    "no-undef": "error",
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "comma-dangle": ["error", "always-multiline"],
+    "no-array-constructor": "error",
+    "dot-notation": "error",
+    "constructor-super": "error",
+    "no-this-before-super": "error",
+    "no-useless-constructor": "error",
+    "getter-return": [
+      "error",
+      {
+        "allowImplicit": true
+      }
+    ],
+    "no-setter-return": "error",
+    "no-dupe-class-members": "error",
+    "default-param-last": "error",
+    "no-func-assign": "error",
+    "no-unsafe-negation": "error",
+    "valid-typeof": "error",
+    "no-empty-function": "error",
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "no-loss-of-precision": "error",
+    "no-magic-numbers": [
+      "warn",
+      {
+        "ignoreArrayIndexes": true,
+        "ignoreDefaultValues": true,
+        "enforceConst": true,
+        "ignore": [0, 1, -1],
+        "ignoreClassFieldInitialValues": true
+      }
+    ],
+    "no-unreachable": "error",
+    "no-throw-literal": "error",
+    "no-implied-eval": "error",
+    "no-new-symbol": "error",
+    "no-obj-calls": "error",
+    "camelcase": [
+      "error",
+      {
+        "properties": "never",
+        "allow": ["^UNSAFE_"],
+        "ignoreDestructuring": true
+      }
+    ],
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "kebabCase": true
+        }
+      }
+    ],
+    "max-lines-per-function": [
+      "error",
+      {
+        "max": 300,
+        "IIFEs": true
+      }
+    ]
+  }
+}
