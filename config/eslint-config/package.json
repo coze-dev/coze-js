@@ -39,7 +39,7 @@
     "@stylistic/eslint-plugin-ts": "^2.8.0",
     "@typescript-eslint/eslint-plugin": "^8.5.0",
     "@typescript-eslint/parser": "^8.5.0",
-    "eslint": "^9.13.0",
+    "eslint": "^8.54.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-react-app": "^7",
@@ -58,7 +58,6 @@
     "eslint-plugin-risxss": "~2.1.0",
     "eslint-plugin-security": "3.0.1",
     "eslint-plugin-unicorn": "48.0.1",
-    "json5": "^2.2.1",
     "prettier": "^3.2.4",
     "prettier-plugin-packagejson": "^2.5.1",
     "sucrase": "^3.32.0"
