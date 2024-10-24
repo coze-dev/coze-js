@@ -47,6 +47,7 @@
     "*.json": "jsonc",
     "package.json": "json",
     "README": "markdown",
+    "CODEOWNERS": "ini",
     "**/coverage/**/*.*": "plaintext",
     "**/pnpm-lock.yaml": "plaintext",
     "**/*.yml": "yaml"

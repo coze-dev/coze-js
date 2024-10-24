@@ -8,6 +8,7 @@
     "url": "https://github.com/coze-dev/coze-js.git"
   },
   "license": "MIT",
+  "author": "Leeight <leeight@gmail.com>",
   "type": "module",
   "exports": {
     ".": "./dist/index.js"

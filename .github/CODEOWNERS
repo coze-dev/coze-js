@@ -1,0 +1,8 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence
+* @fanwenjie.fe@bytedance.com
+
+packages/coze-js/* @jackshen310 @leeight@gmail.com @jsongo
+
+# do not need reviewers for these files
+pnpm-lock.yaml @none-owners
