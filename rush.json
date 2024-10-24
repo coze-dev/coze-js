@@ -378,8 +378,12 @@
       "projectFolder": "config/ts-config"
     },
     {
-      "packageName": "@coze/coze-js",
+      "packageName": "@coze/api",
       "projectFolder": "packages/coze-js"
+    },
+    {
+      "packageName": "@coze/api-node-example",
+      "projectFolder": "packages/coze-js/examples/node"
     }
   ]
 }

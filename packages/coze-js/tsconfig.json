@@ -2,10 +2,15 @@
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@coze-infra/ts-config/tsconfig.node.json",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "moduleResolution": "node",
+    "module": "ES2022",
+    "lib": ["es2015", "dom"],
+    "types": ["node"],
+    "target": "es2022"
   },
   "references": [
     { "path": "./tsconfig.build.json" },
-    {"path": "./tsconfig.misc.json"}
-]
+    { "path": "./tsconfig.misc.json" }
+  ]
 }

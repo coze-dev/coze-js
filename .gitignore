@@ -161,3 +161,7 @@ rush-logs
 dist
 
 *.tsbuildinfo
+
+# Temp file
+**/examples/node/tmp/
+**/examples/node/config.js

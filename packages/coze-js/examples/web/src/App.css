@@ -1,0 +1,53 @@
+.auth {
+  width: 612px;
+  margin: 0 auto;
+  .item {
+    margin-top: 10px;
+    width: 800px;
+  }
+  input,
+  select {
+    width: 500px;
+    height: 24px;
+  }
+  button {
+    margin-top: 10px;
+    width: 80px;
+    height: 30px;
+  }
+}
+.header {
+  margin-top: 10px;
+  align-items: center;
+  width: 100%;
+
+  input {
+    width: 480px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+  button {
+    margin-left: 10px;
+    width: 120px;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 5px;
+  }
+
+  > div {
+    margin: 10px auto;
+    width: 620px;
+  }
+}
+.content {
+  /** 实现内容垂直居中 **/
+  width: 612px;
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid black;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  white-space: pre-wrap;
+}

@@ -1,41 +1,94 @@
-import { formatAddtionalMessages } from '../src/utils';
+import { isBrowser, safeJsonParse, sleep, mergeConfig } from '../src/utils';
 
-describe('formatAddtionalMessages', () => {
-  it('should return an empty array when input is undefined', () => {
-    expect(formatAddtionalMessages(undefined)).toEqual([]);
+describe('safeJsonParse', () => {
+  it('should return the parsed JSON if input is valid', () => {
+    const input = '{"name":"John","age":30}';
+    const result = safeJsonParse(input);
+    expect(result).toEqual({ name: 'John', age: 30 });
   });
 
-  it('should return an empty array when input is an empty array', () => {
-    expect(formatAddtionalMessages([])).toEqual([]);
+  it('should return the default value if input is not valid', () => {
+    const input = '{"name":"John","age":30';
+    const result = safeJsonParse(input);
+    expect(result).toEqual('');
+  });
+});
+
+describe('sleep', () => {
+  it('should return a promise that resolves after the specified time', async () => {
+    const startTime = Date.now();
+    await sleep(1000);
+    const endTime = Date.now();
+    expect(endTime - startTime).toBeGreaterThanOrEqual(1000);
+  });
+});
+
+describe('isBrowser', () => {
+  it('should return false if running in a node', () => {
+    expect(isBrowser()).toBe(false);
+  });
+});
+
+describe('mergeConfig', () => {
+  it('should merge configurations correctly', () => {
+    const defaultConfig = {
+      baseURL: 'https://api.example.com',
+      timeout: 5000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const userConfig = {
+      timeout: 10000,
+      headers: {
+        Authorization: 'Bearer token123',
+      },
+    };
+
+    const options = {
+      headers: {
+        'X-Custom-Header': 'CustomValue',
+      },
+    };
+
+    const result = mergeConfig(defaultConfig, userConfig, options);
+
+    expect(result).toEqual({
+      baseURL: 'https://api.example.com',
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer token123',
+        'X-Custom-Header': 'CustomValue',
+      },
+    });
   });
 
-  it('should stringify content when content_type is "object_string" and content is an array', () => {
-    const input: any[] = [{ content_type: 'object_string', content: [1, 2, 3] }];
-    const expected = [{ content_type: 'object_string', content: '[1,2,3]' }];
-    expect(formatAddtionalMessages(input)).toEqual(expected);
+  it('should handle undefined inputs', () => {
+    const defaultConfig = {
+      baseURL: 'https://api.example.com',
+      timeout: 5000,
+    };
+
+    const result = mergeConfig(defaultConfig, undefined, undefined);
+
+    expect(result).toEqual(defaultConfig);
   });
 
-  it('should not modify content when content_type is not "object_string"', () => {
-    const input: any[] = [{ content_type: 'text', content: 'Hello' }];
-    expect(formatAddtionalMessages(input)).toEqual(input);
-  });
+  it('should override array values instead of merging them', () => {
+    const defaultConfig = {
+      methods: ['GET', 'POST'],
+    };
 
-  it('should not modify content when content_type is "object_string" but content is not an array', () => {
-    const input: any[] = [{ content_type: 'object_string', content: 'Hello' }];
-    expect(formatAddtionalMessages(input)).toEqual(input);
-  });
+    const userConfig = {
+      methods: ['PUT', 'DELETE'],
+    };
 
-  it('should handle mixed input correctly', () => {
-    const input: any[] = [
-      { content_type: 'object_string', content: [1, 2, 3] },
-      { content_type: 'text', content: 'Hello' },
-      { content_type: 'object_string', content: 'World' },
-    ];
-    const expected = [
-      { content_type: 'object_string', content: '[1,2,3]' },
-      { content_type: 'text', content: 'Hello' },
-      { content_type: 'object_string', content: 'World' },
-    ];
-    expect(formatAddtionalMessages(input)).toEqual(expected);
+    const result = mergeConfig(defaultConfig, userConfig);
+
+    expect(result).toEqual({
+      methods: ['PUT', 'DELETE'],
+    });
   });
 });
