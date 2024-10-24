@@ -22,7 +22,6 @@ module.exports = {
           .map(f => path.relative(projectFolder, f))
           .join(' ');
         // TSESTREE_SINGLE_RUN doc https://typescript-eslint.io/packages/parser/#allowautomaticsingleruninference
-        // 切换到项目文件夹，并运行 ESLint 命令
         return [
           `cd ${projectFolder}`,
           `TSESTREE_SINGLE_RUN=true eslint --fix --cache ${filesToCheck} --no-error-on-unmatched-pattern`,
@@ -32,24 +31,12 @@ module.exports = {
 
     if (!eslintCmds.length) return [];
     return [
-      // 这里不能直接返回 eslintCmds 数组，因为 lint-staged 会依次串行执行每个命令
-      // 而 concurrently 会并行执行多个命令
+      // We can't directly return the eslintCmds array here, because lint-staged would execute each command serially
+      // While concurrently will execute multiple commands in parallel
       `concurrently --kill-others-on-fail ${eslintCmds
         .map(r => `"${r}"`)
         .join(' ')}`,
     ];
   },
-  '**/*.{less,scss,css}': files => {
-    // 暂时只修复，不报错卡点
-    return [`stylelint ${files.join(' ')} --fix || exit 0`];
-  },
-  '**/package.json': async files => {
-    const match = micromatch.not(files, [
-      '**/common/_templates/!(_*)/**/(.)?*',
-    ]);
-    const filesToLint = await excludeIgnoredFiles(match);
-    if (!filesToLint) return [];
-    return [`eslint --cache ${filesToLint}`, `prettier ${filesToLint} --write`];
-  },
-  '**/!(package).json': 'prettier --write',
+  '**/*.json': 'prettier --write',
 };

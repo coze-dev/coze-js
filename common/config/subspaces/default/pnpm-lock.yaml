@@ -188,6 +188,9 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.16.15
+      '@types/uuid':
+        specifier: ^9.0.1
+        version: 9.0.8
       '@types/whatwg-fetch':
         specifier: ^0.0.33
         version: 0.0.33
@@ -1277,6 +1280,9 @@ packages:
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
+
+  '@types/uuid@9.0.8':
+    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
 
   '@types/whatwg-fetch@0.0.33':
     resolution: {integrity: sha512-XSWTlUwpjUyLiDu50HhtpUyhvt7QND1ANfyFfiw/TH63GC1ngZMl2rgxuH5SQKfPjMoKRXv94r7crWnJ3mg5tA==}
@@ -5043,6 +5049,8 @@ snapshots:
   '@types/semver@7.5.8': {}
 
   '@types/stack-utils@2.0.3': {}
+
+  '@types/uuid@9.0.8': {}
 
   '@types/whatwg-fetch@0.0.33':
     dependencies:

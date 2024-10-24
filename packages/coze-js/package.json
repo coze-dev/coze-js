@@ -20,7 +20,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -b tsconfig.json",
+    "build": "rm -rf dist && tsc -b tsconfig.build.json",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
     "prepublishOnly": "npm run build",
@@ -35,6 +35,7 @@
     "@types/jest": "^29.2.2",
     "@types/node": "^20",
     "@types/whatwg-fetch": "^0.0.33",
+    "@types/uuid": "^9.0.1",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/eslint-config": "workspace:*",
     "jest": "^29.3.0",

@@ -4,5 +4,8 @@
   "compilerOptions": {
     "outDir": "./dist"
   },
-  "references": [{ "path": "./tsconfig.build.json" },{"path": "./tsconfig.misc.json"}]
+  "references": [
+    { "path": "./tsconfig.build.json" },
+    {"path": "./tsconfig.misc.json"}
+]
 }

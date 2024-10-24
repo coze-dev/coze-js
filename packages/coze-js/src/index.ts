@@ -312,7 +312,7 @@ export class Coze {
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream?: false): Promise<T>;
   private async makeRequest<T = unknown>(apiUrl: string, method: 'GET' | 'POST', body?: unknown, isStream: boolean = false): Promise<T | Response> {
     const fullUrl = `${this.config.endpoint}${apiUrl}`;
-    const headers = {
+    const headers: Record<string, string> = {
       authorization: `Bearer ${this.config.api_key}`,
       'agw-js-conv': 'str',
     };
