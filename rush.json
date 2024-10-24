@@ -24,7 +24,7 @@
    * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
    * for details about these alternatives.
    */
-  "pnpmVersion": "9.12.0",
+  "pnpmVersion": "9.12.3",
   // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
   /**
@@ -376,7 +376,8 @@
     {
       "packageName": "@coze-infra/ts-config",
       "projectFolder": "config/ts-config"
-    },{
+    },
+    {
       "packageName": "@coze/coze-js",
       "projectFolder": "packages/coze-js"
     }
