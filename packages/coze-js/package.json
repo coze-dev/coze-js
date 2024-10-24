@@ -22,7 +22,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -b tsconfig.json",
     "format": "prettier --write .",
-    "lint": "eslint . --cache",
+    "lint": "eslint ./ --cache --quiet",
     "prepublishOnly": "npm run build",
     "test": "jest --coverage --config=jest.config.cjs ./test/*"
   },
