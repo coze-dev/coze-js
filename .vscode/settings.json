@@ -1,11 +1,11 @@
 {
-  "eslint.nodePath": "node_modules/eslint",
+  "eslint.nodePath": "config/eslint-config/node_modules/eslint",
   "eslint.workingDirectories": [
     {
       "mode": "auto"
     }
   ],
-  "prettier.prettierPath": "node_modules/prettier",
+  "prettier.prettierPath": "config/eslint-config/node_modules/prettier",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.formatOnSave": true,
@@ -30,7 +30,7 @@
     "**/.git": true,
     "**/.DS_Store": true,
     "**/.swc": true,
-    "**/.rush": true,
+    "**/.rush": true
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
@@ -59,7 +59,7 @@
   "eslint.probe": ["javascript", "typescript"],
   "editor.semanticHighlighting.enabled": false,
   "javascript.validate.enable": false,
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "config/ts-config/node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.disableAutomaticTypeAcquisition": true,
   "typescript.format.enable": false,
