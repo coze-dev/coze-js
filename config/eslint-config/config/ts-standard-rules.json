@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc.json",
+  "extends": ["./common-standard-rules.json"],
+  "plugins": ["@typescript-eslint", "unicorn"],
+  "rules": {
+    "@typescript-eslint/no-array-constructor": "error",
+    "@typescript-eslint/prefer-for-of": "warn",
+    "@typescript-eslint/prefer-literal-enum-member": "error",
+    "@typescript-eslint/no-duplicate-enum-values": "error",
+    "@typescript-eslint/adjacent-overload-signatures": "error",
+    "@typescript-eslint/unified-signatures": "error",
+    "@typescript-eslint/no-this-alias": "error",
+    "@typescript-eslint/method-signature-style": "error",
+    "@typescript-eslint/no-misused-new": "error",
+    "@typescript-eslint/consistent-type-assertions": [
+      "error",
+      {
+        "assertionStyle": "as",
+        "objectLiteralTypeAssertions": "never"
+      }
+    ],
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-extra-non-null-assertion": "error",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
+    "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        "ts-expect-error": "allow-with-description"
+      }
+    ],
+    "@typescript-eslint/prefer-ts-expect-error": "error",
+    "@typescript-eslint/no-inferrable-types": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/prefer-as-const": "error",
+    "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
+    "@typescript-eslint/no-empty-interface": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unnecessary-type-constraint": "error",
+    "@typescript-eslint/no-invalid-void-type": "error",
+    "@typescript-eslint/no-namespace": "error",
+    "@typescript-eslint/no-require-imports": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "none", // function arguments should not force to match this rule.
+        "argsIgnorePattern": "^_", // 规范允许下划线
+        "ignoreRestSiblings": true, //使用rest语法（如 `var { foo, ...rest } = data`) 忽略foo。
+        "destructuredArrayIgnorePattern": "^_", //结构数组允许使用_
+        "caughtErrors": "none"
+        // "caughtErrorsIgnorePattern": "^e$"
+      }
+    ],
+    "@stylistic/ts/quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "@typescript-eslint/no-magic-numbers": [
+      "warn",
+      {
+        "ignoreArrayIndexes": true,
+        "ignoreDefaultValues": true,
+        "ignoreEnums": true,
+        "ignoreNumericLiteralTypes": true,
+        "enforceConst": true,
+        "ignore": [-1, 0, 1],
+        "ignoreTypeIndexes": true,
+        "ignoreReadonlyClassProperties": true,
+        "ignoreClassFieldInitialValues": true
+      }
+    ],
+    "@stylistic/ts/no-extra-semi": "error",
+    "@typescript-eslint/no-dupe-class-members": "error",
+    "@typescript-eslint/no-useless-constructor": "error",
+    "@typescript-eslint/default-param-last": "error",
+    "@typescript-eslint/no-loss-of-precision": "error",
+    "@stylistic/ts/comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "enums": "always-multiline",
+        "generics": "ignore",
+        "tuples": "always-multiline",
+        "functions": "always-multiline"
+      }
+    ],
+    "@typescript-eslint/no-empty-function": "error",
+    "@typescript-eslint/no-extraneous-class": "error",
+    "no-import-assign": "off",
+    "no-undef": "off",
+    "dot-notation": "off",
+    "constructor-super": "off",
+    "no-this-before-super": "off",
+    "getter-return": "off",
+    "no-setter-return": "off",
+    "no-func-assign": "off",
+    "no-unsafe-negation": "off",
+    "valid-typeof": "off",
+    "no-unreachable": "off",
+    "no-throw-literal": "off",
+    "no-implied-eval": "off",
+    "no-new-symbol": "off",
+    "no-obj-calls": "off",
+    "camelcase": "off",
+    "no-const-assign": "off",
+    "no-dupe-args": "off",
+    "no-dupe-class-members": "off",
+    "no-dupe-keys": "off",
+    "no-redeclare": "off",
+    "no-array-constructor": "off",
+    "no-empty-function": "off",
+    "no-extra-semi": "off",
+    "no-loss-of-precision": "off",
+    "no-unused-vars": "off",
+    "default-param-last": "off",
+    "no-useless-constructor": "off",
+    "quotes": "off",
+    "comma-dangle": "off",
+    "indent": "off",
+    "no-magic-numbers": "warn",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["default", "variableLike"],
+        "format": ["camelCase", "UPPER_CASE"]
+      },
+      {
+        "selector": ["class", "interface", "typeLike"],
+        "format": ["PascalCase"]
+      },
+      {
+        "selector": ["variable"],
+        "format": ["UPPER_CASE", "camelCase"],
+        "modifiers": ["global", "exported"]
+      },
+      {
+        "selector": "objectLiteralProperty",
+        "format": null
+      },
+      {
+        "selector": "enumMember",
+        "format": ["UPPER_CASE", "PascalCase"]
+      },
+      {
+        "selector": "typeProperty",
+        "format": ["camelCase", "snake_case"]
+      },
+      {
+        "selector": "function",
+        "format": ["camelCase"],
+        "leadingUnderscore": "forbid",
+        "trailingUnderscore": "forbid"
+      },
+      {
+        "selector": "parameter",
+        "format": ["camelCase"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "forbid"
+      },
+      {
+        "selector": "variable",
+        "modifiers": ["destructured"],
+        "format": [
+          "camelCase",
+          "PascalCase",
+          "snake_case",
+          "strictCamelCase",
+          "StrictPascalCase",
+          "UPPER_CASE"
+        ]
+      },
+      {
+        "selector": "import",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      }
+    ],
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "kebabCase": true
+        }
+      }
+    ]
+  }
+}

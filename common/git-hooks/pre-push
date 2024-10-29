@@ -1,0 +1,18 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+NC='\033[0m'
+
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [ "$CURRENT_BRANCH" = "main" ]; then
+  echo "${RED}Do not push to main branch directly!!!${NC}"
+  exit 1
+fi
+
+if git status --porcelain | grep -q "pnpm-lock.yaml"; then
+  echo -e "${RED}Error: pnpm-lock.yaml is included in the changes. Please commit it before push!${NC}"
+  exit 1
+fi
+
+node common/scripts/install-run-rush.js install --check-only --ignore-hooks || exit $?

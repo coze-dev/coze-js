@@ -1,0 +1,17 @@
+module.exports = {
+  curly: 'error',
+  indent: 'off', // ['error', 2, { SwitchCase: 1 }],
+  'array-bracket-newline': ['error', 'consistent'],
+  'max-statements-per-line': 'error',
+  'no-mixed-spaces-and-tabs': 'error',
+  'no-extra-semi': 'error',
+  'rest-spread-spacing': 'error',
+  'max-len': ['warn', { code: 120, tabWidth: 2, ignoreUrls: true, ignoreStrings: true }],
+  'no-unexpected-multiline': 'error',
+  'comma-dangle': ['error', 'always-multiline'],
+  'arrow-body-style': 'error',
+  quotes: ['error', 'single', { avoidEscape: true }],
+  'prefer-template': 'warn',
+  'max-lines-per-function': ['warn', { max: 120, IIFEs: true }],
+  'max-lines': ['warn', 500],
+};

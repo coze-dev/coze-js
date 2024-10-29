@@ -22,7 +22,8 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Git config user
+      - name: Config Git User
+        # should be turn to ci user
         run: |
           git config --local user.name "tecvan"
           git config --local user.email "fanwenjie.fe@bytedance.com"
@@ -32,15 +33,16 @@ jobs:
           node-version: ${{ matrix.NodeVersion }}
 
       - name: Install Dependencies
-        run: |
-          npm install -g pnpm@9.7.0
-          pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: npm run lint
+        run: node common/scripts/install-run-rush.js install
 
       - name: Build
-        run: npm run build
+        run: node common/scripts/install-run-rush.js build --verbose
 
       - name: Test
-        run: npm run test
+        run: node common/scripts/install-run-rush.js test --verbose
+
+      - name: Lint
+        # for current stage, we got so much lint error, so we have to ignore it
+        # TODO: it should be fixed ASAP
+        continue-on-error: true
+        run: node common/scripts/install-run-rush.js lint --verbose

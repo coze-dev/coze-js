@@ -1,109 +1,44 @@
-# Usage
+# Monorepo of Coze Orz
 
-## chat (stream mode)
-
-```js
-import { Coze } from "@coze/coze-js";
-
-const apiKey = process.env.COZE_API_KEY;
-const botId = process.env.COZE_BOT_ID;
-const query = '北京新闻';
-
-async function streamingChat() {
-  console.log('=== Streaming Chat ===');
-
-  const coze = new Coze({ api_key: apiKey });
-  const v = await coze.chatV3Streaming({
-    bot_id: botId,
-    auto_save_history: false,
-    additional_messages: [
-      {
-        role: 'user',
-        content: query,
-        content_type: 'text',
-      },
-    ],
-  });
-
-  for await (const part of v) {
-    if (part.event === 'conversation.chat.created') {
-      console.log('[START]');
-    } else if (part.event === 'conversation.message.delta') {
-      process.stdout.write(part.data.content);
-    } else if (part.event === 'conversation.message.completed') {
-      const { role, type, content } = part.data;
-      if (role === 'assistant' && type === 'answer') {
-        process.stdout.write('\n');
-      } else {
-        console.log('[%s]:[%s]:%s', role, type, content);
-      }
-    } else if (part.event === 'conversation.chat.completed') {
-      console.log(part.data.usage);
-    } else if (part.event === 'done') {
-      console.log(part.data);
-    }
-  }
-
-  console.log('=== End of Streaming Chat ===');
-}
+```
+_____________________________________
+< Getting Started With [Coze Dev Monorepo](https://github.com/coze-dev/coze-js) >
+-------------------------------------
+       \   ^__^
+        \  (oo)\_______
+           (__)\       )\/\
+               ||----w |
+               ||     ||
 ```
 
-## chat (non-stream mode)
+## Prerequisite
 
-```js
-import { clearLine, cursorTo } from 'node:readline';
-import { Coze } from "@coze/coze-js";
+### 0. Install Node.js 18+
 
-const apiKey = process.env.COZE_API_KEY;
-const botId = process.env.COZE_BOT_ID;
-const query = "北京新闻";
-
-async function sleep(ms) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, ms);
-  });
-}
-
-async function nonStreamingChat() {
-  console.log('=== Non-Streaming Chat ===');
-
-  const coze = new Coze({ api_key: apiKey });
-  const v = await coze.chatV3({
-    bot_id: botId,
-    additional_messages: [
-      {
-        role: 'user',
-        content: query,
-        content_type: 'text',
-      },
-    ],
-  });
-
-  const chat_id = v.id;
-  const conversation_id = v.conversation_id;
-  while (true) {
-    await sleep(100);
-    const chat = await coze.getChat({ chat_id, conversation_id });
-    if (
-      chat.status === 'completed' ||
-      chat.status === 'failed' ||
-      chat.status === 'requires_action'
-    ) {
-      console.log(chat.usage);
-      break;
-    }
-    const messageList = await coze.getChatHistory({ chat_id, conversation_id });
-    if (messageList.length <= 0) {
-      process.stdout.write('.');
-    } else {
-      clearLine(process.stdout, 0);
-      cursorTo(process.stdout, 0);
-      process.stdout.write('');
-      for (const item of messageList) {
-        // console.log(item);
-        console.log('[%s]:[%s]:%s', item.role, item.type, item.content);
-      }
-    }
-  }
-}
+``` bash
+nvm install lts/hydrogen
+nvm alias default lts/hydrogen # set default node version
+nvm use lts/hydrogen
 ```
+
+### 1. Checkout
+
+``` bash
+git clone git@github.com:coze-dev/coze-js.git
+```
+
+### 2. Install pnpm & rushjs & yarn
+
+``` bash
+npm i -g pnpm@9.12.0 @microsoft/rush@5.14.0
+```
+
+### 3. Install dependencies
+
+``` bash
+rush update
+```
+
+After that, you can start to develop projects inside this repository.
+
+Enjoy it!

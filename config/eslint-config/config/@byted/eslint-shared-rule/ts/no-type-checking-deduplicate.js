@@ -1,0 +1,15 @@
+module.exports = {
+  'no-array-constructor': 'off',
+  'no-empty-function': 'off',
+  'no-extra-semi': 'off',
+  'no-loss-of-precision': 'off',
+  'no-unused-vars': 'off',
+  'default-param-last': 'off',
+  'no-dupe-class-members': 'off',
+  'no-useless-constructor': 'off',
+  quotes: 'off',
+  'comma-dangle': 'off',
+  indent: 'off',
+  camelcase: 'off',
+  'no-magic-numbers': 'off',
+};
