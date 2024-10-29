@@ -1,0 +1,16 @@
+{
+  "name": "@coze/api-node-example",
+  "version": "1.0.0",
+  "description": "coze-api node example",
+  "license": "ISC",
+  "author": "",
+  "main": "config.default.js",
+  "scripts": {
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "@coze/api": "workspace:*",
+    "axios": "^1.7.7",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
