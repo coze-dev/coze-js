@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   preset: 'ts-jest',
@@ -6,6 +8,11 @@ module.exports = {
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: path.resolve(__dirname, 'tsconfig.misc.json'),
+    },
   },
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
