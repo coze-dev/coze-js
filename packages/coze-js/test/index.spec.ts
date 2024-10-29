@@ -11,7 +11,7 @@ describe('CozeAPI', () => {
   });
 
   it('should initialize with the correct API key', () => {
-    expect(api._config.token).toEqual('test-api-key');
+    expect(api.getConfig().token).toEqual('test-api-key');
   });
 
   it('should have all the expected resources', () => {

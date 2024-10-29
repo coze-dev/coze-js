@@ -48,11 +48,11 @@ npm install @coze/api
 create Personal Auth Token at [扣子](https://www.coze.cn/open/oauth/pats) or [Coze Platform](https://www.coze.com/open/oauth/pats)
 
 ```js
-import { CozeAPI } from '@coze/api';
+import { CozeAPI,COZE_COM_BASE_URL ,COZE_CN_BASE_URL } from '@coze/api';
 
 const client = new CozeAPI({
   token: 'your_token',
-  baseURL: 'https://api.coze.com',
+  baseURL: COZE_COM_BASE_URL, // you can change to COZE_CN_BASE_URL if you use https://use coze.cn
 });
 ```
 
@@ -71,19 +71,18 @@ const client = new CozeAPI({
 Call the coze.chat.stream method to create a chat. The create method is a streaming chat and will return a Chat Iterator. Developers should iterate the iterator to get chat event and handle them.
 
 ```js
-import { CozeAPI, ChatEventType } from '@coze/api';
+import { CozeAPI, ChatEventType,COZE_COM_BASE_URL } from '@coze/api';
 import { clearLine, cursorTo } from 'node:readline';
 
 const client = new CozeAPI({
   token: 'your_token',
-  baseURL: 'https://api.coze.com',
+  baseURL: COZE_COM_BASE_URL,
 });
 const query = 'Hello';
 
 async function streamingChat() {
   const v = await client.chat.stream({
     bot_id: botId,
-    user_id: '123***',
     auto_save_history: false,
     additional_messages: [
       {
@@ -125,11 +124,11 @@ streamingChat();
 To simplify the call, the SDK provides a wrapped function to complete non-streaming chat, polling, and obtaining the messages of the chat. Developers can use create_and_poll to simplify the process.
 
 ```js
-import { CozeAPI, ChatStatus } from '@coze/api';
+import { CozeAPI, ChatStatus,COZE_COM_BASE_URL } from '@coze/api';
 
 const client = new CozeAPI({
   token: 'your_token',
-  baseURL: 'https://api.coze.com',
+  baseURL: COZE_COM_BASE_URL,
 });
 const query = 'Hello';
 

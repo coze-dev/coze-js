@@ -55,13 +55,19 @@ while (true) {
       break;
     }
   } catch (error) {
-    // If the error is a 428 (authorization pending), continue polling
-    if (error instanceof APIError && error.status === 428) {
-      continue;
-    } else {
-      // For any other error, throw it
-      throw error;
+    if (error instanceof APIError) {
+      console.log(
+        'rawError',
+        `error:${error.rawError.error}`,
+        `error_description:${error.rawError.error_message}`,
+      );
+      // If the error is a 428 (authorization pending), continue polling
+      if (error.status === 428) {
+        continue;
+      }
     }
+    // For any other error, throw it
+    throw error;
   }
 }
 

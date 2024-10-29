@@ -55,7 +55,7 @@ describe('Error classes', () => {
       expect(error.msg).toBe(errorBody.msg);
       expect(error.detail).toBe(errorBody.error.detail);
       expect(error.help_doc).toBe(errorBody.error.help_doc);
-      expect(error.log_id).toBe('12345');
+      expect(error.logid).toBe('12345');
     });
 
     it('should create correct error message', () => {

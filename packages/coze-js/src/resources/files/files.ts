@@ -12,7 +12,7 @@ export class Files extends APIResource {
    * @param params.file - Required The file to be uploaded. | 需要上传的文件。
    * @returns Information about the new file. | 已上传的文件信息。
    */
-  async create(params: CreateFileReq, options?: RequestOptions) {
+  async upload(params: CreateFileReq, options?: RequestOptions) {
     const apiUrl = '/v1/files/upload';
     const response = await this._client.post<
       GenericFormData,

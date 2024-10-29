@@ -37,7 +37,7 @@ describe('Files', () => {
         file: 'mock-file-content',
       };
 
-      const result = await files.create(params);
+      const result = await files.upload(params);
 
       expect(toFormData).toHaveBeenCalledWith(params);
       expect(client.post).toHaveBeenCalledWith(

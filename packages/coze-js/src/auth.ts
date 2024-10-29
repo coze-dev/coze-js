@@ -3,15 +3,10 @@ import * as nodeCrypto from 'crypto';
 
 import { isBrowser } from './utils.js';
 import { APIClient, type RequestOptions } from './core.js';
-import { DEFAULT_BASE_URL } from './constant.js';
+import { COZE_COM_BASE_URL } from './constant.js';
 
-export const getAuthenticationUrl = (config: {
-  baseURL?: string;
-  clientId: string;
-  redirectUrl: string;
-  state?: string;
-}) => {
-  const baseUrl = (config.baseURL ?? DEFAULT_BASE_URL).replace(
+export const getWebAuthenticationUrl = (config: WebAuthenticationConfig) => {
+  const baseUrl = (config.baseURL ?? COZE_COM_BASE_URL).replace(
     'https://api',
     'https://www',
   );
@@ -24,13 +19,10 @@ export const getAuthenticationUrl = (config: {
   return `${baseUrl}/api/permission/oauth2/authorize?${params.toString()}`;
 };
 
-export const getPKCEAuthenticationUrl = async (config: {
-  baseURL?: string;
-  clientId: string;
-  redirectUrl: string;
-  state?: string;
-}) => {
-  const baseUrl = (config.baseURL ?? DEFAULT_BASE_URL).replace(
+export const getPKCEAuthenticationUrl = async (
+  config: PKCEAuthenticationConfig,
+) => {
+  const baseUrl = (config.baseURL ?? COZE_COM_BASE_URL).replace(
     'https://api',
     'https://www',
   );
@@ -70,7 +62,7 @@ export const getPKCEAuthenticationUrl = async (config: {
     redirect_uri: config.redirectUrl,
     state: config.state ?? '',
     code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
+    code_challenge_method: config.code_challenge_method || 'S256',
   });
   return {
     url: `${baseUrl}/api/permission/oauth2/authorize?${params.toString()}`,
@@ -78,16 +70,10 @@ export const getPKCEAuthenticationUrl = async (config: {
   };
 };
 
-export const getOAuthToken = async (
-  config: {
-    code: string;
-    baseURL?: string;
-    clientId: string;
-    redirectUrl: string;
-    clientSecret: string;
-  },
+export const getWebOAuthToken = async (
+  config: WebOAuthTokenConfig,
   options?: RequestOptions,
-): Promise<OAuthTokenData> => {
+): Promise<OAuthToken> => {
   const api = new APIClient({
     token: config.clientSecret,
     baseURL: config.baseURL,
@@ -99,7 +85,7 @@ export const getOAuthToken = async (
     redirect_uri: config.redirectUrl,
     code: config.code,
   };
-  const result = await api.post<unknown, OAuthTokenData>(
+  const result = await api.post<unknown, OAuthToken>(
     apiUrl,
     payload,
     false,
@@ -110,15 +96,9 @@ export const getOAuthToken = async (
 };
 
 export const getPKCEOAuthToken = async (
-  config: {
-    code: string;
-    baseURL?: string;
-    clientId: string;
-    redirectUrl: string;
-    codeVerifier: string;
-  },
+  config: PKCEOAuthTokenConfig,
   options?: RequestOptions,
-): Promise<OAuthTokenData> => {
+): Promise<OAuthToken> => {
   const api = new APIClient({ token: '', baseURL: config.baseURL });
   const apiUrl = '/api/permission/oauth2/token';
   const payload = {
@@ -128,7 +108,7 @@ export const getPKCEOAuthToken = async (
     code: config.code,
     code_verifier: config.codeVerifier,
   };
-  const result = await api.post<unknown, OAuthTokenData>(
+  const result = await api.post<unknown, OAuthToken>(
     apiUrl,
     payload,
     false,
@@ -139,14 +119,9 @@ export const getPKCEOAuthToken = async (
 };
 
 export const refreshOAuthToken = async (
-  config: {
-    refreshToken: string;
-    baseURL?: string;
-    clientId: string;
-    clientSecret: string;
-  },
+  config: RefreshOAuthTokenConfig,
   options?: RequestOptions,
-): Promise<OAuthTokenData> => {
+): Promise<OAuthToken> => {
   const api = new APIClient({
     token: config.clientSecret,
     baseURL: config.baseURL,
@@ -157,7 +132,7 @@ export const refreshOAuthToken = async (
     client_id: config.clientId,
     refresh_token: config.refreshToken,
   };
-  const result = await api.post<unknown, OAuthTokenData>(
+  const result = await api.post<unknown, OAuthToken>(
     apiUrl,
     payload,
     false,
@@ -168,7 +143,7 @@ export const refreshOAuthToken = async (
 };
 
 export const getDeviceCode = async (
-  config: { baseURL?: string; clientId: string },
+  config: DeviceCodeConfig,
   options?: RequestOptions,
 ) => {
   if (isBrowser()) {
@@ -191,9 +166,9 @@ export const getDeviceCode = async (
 };
 
 export const getDeviceToken = async (
-  config: { baseURL?: string; clientId: string; deviceCode: string },
+  config: DeviceTokenConfig,
   options?: RequestOptions,
-) => {
+): Promise<OAuthToken> => {
   if (isBrowser()) {
     throw new Error('getDeviceToken is not supported in browser');
   }
@@ -217,12 +192,7 @@ export const getDeviceToken = async (
 };
 
 export const getJWTToken = async (
-  config: {
-    baseURL?: string;
-    token: string;
-    duration_seconds?: number;
-    scope?: JWTScope;
-  },
+  config: JWTTokenConfig,
   options?: RequestOptions,
 ) => {
   if (isBrowser()) {
@@ -237,7 +207,7 @@ export const getJWTToken = async (
     scope: config.scope,
   };
 
-  const result = await api.post<unknown, JWTTokenData>(
+  const result = await api.post<unknown, JWTToken>(
     apiUrl,
     payload,
     false,
@@ -255,7 +225,7 @@ export interface DeviceCodeData {
   interval: number;
 }
 
-export interface OAuthTokenData {
+export interface OAuthToken {
   access_token: string;
   refresh_token: string;
   expires_in: number;
@@ -269,7 +239,7 @@ export interface DeviceTokenData {
   error_description?: string;
 }
 
-export interface JWTTokenData {
+export interface JWTToken {
   access_token: string;
   expires_in: number;
 }
@@ -283,4 +253,56 @@ export interface JWTScope {
       bot_id_list: string[];
     };
   };
+}
+
+export interface WebAuthenticationConfig {
+  baseURL?: string;
+  clientId: string;
+  redirectUrl: string;
+  state?: string;
+}
+
+export interface PKCEAuthenticationConfig extends WebAuthenticationConfig {
+  code_challenge_method?: string;
+}
+
+export interface WebOAuthTokenConfig {
+  code: string;
+  baseURL?: string;
+  clientId: string;
+  redirectUrl: string;
+  clientSecret: string;
+}
+
+export interface PKCEOAuthTokenConfig {
+  code: string;
+  baseURL?: string;
+  clientId: string;
+  redirectUrl: string;
+  codeVerifier: string;
+}
+
+export interface RefreshOAuthTokenConfig {
+  refreshToken: string;
+  baseURL?: string;
+  clientId: string;
+  clientSecret: string;
+}
+
+export interface DeviceCodeConfig {
+  baseURL?: string;
+  clientId: string;
+}
+
+export interface DeviceTokenConfig {
+  baseURL?: string;
+  clientId: string;
+  deviceCode: string;
+}
+
+export interface JWTTokenConfig {
+  baseURL?: string;
+  token: string;
+  duration_seconds?: number;
+  scope?: JWTScope;
 }

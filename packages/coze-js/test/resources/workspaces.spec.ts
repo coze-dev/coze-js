@@ -1,7 +1,7 @@
 import * as utils from '../../src/utils';
 import {
-  Workspaces,
-  type ListWorkSpaceReq,
+  WorkSpaces,
+  type ListWorkSpacesReq,
   type OpenSpaceData,
 } from '../../src/resources/workspaces/workspaces';
 import { CozeAPI } from '../../src/index';
@@ -13,11 +13,11 @@ jest.mock('../../src/utils', () => ({
 
 describe('Workspaces', () => {
   let client: CozeAPI;
-  let workspaces: Workspaces;
+  let workspaces: WorkSpaces;
 
   beforeEach(() => {
     client = new CozeAPI({ token: 'test-token' });
-    workspaces = new Workspaces(client);
+    workspaces = new WorkSpaces(client);
   });
 
   describe('list', () => {
@@ -48,7 +48,7 @@ describe('Workspaces', () => {
         data: mockOpenSpaceData,
       });
 
-      const params: ListWorkSpaceReq = {
+      const params: ListWorkSpacesReq = {
         page_num: 1,
         page_size: 10,
       };

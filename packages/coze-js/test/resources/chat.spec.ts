@@ -151,7 +151,10 @@ describe('Chat', () => {
       };
       jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
-      const result = await chat.history('test-conversation-id', 'test-chat-id');
+      const result = await chat.messages.list(
+        'test-conversation-id',
+        'test-chat-id',
+      );
 
       expect(client.get).toHaveBeenCalledWith(
         '/v3/chat/message/list?conversation_id=test-conversation-id&chat_id=test-chat-id',

@@ -12,7 +12,9 @@ export class APIError extends CozeError {
   readonly msg: string | null | undefined;
   readonly detail: string | null | undefined;
   readonly help_doc: string | null | undefined;
-  readonly log_id: string | null | undefined;
+  readonly logid: string | null | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly rawError: any;
 
   constructor(
     status: number | undefined,
@@ -23,13 +25,14 @@ export class APIError extends CozeError {
     super(`${APIError.makeMessage(status, error, message, headers)}`);
     this.status = status;
     this.headers = headers;
-    this.log_id = headers?.['x-tt-logid'];
+    this.logid = headers?.['x-tt-logid'];
 
     // this.error = error;
     this.code = error?.code;
     this.msg = error?.msg;
     this.detail = error?.error?.detail;
     this.help_doc = error?.error?.help_doc;
+    this.rawError = error;
   }
 
   private static makeMessage(

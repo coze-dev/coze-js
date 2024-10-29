@@ -2,15 +2,19 @@ import { APIResource, type ErrorData } from '../resource.js';
 import { sleep } from '../../utils.js';
 import { CozeError } from '../../error.js';
 import { type RequestOptions } from '../../core.js';
+import { Messages } from './messages/index.js';
+
+const uuid = () => (Math.random() * new Date().getTime()).toString();
 
 export class Chat extends APIResource {
+  messages: Messages = new Messages(this._client);
   /**
    * Call the Chat API to send messages to a published Coze agent. | 调用此接口发起一次对话，支持添加上下文
    * @docs en:https://www.coze.com/docs/developer_guides/chat_v3?_lang=en
    * @docs zh:https://www.coze.cn/docs/developer_guides/chat_v3?_lang=zh
    * @param params - Required The parameters for creating a chat session. | 创建会话的参数。
    * @param params.bot_id - Required The ID of the agent. | 要进行会话聊天的 Bot ID。
-   * @param params.user_id - Required The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
+   * @param params.user_id - Optional The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
    * @param params.additional_messages - Optional Additional messages for the conversation. | 对话的附加信息。
    * @param params.custom_variables - Optional Variables defined in the Bot. | Bot 中定义变量。
    * @param params.auto_save_history - Optional Whether to automatically save the conversation history. | 是否自动保存历史对话记录。
@@ -23,6 +27,9 @@ export class Chat extends APIResource {
     params: CreateChatReq,
     options?: RequestOptions,
   ): Promise<CreateChatData> {
+    if (!params.user_id) {
+      params.user_id = uuid();
+    }
     const { conversation_id, ...rest } = params;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
@@ -44,7 +51,7 @@ export class Chat extends APIResource {
    * @docs zh:https://www.coze.cn/docs/developer_guides/chat_v3?_lang=zh
    * @param params - Required The parameters for creating a chat session. | 创建会话的参数。
    * @param params.bot_id - Required The ID of the agent. | 要进行会话聊天的 Bot ID。
-   * @param params.user_id - Required The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
+   * @param params.user_id - Optional The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
    * @param params.additional_messages - Optional Additional messages for the conversation. | 对话的附加信息。
    * @param params.custom_variables - Optional Variables defined in the Bot. | Bot 中定义的变量。
    * @param params.auto_save_history - Optional Whether to automatically save the conversation history. | 是否自动保存历史对话记录。
@@ -57,6 +64,9 @@ export class Chat extends APIResource {
     params: CreateChatReq,
     options?: RequestOptions,
   ): Promise<CreateChatPollData> {
+    if (!params.user_id) {
+      params.user_id = uuid();
+    }
     const { conversation_id, ...rest } = params;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
@@ -85,7 +95,7 @@ export class Chat extends APIResource {
         break;
       }
     }
-    const messageList = await this.history(conversationId, chatId);
+    const messageList = await this.messages.list(conversationId, chatId);
     return {
       chat,
       messages: messageList,
@@ -98,7 +108,7 @@ export class Chat extends APIResource {
    * @docs zh:https://www.coze.cn/docs/developer_guides/chat_v3?_lang=zh
    * @param params - Required The parameters for streaming a chat session. | 流式会话的参数。
    * @param params.bot_id - Required The ID of the agent. | 要进行会话聊天的 Bot ID。
-   * @param params.user_id - Required The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
+   * @param params.user_id - Optional The ID of the user interacting with the Bot. | 标识当前与 Bot 交互的用户。
    * @param params.additional_messages - Optional Additional messages for the conversation. | 对话的附加信息。
    * @param params.custom_variables - Optional Variables defined in the Bot. | Bot 中定义的变量。
    * @param params.auto_save_history - Optional Whether to automatically save the conversation history. | 是否自动保存历史对话记录。
@@ -111,6 +121,9 @@ export class Chat extends APIResource {
     params: StreamChatReq,
     options?: RequestOptions,
   ): AsyncIterable<StreamChatData> {
+    if (!params.user_id) {
+      params.user_id = uuid();
+    }
     const { conversation_id, ...rest } = params;
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
@@ -161,29 +174,6 @@ export class Chat extends APIResource {
   ): Promise<CreateChatData> {
     const apiUrl = `/v3/chat/retrieve?conversation_id=${conversation_id}&chat_id=${chat_id}`;
     const result = await this._client.post<unknown, { data: CreateChatData }>(
-      apiUrl,
-      undefined,
-      false,
-      options,
-    );
-    return result.data;
-  }
-
-  /**
-   * Get the list of messages in a chat. | 获取对话中的消息列表。
-   * @docs en:https://www.coze.com/docs/developer_guides/chat_message_list?_lang=en
-   * @docs zh:https://www.coze.cn/docs/developer_guides/chat_message_list?_lang=zh
-   * @param conversation_id - Required The ID of the conversation. | 会话 ID。
-   * @param chat_id - Required The ID of the chat. | 对话 ID。
-   * @returns An array of chat messages. | 对话消息数组。
-   */
-  async history(
-    conversation_id: string,
-    chat_id: string,
-    options?: RequestOptions,
-  ): Promise<ChatV3Message[]> {
-    const apiUrl = `/v3/chat/message/list?conversation_id=${conversation_id}&chat_id=${chat_id}`;
-    const result = await this._client.get<unknown, { data: ChatV3Message[] }>(
       apiUrl,
       undefined,
       false,
@@ -299,7 +289,7 @@ export interface CreateChatReq {
   /**
    * 标识当前与 Bot 交互的用户，由使用方在业务系统中自行定义、生成与维护。
    */
-  user_id: string;
+  user_id?: string;
 
   /**
    * 对话的附加信息。你可以通过此字段传入本次对话中用户的问题。数组长度限制为 100，即最多传入 100 条消息。

@@ -5,20 +5,24 @@ import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
 import { type FetchAPIOptions, fetchAPI } from './fetcher.js';
 import { APIError, type ErrorRes } from './error.js';
 import * as Errors from './error.js';
-import { DEFAULT_BASE_URL } from './constant.js';
+import { COZE_COM_BASE_URL } from './constant.js';
 
 export type RequestOptions = Omit<
   AxiosRequestConfig,
   'url' | 'method' | 'baseURL' | 'data' | 'responseType'
 >;
 export interface ClientOptions {
+  /** baseURL, default is https://api.coze.com, Use https://api.coze.cn if you use https://coze.cn */
   baseURL?: string;
+  /** Personal Access Token (PAT) or OAuth2.0 token */
   token: string;
-  // see https://github.com/axios/axios?tab=readme-ov-file#request-config
+  /** see https://github.com/axios/axios?tab=readme-ov-file#request-config */
   axiosOptions?: RequestOptions;
+  /** Whether to enable debug mode */
   debug?: boolean;
+  /** Custom headers */
   headers?: Headers | undefined;
-  //  Whether Personal Access Tokens (PAT) are allowed in browser environments
+  /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
   allowPersonalAccessTokenInBrowser?: boolean;
 }
 
@@ -33,7 +37,7 @@ export class APIClient {
 
   constructor(config: ClientOptions) {
     this._config = config;
-    this.baseURL = config.baseURL || DEFAULT_BASE_URL;
+    this.baseURL = config.baseURL || COZE_COM_BASE_URL;
     this.token = config.token;
     this.axiosOptions = config.axiosOptions || {};
     this.debug = config.debug || false;
@@ -72,16 +76,16 @@ export class APIClient {
       authorization: `Bearer ${this.token}`,
     };
     // FIXME: browser 下存在跨域问题，后续再看看
-    if (!isBrowser()) {
-      headers['agw-js-conv'] = 'str';
-    }
+    // if (!isBrowser()) {
+    //   headers['agw-js-conv'] = 'str';
+    // }
     const config = mergeConfig(this.axiosOptions, options, { headers });
     config.method = method;
     config.data = body;
 
     return config;
   }
-  protected async makeRequest<Req, Rsp>(
+  public async makeRequest<Req, Rsp>(
     apiUrl: string,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     body?: Req,
@@ -196,8 +200,12 @@ export class APIClient {
     );
   }
 
+  public getConfig() {
+    return this._config;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected debugLog(...msgs: any[]) {
+  public debugLog(...msgs: any[]) {
     if (this.debug) {
       console.debug(...msgs);
     }

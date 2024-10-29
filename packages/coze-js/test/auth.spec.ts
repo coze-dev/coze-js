@@ -1,9 +1,9 @@
 import * as utils from '../src/utils.js';
 import { APIClient } from '../src/core.js';
 import {
-  getAuthenticationUrl,
+  getWebAuthenticationUrl,
   getPKCEAuthenticationUrl,
-  getOAuthToken,
+  getWebOAuthToken,
   getDeviceCode,
   getDeviceToken,
   getJWTToken,
@@ -110,7 +110,7 @@ describe('Auth functions', () => {
 
   describe('getAuthenticationUrl', () => {
     it('should return the correct authentication URL', () => {
-      const url = getAuthenticationUrl(mockConfig);
+      const url = getWebAuthenticationUrl(mockConfig);
       expect(url).toBe(
         'https://www.coze.com/api/permission/oauth2/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state',
       );
@@ -137,7 +137,7 @@ describe('Auth functions', () => {
         post: mockPost,
       }));
 
-      await getOAuthToken({ ...mockConfig, code: 'test-code' });
+      await getWebOAuthToken({ ...mockConfig, code: 'test-code' });
 
       expect(APIClient).toHaveBeenCalledWith({
         token: mockConfig.clientSecret,

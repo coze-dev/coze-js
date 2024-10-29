@@ -38,6 +38,9 @@ export function isPlainObject(obj: any): boolean {
 
 export function mergeConfig(...objects: any[]) {
   return objects.reduce((result, obj) => {
+    if (obj === undefined) {
+      return result || {};
+    }
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         if (isPlainObject(obj[key]) && !Array.isArray(obj[key])) {

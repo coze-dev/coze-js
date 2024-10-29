@@ -1,4 +1,11 @@
-import { CozeAPI, getOAuthToken, getPKCEOAuthToken, getAuthenticationUrl, getPKCEAuthenticationUrl, OAuthTokenData } from '@coze/api';
+import {
+  CozeAPI,
+  getWebOAuthToken,
+  getPKCEOAuthToken,
+  getWebAuthenticationUrl,
+  getPKCEAuthenticationUrl,
+  OAuthToken,
+} from '@coze/api';
 import { useEffect, useState } from 'react';
 import { SettingConfig } from './Setting';
 
@@ -20,12 +27,17 @@ const useCozeAPI = () => {
   });
 
   useEffect(() => {
-    const config = JSON.parse(sessionStorage.getItem('settingConfig') || '{}') as SettingConfig;
+    const config = JSON.parse(
+      sessionStorage.getItem('settingConfig') || '{}',
+    ) as SettingConfig;
 
     if (config && config.authType) {
       if (config.authType === 'pat_token') {
         initClient(config);
-      } else if (config.authType === 'oauth_token' || config.authType === 'oauth_pkce') {
+      } else if (
+        config.authType === 'oauth_token' ||
+        config.authType === 'oauth_pkce'
+      ) {
         if (config.token) {
           initClient(config);
           return;
@@ -36,9 +48,9 @@ const useCozeAPI = () => {
         if (code) {
           const codeVerifier = sessionStorage.getItem('codeVerifier') || '';
 
-          let result: Promise<OAuthTokenData> | undefined;
+          let result: Promise<OAuthToken>;
           if (config.authType === 'oauth_token') {
-            result = getOAuthToken({
+            result = getWebOAuthToken({
               baseURL: config.baseUrl,
               code,
               clientId: config.clientId || '',
@@ -63,7 +75,11 @@ const useCozeAPI = () => {
             })
             .finally(() => {
               params.delete('code');
-              window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+              window.history.replaceState(
+                {},
+                '',
+                `${window.location.pathname}?${params.toString()}`,
+              );
             });
         }
       }
@@ -74,7 +90,12 @@ const useCozeAPI = () => {
     setConfig(config);
 
     if (config.authType === 'oauth_token' && !config.token) {
-      window.location.href = getAuthenticationUrl({ baseURL: config.baseUrl, clientId: config.clientId || '', redirectUrl, state: '' });
+      window.location.href = getWebAuthenticationUrl({
+        baseURL: config.baseUrl,
+        clientId: config.clientId || '',
+        redirectUrl,
+        state: '',
+      });
       return;
     }
 
@@ -169,7 +190,7 @@ const useCozeAPI = () => {
   const uploadFile = async (file: File) => {
     setIsReady(false);
     try {
-      const res = await client.files.create({ file });
+      const res = await client.files.upload({ file });
       setFileId(res.id);
       setIsReady(true);
       console.log(res);

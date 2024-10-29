@@ -6,7 +6,7 @@ async function main() {
   const fileBase64 = file.toString('base64');
 
   const create = await client.knowledge.documents.create({
-    dataset_id: '7421572319993495569',
+    dataset_id: '7430806536349941770',
     document_bases: [
       {
         name: 'test.txt',
@@ -33,7 +33,7 @@ async function main() {
   });
 
   const list = await client.knowledge.documents.list({
-    dataset_id: '7421572319993495569',
+    dataset_id: '7430806536349941770',
     page: 1,
     page_size: 10,
   });

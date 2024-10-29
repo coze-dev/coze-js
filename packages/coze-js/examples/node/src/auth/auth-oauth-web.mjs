@@ -15,8 +15,8 @@
 
 import {
   CozeAPI,
-  getAuthenticationUrl,
-  getOAuthToken,
+  getWebAuthenticationUrl,
+  getWebOAuthToken,
   refreshOAuthToken,
 } from '@coze/api';
 
@@ -31,7 +31,7 @@ const redirectUrl = config[key].auth.oauth_web.COZE_REDIRECT_URL;
 const baseURL = config[key].COZE_BASE_URL;
 
 // Generate the authentication URL using the provided parameters
-const authUrl = getAuthenticationUrl({
+const authUrl = getWebAuthenticationUrl({
   clientId,
   redirectUrl,
   baseURL,
@@ -63,7 +63,7 @@ const code = await getCodeFromUser();
 console.log('Received code:', code);
 
 // Exchange the authorization code for an OAuth token
-const oauthToken = await getOAuthToken({
+const oauthToken = await getWebOAuthToken({
   clientId,
   clientSecret,
   redirectUrl,

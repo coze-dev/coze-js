@@ -8,22 +8,11 @@ export class CozeAPI extends APIClient {
   files: API.Files = new API.Files(this);
   knowledge: API.Knowledge = new API.Knowledge(this);
   workflows: API.Workflows = new API.Workflows(this);
-  workspaces: API.Workspaces = new API.Workspaces(this);
+  workspaces: API.WorkSpaces = new API.WorkSpaces(this);
   audio: API.Audio = new API.Audio(this);
 }
-export {
-  getOAuthToken,
-  getPKCEOAuthToken,
-  getAuthenticationUrl,
-  getPKCEAuthenticationUrl,
-  OAuthTokenData,
-  refreshOAuthToken,
-  getDeviceCode,
-  getDeviceToken,
-  DeviceCodeData,
-  DeviceTokenData,
-  getJWTToken,
-} from './auth.js';
+export * from './auth.js';
 export * from './resources/index.js';
 export * from './fetcher.js';
 export * from './error.js';
+export * from './constant.js';

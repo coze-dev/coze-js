@@ -59,7 +59,6 @@ export async function fetchAPI<ResultType>(
     adapter: options.isStreaming ? 'fetch' : undefined,
     ...options,
   }).catch(error => {
-    console.log('fetchAPIerror', error);
     throw handleError(error);
   });
 
