@@ -77,7 +77,7 @@ class RealtimeClient extends RealtimeEventHandler {
   async connect() {
     const { botId, conversationId, voiceId } = this._config;
 
-    // step1 get token
+    // Step1 get token
     const roomInfo = await this._api.audio.rooms.create({
       bot_id: botId,
       conversation_id: conversationId,
@@ -86,20 +86,20 @@ class RealtimeClient extends RealtimeEventHandler {
     });
     this._roomInfo = roomInfo;
 
-    // step2 create engine
+    // Step2 create engine
     this._client = new EngineClient(
       roomInfo.app_id,
       this._config.debug,
       this._isTestEnv,
     );
 
-    // step3 bind engine events
+    // Step3 bind engine events
     this._client.bindEngineEvents();
     this._client.on(EventNames.ALL, (eventName: string, data: unknown) => {
       this.dispatch(eventName, data);
     });
 
-    // step4 join room
+    // Step4 join room
     await this._client.joinRoom({
       token: roomInfo.token,
       roomId: roomInfo.room_id,
@@ -107,7 +107,7 @@ class RealtimeClient extends RealtimeEventHandler {
       audioMutedDefault: this._config.audioMutedDefault ?? false,
     });
 
-    // step5 create local stream
+    // Step5 create local stream
     await this._client.createLocalStream();
 
     // step6 set connected and dispatch connected event

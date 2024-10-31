@@ -18,7 +18,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ onSubmit }) => {
 
     if (savedEventData) {
       form.setFieldsValue({
-        eventData: savedEventData || '',
+        eventData: savedEventData,
       });
     }
   }, [form]);

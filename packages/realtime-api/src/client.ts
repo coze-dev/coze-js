@@ -26,7 +26,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.handleUserLeave = this.handleUserLeave.bind(this);
     this.handleEventError = this.handleEventError.bind(this);
 
-    // debug only
+    // Debug only
     this.handleLocalAudioPropertiesReport =
       this.handleLocalAudioPropertiesReport.bind(this);
     this.handleRemoteAudioPropertiesReport =

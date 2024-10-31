@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import {
@@ -23,10 +22,18 @@ import ConsoleFooter from './ConsoleFooter';
 const { Content, Footer } = Layout;
 const { Text } = Typography;
 
+interface EventData {
+  time: string;
+  type?: string;
+  event: string;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  data?: any;
+}
+
 const RealtimeConsole: React.FC = () => {
   const clientRef = useRef<RealtimeClient | null>(null);
-  const [events, setEvents] = useState<any[]>([]);
-  const [serverEvents, setServerEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [serverEvents, setServerEvents] = useState<EventData[]>([]);
   const [autoScrollEvents, setAutoScrollEvents] = useState(true);
   const [autoScrollServerEvents, setAutoScrollServerEvents] = useState(true);
   const eventsEndRef = useRef<HTMLDivElement>(null);
@@ -65,14 +72,14 @@ const RealtimeConsole: React.FC = () => {
       accessToken: accessToken.trim(),
       botId: botId.trim(),
       voiceId: voiceId.trim(),
-      // conversationId: '1234567890', // optional
+      // conversationId: '1234567890', // Optional
       debug: true,
       baseURL: baseURL.trim(),
       allowPersonalAccessTokenInBrowser: true,
       audioMutedDefault: !isMicrophoneOn,
     });
 
-    // listen all events
+    // Subscribe to all client and server events
     client.on(EventNames.ALL, handleAllMessage);
 
     clientRef.current = client;
@@ -97,7 +104,7 @@ const RealtimeConsole: React.FC = () => {
       } else {
         message.error('An unknown error occurred');
       }
-      console.log('connect error', e);
+      console.log('Connect error', e);
     }
   };
 
@@ -230,7 +237,7 @@ const RealtimeConsole: React.FC = () => {
               }
             >
               <List
-                dataSource={[...events, { event: 'end' }]}
+                dataSource={[...events, { event: 'end', time: '', type: '' }]}
                 style={{ maxHeight: '420px', overflow: 'auto' }}
                 renderItem={item =>
                   item.event === 'end' ? (
@@ -259,7 +266,10 @@ const RealtimeConsole: React.FC = () => {
               }
             >
               <List
-                dataSource={[...serverEvents, { event: 'end' }]}
+                dataSource={[
+                  ...serverEvents,
+                  { event: 'end', time: '', type: '' },
+                ]}
                 style={{ maxHeight: '420px', overflow: 'auto' }}
                 renderItem={item =>
                   item.event === 'end' ? (

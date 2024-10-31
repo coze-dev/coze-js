@@ -13,8 +13,7 @@ export const sleep = (milliseconds: number): Promise<void> => {
   return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
 };
 /**
- * en: Check microphone permission，return boolean
- * zh: 检查麦克风权限，返回布尔值
+ * Check microphone permission，return boolean
  */
 export const checkPermission: () => Promise<boolean> = async () =>
   (await VERTC.enableDevices({ audio: true, video: false })).audio;
