@@ -21,7 +21,7 @@ describe('Documents', () => {
     it('should create a document', async () => {
       const mockDocumentInfo: DocumentInfo = {
         char_count: 1000,
-        chunk_strategy: { chunk_type: 'token', max_tokens: 500 },
+        chunk_strategy: { chunk_type: 0, max_tokens: 500 },
         create_time: 1234567890,
         document_id: 'doc-1',
         format_type: 1,
@@ -55,7 +55,7 @@ describe('Documents', () => {
           },
         ],
         chunk_strategy: {
-          chunk_type: 'token',
+          chunk_type: 0,
           max_tokens: 500,
         },
       };
@@ -66,7 +66,7 @@ describe('Documents', () => {
         '/open_api/knowledge/document/create',
         params,
         false,
-        undefined,
+        { headers: { 'agw-js-conv': 'str' } },
       );
       expect(result).toEqual([mockDocumentInfo]);
     });
@@ -92,7 +92,7 @@ describe('Documents', () => {
         '/open_api/knowledge/document/update',
         params,
         false,
-        undefined,
+        { headers: { 'agw-js-conv': 'str' } },
       );
     });
   });
@@ -112,7 +112,7 @@ describe('Documents', () => {
         '/open_api/knowledge/document/delete',
         params,
         false,
-        undefined,
+        { headers: { 'agw-js-conv': 'str' } },
       );
     });
   });
@@ -170,7 +170,7 @@ describe('Documents', () => {
         '/open_api/knowledge/document/list',
         params,
         false,
-        undefined,
+        { headers: { 'agw-js-conv': 'str' } },
       );
       expect(result).toEqual(mockResponse);
     });

@@ -8,6 +8,10 @@ async function main() {
     space_id: spaceId,
     name: 'test',
     description: 'test',
+    prompt_info: {
+      prompt:
+        'your are a translator, translate the following text from English to Chinese',
+    },
   });
   console.log('client.bots.create', bot);
 

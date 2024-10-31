@@ -1,6 +1,9 @@
 import { APIResource } from '../../resource.js';
+import { mergeConfig } from '../../../utils.js';
 import { type RequestOptions } from '../../../core.js';
 
+// Required header for knowledge APIs
+const headers = { 'agw-js-conv': 'str' };
 export class Documents extends APIResource {
   /**
    * View the file list of a specified knowledge base, which includes lists of documents, spreadsheets, or images.
@@ -18,7 +21,7 @@ export class Documents extends APIResource {
       apiUrl,
       params,
       false,
-      options,
+      mergeConfig(options, { headers }),
     );
     return response;
   }
@@ -38,7 +41,7 @@ export class Documents extends APIResource {
     const response = await this._client.post<
       CreateDocumentReq,
       { document_infos: DocumentInfo[] }
-    >(apiUrl, params, false, options);
+    >(apiUrl, params, false, mergeConfig(options, { headers }));
     return response.document_infos;
   }
 
@@ -56,7 +59,7 @@ export class Documents extends APIResource {
       apiUrl,
       params,
       false,
-      options,
+      mergeConfig(options, { headers }),
     );
   }
 
@@ -75,7 +78,7 @@ export class Documents extends APIResource {
       apiUrl,
       params,
       false,
-      options,
+      mergeConfig(options, { headers }),
     );
   }
 }
@@ -125,7 +128,7 @@ export interface DocumentInfo {
 }
 
 export interface ChunkStrategy {
-  chunk_type: string;
+  chunk_type: number;
   separator?: string;
   max_tokens?: number;
   remove_extra_spaces?: boolean;
@@ -135,7 +138,7 @@ export interface ChunkStrategy {
 export interface DocumentBase {
   name: string;
   source_info: SourceInfo;
-  update_rule: UpdateRule;
+  update_rule?: UpdateRule;
 }
 
 export interface SourceInfo {
