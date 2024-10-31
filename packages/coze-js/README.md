@@ -25,21 +25,21 @@ npm install @coze/api
 
 | Example                                          | File                                              |
 | ------------------------------------------------ | ------------------------------------------------- |
-| Personal Access Token authentication             | examples/node/src/auth/auth-pat.mjs               |
-| OAuth Web application authentication             | examples/node/src/auth/auth-oauth-web.mjs         |
-| OAuth PKCE authentication                        | examples/node/src/auth/auth-oauth-pkce.mjs        |
-| OAuth JWT authentication                         | examples/node/src/auth/auth_oauth_jwt.mjs         |
-| OAuth JWT authentication for channel access      | examples/node/src/auth/auth-oauth-jwt-channel.mjs |
-| OAuth Device Code flow authentication            | examples/node/src/auth/auth-oauth-device.mjs      |
-| Chat (streaming and non-streaming)               | examples/node/src/chat.mjs                        |
-| Bot creation and management                      | examples/node/src/bot.mjs                         |
-| File operations                                  | examples/node/src/file.mjs                        |
-| Knowledge base document management               | examples/node/src/knowledge.mjs                   |
-| Workspace listing                                | examples/node/src/workspace.mjs                   |
-| Conversation management                          | examples/node/src/conversation.mjs                |
-| Workflow execution (streaming and non-streaming) | examples/node/src/workflow.mjs                    |
-| Error handling examples                          | examples/node/src/error-handle.mjs                |
-| Request options (Support all axios options)      | examples/node/src/request-options.mjs             |
+| Personal Access Token authentication             | [examples/node/src/auth/auth-pat.mjs](./examples/node/src/auth/auth-pat.mjs)               |
+| OAuth Web application authentication             | [examples/node/src/auth/auth-oauth-web.mjs](./examples/node/src/auth/auth-oauth-web.mjs)         |
+| OAuth PKCE authentication                        | [examples/node/src/auth/auth-oauth-pkce.mjs](./examples/node/src/auth/auth-oauth-pkce.mjs)        |
+| OAuth JWT authentication                         | [examples/node/src/auth/auth_oauth_jwt.mjs](./examples/node/src/auth/auth_oauth_jwt.mjs)         |
+| OAuth JWT authentication for channel access      | [examples/node/src/auth/auth-oauth-jwt-channel.mjs](./examples/node/src/auth/auth-oauth-jwt-channel.mjs) |
+| OAuth Device Code flow authentication            | [examples/node/src/auth/auth-oauth-device.mjs](./examples/node/src/auth/auth-oauth-device.mjs)      |
+| Chat (streaming and non-streaming)               | [examples/node/src/chat.mjs](./examples/node/src/chat.mjs)                        |
+| Bot creation and management                      | [examples/node/src/bot.mjs](./examples/node/src/bot.mjs)                         |
+| File operations                                  | [examples/node/src/file.mjs](./examples/node/src/file.mjs)                        |
+| Knowledge base document management               | [examples/node/src/knowledge.mjs](./examples/node/src/knowledge.mjs)                   |
+| Workspace listing                                | [examples/node/src/workspace.mjs](./examples/node/src/workspace.mjs)                   |
+| Conversation management                          | [examples/node/src/conversation.mjs](./examples/node/src/conversation.mjs)                |
+| Workflow execution (streaming and non-streaming) | [examples/node/src/workflow.mjs](./examples/node/src/workflow.mjs)                    |
+| Error handling examples                          | [examples/node/src/error-handle.mjs](./examples/node/src/error-handle.mjs)                |
+| Request options (Support all axios options)      | [examples/node/src/request-options.mjs](./examples/node/src/request-options.mjs)             |
 
 ## Initialize the coze client
 
@@ -48,17 +48,17 @@ npm install @coze/api
 create Personal Auth Token at [扣子](https://www.coze.cn/open/oauth/pats) or [Coze Platform](https://www.coze.com/open/oauth/pats)
 
 ```js
-import { CozeAPI,COZE_COM_BASE_URL ,COZE_CN_BASE_URL } from '@coze/api';
+import { CozeAPI,COZE_COM_BASE_URL, COZE_CN_BASE_URL } from '@coze/api';
 
 const client = new CozeAPI({
   token: 'your_token',
-  baseURL: COZE_COM_BASE_URL, // you can change to COZE_CN_BASE_URL if you use https://use coze.cn
+  baseURL: COZE_COM_BASE_URL, // Use COZE_CN_BASE_URL for China region (https://www.coze.cn)
 });
 ```
 
 ### OAuth、JWT 和 Device Code
 
-支持 OAuth 2.0 、 JWT 和 Device Code 等多种认证方式，请参考：
+Supports multiple authentication methods including OAuth 2.0, JWT, and Device Code. Please refer to:
 
 - [auth-oauth-web](./examples/node/src/auth/auth-oauth-web.mjs)
 - [auth-oauth-pkce](./examples/node/src/auth/auth-oauth-pkce.mjs)
