@@ -1,0 +1,40 @@
+{
+  "name": "@coze/realtime-api-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "react-scripts build",
+    "eject": "react-scripts eject",
+    "start": "react-scripts start",
+    "test": "exit 0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.5.1",
+    "@coze/realtime-api": "file:../../dist",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^29.2.2",
+    "@types/node": "^20",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "antd": "^5.21.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^5.5.3",
+    "web-vitals": "^2.1.4"
+  }
+}

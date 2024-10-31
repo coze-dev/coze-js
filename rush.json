@@ -384,6 +384,14 @@
     {
       "packageName": "@coze/api-node-example",
       "projectFolder": "packages/coze-js/examples/node"
+    },
+    {
+      "packageName": "@coze/realtime-api",
+      "projectFolder": "packages/realtime-api"
+    },
+    {
+      "packageName": "@coze/realtime-api-example",
+      "projectFolder": "packages/realtime-api/examples/realtime-console"
     }
   ]
 }
