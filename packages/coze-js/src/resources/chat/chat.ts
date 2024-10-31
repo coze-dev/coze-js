@@ -517,6 +517,7 @@ export enum ChatEventType {
   CONVERSATION_CHAT_REQUIRES_ACTION = 'conversation.chat.requires_action',
   CONVERSATION_MESSAGE_DELTA = 'conversation.message.delta',
   CONVERSATION_MESSAGE_COMPLETED = 'conversation.message.completed',
+  CONVERSATION_AUDIO_DELTA = 'conversation.audio.delta',
   DONE = 'done',
   ERROR = 'error',
 }
@@ -534,7 +535,8 @@ export type StreamChatData =
   | {
       event:
         | ChatEventType.CONVERSATION_MESSAGE_DELTA
-        | ChatEventType.CONVERSATION_MESSAGE_COMPLETED;
+        | ChatEventType.CONVERSATION_MESSAGE_COMPLETED
+        | ChatEventType.CONVERSATION_AUDIO_DELTA;
       data: ChatV3Message;
     }
   | { event: ChatEventType.DONE; data: '[DONE]' }
