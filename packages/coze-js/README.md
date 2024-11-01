@@ -38,6 +38,7 @@ npm install @coze/api
 | Workspace listing                                | [examples/node/src/workspace.mjs](./examples/node/src/workspace.mjs)                   |
 | Conversation management                          | [examples/node/src/conversation.mjs](./examples/node/src/conversation.mjs)                |
 | Workflow execution (streaming and non-streaming) | [examples/node/src/workflow.mjs](./examples/node/src/workflow.mjs)                    |
+| Speech synthesis                                | [examples/node/src/voice.mjs](./examples/node/src/voice.mjs)                    |
 | Error handling examples                          | [examples/node/src/error-handle.mjs](./examples/node/src/error-handle.mjs)                |
 | Request options (Support all axios options)      | [examples/node/src/request-options.mjs](./examples/node/src/request-options.mjs)             |
 
@@ -175,6 +176,7 @@ nonStreamingChat();
 - [knowledge](./examples/node/src/knowledge.mjs)
 - [conversation](./examples/node/src/conversation.mjs)
 - [workflow](./examples/node/src/workflow.mjs)
+- [voice](./examples/node/src/voice.mjs)
 - [error-handle](./examples/node/src/error-handle.mjs)
 - [request-options](./examples/node/src/request-options.mjs)
 
