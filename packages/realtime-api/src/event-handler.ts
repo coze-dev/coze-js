@@ -41,6 +41,11 @@ export enum EventNames {
    * zh: 客户端音频静音
    */
   AUDIO_MUTED = 'client.audio.muted',
+  /**
+   * en: Client error
+   * zh: 客户端错误
+   */
+  ERROR = 'client.error',
 }
 type EventCallback = (eventName: string, event: unknown) => void;
 

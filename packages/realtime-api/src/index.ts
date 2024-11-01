@@ -77,13 +77,23 @@ class RealtimeClient extends RealtimeEventHandler {
   async connect() {
     const { botId, conversationId, voiceId } = this._config;
 
-    // Step1 get token
-    const roomInfo = await this._api.audio.rooms.create({
-      bot_id: botId,
-      conversation_id: conversationId,
-      voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
-      connector_id: this._config.connectorId ?? '999',
-    });
+    let roomInfo: CreateRoomData;
+    try {
+      // Step1 get token
+      roomInfo = await this._api.audio.rooms.create({
+        bot_id: botId,
+        conversation_id: conversationId,
+        voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
+        connector_id: this._config.connectorId ?? '999',
+      });
+    } catch (error) {
+      this.dispatch(EventNames.ERROR, error);
+      throw new RealtimeAPIError(
+        RealtimeError.CREATE_ROOM_ERROR,
+        error instanceof Error ? error.message : 'Unknown error',
+      );
+    }
+
     this._roomInfo = roomInfo;
 
     // Step2 create engine

@@ -207,13 +207,15 @@ export class EngineClient extends RealtimeEventHandler {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleLocalAudioPropertiesReport(event: any) {
-    if (event[0]?.audioPropertiesInfo?.linearVolume > 0) {
+    if (this._debug && event[0]?.audioPropertiesInfo?.linearVolume > 0) {
       console.log('handleLocalAudioPropertiesReport', event);
     }
   }
 
   handleRemoteAudioPropertiesReport(event: unknown) {
-    console.log('handleRemoteAudioPropertiesReport', event);
+    if (this._debug) {
+      console.log('handleRemoteAudioPropertiesReport', event);
+    }
   }
 
   async startAudioPlaybackDeviceTest() {
