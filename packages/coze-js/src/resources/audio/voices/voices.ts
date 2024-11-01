@@ -110,6 +110,10 @@ export interface Voice {
   name: string;
   /** Language code | 语言代码 */
   language_code: string;
+  /** Voice ID | 音色ID */
+  voice_id: string;
   /** Remaining number of times this voice can be trained | 当前音色还可以训练的次数 */
   available_training_times: number;
+  /** Preview audio | 预览音频 */
+  preview_audio: string;
 }

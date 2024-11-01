@@ -58,6 +58,8 @@ describe('Voices', () => {
               name: 'Test Voice',
               language_code: 'en',
               available_training_times: 5,
+              voice_id: 'test-voice-id',
+              preview_audio: 'test-preview-audio',
             },
           ],
           has_more: false,
