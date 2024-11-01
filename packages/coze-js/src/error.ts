@@ -61,9 +61,7 @@ export class APIError extends CozeError {
         list.push(`logid: ${logId}`);
       }
 
-      const help_doc =
-        error?.help_doc ||
-        'https://www.coze.com/docs/developer_guides/coze_error_codes?_lang=en';
+      const help_doc = error?.help_doc;
       if (help_doc) {
         list.push(`help doc: ${help_doc}`);
       }
