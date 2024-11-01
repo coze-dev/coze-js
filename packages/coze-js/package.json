@@ -27,6 +27,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -b tsconfig.build.json",
     "format": "prettier --write .",
+    "postinstall": "npm run build",
     "lint": "eslint ./ --cache --quiet",
     "prepublishOnly": "npm run build",
     "start": "rm -rf dist && tsc -b -w tsconfig.build.json",
