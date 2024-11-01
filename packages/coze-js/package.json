@@ -5,7 +5,8 @@
   "homepage": "https://github.com/coze-dev/coze-js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/coze-dev/coze-js.git"
+    "url": "https://github.com/coze-dev/coze-js.git",
+    "directory": "packages/coze-js"
   },
   "license": "MIT",
   "author": "Leeight <leeight@gmail.com>",
