@@ -7,18 +7,18 @@ import { RealtimeAPIError, RealtimeError } from './error';
 import { EngineClient } from './client';
 
 export interface RealtimeClientConfig {
-  accessToken: string /** 必填(required)，Access Token */;
-  botId: string /** 必填(required)，Bot Id */;
-  voiceId?: string /** 可选(optional)，音色Id */;
-  conversationId?: string /** 可选(optional)，会话Id */;
-  baseURL?: string /** 可选(optional)，默认 https://api.coze.cn */;
-  debug?: boolean /** 可选(optional)，默认 false */;
+  accessToken: string /** required, Access Token */;
+  botId: string /** required, Bot Id */;
+  voiceId?: string /** optional, Voice Id */;
+  conversationId?: string /** optional, Conversation Id */;
+  baseURL?: string /** optional, defaults to "https://api.coze.cn" */;
+  debug?: boolean /** optional, defaults to false */;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
   allowPersonalAccessTokenInBrowser?: boolean;
   /** Whether to mute by default, defaults to false
    * If set to true, audio streams will not be automatically published and subscribed */
   audioMutedDefault?: boolean;
-  connectorId?: string /** 可选(optional)，Connector Id，默认值为 '999' */;
+  connectorId?: string /** optional, Connector Id, defaults to '999' */;
 }
 
 class RealtimeClient extends RealtimeEventHandler {
