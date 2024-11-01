@@ -1,10 +1,10 @@
 import { type AudioPropertiesConfig } from '@volcengine/rtc';
 import { CozeAPI, type CreateRoomData } from '@coze/api';
 
-import * as RealtimeUtils from './utils.js';
-import { RealtimeEventHandler, EventNames } from './event-handler.js';
-import { RealtimeAPIError, RealtimeError } from './error.js';
-import { EngineClient } from './client.js';
+import * as RealtimeUtils from './utils';
+import { RealtimeEventHandler, EventNames } from './event-handler';
+import { RealtimeAPIError, RealtimeError } from './error';
+import { EngineClient } from './client';
 
 export interface RealtimeClientConfig {
   accessToken: string /** 必填(required)，Access Token */;

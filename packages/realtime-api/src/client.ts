@@ -7,8 +7,8 @@ import VERTC, {
   type UserMessageEvent,
 } from '@volcengine/rtc';
 
-import { RealtimeEventHandler } from './event-handler.js';
-import { RealtimeAPIError, RealtimeError } from './error.js';
+import { RealtimeEventHandler } from './event-handler';
+import { RealtimeAPIError, RealtimeError } from './error';
 
 export class EngineClient extends RealtimeEventHandler {
   private engine: IRTCEngine;

@@ -1,4 +1,4 @@
-import { RealtimeError, RealtimeAPIError } from './error.js';
+import { RealtimeError, RealtimeAPIError } from './error';
 
 export enum EventNames {
   /**
