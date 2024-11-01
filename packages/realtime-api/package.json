@@ -26,7 +26,6 @@
     "buildAll": "npm run build && cd examples/realtime-console && npm run build",
     "demo": "npm run build && cd examples/realtime-console && npm run start",
     "format": "prettier --write .",
-    "postinstall": "npm run build",
     "lint": "eslint ./ --cache --quiet",
     "prepublishOnly": "npm run build",
     "start": "rm -rf dist && tsc -b -w tsconfig.build.json",
