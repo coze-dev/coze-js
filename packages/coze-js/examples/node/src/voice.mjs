@@ -45,17 +45,18 @@ try {
 
 async function listAllVoices() {
   try {
-    const PAGE_SIZE = 2;
+    const PAGE_SIZE = 20;
     let page = 1;
     let allVoices = [];
 
     while (true) {
+      console.log('page', page);
       const response = await client.audio.voices.list({
         page_size: PAGE_SIZE,
-        page,
+        page_num: page,
       });
       allVoices = allVoices.concat(response.voice_list);
-
+      console.log('response', response);
       if (response.has_more === false) {
         break;
       }
