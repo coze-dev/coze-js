@@ -5,16 +5,17 @@
   "homepage": "https://github.com/coze-dev/coze-js/packages/realtime-api",
   "repository": {
     "type": "git",
-    "url": "https://github.com/coze-dev/coze-js.git"
+    "url": "https://github.com/coze-dev/coze-js.git",
+    "directory": "packages/realtime-api"
   },
   "license": "MIT",
   "author": "jackshen <jackshen310@gmail.com>",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./src/index.ts"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "files": [
     "dist",
     "LICENSE",

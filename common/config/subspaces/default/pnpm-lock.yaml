@@ -164,6 +164,111 @@ importers:
         specifier: ^5.5.3
         version: 5.6.3
 
+  ../../../examples/coze-js-node:
+    dependencies:
+      '@coze/api':
+        specifier: workspace:*
+        version: link:../../packages/coze-js
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint-config
+
+  ../../../examples/coze-js-web:
+    dependencies:
+      '@coze/api':
+        specifier: workspace:*
+        version: link:../../packages/coze-js
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      web-vitals:
+        specifier: ^2.1.4
+        version: 2.1.4
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint-config
+      '@types/jest':
+        specifier: ^29.2.2
+        version: 29.5.14
+      '@types/node':
+        specifier: ^20
+        version: 20.16.15
+      '@types/react':
+        specifier: ^18.3.11
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-scripts:
+        specifier: 5.0.1
+        version: 5.0.1(@types/babel__core@7.20.5)(react@18.3.1)(type-fest@0.21.3)(typescript@5.6.3)
+      typescript:
+        specifier: ^5.5.3
+        version: 5.6.3
+
+  ../../../examples/realtime-console:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.1
+        version: 5.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@coze/realtime-api':
+        specifier: workspace:*
+        version: link:../../packages/realtime-api
+      antd:
+        specifier: ^5.21.3
+        version: 5.21.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      web-vitals:
+        specifier: ^2.1.4
+        version: 2.1.4
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint-config
+      '@testing-library/jest-dom':
+        specifier: ^5.17.0
+        version: 5.17.0
+      '@testing-library/react':
+        specifier: ^13.4.0
+        version: 13.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@testing-library/user-event':
+        specifier: ^13.5.0
+        version: 13.5.0(@testing-library/dom@8.20.1)
+      '@types/jest':
+        specifier: ^29.2.2
+        version: 29.5.14
+      '@types/node':
+        specifier: ^20
+        version: 20.16.15
+      '@types/react':
+        specifier: ^18.3.11
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-scripts:
+        specifier: 5.0.1
+        version: 5.0.1(@types/babel__core@7.20.5)(react@18.3.1)(type-fest@0.21.3)(typescript@5.6.3)
+      typescript:
+        specifier: ^5.5.3
+        version: 5.6.3
+
   ../../../packages/coze-js:
     devDependencies:
       '@coze-infra/eslint-config':
@@ -199,18 +304,6 @@ importers:
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
-
-  ../../../packages/coze-js/examples/node:
-    dependencies:
-      '@coze/api':
-        specifier: workspace:*
-        version: link:../..
-      axios:
-        specifier: ^1.7.7
-        version: 1.7.7
-      jsonwebtoken:
-        specifier: ^9.0.2
-        version: 9.0.2
 
   ../../../packages/realtime-api:
     dependencies:
@@ -254,54 +347,6 @@ importers:
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
-
-  ../../../packages/realtime-api/examples/realtime-console:
-    dependencies:
-      '@ant-design/icons':
-        specifier: ^5.5.1
-        version: 5.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@coze/realtime-api':
-        specifier: file:../../dist
-        version: dist@file:../../../packages/realtime-api/dist
-      '@testing-library/jest-dom':
-        specifier: ^5.17.0
-        version: 5.17.0
-      '@testing-library/react':
-        specifier: ^13.4.0
-        version: 13.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@testing-library/user-event':
-        specifier: ^13.5.0
-        version: 13.5.0(@testing-library/dom@8.20.1)
-      '@types/jest':
-        specifier: ^29.2.2
-        version: 29.5.14
-      '@types/node':
-        specifier: ^20
-        version: 20.16.15
-      '@types/react':
-        specifier: ^18.3.11
-        version: 18.3.12
-      '@types/react-dom':
-        specifier: ^18.3.0
-        version: 18.3.1
-      antd:
-        specifier: ^5.21.3
-        version: 5.21.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      react-dom:
-        specifier: ^18.3.1
-        version: 18.3.1(react@18.3.1)
-      react-scripts:
-        specifier: 5.0.1
-        version: 5.0.1(@types/babel__core@7.20.5)(react@18.3.1)(type-fest@0.21.3)(typescript@5.6.3)
-      typescript:
-        specifier: ^5.5.3
-        version: 5.6.3
-      web-vitals:
-        specifier: ^2.1.4
-        version: 2.1.4
 
 packages:
 
@@ -3053,9 +3098,6 @@ packages:
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
-
-  dist@file:../../../packages/realtime-api/dist:
-    resolution: {directory: ../../../packages/realtime-api/dist, type: directory}
 
   dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
@@ -10557,8 +10599,6 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
-  dist@file:../../../packages/realtime-api/dist: {}
-
   dlv@1.1.3: {}
 
   dns-packet@5.6.1:
@@ -12388,7 +12428,7 @@ snapshots:
       jest-runtime: 27.5.1
       jest-util: 27.5.1
       jest-worker: 27.5.1
-      source-map-support: 0.5.13
+      source-map-support: 0.5.21
       throat: 6.0.2
     transitivePeerDependencies:
       - bufferutil

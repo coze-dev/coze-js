@@ -1,13 +1,15 @@
+import { useEffect, useState } from 'react';
+
 import {
   CozeAPI,
   getWebOAuthToken,
   getPKCEOAuthToken,
   getWebAuthenticationUrl,
   getPKCEAuthenticationUrl,
-  OAuthToken,
+  type OAuthToken,
 } from '@coze/api';
-import { useEffect, useState } from 'react';
-import { SettingConfig } from './Setting';
+
+import { type SettingConfig } from './Setting';
 
 let client: CozeAPI;
 const redirectUrl = 'http://localhost:3000';
