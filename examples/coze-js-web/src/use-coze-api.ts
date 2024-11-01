@@ -14,6 +14,7 @@ import { type SettingConfig } from './Setting';
 let client: CozeAPI;
 const redirectUrl = 'http://localhost:3000';
 
+// eslint-disable-next-line max-lines-per-function
 const useCozeAPI = () => {
   const [message, setMessage] = useState('');
   const [isReady, setIsReady] = useState(false);
@@ -29,11 +30,11 @@ const useCozeAPI = () => {
   });
 
   useEffect(() => {
-    const config = JSON.parse(
+    const configData = JSON.parse(
       sessionStorage.getItem('settingConfig') || '{}',
     ) as SettingConfig;
 
-    if (config && config.authType) {
+    if (configData && configData.authType) {
       if (config.authType === 'pat_token') {
         initClient(config);
       } else if (
@@ -88,23 +89,23 @@ const useCozeAPI = () => {
     }
   }, []);
 
-  async function initClient(config: SettingConfig) {
-    setConfig(config);
+  async function initClient(configData: SettingConfig) {
+    setConfig(configData);
 
-    if (config.authType === 'oauth_token' && !config.token) {
+    if (configData.authType === 'oauth_token' && !configData.token) {
       window.location.href = getWebAuthenticationUrl({
-        baseURL: config.baseUrl,
-        clientId: config.clientId || '',
+        baseURL: configData.baseUrl,
+        clientId: configData.clientId || '',
         redirectUrl,
         state: '',
       });
       return;
     }
 
-    if (config.authType === 'oauth_pkce' && !config.token) {
+    if (configData.authType === 'oauth_pkce' && !configData.token) {
       const { url, codeVerifier } = await getPKCEAuthenticationUrl({
-        baseURL: config.baseUrl,
-        clientId: config.clientId || '',
+        baseURL: configData.baseUrl,
+        clientId: configData.clientId || '',
         redirectUrl,
         state: '',
       });
@@ -113,19 +114,20 @@ const useCozeAPI = () => {
       return;
     }
 
-    if (!config.token) {
+    if (!configData.token) {
       return;
     }
 
     client = new CozeAPI({
-      token: config.token || '',
-      baseURL: config.baseUrl,
+      token: configData.token || '',
+      baseURL: configData.baseUrl,
       allowPersonalAccessTokenInBrowser: true,
     });
     setIsReady(true);
   }
 
   async function streamingChat(query: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let messages: any[];
     if (fileId) {
       messages = [

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
-export type SettingConfig = {
+export interface SettingConfig {
   authType: string;
   baseUrl: string;
   token?: string;
   botId: string;
   clientId?: string;
   clientSecret?: string;
-};
+}
 
 interface Props {
   onSubmit: (settingConfig: SettingConfig) => void;

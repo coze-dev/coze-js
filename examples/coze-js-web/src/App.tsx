@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+
 import './App.css';
 import { useCozeAPI } from './use-coze-api';
-import Setting, { SettingConfig } from './Setting';
+import Setting, { type SettingConfig } from './Setting';
 
 function App() {
-  const { initClient, message, sendMessage, isReady, uploadFile } = useCozeAPI();
+  const { initClient, message, sendMessage, isReady, uploadFile } =
+    useCozeAPI();
   const [isModify, setIsModify] = useState(false);
   const [query, setQuery] = useState('');
   const [file, setFile] = useState<File | null>(null);
