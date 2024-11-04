@@ -4,7 +4,7 @@
   "description": "coze-api node example",
   "license": "ISC",
   "author": "",
-  "main": "config.default.js",
+  "type": "module",
   "scripts": {
     "test": "exit 0"
   },

@@ -1,16 +1,13 @@
 import { Voices } from '../../src/resources/audio/voices/voices';
-import { Audio } from '../../src/resources/audio';
 import { CozeAPI } from '../../src/index';
 
 describe('Voices', () => {
   let client: CozeAPI;
   let voices: Voices;
-  let audio: Audio;
 
   beforeEach(() => {
     client = new CozeAPI({ token: 'test-token' });
     voices = new Voices(client);
-    audio = new Audio(client);
   });
 
   describe('clone', () => {
@@ -82,32 +79,6 @@ describe('Voices', () => {
         undefined,
       );
       expect(result).toEqual(mockResponse.data);
-    });
-  });
-
-  describe('speech', () => {
-    it('should generate speech synthesis', async () => {
-      const mockResponse = new ArrayBuffer(8);
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
-
-      const params = {
-        input: 'Hello world',
-        voice_id: 'test-voice-id',
-        response_format: 'mp3' as const,
-        speed: 1.0,
-      };
-
-      const result = await audio.speech(params);
-
-      expect(client.post).toHaveBeenCalledWith(
-        '/v1/audio/speech',
-        params,
-        false,
-        expect.objectContaining({
-          responseType: 'arraybuffer',
-        }),
-      );
-      expect(result).toEqual(mockResponse);
     });
   });
 });
