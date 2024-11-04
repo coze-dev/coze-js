@@ -163,5 +163,5 @@ dist
 *.tsbuildinfo
 
 # Temp file
-**/examples/node/tmp/
-**/examples/node/config.js
+examples/coze-js-node/tmp/
+examples/coze-js-node/config.js

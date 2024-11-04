@@ -1,6 +1,5 @@
 export default {
   zh: {
-    COZE_API_KEY: 'pat_4hde3zg5***',
     COZE_BOT_ID: '7395773137***',
     COZE_SPACE_ID: '7366123674***',
     COZE_BASE_URL: 'https://api.coze.cn',

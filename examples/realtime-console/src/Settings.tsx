@@ -11,7 +11,9 @@ import {
   Form,
   Dropdown,
   Menu,
+  Select,
 } from 'antd';
+import { CozeAPI, type Voice } from '@coze/api';
 import { SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 
 import logo from './logo.svg'; // 导入 logo
@@ -25,9 +27,17 @@ interface SettingsProps {
 
 const DOCS_URL =
   'https://bytedance.larkoffice.com/docx/FQJ9dvBE7oLzu3xtacJc6Cyjnof';
+
+interface VoiceOption {
+  id: string;
+  name: string;
+}
+
 const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [voiceOptions, setVoiceOptions] = useState<VoiceOption[]>([]);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     // Load values from localStorage on component mount
@@ -42,6 +52,41 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       baseURL: storedBaseURL || 'https://api.coze.cn',
     });
   }, [form]);
+
+  useEffect(() => {
+    // Fetch voice options when accessToken or baseURL changes
+    const fetchVoiceOptions = async () => {
+      const accessToken = form.getFieldValue('accessToken');
+      const baseURL = form.getFieldValue('baseURL');
+
+      if (!accessToken || !baseURL) {
+        return;
+      }
+
+      try {
+        const api = new CozeAPI({
+          token: accessToken,
+          baseURL,
+          allowPersonalAccessTokenInBrowser: true,
+        });
+        const result = await api.audio.voices.list();
+        setVoiceOptions(
+          result.voice_list.map((voice: Voice) => ({
+            id: voice.voice_id,
+            name: voice.name,
+          })),
+        );
+      } catch (error) {
+        console.error('Failed to fetch voice options:', error);
+        message.error('Failed to load voice options');
+      }
+    };
+    fetchVoiceOptions();
+  }, [form.getFieldValue('accessToken'), form.getFieldValue('baseURL')]);
+
+  const handleFormChange = () => {
+    setForceUpdate(forceUpdate + 1);
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -164,7 +209,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} onValuesChange={handleFormChange} layout="vertical">
           <Form.Item
             name="accessToken"
             label="Access Token"
@@ -187,21 +232,28 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
             <Input />
           </Form.Item>
           <Form.Item
+            name="baseURL"
+            label="Base URL"
+            rules={[{ required: true, message: 'Please input the base URL!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
             name="botId"
             label="Bot ID"
             rules={[{ required: true, message: 'Please input your bot ID!' }]}
           >
             <Input />
           </Form.Item>
-          <Form.Item name="voiceId" label="Voice ID">
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="baseURL"
-            label="Base URL"
-            rules={[{ required: true, message: 'Please input the base URL!' }]}
-          >
-            <Input />
+          <Form.Item name="voiceId" label="Voice">
+            <Select
+              allowClear
+              placeholder="Select a voice"
+              options={voiceOptions.map(voice => ({
+                value: voice.id,
+                label: voice.name,
+              }))}
+            />
           </Form.Item>
         </Form>
       </Modal>
