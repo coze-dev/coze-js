@@ -43,7 +43,7 @@ export class Voices extends APIResource {
    * @param options - Request options
    * @returns List voices data
    */
-  async list(params: ListVoicesReq, options?: RequestOptions) {
+  async list(params?: ListVoicesReq, options?: RequestOptions) {
     const apiUrl = '/v1/audio/voices';
     const response = await this._client.get<
       ListVoicesReq,

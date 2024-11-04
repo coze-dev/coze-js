@@ -345,6 +345,9 @@ importers:
       '@babel/core':
         specifier: ^7.16.0
         version: 7.25.9
+      '@coze/api':
+        specifier: workspace:*
+        version: link:../../packages/coze-js
       '@coze/realtime-api':
         specifier: workspace:*
         version: link:../../packages/realtime-api
