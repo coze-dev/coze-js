@@ -252,10 +252,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
 
   useEffect(() => {
     (async () => {
-      const refreshToken = await getOrRefreshToken();
-      setAccessToken(refreshToken);
+      const accessTokenObtained = await getOrRefreshToken();
+      setAccessToken(accessTokenObtained);
 
-      if (refreshToken) {
+      if (accessTokenObtained) {
         await loadData(
           'Voices',
           'voiceId',
