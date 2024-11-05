@@ -64,7 +64,7 @@ const RealtimeConsole: React.FC = () => {
     }
 
     if (!accessToken || !botId) {
-      message.error('Please set accessToken and botId');
+      message.warning('Please click Settings to set configuration');
       return;
     }
 

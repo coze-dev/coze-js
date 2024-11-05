@@ -64,7 +64,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
   const handleInterrupt = async () => {
     if (!clientRef.current) {
-      message.error('Please set accessToken and botId first');
+      message.error('Please click Settings to set configuration first');
       return;
     }
 
@@ -85,13 +85,13 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
       onToggleMicrophone(!isMicrophoneOn);
       message.success(`Microphone ${!isMicrophoneOn ? 'unmuted' : 'muted'}`);
     } else {
-      message.error('Please set accessToken and botId first');
+      message.error('Please click Settings to set configuration first');
     }
   };
 
   const handleSendMessage = (values: { eventData: string }) => {
     if (!clientRef.current) {
-      message.error('Please set accessToken and botId first');
+      message.error('Please click Settings to set configuration first');
       return;
     }
     try {
@@ -104,7 +104,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
   const handleEnableAudioPropertiesReport = () => {
     if (!clientRef?.current) {
-      message.error('Please set accessToken and botId first');
+      message.error('Please click Settings to set configuration first');
       return;
     }
     try {
@@ -118,7 +118,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
   const handleAudioPlaybackDeviceTest = () => {
     if (!clientRef?.current) {
-      message.error('Please set accessToken and botId first');
+      message.error('Please click Settings to set configuration first');
       return;
     }
     if (isAudioPlaybackDeviceTest) {

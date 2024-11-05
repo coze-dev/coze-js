@@ -266,7 +266,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     } else if (storedAccessToken) {
       // no refresh token, use access token
       if (isTokenExpired(tokenExpiresAt)) {
-        message.error('Access token has expired');
+        // expired, need re-authorize, no need error message
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('tokenExpiresAt');
         return '';
       }
       setAccessToken(storedAccessToken);
