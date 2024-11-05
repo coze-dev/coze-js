@@ -493,10 +493,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
               <>
                 仅支持已开通白名单的火山引擎专业版用户，
                 <Link
-                  href="https://www.coze.cn/store/agent/7431466007513808959?bid=6e8pp4bh8100f&bot_id=true"
+                  href="https://www.coze.cn/survey/7431180581536268314"
                   target="_blank"
                 >
-                  通过与Bot的对话开启白名单
+                  填写问卷申请开通使用
                 </Link>
               </>
             }
