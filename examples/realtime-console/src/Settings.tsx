@@ -117,6 +117,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [accessToken, setAccessToken] = useState<string>('');
+  const [isAccessTokenLoaded, setIsAccessTokenLoaded] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState<string>('');
   const [voices, setVoices] = useState<VoiceOption[]>([]);
   const [workspaces, setWorkspaces] = useState<WorkspaceOption[]>([]);
@@ -254,6 +255,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     (async () => {
       const accessTokenObtained = await getOrRefreshToken();
       setAccessToken(accessTokenObtained);
+      setIsAccessTokenLoaded(true);
 
       if (accessTokenObtained) {
         await loadData(
@@ -482,7 +484,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
 
       <Modal
         title="Settings"
-        visible={isModalVisible}
+        visible={isModalVisible || (isAccessTokenLoaded && accessToken === '')}
         onOk={handleOk}
         onCancel={handleCancel}
       >
