@@ -1,10 +1,11 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 import assert from 'assert';
 
 import { CozeAPI } from '@coze/api';
 
-import { client, spaceId } from './client.mjs';
+import { client, spaceId } from './client.js';
 
 async function test_BadRequestError() {
   try {
@@ -71,10 +72,10 @@ async function test_NotFoundError() {
 
 async function test_Wrongchat() {
   try {
-    const chat = await client.chat.retrieve({
-      chat_id: 'wrong chat id',
-      conversation_id: 'wrong conversation id',
-    });
+    const chat = await client.chat.retrieve(
+      'wrong chat id',
+      'wrong conversation id',
+    );
   } catch (err) {
     assert(err instanceof CozeAPI.APIError);
     console.log('test_Wrongchat', err.name);

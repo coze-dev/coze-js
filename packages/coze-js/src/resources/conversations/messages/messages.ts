@@ -99,7 +99,7 @@ export class Messages extends APIResource {
    */
   async list(
     conversation_id: string,
-    params: ListMessageReq,
+    params?: ListMessageReq,
     options?: RequestOptions,
   ): Promise<ListMessageData> {
     const apiUrl = `/v1/conversation/message/list?conversation_id=${conversation_id}`;

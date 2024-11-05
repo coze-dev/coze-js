@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
 import assert from 'assert';
 
-import { client, botId, workflowId } from './client.mjs';
+import { client, botId, workflowId } from './client.js';
 async function streamWorkflow() {
   assert(botId, 'botId is required');
   assert(workflowId, 'workflowId is required');
@@ -27,5 +26,5 @@ async function nonStreamWorkflow() {
   console.log('workflow', workflow);
 }
 
-streamWorkflow();
-// nonStreamWorkflow();
+streamWorkflow().catch(console.error);
+nonStreamWorkflow().catch(console.error);

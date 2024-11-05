@@ -1,8 +1,12 @@
+/// <reference types="node" />
 import { CozeAPI } from '@coze/api';
 
-import config from '../config.js';
+import config from './config/config.js';
 
-const key = process.env.COZE_ENV || 'en';
+const key = (process.env.COZE_ENV as keyof typeof config) || 'en';
+if (!(key in config)) {
+  throw new Error(`Invalid COZE_ENV value: ${key}`);
+}
 
 const apiKey = process.env.COZE_API_KEY || config[key].auth.pat.COZE_API_KEY;
 const botId = process.env.COZE_BOT_ID || config[key].COZE_BOT_ID;
@@ -15,7 +19,7 @@ const client = new CozeAPI({
   token: apiKey,
 });
 
-async function sleep(ms) {
+async function sleep(ms: number) {
   return new Promise(function (resolve) {
     setTimeout(resolve, ms);
   });
