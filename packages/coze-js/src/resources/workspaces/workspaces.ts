@@ -20,9 +20,8 @@ export class WorkSpaces extends APIResource {
       false,
       options,
     );
-    const spaces = safeJsonParse(response).data || response.data;
-    // TODO The returned type is not in JSON format
-    return spaces as OpenSpaceData;
+    const data = safeJsonParse(response) || response;
+    return data.data as OpenSpaceData;
   }
 }
 
