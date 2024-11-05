@@ -13,7 +13,6 @@ import {
   Dropdown,
   Menu,
   Select,
-  Badge,
   Space,
   Row,
   Col,
@@ -29,7 +28,6 @@ import {
 import {
   SettingOutlined,
   FileTextOutlined,
-  PlayCircleOutlined,
   RobotOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
@@ -42,6 +40,7 @@ import useCozeAPI, {
 import logo from './logo.svg';
 const { Header } = Layout;
 const { Text } = Typography;
+import VoiceSelect from './VoiceSelect';
 
 interface SettingsProps {
   onSaveSettings: () => void;
@@ -114,82 +113,6 @@ const BotSelect: React.FC<{
   </Select>
 );
 
-const VoiceSelect: React.FC<{
-  voices: VoiceOption[];
-  loading: boolean;
-  value?: string;
-  onChange?: (value: string) => void;
-}> = ({ voices, loading, value, onChange }) => {
-  const [audioPlayer] = useState(new Audio());
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const handleAudioError = (error: Event | string) => {
-    message.error('Failed to play audio preview');
-    console.error('Audio playback error:', error);
-  };
-
-  const handlePreview = (previewUrl: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (audioPlayer.src === previewUrl) {
-      if (audioPlayer.paused) {
-        audioPlayer.play();
-        setIsPlaying(true);
-      } else {
-        audioPlayer.pause();
-        setIsPlaying(false);
-      }
-    } else {
-      audioPlayer.src = previewUrl;
-      audioPlayer.onerror = handleAudioError;
-      audioPlayer.play();
-      setIsPlaying(true);
-    }
-  };
-
-  useEffect(
-    () => () => {
-      audioPlayer.pause();
-      audioPlayer.src = '';
-    },
-    [audioPlayer],
-  );
-
-  return (
-    <Select
-      value={value}
-      onChange={onChange}
-      placeholder="Select a voice"
-      allowClear
-      style={{ width: '100%' }}
-      loading={loading}
-    >
-      {voices.map(voice => (
-        <Select.Option key={voice.value} value={voice.value}>
-          <Space>
-            {voice.name} ({voice.language_name})
-            <Badge
-              count={voice.is_system_voice ? 'System' : 'Custom'}
-              style={{
-                backgroundColor: voice.is_system_voice ? '#87d068' : '#108ee9',
-              }}
-            />
-            {voice?.preview_url && (
-              <PlayCircleOutlined
-                onClick={e => handlePreview(voice.preview_url || '', e)}
-                aria-label={`Play ${voice.name} preview`}
-                role="button"
-                aria-pressed={
-                  isPlaying && audioPlayer.src === voice.preview_url
-                }
-              />
-            )}
-          </Space>
-        </Select.Option>
-      ))}
-    </Select>
-  );
-};
-
 const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -203,10 +126,11 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const [loadingBots, setLoadingBots] = useState(false);
   const baseURL = localStorage.getItem('baseURL') || 'https://api.coze.cn';
 
-  const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces } = useCozeAPI({
-    accessToken,
-    baseURL,
-  });
+  const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces, cloneVoice } =
+    useCozeAPI({
+      accessToken,
+      baseURL,
+    });
 
   const setToken = (token: OAuthToken) => {
     localStorage.setItem('accessToken', token.access_token);
@@ -637,6 +561,8 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
               loading={loadingVoices}
               value={form.getFieldValue('voiceId')}
               onChange={value => form.setFieldsValue({ voiceId: value })}
+              cloneVoice={cloneVoice}
+              fetchAllVoices={fetchAllVoices}
             />
           </Form.Item>
           <Form.Item

@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { CozeAPI } from '@coze/api';
+import { CozeAPI, type CloneVoiceReq } from '@coze/api';
 
 export interface VoiceOption {
   label: React.ReactNode;
   value: string;
   preview_url?: string;
   name: string;
+  language_code: string;
   language_name: string;
   is_system_voice: boolean;
+  available_training_times: number;
+  preview_text: string;
 }
+
 export interface BotOption {
   value: string;
   label: string;
@@ -95,9 +99,12 @@ const useCozeAPI = ({
         value: voice.voice_id,
         preview_url: voice.preview_audio,
         name: voice.name,
+        language_code: voice.language_code,
         language_name: voice.language_name,
         is_system_voice: voice.is_system_voice,
         label: `${voice.name} (${voice.language_name})`,
+        preview_text: voice.preview_text,
+        available_training_times: voice.available_training_times,
       }));
 
       return formattedVoices;
@@ -139,11 +146,22 @@ const useCozeAPI = ({
     }
   };
 
+  const cloneVoice = async (params: CloneVoiceReq): Promise<string> => {
+    try {
+      const response = await api?.audio.voices.clone(params);
+      return response?.voice_id || '';
+    } catch (error) {
+      console.error('clone voice error:', error);
+      throw error;
+    }
+  };
+
   return {
     api,
     fetchAllVoices,
     fetchAllBots,
     fetchAllWorkspaces,
+    cloneVoice,
   };
 };
 
