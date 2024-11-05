@@ -17,6 +17,7 @@ import {
 } from '@coze/realtime-api';
 
 import Settings from './Settings';
+import logo from './logo.svg';
 import ConsoleFooter from './ConsoleFooter';
 
 const { Content, Footer } = Layout;
@@ -200,6 +201,19 @@ const RealtimeConsole: React.FC = () => {
   const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    // 设置网站图标
+    const link = document.querySelector("link[rel~='icon']");
+    if (link) {
+      link.setAttribute('href', logo);
+    } else {
+      const favicon = document.createElement('link');
+      favicon.rel = 'icon';
+      favicon.href = logo;
+      document.head.appendChild(favicon);
+    }
+  }, []);
 
   useEffect(() => {
     if (autoScrollEvents) {
