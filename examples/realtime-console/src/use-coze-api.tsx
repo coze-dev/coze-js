@@ -94,18 +94,37 @@ const useCozeAPI = ({
       const systemVoices =
         response?.voice_list.filter(voice => voice.is_system_voice) || [];
 
-      // Merge and format voice list
-      const formattedVoices = [...customVoices, ...systemVoices].map(voice => ({
-        value: voice.voice_id,
-        preview_url: voice.preview_audio,
-        name: voice.name,
-        language_code: voice.language_code,
-        language_name: voice.language_name,
-        is_system_voice: voice.is_system_voice,
-        label: `${voice.name} (${voice.language_name})`,
-        preview_text: voice.preview_text,
-        available_training_times: voice.available_training_times,
-      }));
+      // Group system voices by language
+      const systemVoicesByLanguage = systemVoices.reduce<
+        Record<string, typeof systemVoices>
+      >((acc, voice) => {
+        const languageName = voice.language_name;
+        if (!acc[languageName]) {
+          acc[languageName] = [];
+        }
+        acc[languageName].push(voice);
+        return acc;
+      }, {});
+
+      // Sort languages alphabetically and flatten voices
+      const sortedSystemVoices = Object.entries(systemVoicesByLanguage)
+        .sort(([langA], [langB]) => langB.localeCompare(langA))
+        .flatMap(([, voices]) => voices);
+
+      // Merge custom voices with sorted system voices and format
+      const formattedVoices = [...customVoices, ...sortedSystemVoices].map(
+        voice => ({
+          value: voice.voice_id,
+          preview_url: voice.preview_audio,
+          name: voice.name,
+          language_code: voice.language_code,
+          language_name: voice.language_name,
+          is_system_voice: voice.is_system_voice,
+          label: `${voice.name} (${voice.language_name})`,
+          preview_text: voice.preview_text,
+          available_training_times: voice.available_training_times,
+        }),
+      );
 
       return formattedVoices;
     } catch (error) {
