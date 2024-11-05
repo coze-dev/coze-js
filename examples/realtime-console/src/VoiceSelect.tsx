@@ -146,6 +146,16 @@ const VoiceClone: React.FC<{
               maxCount={1}
               beforeUpload={() => false}
               accept=".wav,.mp3,.ogg,.m4a,.aac,.pcm"
+              onChange={info => {
+                if (info.file) {
+                  form.setFieldsValue({
+                    audio: {
+                      file: info.file,
+                      fileList: [info.file],
+                    },
+                  });
+                }
+              }}
             >
               <Button icon={<UploadOutlined />}>Upload Audio</Button>
             </Upload>
