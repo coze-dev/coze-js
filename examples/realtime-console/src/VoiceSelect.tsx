@@ -192,7 +192,9 @@ const VoiceSelect: React.FC<{
   useEffect(
     () => () => {
       audioPlayer.pause();
+      audioPlayer.onerror = null;
       audioPlayer.src = '';
+      setIsPlaying(false);
     },
     [audioPlayer],
   );

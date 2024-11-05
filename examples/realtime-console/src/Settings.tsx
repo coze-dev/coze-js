@@ -159,20 +159,34 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       return Date.now() >= parseInt(expiresAt) - 5 * 60 * 1000;
     };
 
+    const isNeedRefreshToken = (): boolean => {
+      // token expired, need refresh token
+      if (
+        storedRefreshToken &&
+        tokenExpiresAt &&
+        isTokenExpired(tokenExpiresAt)
+      ) {
+        console.log('token expired, need refresh token');
+        return true;
+      }
+      if (storedRefreshToken && !storedAccessToken) {
+        console.log('no access token, and has refresh token, need refresh');
+        return true;
+      }
+      return false;
+    };
+
     if (code && codeVerifier) {
       // pkce flow
       const token = await exchangeCodeForToken(code, codeVerifier);
       if (token) {
+        console.log('pkce flow, set token', token);
         setToken(token);
         return token.access_token;
       }
+      console.log('pkce flow failed, no token');
       return '';
-    } else if (
-      storedRefreshToken &&
-      tokenExpiresAt &&
-      isTokenExpired(tokenExpiresAt)
-    ) {
-      // refresh token
+    } else if (storedRefreshToken && isNeedRefreshToken()) {
       try {
         const refreshedToken = await refreshOAuthToken({
           baseURL,
@@ -181,26 +195,28 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
           clientSecret: '',
         });
 
+        console.log('refresh token');
         setToken(refreshedToken);
         return refreshedToken.access_token;
-      } catch (error) {
-        message.error('Failed to refresh token');
-        console.error(error);
+      } catch (err) {
+        console.error(err);
+        message.error(`Failed to refresh token: ${err}`);
+        // if contains `BadRequestError`, remove token
+        if (`${err}`.includes('BadRequestError')) {
+          setToken({
+            access_token: '',
+            refresh_token: '',
+            expires_in: 0,
+          });
+        }
+        console.log('refresh token failed');
         return '';
       }
     } else if (storedAccessToken) {
-      // no refresh token, use access token
-      if (isTokenExpired(tokenExpiresAt)) {
-        // expired, need re-authorize, no need error message
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('tokenExpiresAt');
-        return '';
-      }
-      setAccessToken(storedAccessToken);
+      console.log('has access token, return access token');
       return storedAccessToken;
     } else {
-      // no tokens
+      console.log('no access token, return empty');
       return '';
     }
   };
@@ -228,9 +244,14 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
         form.setFieldsValue({ [dataLocalKey]: firstData });
       }
       setData(data);
-    } catch (error) {
-      message.error(`Failed to load ${objectName}`);
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      message.error(`Failed to load ${objectName}: ${err}`);
+      // code: 4100, remove token
+      if (`${err}`.includes('code: 4100')) {
+        console.log('remove token');
+        localStorage.removeItem('accessToken');
+      }
     } finally {
       setLoading(false);
     }
