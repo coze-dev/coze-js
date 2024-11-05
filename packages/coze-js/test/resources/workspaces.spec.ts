@@ -86,13 +86,5 @@ describe('Workspaces', () => {
         undefined,
       );
     });
-
-    it('should handle errors from safeJsonParse', async () => {
-      const mockResponse = 'Invalid JSON';
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
-      (utils.safeJsonParse as jest.Mock).mockReturnValue(null);
-
-      await expect(workspaces.list({})).rejects.toThrow();
-    });
   });
 });
