@@ -400,7 +400,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
       });
     })();
-  }, [form, voices]);
+  }, [form]);
 
   const exchangeCodeForToken = async (
     code: string,
