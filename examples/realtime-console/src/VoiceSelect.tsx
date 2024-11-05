@@ -73,6 +73,11 @@ const VoiceClone: React.FC<{
     } catch (err) {
       console.error(err);
       message.error(`Clone voice failed: ${err}`);
+      // code: 4100, remove token
+      if (`${err}`.includes('code: 4100')) {
+        console.log('remove token in voice clone');
+        localStorage.removeItem('accessToken');
+      }
     } finally {
       setLoading(false);
     }
