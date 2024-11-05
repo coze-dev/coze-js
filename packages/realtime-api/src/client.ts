@@ -1,3 +1,4 @@
+import RTCAIAnsExtension from '@volcengine/rtc/extension-ainr';
 import VERTC, {
   type AudioPropertiesConfig,
   type IRTCEngine,
@@ -13,6 +14,7 @@ import { RealtimeAPIError, RealtimeError } from './error';
 export class EngineClient extends RealtimeEventHandler {
   private engine: IRTCEngine;
   private joinUserId = '';
+  private _AIAnsExtension: RTCAIAnsExtension | null = null;
   constructor(appId: string, debug = false, isTestEnv = false) {
     super(debug);
 
@@ -21,6 +23,7 @@ export class EngineClient extends RealtimeEventHandler {
     }
 
     this.engine = VERTC.createEngine(appId);
+
     this.handleMessage = this.handleMessage.bind(this);
     this.handleUserJoin = this.handleUserJoin.bind(this);
     this.handleUserLeave = this.handleUserLeave.bind(this);
@@ -215,6 +218,28 @@ export class EngineClient extends RealtimeEventHandler {
   handleRemoteAudioPropertiesReport(event: unknown) {
     if (this._debug) {
       console.log('handleRemoteAudioPropertiesReport', event);
+    }
+  }
+
+  async enableAudioNoiseReduction() {
+    await this.engine?.setAudioCaptureConfig({
+      noiseSuppression: true,
+      echoCancellation: true,
+      autoGainControl: true,
+    });
+  }
+
+  async initAIAnsExtension() {
+    const AIAnsExtension = new RTCAIAnsExtension();
+    await this.engine.registerExtension(AIAnsExtension);
+    this._AIAnsExtension = AIAnsExtension;
+  }
+
+  changeAIAnsExtension(enable: boolean) {
+    if (enable) {
+      this._AIAnsExtension?.enable();
+    } else {
+      this._AIAnsExtension?.disable();
     }
   }
 

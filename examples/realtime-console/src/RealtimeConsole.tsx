@@ -57,6 +57,9 @@ const RealtimeConsole: React.FC = () => {
     const botId = localStorage.getItem('botId');
     const voiceId = localStorage.getItem('voiceId') || '';
     const baseURL = localStorage.getItem('baseURL') || '';
+    const noiseSuppression = JSON.parse(
+      localStorage.getItem('noiseSuppression') || '[]',
+    );
 
     if (baseURL && !baseURL.trim().match(/^https?:\/\/.+/)) {
       message.error('Invalid base URL format');
@@ -77,6 +80,8 @@ const RealtimeConsole: React.FC = () => {
       baseURL: baseURL.trim(),
       allowPersonalAccessTokenInBrowser: true,
       audioMutedDefault: !isMicrophoneOn,
+      suppressStationaryNoise: noiseSuppression.includes('stationary'),
+      suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
     });
 
     // Subscribe to all client and server events

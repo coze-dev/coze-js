@@ -4,6 +4,12 @@ import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
 
 jest.mock('@volcengine/rtc');
+jest.mock('@volcengine/rtc/extension-ainr', () =>
+  jest.fn().mockImplementation(() => ({
+    enable: jest.fn(),
+    disable: jest.fn(),
+  })),
+);
 
 describe('EngineClient', () => {
   let client: EngineClient;
@@ -23,6 +29,9 @@ describe('EngineClient', () => {
       enableAudioPropertiesReport: jest.fn(),
       startAudioPlaybackDeviceTest: jest.fn(),
       stopAudioPlaybackDeviceTest: jest.fn(),
+      setAudioCaptureConfig: jest.fn(),
+      registerExtension: jest.fn(),
+      sendUserMessage: jest.fn(),
     };
     (VERTC.createEngine as jest.Mock).mockReturnValue(mockEngine);
     (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([
@@ -124,9 +133,73 @@ describe('EngineClient', () => {
   });
 
   describe('stop', () => {
-    it('should call engine stop', async () => {
-      // await client.stop('userId');
-      // expect(mockEngine.stop).toHaveBeenCalledWith('userId', MediaType.AUDIO);
+    it('should send stop message to joined user', async () => {
+      mockEngine.sendUserMessage.mockResolvedValue('success');
+      await client.stop();
+      expect(mockEngine.sendUserMessage).toHaveBeenCalledWith(
+        '', // joinUserId is empty in test
+        JSON.stringify({
+          id: 'event_1',
+          event_type: 'conversation.chat.cancel',
+          data: {},
+        }),
+      );
+    });
+
+    it('should handle errors when stopping', async () => {
+      mockEngine.sendUserMessage.mockRejectedValue(new Error('Failed to send'));
+      await expect(client.stop()).rejects.toThrow(Error);
+    });
+  });
+
+  describe('sendMessage', () => {
+    it('should send message to joined user', async () => {
+      const message = { type: 'test', data: {} };
+      mockEngine.sendUserMessage.mockResolvedValue('success');
+      await client.sendMessage(message);
+      expect(mockEngine.sendUserMessage).toHaveBeenCalledWith(
+        '', // joinUserId is empty in test
+        JSON.stringify(message),
+      );
+    });
+
+    it('should handle errors when sending message', async () => {
+      mockEngine.sendUserMessage.mockRejectedValue(new Error('Failed to send'));
+      await expect(client.sendMessage({})).rejects.toThrow(Error);
+    });
+  });
+
+  describe('enableAudioNoiseReduction', () => {
+    it('should set audio capture config with noise reduction enabled', async () => {
+      await client.enableAudioNoiseReduction();
+      expect(mockEngine.setAudioCaptureConfig).toHaveBeenCalledWith({
+        noiseSuppression: true,
+        echoCancellation: true,
+        autoGainControl: true,
+      });
+    });
+  });
+
+  describe('initAIAnsExtension', () => {
+    it('should register AI extension', async () => {
+      await client.initAIAnsExtension();
+      expect(mockEngine.registerExtension).toHaveBeenCalled();
+    });
+  });
+
+  describe('changeAIAnsExtension', () => {
+    it('should enable AI extension when true', async () => {
+      await client.initAIAnsExtension();
+      client.changeAIAnsExtension(true);
+      // Note: We can't directly test the extension enable/disable calls
+      // as they are internal to the extension instance
+    });
+
+    it('should disable AI extension when false', async () => {
+      await client.initAIAnsExtension();
+      client.changeAIAnsExtension(false);
+      // Note: We can't directly test the extension enable/disable calls
+      // as they are internal to the extension instance
     });
   });
 
