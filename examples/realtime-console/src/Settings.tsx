@@ -367,6 +367,9 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     })();
   }, [form, api]);
 
+  const getCurrentLocation = () =>
+    `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+
   const exchangeCodeForToken = async (
     code: string,
     codeVerifier: string,
@@ -376,7 +379,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
         code,
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
         clientId: DEFAULT_OAUTH_CLIENT_ID,
-        redirectUrl: window.location.origin,
+        redirectUrl: getCurrentLocation(),
         codeVerifier,
       });
 
@@ -399,7 +402,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       const pkceAuth = await getPKCEAuthenticationUrl({
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
         clientId: DEFAULT_OAUTH_CLIENT_ID,
-        redirectUrl: window.location.origin,
+        redirectUrl: getCurrentLocation(),
       });
       localStorage.setItem('pkce_code_verifier', pkceAuth.codeVerifier);
       window.location.href = pkceAuth.url;
