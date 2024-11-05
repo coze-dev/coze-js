@@ -230,7 +230,12 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
 
     if (code && codeVerifier) {
       // pkce flow
-      return await exchangeCodeForToken(code, codeVerifier);
+      const token = await exchangeCodeForToken(code, codeVerifier);
+      if (token) {
+        setToken(token);
+        return token.access_token;
+      }
+      return '';
     } else if (
       storedRefreshToken &&
       tokenExpiresAt &&
@@ -375,7 +380,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const exchangeCodeForToken = async (
     code: string,
     codeVerifier: string,
-  ): Promise<string> => {
+  ): Promise<OAuthToken | null> => {
     try {
       const token = await getPKCEOAuthToken({
         code,
@@ -391,11 +396,11 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       localStorage.removeItem('pkce_code_verifier');
 
       message.success('Successfully obtained access token');
-      return token.access_token;
+      return token;
     } catch (error) {
       message.error('Failed to exchange code for token');
       console.error(error);
-      return '';
+      return null;
     }
   };
 
