@@ -19,6 +19,8 @@ export interface RealtimeClientConfig {
    * If set to true, audio streams will not be automatically published and subscribed */
   audioMutedDefault?: boolean;
   connectorId?: string /** optional, Connector Id, defaults to '999' */;
+  suppressStationaryNoise?: boolean /** optional, Suppress stationary noise, defaults to false */;
+  suppressNonStationaryNoise?: boolean /** optional, Suppress non-stationary noise, defaults to false */;
 }
 
 class RealtimeClient extends RealtimeEventHandler {
@@ -108,6 +110,17 @@ class RealtimeClient extends RealtimeEventHandler {
     this._client.on(EventNames.ALL, (eventName: string, data: unknown) => {
       this.dispatch(eventName, data);
     });
+
+    if (this._config.suppressStationaryNoise) {
+      await this._client.enableAudioNoiseReduction();
+      this.dispatch(EventNames.SUPPRESS_STATIONARY_NOISE, {});
+    }
+
+    if (this._config.suppressNonStationaryNoise) {
+      await this._client.initAIAnsExtension();
+      this._client.changeAIAnsExtension(true);
+      this.dispatch(EventNames.SUPPRESS_NON_STATIONARY_NOISE, {});
+    }
 
     // Step4 join room
     await this._client.joinRoom({

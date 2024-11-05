@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, message, Typography } from 'antd';
+import { Button, message, Typography, Select } from 'antd';
 import {
   RealtimeAPIError,
   type RealtimeClient,
@@ -11,7 +11,7 @@ import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 import MessageForm from './MessageForm';
 import './App.css';
 
-const { Link } = Typography;
+const { Text, Link } = Typography;
 
 interface ConsoleFooterProps {
   onConnect: () => Promise<void>;
@@ -21,6 +21,8 @@ interface ConsoleFooterProps {
   isConnected?: boolean;
   clientRef: React.MutableRefObject<RealtimeClient | null>;
 }
+
+const STORAGE_KEY = 'noiseSuppression';
 
 const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   onConnect,
@@ -36,6 +38,10 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   );
   const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
     useState(false);
+  const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
+    const savedValue = localStorage.getItem(STORAGE_KEY);
+    return savedValue ? JSON.parse(savedValue) : [''];
+  });
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkPermission().then(isDeviceEnable => {
@@ -53,6 +59,11 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
   const handleRefreshMicrophone = () => {
     checkMicrophonePermission();
+  };
+
+  const handleNoiseSuppressionChange = (value: string[]) => {
+    setNoiseSuppression(value);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
   };
 
   const handleConnect = () => {
@@ -201,6 +212,17 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   }
   return (
     <>
+      <Text style={{ marginRight: 8 }}>Audio Noise Suppression:</Text>
+      <Select
+        mode="multiple"
+        style={{ width: 300, marginRight: 10 }}
+        value={noiseSuppression}
+        onChange={handleNoiseSuppressionChange}
+        options={[
+          { label: 'Stationary Noise', value: 'stationary' },
+          { label: 'Non-stationary Noise', value: 'non-stationary' },
+        ]}
+      />
       <Button
         type="primary"
         loading={isConnecting}

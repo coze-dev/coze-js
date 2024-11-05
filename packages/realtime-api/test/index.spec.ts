@@ -6,6 +6,12 @@ import {
 import { EngineClient } from '../src/client.js';
 
 jest.mock('../src/client.js');
+jest.mock('@volcengine/rtc/extension-ainr', () =>
+  jest.fn().mockImplementation(() => ({
+    enable: jest.fn(),
+    disable: jest.fn(),
+  })),
+);
 
 jest.mock('@coze/api', () => ({
   CozeAPI: jest.fn().mockImplementation(() => ({
@@ -53,6 +59,9 @@ describe('RealtimeClient', () => {
         createLocalStream: jest.fn(),
         bindEngineEvents: jest.fn(),
         on: jest.fn(),
+        enableAudioNoiseReduction: jest.fn(),
+        initAIAnsExtension: jest.fn(),
+        changeAIAnsExtension: jest.fn(),
       } as any;
       (EngineClient as jest.Mock).mockImplementation(() => mockEngineClient);
     });
@@ -75,6 +84,31 @@ describe('RealtimeClient', () => {
         EventNames.CONNECTED,
         expect.any(Object),
       );
+    });
+
+    it('should connect successfully with noise suppression', async () => {
+      const configWithNoise = {
+        ...config,
+        suppressStationaryNoise: true,
+        suppressNonStationaryNoise: true,
+      };
+      client = new RealtimeClient(configWithNoise);
+      const dispatchSpy = jest.spyOn(client, 'dispatch');
+
+      await client.connect();
+
+      expect(mockEngineClient.enableAudioNoiseReduction).toHaveBeenCalled();
+      expect(mockEngineClient.initAIAnsExtension).toHaveBeenCalled();
+      expect(mockEngineClient.changeAIAnsExtension).toHaveBeenCalledWith(true);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.SUPPRESS_STATIONARY_NOISE,
+        {},
+      );
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.SUPPRESS_NON_STATIONARY_NOISE,
+        {},
+      );
+      // ... existing expectations ...
     });
   });
 

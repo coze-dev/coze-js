@@ -350,7 +350,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const initPKCEFlow = async () => {
     try {
       const pkceAuth = await getPKCEAuthenticationUrl({
-        baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
+        baseURL: form.getFieldValue('baseURL') || 'https://api.coze.cn',
         clientId: DEFAULT_OAUTH_CLIENT_ID,
         redirectUrl: getCurrentLocation(),
       });
