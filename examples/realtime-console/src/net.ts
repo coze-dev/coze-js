@@ -20,10 +20,12 @@ export interface BotOption {
   avatar?: string;
 }
 
-export const fetchAllWorkspaces = async (api: CozeAPI) => {
+export const fetchAllWorkspaces = async (
+  api: CozeAPI,
+): Promise<WorkspaceOption[]> => {
   let page_num = 1;
   const page_size = 50;
-  let allWorkspaces: { value: string; label: string }[] = [];
+  let allWorkspaces: WorkspaceOption[] = [];
   let hasMore = true;
 
   try {
@@ -59,6 +61,9 @@ export const fetchAllBots = async (
   const page_size = 20;
   let allBots: BotOption[] = [];
   let hasMore = true;
+  if (!workspaceId) {
+    throw new Error('workspaceId is required');
+  }
 
   try {
     while (hasMore) {
@@ -88,7 +93,7 @@ export const fetchAllBots = async (
   }
 };
 
-export const fetchAllVoices = async (api: CozeAPI) => {
+export const fetchAllVoices = async (api: CozeAPI): Promise<VoiceOption[]> => {
   try {
     const response = await api.audio.voices.list();
 

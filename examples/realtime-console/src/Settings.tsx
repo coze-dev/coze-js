@@ -128,18 +128,28 @@ const VoiceSelect: React.FC<{
   onChange?: (value: string) => void;
 }> = ({ voices, loading, value, onChange }) => {
   const [audioPlayer] = useState(new Audio());
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handleAudioError = (error: Event | string) => {
+    message.error('Failed to play audio preview');
+    console.error('Audio playback error:', error);
+  };
 
   const handlePreview = (previewUrl: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (audioPlayer.src === previewUrl) {
       if (audioPlayer.paused) {
         audioPlayer.play();
+        setIsPlaying(true);
       } else {
         audioPlayer.pause();
+        setIsPlaying(false);
       }
     } else {
       audioPlayer.src = previewUrl;
+      audioPlayer.onerror = handleAudioError;
       audioPlayer.play();
+      setIsPlaying(true);
     }
   };
 
@@ -172,6 +182,11 @@ const VoiceSelect: React.FC<{
             {voice.preview_url && (
               <PlayCircleOutlined
                 onClick={e => handlePreview(voice.preview_url!, e)}
+                aria-label={`Play ${voice.name} preview`}
+                role="button"
+                aria-pressed={
+                  isPlaying && audioPlayer.src === voice.preview_url
+                }
               />
             )}
           </Space>
@@ -228,6 +243,12 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     const code = urlParams.get('code');
     const codeVerifier = localStorage.getItem('pkce_code_verifier');
 
+    const isTokenExpired = (expiresAt: string | null): boolean => {
+      if (!expiresAt) return true;
+      // Add 5-minute buffer before expiration
+      return Date.now() >= parseInt(expiresAt) - 5 * 60 * 1000;
+    };
+
     if (code && codeVerifier) {
       // pkce flow
       const token = await exchangeCodeForToken(code, codeVerifier);
@@ -239,7 +260,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     } else if (
       storedRefreshToken &&
       tokenExpiresAt &&
-      Date.now() >= parseInt(tokenExpiresAt)
+      isTokenExpired(tokenExpiresAt)
     ) {
       // refresh token
       try {
@@ -259,6 +280,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       }
     } else if (storedAccessToken) {
       // no refresh token, use access token
+      if (isTokenExpired(tokenExpiresAt)) {
+        message.error('Access token has expired');
+        return '';
+      }
       setAccessToken(storedAccessToken);
       return storedAccessToken;
     } else {
@@ -375,7 +400,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
       });
     })();
-  }, [form]);
+  }, [form, voices]);
 
   const exchangeCodeForToken = async (
     code: string,
