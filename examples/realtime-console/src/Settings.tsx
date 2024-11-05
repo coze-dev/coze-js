@@ -1,8 +1,8 @@
+/* eslint-disable max-lines */
 import React, { useState, useEffect } from 'react';
 
 import Link from 'antd/es/typography/Link';
 import {
-  FormInstance,
   Layout,
   Button,
   Modal,
@@ -21,28 +21,25 @@ import {
   Avatar,
 } from 'antd';
 import {
+  getPKCEAuthenticationUrl,
+  getPKCEOAuthToken,
+  type OAuthToken,
+  refreshOAuthToken,
+} from '@coze/api';
+import {
   SettingOutlined,
   FileTextOutlined,
   PlayCircleOutlined,
   RobotOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
+
+import useCozeAPI, {
+  type WorkspaceOption,
+  type BotOption,
+  type VoiceOption,
+} from './use-coze-api';
 import logo from './logo.svg';
-import {
-  CozeAPI,
-  getPKCEAuthenticationUrl,
-  getPKCEOAuthToken,
-  OAuthToken,
-  refreshOAuthToken,
-} from '@coze/api';
-import {
-  fetchAllWorkspaces,
-  fetchAllVoices,
-  fetchAllBots,
-  WorkspaceOption,
-  BotOption,
-  VoiceOption,
-} from './net';
 const { Header } = Layout;
 const { Text } = Typography;
 
@@ -60,22 +57,20 @@ const WorkspaceSelect: React.FC<{
   loading: boolean;
   onChange: (value: string) => void;
   value?: string;
-}> = ({ workspaces, loading, onChange, value }) => {
-  return (
-    <Select
-      placeholder="Select a workspace"
-      onChange={onChange}
-      loading={loading}
-      value={value}
-    >
-      {workspaces.map(workspace => (
-        <Select.Option key={workspace.value} value={workspace.value}>
-          {workspace.label}
-        </Select.Option>
-      ))}
-    </Select>
-  );
-};
+}> = ({ workspaces, loading, onChange, value }) => (
+  <Select
+    placeholder="Select a workspace"
+    onChange={onChange}
+    loading={loading}
+    value={value}
+  >
+    {workspaces.map(workspace => (
+      <Select.Option key={workspace.value} value={workspace.value}>
+        {workspace.label}
+      </Select.Option>
+    ))}
+  </Select>
+);
 
 const BotSelect: React.FC<{
   bots: BotOption[];
@@ -83,43 +78,41 @@ const BotSelect: React.FC<{
   disabled: boolean;
   value?: string;
   onChange?: (value: string) => void;
-}> = ({ bots, loading, disabled, value, onChange }) => {
-  return (
-    <Select
-      placeholder="Select a bot"
-      disabled={disabled}
-      value={value}
-      onChange={onChange}
-      loading={loading}
-      notFoundContent={
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            <Space direction="vertical" align="center">
-              <InfoCircleOutlined style={{ fontSize: '24px', color: '#999' }} />
-              <Text type="secondary">
-                No bots found in this workspace. Please create a bot first.
-              </Text>
-            </Space>
-          }
-        />
-      }
-    >
-      {bots.map(bot => (
-        <Select.Option key={bot.value} value={bot.value}>
-          <Space align="center">
-            {bot.avatar ? (
-              <Avatar size="small" src={bot.avatar} />
-            ) : (
-              <RobotOutlined style={{ fontSize: '16px' }} />
-            )}
-            {bot.label}
+}> = ({ bots, loading, disabled, value, onChange }) => (
+  <Select
+    placeholder="Select a bot"
+    disabled={disabled}
+    value={value}
+    onChange={onChange}
+    loading={loading}
+    notFoundContent={
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={
+          <Space direction="vertical" align="center">
+            <InfoCircleOutlined style={{ fontSize: '24px', color: '#999' }} />
+            <Text type="secondary">
+              No bots found in this workspace. Please create a bot first.
+            </Text>
           </Space>
-        </Select.Option>
-      ))}
-    </Select>
-  );
-};
+        }
+      />
+    }
+  >
+    {bots.map(bot => (
+      <Select.Option key={bot.value} value={bot.value}>
+        <Space align="center">
+          {bot.avatar ? (
+            <Avatar size="small" src={bot.avatar} />
+          ) : (
+            <RobotOutlined style={{ fontSize: '16px' }} />
+          )}
+          {bot.label}
+        </Space>
+      </Select.Option>
+    ))}
+  </Select>
+);
 
 const VoiceSelect: React.FC<{
   voices: VoiceOption[];
@@ -153,12 +146,13 @@ const VoiceSelect: React.FC<{
     }
   };
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       audioPlayer.pause();
       audioPlayer.src = '';
-    };
-  }, [audioPlayer]);
+    },
+    [audioPlayer],
+  );
 
   return (
     <Select
@@ -179,9 +173,9 @@ const VoiceSelect: React.FC<{
                 backgroundColor: voice.is_system_voice ? '#87d068' : '#108ee9',
               }}
             />
-            {voice.preview_url && (
+            {voice?.preview_url && (
               <PlayCircleOutlined
-                onClick={e => handlePreview(voice.preview_url!, e)}
+                onClick={e => handlePreview(voice.preview_url || '', e)}
                 aria-label={`Play ${voice.name} preview`}
                 role="button"
                 aria-pressed={
@@ -208,15 +202,11 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
   const [loadingVoices, setLoadingVoices] = useState(false);
   const [loadingBots, setLoadingBots] = useState(false);
   const baseURL = localStorage.getItem('baseURL') || 'https://api.coze.cn';
-  const [api, setApi] = useState<CozeAPI | null>(
-    accessToken
-      ? new CozeAPI({
-          token: accessToken,
-          baseURL,
-          allowPersonalAccessTokenInBrowser: true,
-        })
-      : null,
-  );
+
+  const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces } = useCozeAPI({
+    accessToken,
+    baseURL,
+  });
 
   const setToken = (token: OAuthToken) => {
     localStorage.setItem('accessToken', token.access_token);
@@ -226,13 +216,6 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       (token.expires_in * 1000).toString(),
     );
     setAccessToken(token.access_token);
-    setApi(
-      new CozeAPI({
-        token: token.access_token,
-        baseURL,
-        allowPersonalAccessTokenInBrowser: true,
-      }),
-    );
   };
 
   const getOrRefreshToken = async (): Promise<string> => {
@@ -244,7 +227,9 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     const codeVerifier = localStorage.getItem('pkce_code_verifier');
 
     const isTokenExpired = (expiresAt: string | null): boolean => {
-      if (!expiresAt) return true;
+      if (!expiresAt) {
+        return true;
+      }
       // Add 5-minute buffer before expiration
       return Date.now() >= parseInt(expiresAt) - 5 * 60 * 1000;
     };
@@ -292,19 +277,20 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     }
   };
 
+  /* eslint-disable max-params */
   const loadData = async (
-    api: CozeAPI,
-    form: FormInstance<any>,
     objectName: string,
     dataLocalKey: string,
     setLoading: (loading: boolean) => void,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     setData: (data: any[]) => void,
-    fetchData: (api: CozeAPI, id?: string) => Promise<any[]>,
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    fetchData: (id?: string) => Promise<any[]>,
     parentId?: string,
   ): Promise<void> => {
     setLoading(true);
     try {
-      const data = await fetchData(api, parentId);
+      const data = await fetchData(parentId);
 
       // if no data in localStorage, set the first data as default
       const storedData = localStorage.getItem(dataLocalKey);
@@ -315,50 +301,35 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       }
       setData(data);
     } catch (error) {
-      message.error('Failed to load ' + objectName);
+      message.error(`Failed to load ${objectName}`);
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWorkspaceChange =
-    (api: CozeAPI | null) => (workspaceId: string) => {
-      if (!api) {
-        return;
-      }
+  const handleWorkspaceChange = () => (workspaceId: string) => {
+    setSelectedWorkspace(workspaceId);
+    localStorage.setItem('workspaceId', workspaceId);
+    form.setFieldsValue({ botId: undefined });
 
-      setSelectedWorkspace(workspaceId);
-      localStorage.setItem('workspaceId', workspaceId);
-      form.setFieldsValue({ botId: undefined });
-
-      loadData(
-        api,
-        form,
-        'Bots',
-        'botId',
-        setLoadingBots,
-        setBots,
-        fetchAllBots,
-        workspaceId,
-      );
-    };
+    loadData(
+      'Bots',
+      'botId',
+      setLoadingBots,
+      setBots,
+      fetchAllBots,
+      workspaceId,
+    );
+  };
 
   useEffect(() => {
     (async () => {
-      const accessToken = await getOrRefreshToken();
+      const refreshToken = await getOrRefreshToken();
+      setAccessToken(refreshToken);
 
-      if (accessToken) {
-        const api = new CozeAPI({
-          token: accessToken,
-          baseURL,
-          allowPersonalAccessTokenInBrowser: true,
-        });
-        setApi(api);
-
-        loadData(
-          api,
-          form,
+      if (refreshToken) {
+        await loadData(
           'Voices',
           'voiceId',
           setLoadingVoices,
@@ -366,9 +337,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
           fetchAllVoices,
         );
 
-        loadData(
-          api,
-          form,
+        await loadData(
           'Workspaces',
           'workspaceId',
           setLoadingWorkspaces,
@@ -378,9 +347,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
 
         const workspaceId = localStorage.getItem('workspaceId');
         if (workspaceId) {
-          loadData(
-            api,
-            form,
+          await loadData(
             'Bots',
             'botId',
             setLoadingBots,
@@ -394,13 +361,11 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       form.setFieldsValue({
         workspaceId: localStorage.getItem('workspaceId') || '',
         botId: localStorage.getItem('botId') || '',
-        voiceId:
-          localStorage.getItem('voiceId') ||
-          (voices.length > 0 ? voices[0].value : ''),
+        voiceId: localStorage.getItem('voiceId') || '',
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
       });
     })();
-  }, [form]);
+  }, [form, api]);
 
   const exchangeCodeForToken = async (
     code: string,
@@ -451,8 +416,8 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     form
       .validateFields()
       .then(values => {
-        const { workspaceId, botId, voiceId, baseURL } = values;
-        if (!accessToken || !workspaceId || !botId || !baseURL) {
+        const { workspaceId, botId, voiceId } = values;
+        if (!accessToken || !workspaceId || !botId) {
           message.error(
             'Access Token, Workspace, Bot, and Base URL are required!',
           );
@@ -526,14 +491,26 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     <>
       <Header
         style={{
-          padding: '0 16px',
+          padding: '16px',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px',
+          height: 'auto',
+          minHeight: '64px',
+          lineHeight: 'normal',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            flex: '1 1 auto',
+            minWidth: '200px',
+          }}
+        >
           <img
             src={logo}
             alt="Logo"
@@ -546,13 +523,21 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
+              minWidth: 0,
             }}
           >
             Coze Realtime Console
           </div>
         </div>
-        <div>
-          <Link href={DOCS_URL} target="_blank" style={{ marginRight: '8px' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            flexShrink: 0,
+            alignItems: 'center',
+          }}
+        >
+          <Link href={DOCS_URL} target="_blank">
             <Button type="primary" icon={<FileTextOutlined />}>
               Documentation
             </Button>
@@ -619,7 +604,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
                 <WorkspaceSelect
                   workspaces={workspaces}
                   loading={loadingWorkspaces}
-                  onChange={handleWorkspaceChange(api)}
+                  onChange={handleWorkspaceChange()}
                   value={selectedWorkspace}
                 />
               </Form.Item>
