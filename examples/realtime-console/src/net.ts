@@ -105,15 +105,34 @@ export const fetchAllVoices = async (api: CozeAPI): Promise<VoiceOption[]> => {
       voice => voice.is_system_voice,
     );
 
+    // Group system voices by language
+    const systemVoicesByLanguage = systemVoices.reduce(
+      (acc, voice) => {
+        if (!acc[voice.language_name]) {
+          acc[voice.language_name] = [];
+        }
+        acc[voice.language_name].push(voice);
+        return acc;
+      },
+      {} as Record<string, typeof systemVoices>,
+    );
+
+    // Flatten and format grouped system voices
+    const sortedSystemVoices = Object.entries(systemVoicesByLanguage)
+      .sort(([a], [b]) => b.localeCompare(a))
+      .flatMap(([_, voices]) => voices);
+
     // Merge and format voice list
-    const formattedVoices = [...customVoices, ...systemVoices].map(voice => ({
-      value: voice.voice_id,
-      preview_url: voice.preview_audio,
-      name: voice.name,
-      language_name: voice.language_name,
-      is_system_voice: voice.is_system_voice,
-      label: `${voice.name} (${voice.language_name})`,
-    }));
+    const formattedVoices = [...customVoices, ...sortedSystemVoices].map(
+      voice => ({
+        value: voice.voice_id,
+        preview_url: voice.preview_audio,
+        name: voice.name,
+        language_name: voice.language_name,
+        is_system_voice: voice.is_system_voice,
+        label: `${voice.name} (${voice.language_name})`,
+      }),
+    );
 
     return formattedVoices;
   } catch (error) {
