@@ -4,7 +4,12 @@
   "dictionaryDefinitions": [],
   "dictionaries": [],
   "caseSensitive": false,
-  "words": ["preinstall", "undici", "packagejson"],
+  "words": [
+    "packagejson",
+    "pkce",
+    "preinstall",
+    "undici"
+  ],
   "ignoreWords": [],
   "import": []
 }
