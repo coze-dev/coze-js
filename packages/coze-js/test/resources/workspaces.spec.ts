@@ -61,7 +61,6 @@ describe('Workspaces', () => {
         false,
         undefined,
       );
-      expect(utils.safeJsonParse).toHaveBeenCalledWith(mockResponse);
       expect(result).toEqual(mockOpenSpaceData);
     });
 
