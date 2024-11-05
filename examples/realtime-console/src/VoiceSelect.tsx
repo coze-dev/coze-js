@@ -16,6 +16,7 @@ import {
   PlayCircleOutlined,
   CopyOutlined,
   UploadOutlined,
+  AudioOutlined,
 } from '@ant-design/icons';
 
 import { type VoiceOption } from './use-coze-api';
@@ -27,8 +28,11 @@ const VoiceClone: React.FC<{
   cloneVoice: (params: CloneVoiceReq) => Promise<string>;
 }> = ({ visible, onClose, voice, cloneVoice }) => {
   const [form] = Form.useForm();
+  const [isRecording, setIsRecording] = useState(false);
   console.log('voice xx', voice);
   const [loading, setLoading] = useState(false);
+  const [mediaRecorderState, setMediaRecorderState] = useState<MediaStream>();
+  const [recorderState, setRecorderState] = useState<MediaRecorder>();
 
   const handleSubmit = async () => {
     try {
@@ -123,16 +127,84 @@ const VoiceClone: React.FC<{
         </Form.Item>
         <Form.Item
           name="audio"
-          label="Audio File"
-          rules={[{ required: true, message: 'Please upload an audio file' }]}
+          label="Audio"
+          rules={[{ required: true, message: 'Please upload or record audio' }]}
         >
-          <Upload
-            maxCount={1}
-            beforeUpload={() => false}
-            accept=".wav,.mp3,.ogg,.m4a,.aac,.pcm"
+          <Space
+            split={
+              <div
+                style={{
+                  width: 1,
+                  height: 24,
+                  backgroundColor: '#d9d9d9',
+                  margin: '0 8px',
+                }}
+              />
+            }
           >
-            <Button icon={<UploadOutlined />}>Upload Audio</Button>
-          </Upload>
+            <Upload
+              maxCount={1}
+              beforeUpload={() => false}
+              accept=".wav,.mp3,.ogg,.m4a,.aac,.pcm"
+            >
+              <Button icon={<UploadOutlined />}>Upload Audio</Button>
+            </Upload>
+            <Button
+              icon={<AudioOutlined />}
+              type={isRecording ? 'primary' : 'default'}
+              danger={isRecording}
+              onClick={async () => {
+                if (isRecording) {
+                  recorderState?.stop();
+                  mediaRecorderState
+                    ?.getTracks()
+                    .forEach(track => track.stop());
+                } else {
+                  const chunks: Blob[] = [];
+
+                  const mediaRecorder =
+                    await navigator.mediaDevices.getUserMedia({
+                      audio: true,
+                    });
+                  const recorder = new MediaRecorder(mediaRecorder);
+                  setMediaRecorderState(mediaRecorder);
+                  setRecorderState(recorder);
+
+                  recorder.ondataavailable = e => {
+                    chunks.push(e.data);
+                  };
+
+                  recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/wav' });
+                    const file = new File([blob], 'recording.wav', {
+                      type: 'audio/wav',
+                    });
+                    form.setFieldsValue({
+                      audio: {
+                        file,
+                        fileList: [
+                          {
+                            uid: '-1',
+                            name: 'recording.wav',
+                            status: 'done',
+                            url: URL.createObjectURL(blob),
+                          },
+                        ],
+                      },
+                    });
+                    setIsRecording(false);
+                    message.success('Recording completed');
+                  };
+
+                  recorder.start();
+                  setIsRecording(true);
+                  message.info('Start recording');
+                }
+              }}
+            >
+              {isRecording ? 'Stop Recording' : 'Start Recording'}
+            </Button>
+          </Space>
         </Form.Item>
       </Form>
     </Modal>
