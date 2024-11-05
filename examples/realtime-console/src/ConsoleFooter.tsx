@@ -40,7 +40,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     useState(false);
   const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
     const savedValue = localStorage.getItem(STORAGE_KEY);
-    return savedValue ? JSON.parse(savedValue) : [''];
+    return savedValue ? JSON.parse(savedValue) : [];
   });
 
   const checkMicrophonePermission = () => {
