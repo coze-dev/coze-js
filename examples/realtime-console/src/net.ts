@@ -92,7 +92,7 @@ export const fetchAllVoices = async (api: CozeAPI) => {
   try {
     const response = await api.audio.voices.list();
 
-    // 分离系统音色和自定义音色
+    // Separate system voices and custom voices
     const customVoices = response.voice_list.filter(
       voice => !voice.is_system_voice,
     );
@@ -100,7 +100,7 @@ export const fetchAllVoices = async (api: CozeAPI) => {
       voice => voice.is_system_voice,
     );
 
-    // 合并并格式化音色列表
+    // Merge and format voice list
     const formattedVoices = [...customVoices, ...systemVoices].map(voice => ({
       value: voice.voice_id,
       preview_url: voice.preview_audio,

@@ -35,7 +35,14 @@ import {
   OAuthToken,
   refreshOAuthToken,
 } from '@coze/api';
-import { fetchAllWorkspaces, fetchAllVoices, fetchAllBots } from './net';
+import {
+  fetchAllWorkspaces,
+  fetchAllVoices,
+  fetchAllBots,
+  WorkspaceOption,
+  BotOption,
+  VoiceOption,
+} from './net';
 const { Header } = Layout;
 const { Text } = Typography;
 
@@ -46,25 +53,7 @@ interface SettingsProps {
 const DOCS_URL =
   'https://bytedance.larkoffice.com/docx/FQJ9dvBE7oLzu3xtacJc6Cyjnof';
 
-interface VoiceOption {
-  label: React.ReactNode;
-  value: string;
-  preview_url?: string;
-  name: string;
-  language_name: string;
-  is_system_voice: boolean;
-}
-
-interface WorkspaceOption {
-  value: string;
-  label: string;
-}
-
-interface BotOption {
-  value: string;
-  label: string;
-  avatar?: string;
-}
+const DEFAULT_OAUTH_CLIENT_ID = '30367348905137699749500653976611.app.coze';
 
 const WorkspaceSelect: React.FC<{
   workspaces: WorkspaceOption[];
@@ -251,7 +240,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       try {
         const refreshedToken = await refreshOAuthToken({
           baseURL,
-          clientId: '30367348905137699749500653976611.app.coze',
+          clientId: DEFAULT_OAUTH_CLIENT_ID,
           refreshToken: storedRefreshToken,
           clientSecret: '',
         });
@@ -388,11 +377,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     codeVerifier: string,
   ): Promise<string> => {
     try {
-      const cozeDemoClientId = '30367348905137699749500653976611.app.coze';
       const token = await getPKCEOAuthToken({
         code,
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
-        clientId: cozeDemoClientId,
+        clientId: DEFAULT_OAUTH_CLIENT_ID,
         redirectUrl: window.location.origin,
         codeVerifier,
       });
@@ -415,7 +403,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
     try {
       const pkceAuth = await getPKCEAuthenticationUrl({
         baseURL: localStorage.getItem('baseURL') || 'https://api.coze.cn',
-        clientId: '30367348905137699749500653976611.app.coze',
+        clientId: DEFAULT_OAUTH_CLIENT_ID,
         redirectUrl: window.location.origin,
       });
       localStorage.setItem('pkce_code_verifier', pkceAuth.codeVerifier);
