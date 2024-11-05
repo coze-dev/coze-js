@@ -64,7 +64,7 @@ const RealtimeConsole: React.FC = () => {
     }
 
     if (!accessToken || !botId) {
-      message.warning('Please click Settings to set configuration');
+      console.log('no access token or bot id, auto config');
       return;
     }
 
