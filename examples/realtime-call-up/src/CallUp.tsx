@@ -2,7 +2,8 @@ import { OAuthToken, type SimpleBot } from '@coze/api';
 import { RealtimeClient } from '@coze/realtime-api';
 import React, { useState, useEffect, useRef } from 'react';
 import useCozeAPI, { INVALID_ACCESS_TOKEN, VoiceOption } from './use-coze-api';
-import cozeLogo from './coze.png';
+// TODO: fix missing coze.png asset
+import cozeLogo from './assets/coze.png';
 import './CallUp.css';
 
 const CallUp: React.FC = () => {
@@ -240,7 +241,7 @@ const CallUp: React.FC = () => {
   return (
     <div className="container">
       <div className="phone-container">
-        <div className="title-text">Coze AI 助手</div>
+        <div className="title-text">Coze 语音通话</div>
         <div className="avatar-container">
           <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
         </div>
