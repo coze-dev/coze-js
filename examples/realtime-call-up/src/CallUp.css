@@ -1,12 +1,20 @@
+/* 添加全局样式，禁止滚动 */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  height: 100vh; /* 改用 height 而不是 min-height */
   background: linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%);
   padding: 10px;
   box-sizing: border-box;
+  overflow: hidden; /* 确保容器也不会滚动 */
 }
 
 .phone-container {
@@ -17,6 +25,8 @@
   text-align: center;
   background: #ffffff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  max-height: 100vh; /* 限制最大高度 */
+  overflow: hidden; /* 确保内容不会溢出 */
 }
 
 @media (max-width: 768px) {
@@ -25,6 +35,7 @@
     max-width: none;
     padding: 30px 16px;
     box-shadow: none;
+    height: 100%; /* 在移动端占满全高 */
   }
 }
 
