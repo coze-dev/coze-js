@@ -18,7 +18,7 @@ export interface RealtimeClientConfig {
   /** Whether to mute by default, defaults to false
    * If set to true, audio streams will not be automatically published and subscribed */
   audioMutedDefault?: boolean;
-  connectorId?: string /** optional, Connector Id, defaults to '999' */;
+  connectorId: string /** required, Connector Id */;
   suppressStationaryNoise?: boolean /** optional, Suppress stationary noise, defaults to false */;
   suppressNonStationaryNoise?: boolean /** optional, Suppress non-stationary noise, defaults to false */;
 }
@@ -54,6 +54,12 @@ class RealtimeClient extends RealtimeEventHandler {
    *   可选，是否允许在浏览器环境中使用个人访问令牌。
    * @param config.audioMutedDefault - Optional, whether audio is muted by default, defaults to false. |
    *                                  可选，默认是否静音，默认值为 false。
+   * @param config.connectorId - Required, Connector Id. |
+   *                             必填，渠道 Id。
+   * @param config.suppressStationaryNoise - Optional, suppress stationary noise, defaults to false. |
+   *                                       可选，默认是否抑制静态噪声，默认值为 false。
+   * @param config.suppressNonStationaryNoise - Optional, suppress non-stationary noise, defaults to false. |
+   *                                         可选，默认是否抑制非静态噪声，默认值为 false。
    */
   constructor(config: RealtimeClientConfig) {
     super(config.debug);
@@ -86,7 +92,7 @@ class RealtimeClient extends RealtimeEventHandler {
         bot_id: botId,
         conversation_id: conversationId,
         voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
-        connector_id: this._config.connectorId ?? '999',
+        connector_id: this._config.connectorId,
       });
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);
