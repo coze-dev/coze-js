@@ -29,7 +29,6 @@ const VoiceClone: React.FC<{
 }> = ({ visible, onClose, voice, cloneVoice }) => {
   const [form] = Form.useForm();
   const [isRecording, setIsRecording] = useState(false);
-  console.log('voice xx', voice);
   const [loading, setLoading] = useState(false);
   const [mediaRecorderState, setMediaRecorderState] = useState<MediaStream>();
   const [recorderState, setRecorderState] = useState<MediaRecorder>();
@@ -75,7 +74,7 @@ const VoiceClone: React.FC<{
       message.error(`Clone voice failed: ${err}`);
       // code: 4100, remove token
       if (`${err}`.includes('code: 4100')) {
-        console.log('remove token in voice clone');
+        console.log(`remove token in voice clone failed: ${err}`);
         localStorage.removeItem('accessToken');
       }
     } finally {

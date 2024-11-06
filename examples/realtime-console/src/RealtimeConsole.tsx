@@ -203,7 +203,7 @@ const RealtimeConsole: React.FC = () => {
   };
 
   useEffect(() => {
-    // 设置网站图标
+    // set favicon
     const link = document.querySelector("link[rel~='icon']");
     if (link) {
       link.setAttribute('href', logo);

@@ -249,7 +249,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       message.error(`Failed to load ${objectName}: ${err}`);
       // code: 4100, remove token
       if (`${err}`.includes('code: 4100')) {
-        console.log('remove token');
+        console.log(`remove token when load ${objectName} failed: ${err}`);
         localStorage.removeItem('accessToken');
       }
     } finally {
@@ -535,6 +535,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
               </Button>
               <Button
                 onClick={() => {
+                  console.log('clear token');
                   localStorage.removeItem('accessToken');
                   localStorage.removeItem('refreshToken');
                   localStorage.removeItem('tokenExpiresAt');
