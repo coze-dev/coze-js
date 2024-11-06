@@ -133,11 +133,14 @@ const CallUp: React.FC = () => {
   });
 
   const tryRefreshToken = async (err: string) => {
-    // no refresh token
-    if (!refreshTokenData) return;
-
     // no error 401
     if (!`${err}`.includes(INVALID_ACCESS_TOKEN)) return;
+
+    if (!refreshTokenData) {
+      // remove access token, can't refresh
+      localStorage.removeItem('accessToken');
+      return;
+    }
 
     try {
       const token = await refreshToken(refreshTokenData);
@@ -145,6 +148,7 @@ const CallUp: React.FC = () => {
     } catch (err) {
       console.log(`refresh token error: ${err}`);
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('accessToken');
     }
   };
 
@@ -169,8 +173,7 @@ const CallUp: React.FC = () => {
       try {
         if (code && codeVerifier) {
           const token = await getToken(code, codeVerifier);
-          setAccessToken(token.access_token);
-          localStorage.setItem('accessToken', token.access_token);
+          storeToken(token);
         }
       } finally {
         window.history.replaceState(
