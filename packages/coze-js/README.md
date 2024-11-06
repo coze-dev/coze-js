@@ -135,4 +135,3 @@ npm run start
 For detailed API documentation and guides, visit:
 - [API Overview](https://www.coze.com/docs/developer_guides/api_overview)
 - [Authentication Guide](https://www.coze.com/docs/developer_guides/authentication)
-```
