@@ -39,23 +39,25 @@
 }
 
 .avatar-container {
-  width: 240px;
-  height: 240px;
+  position: relative;
+  width: min(240px, 50vw);
+  padding-bottom: min(240px, 50vw);
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 40px;
   border: 4px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background: #f7f9fc;
 }
 
 .avatar-image {
-  width: 70%;
-  height: 70%;
-  object-fit: contain;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .status {
@@ -192,8 +194,8 @@
   }
 
   .avatar-container {
-    width: 200px;
-    height: 200px;
+    width: min(200px, 45vw);
+    padding-bottom: min(200px, 45vw);
     margin-bottom: 32px;
   }
 

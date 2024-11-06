@@ -108,9 +108,10 @@ const CallUp: React.FC = () => {
       stream.getTracks().forEach(track => track.stop());
       setHasAudioPermission(true);
       setErrorMessage('');
+      console.log('✅ 麦克风权限获取成功');
       return true;
     } catch (error) {
-      console.error('麦克风权限获取失败:', error);
+      console.error('❌ 麦克风权限获取失败:', error);
       setErrorMessage('请允许访问麦克风以开始通话');
       setHasAudioPermission(false);
       return false;
@@ -124,6 +125,11 @@ const CallUp: React.FC = () => {
     }
 
     try {
+      console.log('🚀 开始初始化实时通话客户端:', {
+        botId: bot.bot_id,
+        voiceId: voice?.value,
+      });
+
       realtimeAPIRef.current = new RealtimeClient({
         accessToken,
         baseURL: 'https://api.coze.cn',
@@ -134,11 +140,14 @@ const CallUp: React.FC = () => {
         connectorId: '1024',
       });
 
+      console.log('📞 正在连接服务器...');
       await realtimeAPIRef.current.connect();
+      console.log('✅ 服务器连接成功');
 
+      // realtimeAPIRef.current.enableAudioPropertiesReport({});
       return true;
     } catch (error) {
-      console.error('实时通话初始化失败:', error);
+      console.error('❌ 实时通话初始化失败:', error);
       tryRefreshToken(`${error}`);
       setErrorMessage('通话初始化失败，请重试');
       return false;
@@ -146,6 +155,7 @@ const CallUp: React.FC = () => {
   };
 
   const handleEndCall = () => {
+    console.log('👋 结束通话');
     setIsCallActive(false);
     setIsMuted(false);
     if (timerInterval) {
@@ -155,6 +165,7 @@ const CallUp: React.FC = () => {
     setTimer(0);
 
     if (realtimeAPIRef.current) {
+      console.log('🔌 断开服务器连接');
       realtimeAPIRef.current.disconnect();
       realtimeAPIRef.current = null;
     }
@@ -162,32 +173,39 @@ const CallUp: React.FC = () => {
 
   const handleToggleMicrophone = () => {
     if (realtimeAPIRef.current) {
+      console.log(`🎤 ${isMuted ? '开启' : '关闭'}麦克风`);
       realtimeAPIRef.current.setAudioEnable(isMuted);
       setIsMuted(!isMuted);
-      // message.success(`Microphone ${!isMicrophoneOn ? 'unmuted' : 'muted'}`);
     } else {
-      // message.error('Please click Settings to set configuration first');
+      console.error('❌ RealtimeClient 未初始化');
+      setErrorMessage('通话未正确初始化，请重试');
     }
   };
 
   const handleCall = async () => {
     if (!isCallActive) {
+      console.log('🎤 正在请求麦克风权限...');
       const hasPermission = await checkMicrophonePermission();
       if (!hasPermission) {
+        console.log('❌ 麦克风权限被拒绝');
         return;
       }
 
+      console.log('🔄 正在初始化通话...');
       const initialized = await initializeRealtimeCall();
       if (!initialized) {
+        console.log('❌ 通话初始化失败');
         return;
       }
 
+      console.log('✅ 通话已开始');
       setIsCallActive(true);
       const interval = setInterval(() => {
         setTimer(prev => prev + 1);
       }, 1000);
       setTimerInterval(interval);
     } else {
+      console.log('📞 通话已结束');
       handleEndCall();
     }
   };
@@ -209,19 +227,22 @@ const CallUp: React.FC = () => {
       if (!accessToken) return;
 
       try {
+        console.log('🤖 正在获取或创建 Bot...');
         const bot = await getOrCreateRealtimeCallUpBot();
-        console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
+        console.log('✅ 获取 Bot 成功:', bot?.bot_name, bot?.bot_id);
         setBot(bot);
       } catch (err) {
-        console.log(`get bot error: ${err}`);
+        console.error('❌ 获取 Bot 失败:', err);
         tryRefreshToken(`${err}`);
       }
 
       try {
+        console.log('🎵 正在获取语音配置...');
         const voice = await getSomeVoice();
+        console.log('✅ 获取语音配置成功:', voice?.name);
         setVoice(voice);
       } catch (err) {
-        console.log(`get voice error: ${err}`);
+        console.error('❌ 获取语音配置失败:', err);
         tryRefreshToken(`${err}`);
       }
     }
