@@ -12,7 +12,10 @@ export class WorkSpaces extends APIResource {
    * @param params.page_size - Optional The size of pagination. Default is 10. Maximum is 50. | 可选 分页大小。默认为 10，最大为 50。
    * @returns OpenSpaceData | 工作空间列表
    */
-  async list(params?: ListWorkSpacesReq, options?: RequestOptions) {
+  async list(
+    params?: ListWorkSpacesReq,
+    options?: RequestOptions,
+  ): Promise<OpenSpaceData> {
     const apiUrl = '/v1/workspaces';
     const response = await this._client.get<ListWorkSpacesReq, string>(
       apiUrl,
@@ -20,8 +23,8 @@ export class WorkSpaces extends APIResource {
       false,
       options,
     );
-    // TODO The returned type is not in JSON format
-    return safeJsonParse(response).data as OpenSpaceData;
+    console.log(`list workspaces: ${response}`);
+    return safeJsonParse(response, response).data;
   }
 }
 

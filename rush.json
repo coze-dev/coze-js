@@ -396,6 +396,10 @@
     {
       "packageName": "@coze/realtime-api-example",
       "projectFolder": "examples/realtime-console"
+    },
+    {
+      "packageName": "@coze/realtime-call-up",
+      "projectFolder": "examples/realtime-call-up"
     }
   ]
 }
