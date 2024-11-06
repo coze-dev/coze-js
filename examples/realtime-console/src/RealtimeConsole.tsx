@@ -83,6 +83,7 @@ const RealtimeConsole: React.FC = () => {
       audioMutedDefault: !isMicrophoneOn,
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
+      connectorId: '1024',
     });
 
     // Subscribe to all client and server events
