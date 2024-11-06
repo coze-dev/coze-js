@@ -24,6 +24,8 @@ interface ConsoleFooterProps {
 
 const STORAGE_KEY = 'noiseSuppression';
 
+const DISCONNECT_TIME = 1800; // 30 minutes
+
 const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   onConnect,
   onDisconnect,
@@ -42,6 +44,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     const savedValue = localStorage.getItem(STORAGE_KEY);
     return savedValue ? JSON.parse(savedValue) : [];
   });
+  const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkPermission().then(isDeviceEnable => {
@@ -56,6 +59,20 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   useEffect(() => {
     checkMicrophonePermission();
   }, []);
+  useEffect(() => {
+    if (isConnected && connectLeftTime > 0) {
+      const timer = setInterval(() => {
+        setConnectLeftTime(prev => {
+          if (prev <= 1) {
+            handleDisconnect();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [isConnected, connectLeftTime]);
 
   const handleRefreshMicrophone = () => {
     checkMicrophonePermission();
@@ -71,6 +88,11 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     onConnect().finally(() => {
       setIsConnecting(false);
     });
+  };
+
+  const handleDisconnect = () => {
+    setConnectLeftTime(DISCONNECT_TIME);
+    onDisconnect();
   };
 
   const handleInterrupt = async () => {
@@ -186,10 +208,11 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
         <Button
           type="primary"
           danger
-          onClick={onDisconnect}
+          onClick={handleDisconnect}
           className="button-margin-right"
         >
-          Disconnect
+          Disconnect ({Math.floor(connectLeftTime / 60)}m {connectLeftTime % 60}
+          s)
         </Button>
         <div style={{ marginTop: '10px' }}></div>
         <MessageForm onSubmit={handleSendMessage} />
