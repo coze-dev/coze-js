@@ -253,7 +253,10 @@ const CallUp: React.FC = () => {
     return (
       <div className="container">
         <div className="phone-container">
-          <div className="bot-name">欢迎使用语音通话</div>
+          <div className="title-text">Coze 语音通话</div>
+          <div className="avatar-container">
+            <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
+          </div>
           <button className="login-button" onClick={handleLogin}>
             立即登录体验
           </button>
