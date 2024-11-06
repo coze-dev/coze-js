@@ -359,7 +359,19 @@ const CallUp: React.FC = () => {
             (e.target as HTMLButtonElement).style.transform = 'scale(1)';
           }}
         >
-          {isCallActive ? '✕' : '✆'}
+          {isCallActive ? (
+            <span style={{ fontSize: '24px' }}>✕</span>
+          ) : (
+            <span
+              style={{
+                fontSize: '32px',
+                transform: 'rotate(15deg)',
+                display: 'inline-block',
+              }}
+            >
+              📞
+            </span>
+          )}
         </button>
       </div>
     </div>
