@@ -87,7 +87,7 @@ const CallUp: React.FC = () => {
     null,
   );
   const [bot, setBot] = useState<SimpleBot | null>(null);
-  const { getOrCreateRealtimeCallUpBot } = useCozeAPI({
+  const { api, getOrCreateRealtimeCallUpBot } = useCozeAPI({
     accessToken:
       'pat_orIAResSJDUxT38T6gH7BwXsVNiEzf4PljAaeRW2JXKaCqWNc8F4PMPP1mYr10Me',
     baseURL: 'https://api.coze.cn',
@@ -116,15 +116,6 @@ const CallUp: React.FC = () => {
   };
 
   useEffect(() => {
-    async function init() {
-      const bot = await getOrCreateRealtimeCallUpBot();
-      console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
-      setBot(bot);
-    }
-    init();
-  }, []);
-
-  useEffect(() => {
     const viewport = document.createElement('meta');
     viewport.name = 'viewport';
     viewport.content =
@@ -135,6 +126,15 @@ const CallUp: React.FC = () => {
       document.head.removeChild(viewport);
     };
   }, []);
+
+  useEffect(() => {
+    async function init() {
+      const bot = await getOrCreateRealtimeCallUpBot();
+      console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
+      setBot(bot);
+    }
+    init();
+  }, [api]);
 
   return (
     <div style={containerStyle}>
