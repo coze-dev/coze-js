@@ -76,6 +76,30 @@ const getCallButtonStyle = (active: boolean) => ({
   },
 });
 
+const getMuteButtonStyle = (muted: boolean) => ({
+  width: '60px',
+  height: '60px',
+  borderRadius: '50%',
+  background: muted ? '#ff9800' : '#2196F3',
+  border: 'none',
+  color: 'white',
+  fontSize: '24px',
+  cursor: 'pointer',
+  margin: '20px 10px',
+  transition: 'all 0.3s',
+  WebkitTapHighlightColor: 'transparent',
+  touchAction: 'manipulation',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  '&:hover': {
+    transform: 'scale(1.1)',
+  },
+  '@media (max-width: 480px)': {
+    width: '50px',
+    height: '50px',
+    fontSize: '20px',
+  },
+});
+
 const loginButtonStyle = {
   padding: '10px 20px',
   fontSize: '16px',
@@ -119,6 +143,7 @@ const errorMessageStyle = {
 
 const CallUp: React.FC = () => {
   const [isCallActive, setIsCallActive] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [timer, setTimer] = useState(0);
   const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(
     null,
@@ -253,6 +278,7 @@ const CallUp: React.FC = () => {
 
   const handleEndCall = () => {
     setIsCallActive(false);
+    setIsMuted(false);
     if (timerInterval) {
       clearInterval(timerInterval);
       setTimerInterval(null);
@@ -262,6 +288,13 @@ const CallUp: React.FC = () => {
     if (realtimeAPIRef.current) {
       realtimeAPIRef.current.disconnect();
       realtimeAPIRef.current = null;
+    }
+  };
+
+  const handleMute = () => {
+    if (realtimeAPIRef.current) {
+      setIsMuted(!isMuted);
+      realtimeAPIRef.current.setMuted(!isMuted);
     }
   };
 
@@ -349,30 +382,52 @@ const CallUp: React.FC = () => {
         </div>
         {isCallActive && <div style={timerStyle}>{formatTime(timer)}</div>}
         {errorMessage && <div style={errorMessageStyle}>{errorMessage}</div>}
-        <button
-          style={getCallButtonStyle(isCallActive)}
-          onClick={handleCall}
-          onMouseOver={e => {
-            (e.target as HTMLButtonElement).style.transform = 'scale(1.1)';
-          }}
-          onMouseOut={e => {
-            (e.target as HTMLButtonElement).style.transform = 'scale(1)';
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          {isCallActive ? (
-            <span style={{ fontSize: '24px' }}>✕</span>
-          ) : (
-            <span
-              style={{
-                fontSize: '32px',
-                transform: 'rotate(15deg)',
-                display: 'inline-block',
+          {isCallActive && (
+            <button
+              style={getMuteButtonStyle(isMuted)}
+              onClick={handleMute}
+              onMouseOver={e => {
+                (e.target as HTMLButtonElement).style.transform = 'scale(1.1)';
+              }}
+              onMouseOut={e => {
+                (e.target as HTMLButtonElement).style.transform = 'scale(1)';
               }}
             >
-              📞
-            </span>
+              <span style={{ fontSize: '24px' }}>{isMuted ? '🔇' : '🎤'}</span>
+            </button>
           )}
-        </button>
+          <button
+            style={getCallButtonStyle(isCallActive)}
+            onClick={handleCall}
+            onMouseOver={e => {
+              (e.target as HTMLButtonElement).style.transform = 'scale(1.1)';
+            }}
+            onMouseOut={e => {
+              (e.target as HTMLButtonElement).style.transform = 'scale(1)';
+            }}
+          >
+            {isCallActive ? (
+              <span style={{ fontSize: '24px' }}>✕</span>
+            ) : (
+              <span
+                style={{
+                  fontSize: '32px',
+                  transform: 'rotate(15deg)',
+                  display: 'inline-block',
+                }}
+              >
+                📞
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
