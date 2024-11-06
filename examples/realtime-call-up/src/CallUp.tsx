@@ -8,34 +8,47 @@ const containerStyle = {
   flexDirection: 'column' as const,
   alignItems: 'center',
   justifyContent: 'center',
-  height: '100vh',
-  background: '#f5f5f5',
+  minHeight: '100vh',
+  background: 'linear-gradient(135deg, #f6f9fc 0%, #e9f2f9 100%)',
   padding: '10px',
   boxSizing: 'border-box' as const,
 };
 
 const phoneContainerStyle = {
   width: '100%',
-  maxWidth: '300px',
+  maxWidth: '600px',
   padding: '20px',
   borderRadius: '20px',
-  background: 'white',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  background: 'rgba(255, 255, 255, 0.95)',
+  boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
+  backdropFilter: 'blur(4px)',
   textAlign: 'center' as const,
+  '@media (max-width: 768px)': {
+    width: '50vw',
+    maxWidth: 'none',
+    padding: '10px',
+  },
 };
 
 const avatarStyle = {
-  width: '80px',
-  height: '80px',
+  width: '200px',
+  height: '200px',
   borderRadius: '50%',
-  marginBottom: '15px',
-  border: '2px solid #eee',
+  marginBottom: '30px',
+  border: '3px solid rgba(255, 255, 255, 0.8)',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  '@media (max-width: 768px)': {
+    width: '100%',
+    height: 'auto',
+    aspectRatio: '1',
+    marginBottom: '20px',
+  },
 };
 
 const botNameStyle = {
   fontSize: '20px',
   fontWeight: 'bold' as const,
-  color: '#333',
+  color: '#2c3e50',
   marginBottom: '10px',
 };
 
@@ -52,6 +65,7 @@ const getCallButtonStyle = (active: boolean) => ({
   transition: 'all 0.3s',
   WebkitTapHighlightColor: 'transparent',
   touchAction: 'manipulation',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
   '&:hover': {
     transform: 'scale(1.1)',
   },
@@ -71,11 +85,12 @@ const loginButtonStyle = {
   borderRadius: '5px',
   cursor: 'pointer',
   margin: '20px 0',
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
 };
 
 const timerStyle = {
   fontSize: '24px',
-  color: '#333',
+  color: '#2c3e50',
   margin: '10px 0',
   '@media (max-width: 480px)': {
     fontSize: '20px',
@@ -84,7 +99,7 @@ const timerStyle = {
 
 const statusStyle = {
   fontSize: '18px',
-  color: '#666',
+  color: '#34495e',
   marginBottom: '20px',
   '@media (max-width: 480px)': {
     fontSize: '16px',
@@ -96,7 +111,7 @@ const errorMessageStyle = {
   fontSize: '14px',
   marginTop: '10px',
   padding: '8px',
-  backgroundColor: '#ffe6e6',
+  backgroundColor: 'rgba(255, 68, 68, 0.1)',
   borderRadius: '4px',
   width: '100%',
   boxSizing: 'border-box' as const,
@@ -324,8 +339,11 @@ const CallUp: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={phoneContainerStyle}>
-        <img src={bot?.icon_url} alt="Bot Avatar" style={avatarStyle} />
-        <div style={botNameStyle}>{bot?.bot_name || '智能助手'}</div>
+        <img
+          src={bot?.icon_url || '/default-avatar.png'}
+          alt="Bot Avatar"
+          style={avatarStyle}
+        />
         <div style={statusStyle}>
           {isCallActive ? '正在与智能助手通话中...' : '点击按钮开始通话'}
         </div>
