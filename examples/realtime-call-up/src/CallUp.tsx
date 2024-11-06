@@ -1,7 +1,7 @@
-import { type SimpleBot } from '@coze/api';
+import { OAuthToken, type SimpleBot } from '@coze/api';
 import { RealtimeClient } from '@coze/realtime-api';
 import React, { useState, useEffect, useRef } from 'react';
-import useCozeAPI, { VoiceOption } from './use-coze-api';
+import useCozeAPI, { INVALID_ACCESS_TOKEN, VoiceOption } from './use-coze-api';
 
 const containerStyle = {
   display: 'flex',
@@ -62,6 +62,17 @@ const getCallButtonStyle = (active: boolean) => ({
   },
 });
 
+const loginButtonStyle = {
+  padding: '10px 20px',
+  fontSize: '16px',
+  backgroundColor: '#4CAF50',
+  color: 'white',
+  border: 'none',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  margin: '20px 0',
+};
+
 const timerStyle = {
   fontSize: '24px',
   color: '#333',
@@ -91,9 +102,6 @@ const errorMessageStyle = {
   boxSizing: 'border-box' as const,
 };
 
-const TOKEN =
-  'pat_orIAResSJDUxT38T6gH7BwXsVNiEzf4PljAaeRW2JXKaCqWNc8F4PMPP1mYr10Me';
-
 const CallUp: React.FC = () => {
   const [isCallActive, setIsCallActive] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -104,12 +112,75 @@ const CallUp: React.FC = () => {
   const [voice, setVoice] = useState<VoiceOption | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean>(false);
+  const [accessToken, setAccessToken] = useState<string>(
+    localStorage.getItem('accessToken') || '',
+  );
+  const [refreshTokenData, setRefreshTokenData] = useState<string>(
+    localStorage.getItem('refreshToken') || '',
+  );
   const realtimeAPIRef = useRef<RealtimeClient | null>(null);
 
-  const { api, getSomeVoice, getOrCreateRealtimeCallUpBot } = useCozeAPI({
-    accessToken: TOKEN,
+  const {
+    api,
+    getAuthUrl,
+    getToken,
+    refreshToken,
+    getSomeVoice,
+    getOrCreateRealtimeCallUpBot,
+  } = useCozeAPI({
+    accessToken,
     baseURL: 'https://api.coze.cn',
   });
+
+  const tryRefreshToken = async (err: string) => {
+    // no refresh token
+    if (!refreshTokenData) return;
+
+    // no error 401
+    if (!`${err}`.includes(INVALID_ACCESS_TOKEN)) return;
+
+    try {
+      const token = await refreshToken(refreshTokenData);
+      storeToken(token);
+    } catch (err) {
+      console.log(`refresh token error: ${err}`);
+      localStorage.removeItem('refreshToken');
+    }
+  };
+
+  const storeToken = (token: OAuthToken) => {
+    setAccessToken(token.access_token);
+    localStorage.setItem('accessToken', token.access_token);
+    localStorage.setItem('refreshToken', token.refresh_token);
+  };
+
+  const handleLogin = async () => {
+    const { url, codeVerifier } = await getAuthUrl();
+    localStorage.setItem('codeVerifier', codeVerifier);
+    window.location.href = url;
+  };
+
+  useEffect(() => {
+    (async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const codeVerifier = localStorage.getItem('codeVerifier');
+
+      try {
+        if (code && codeVerifier) {
+          const token = await getToken(code, codeVerifier);
+          setAccessToken(token.access_token);
+          localStorage.setItem('accessToken', token.access_token);
+        }
+      } finally {
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
+      }
+    })();
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -119,8 +190,11 @@ const CallUp: React.FC = () => {
 
   const checkMicrophonePermission = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop()); // 停止所有轨道
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false,
+      });
+      stream.getTracks().forEach(track => track.stop());
       setHasAudioPermission(true);
       setErrorMessage('');
       return true;
@@ -140,7 +214,7 @@ const CallUp: React.FC = () => {
 
     try {
       realtimeAPIRef.current = new RealtimeClient({
-        accessToken: TOKEN,
+        accessToken,
         baseURL: 'https://api.coze.cn',
         botId: bot.bot_id,
         voiceId: voice?.value,
@@ -175,7 +249,6 @@ const CallUp: React.FC = () => {
 
   const handleCall = async () => {
     if (!isCallActive) {
-      // 开始通话
       const hasPermission = await checkMicrophonePermission();
       if (!hasPermission) {
         return;
@@ -192,7 +265,6 @@ const CallUp: React.FC = () => {
       }, 1000);
       setTimerInterval(interval);
     } else {
-      // 结束通话
       handleEndCall();
     }
   };
@@ -211,27 +283,48 @@ const CallUp: React.FC = () => {
 
   useEffect(() => {
     async function init() {
-      const bot = await getOrCreateRealtimeCallUpBot();
-      console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
-      setBot(bot);
+      if (!accessToken) return;
 
-      const voice = await getSomeVoice();
-      setVoice(voice);
+      try {
+        const bot = await getOrCreateRealtimeCallUpBot();
+        console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
+        setBot(bot);
+      } catch (err) {
+        console.log(`get bot error: ${err}`);
+        tryRefreshToken(`${err}`);
+      }
+
+      try {
+        const voice = await getSomeVoice();
+        setVoice(voice);
+      } catch (err) {
+        console.log(`get voice error: ${err}`);
+        tryRefreshToken(`${err}`);
+      }
     }
     init();
-  }, [api]);
+  }, [accessToken, api]);
+
+  if (!accessToken) {
+    return (
+      <div style={containerStyle}>
+        <div style={phoneContainerStyle}>
+          <div style={botNameStyle}>欢迎使用语音通话</div>
+          <button style={loginButtonStyle} onClick={handleLogin}>
+            立即登录体验
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={containerStyle}>
       <div style={phoneContainerStyle}>
         <img src={bot?.icon_url} alt="Bot Avatar" style={avatarStyle} />
-        <div style={botNameStyle}>{bot?.bot_name}</div>
+        <div style={botNameStyle}>{bot?.bot_name || '智能助手'}</div>
         <div style={statusStyle}>
-          {isCallActive
-            ? '通话中...'
-            : hasAudioPermission
-              ? '准备通话'
-              : '等待麦克风权限'}
+          {isCallActive ? '正在与智能助手通话中...' : '点击按钮开始通话'}
         </div>
         {isCallActive && <div style={timerStyle}>{formatTime(timer)}</div>}
         {errorMessage && <div style={errorMessageStyle}>{errorMessage}</div>}

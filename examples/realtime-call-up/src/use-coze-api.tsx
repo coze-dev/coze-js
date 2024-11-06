@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 
 import {
   CozeAPI,
+  getPKCEAuthenticationUrl,
+  getPKCEOAuthToken,
+  refreshOAuthToken,
+  type OAuthToken,
   type WorkSpace,
   type CloneVoiceReq,
   type SimpleBot,
@@ -30,6 +34,10 @@ export interface WorkspaceOption {
   label: string;
 }
 
+const DEFAULT_OAUTH_CLIENT_ID = '30367348905137699749500653976611.app.coze';
+
+export const INVALID_ACCESS_TOKEN = 'code: 4100';
+
 const useCozeAPI = ({
   accessToken,
   baseURL = 'https://api.coze.cn',
@@ -50,6 +58,42 @@ const useCozeAPI = ({
       );
     }
   }, [accessToken, baseURL]);
+
+  const getCurrentLocation = () =>
+    `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
+
+  const getAuthUrl = async (): Promise<{
+    url: string;
+    codeVerifier: string;
+  }> => {
+    return getPKCEAuthenticationUrl({
+      baseURL: baseURL,
+      clientId: DEFAULT_OAUTH_CLIENT_ID,
+      redirectUrl: getCurrentLocation(),
+    });
+  };
+
+  const getToken = async (
+    code: string,
+    codeVerifier: string,
+  ): Promise<OAuthToken> => {
+    return await getPKCEOAuthToken({
+      code,
+      baseURL,
+      clientId: DEFAULT_OAUTH_CLIENT_ID,
+      redirectUrl: getCurrentLocation(),
+      codeVerifier,
+    });
+  };
+
+  const refreshToken = async (refreshToken: string): Promise<OAuthToken> => {
+    return await refreshOAuthToken({
+      baseURL,
+      clientId: DEFAULT_OAUTH_CLIENT_ID,
+      clientSecret: '',
+      refreshToken,
+    });
+  };
 
   const getPersonalWorkspace = async (): Promise<WorkSpace | null> => {
     const page_size = 50;
@@ -259,6 +303,9 @@ const useCozeAPI = ({
 
   return {
     api,
+    getAuthUrl,
+    getToken,
+    refreshToken,
     getSomeVoice,
     fetchAllVoices,
     fetchAllWorkspaces,
