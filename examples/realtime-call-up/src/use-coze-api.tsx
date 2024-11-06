@@ -155,6 +155,16 @@ const useCozeAPI = ({
     }
   };
 
+  const getSomeVoice = async (): Promise<VoiceOption | null> => {
+    const voices = await fetchAllVoices();
+    // 如果有自定义音色，返回，否则返回第一个
+    const customVoice = voices.find(voice => !voice.is_system_voice);
+    if (customVoice) {
+      return customVoice;
+    }
+    return voices[0];
+  };
+
   const fetchAllWorkspaces = async (): Promise<WorkspaceOption[]> => {
     let pageNum = 1;
     const pageSize = 50;
@@ -249,6 +259,7 @@ const useCozeAPI = ({
 
   return {
     api,
+    getSomeVoice,
     fetchAllVoices,
     fetchAllWorkspaces,
     cloneVoice,

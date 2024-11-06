@@ -1,7 +1,7 @@
 import { type SimpleBot } from '@coze/api';
-import React, { useState, useEffect } from 'react';
-import useCozeAPI from './use-coze-api';
-import { access } from 'fs';
+import { RealtimeClient } from '@coze/realtime-api';
+import React, { useState, useEffect, useRef } from 'react';
+import useCozeAPI, { VoiceOption } from './use-coze-api';
 
 const containerStyle = {
   display: 'flex',
@@ -80,6 +80,20 @@ const statusStyle = {
   },
 };
 
+const errorMessageStyle = {
+  color: '#ff4444',
+  fontSize: '14px',
+  marginTop: '10px',
+  padding: '8px',
+  backgroundColor: '#ffe6e6',
+  borderRadius: '4px',
+  width: '100%',
+  boxSizing: 'border-box' as const,
+};
+
+const TOKEN =
+  'pat_orIAResSJDUxT38T6gH7BwXsVNiEzf4PljAaeRW2JXKaCqWNc8F4PMPP1mYr10Me';
+
 const CallUp: React.FC = () => {
   const [isCallActive, setIsCallActive] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -87,9 +101,13 @@ const CallUp: React.FC = () => {
     null,
   );
   const [bot, setBot] = useState<SimpleBot | null>(null);
-  const { api, getOrCreateRealtimeCallUpBot } = useCozeAPI({
-    accessToken:
-      'pat_orIAResSJDUxT38T6gH7BwXsVNiEzf4PljAaeRW2JXKaCqWNc8F4PMPP1mYr10Me',
+  const [voice, setVoice] = useState<VoiceOption | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [hasAudioPermission, setHasAudioPermission] = useState<boolean>(false);
+  const realtimeAPIRef = useRef<RealtimeClient | null>(null);
+
+  const { api, getSomeVoice, getOrCreateRealtimeCallUpBot } = useCozeAPI({
+    accessToken: TOKEN,
     baseURL: 'https://api.coze.cn',
   });
 
@@ -99,19 +117,83 @@ const CallUp: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleCall = () => {
+  const checkMicrophonePermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // 停止所有轨道
+      setHasAudioPermission(true);
+      setErrorMessage('');
+      return true;
+    } catch (error) {
+      console.error('麦克风权限获取失败:', error);
+      setErrorMessage('请允许访问麦克风以开始通话');
+      setHasAudioPermission(false);
+      return false;
+    }
+  };
+
+  const initializeRealtimeCall = async () => {
+    if (!bot?.bot_id) {
+      setErrorMessage('Bot未初始化');
+      return false;
+    }
+
+    try {
+      realtimeAPIRef.current = new RealtimeClient({
+        accessToken: TOKEN,
+        baseURL: 'https://api.coze.cn',
+        botId: bot.bot_id,
+        voiceId: voice?.value,
+        debug: true,
+        allowPersonalAccessTokenInBrowser: true,
+        connectorId: '1024',
+      });
+
+      await realtimeAPIRef.current.connect();
+
+      return true;
+    } catch (error) {
+      console.error('实时通话初始化失败:', error);
+      setErrorMessage('通话初始化失败，请重试');
+      return false;
+    }
+  };
+
+  const handleEndCall = () => {
+    setIsCallActive(false);
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      setTimerInterval(null);
+    }
+    setTimer(0);
+
+    if (realtimeAPIRef.current) {
+      realtimeAPIRef.current.disconnect();
+      realtimeAPIRef.current = null;
+    }
+  };
+
+  const handleCall = async () => {
     if (!isCallActive) {
+      // 开始通话
+      const hasPermission = await checkMicrophonePermission();
+      if (!hasPermission) {
+        return;
+      }
+
+      const initialized = await initializeRealtimeCall();
+      if (!initialized) {
+        return;
+      }
+
       setIsCallActive(true);
       const interval = setInterval(() => {
         setTimer(prev => prev + 1);
       }, 1000);
       setTimerInterval(interval);
     } else {
-      setIsCallActive(false);
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-      setTimer(0);
+      // 结束通话
+      handleEndCall();
     }
   };
 
@@ -132,6 +214,9 @@ const CallUp: React.FC = () => {
       const bot = await getOrCreateRealtimeCallUpBot();
       console.log(`get bot: ${bot?.bot_name} ${bot?.bot_id}`);
       setBot(bot);
+
+      const voice = await getSomeVoice();
+      setVoice(voice);
     }
     init();
   }, [api]);
@@ -141,8 +226,15 @@ const CallUp: React.FC = () => {
       <div style={phoneContainerStyle}>
         <img src={bot?.icon_url} alt="Bot Avatar" style={avatarStyle} />
         <div style={botNameStyle}>{bot?.bot_name}</div>
-        <div style={statusStyle}>{isCallActive ? '通话中...' : '准备通话'}</div>
+        <div style={statusStyle}>
+          {isCallActive
+            ? '通话中...'
+            : hasAudioPermission
+              ? '准备通话'
+              : '等待麦克风权限'}
+        </div>
         {isCallActive && <div style={timerStyle}>{formatTime(timer)}</div>}
+        {errorMessage && <div style={errorMessageStyle}>{errorMessage}</div>}
         <button
           style={getCallButtonStyle(isCallActive)}
           onClick={handleCall}
