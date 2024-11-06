@@ -370,7 +370,10 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       .validateFields()
       .then(values => {
         const { workspaceId, botId, voiceId, baseURL: baseURLForm } = values;
-        if (!accessToken || !workspaceId || !botId || !baseURLForm) {
+        if (baseURLForm) {
+          localStorage.setItem('baseURL', baseURLForm);
+        }
+        if (!accessToken || !workspaceId || !botId) {
           message.error(
             'Access Token, Workspace, Bot, and Base URL are required!',
           );
