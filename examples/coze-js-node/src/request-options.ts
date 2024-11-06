@@ -4,7 +4,7 @@ import assert from 'assert';
 
 import { CozeAPI, RoleType } from '@coze/api';
 
-import { botId, baseURL, apiKey } from './client.js';
+import { botId, baseURL, apiKey } from './client';
 
 async function test_timeout_global() {
   try {

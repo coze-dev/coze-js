@@ -6,19 +6,19 @@
   "author": "",
   "type": "module",
   "scripts": {
-    "lint": "eslint ./ --cache --quiet",
-    "start": "node --loader ts-node/esm $1"
+    "lint": "eslint ./ --cache --quiet"
   },
   "dependencies": {
     "@coze/api": "workspace:*",
     "axios": "^1.7.7",
-    "jsonwebtoken": "^9.0.2",
-    "ts-node": "^10.9.2"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
     "@types/jsonwebtoken": "8.5.9",
     "@types/node": "^20",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "^5.5.3"
   }
 }

@@ -24,8 +24,8 @@ Choose one of the following commands based on your endpoint:
 
 ```bash
 # For China region (api.coze.cn)
-COZE_ENV=zh npm run start src/chat.ts
+COZE_ENV=zh npx tsx ./src/chat.ts
 
 # For Global region (api.coze.com)
-npm run start src/chat.ts
+npx  tsx ./src/chat.ts
 ```

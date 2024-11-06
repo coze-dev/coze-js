@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { client, spaceId } from './client.js';
+import { client, spaceId } from './client';
 
 async function main() {
   assert(spaceId, 'spaceId is required');

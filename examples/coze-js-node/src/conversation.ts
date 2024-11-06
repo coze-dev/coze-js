@@ -1,6 +1,6 @@
 import { RoleType } from '@coze/api';
 
-import { client } from './client.js';
+import { client } from './client';
 
 async function main() {
   const conversation = await client.conversations.create({

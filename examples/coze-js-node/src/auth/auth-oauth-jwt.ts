@@ -22,7 +22,7 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import { CozeAPI, getJWTToken } from '@coze/api';
 
-import config from '../config/config.js';
+import config from '../config/config';
 
 // 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';

@@ -9,8 +9,8 @@
 
 import { APIError, getDeviceCode, getDeviceToken } from '@coze/api';
 
-import config from '../config/config.js';
-import { sleep } from '../client.js';
+import config from '../config/config';
+import { sleep } from '../client';
 
 // 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';
