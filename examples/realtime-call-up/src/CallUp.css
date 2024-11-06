@@ -94,31 +94,22 @@
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
 }
 
 .mute-button:hover {
   transform: scale(1.1);
 }
 
-.mute-button.muted {
-  background: #ffffff;
-}
-
-.mute-button:not(.muted) {
-  background: #808080;
-}
-
 .microphone-icon {
   width: 24px;
   height: 24px;
+  fill: #4caf50;
+  transition: fill 0.3s;
 }
 
 .microphone-icon.muted {
-  fill: #ff0000;
-}
-
-.microphone-icon:not(.muted) {
-  fill: #ffffff;
+  fill: #ff4444;
 }
 
 .login-button {
