@@ -1,0 +1,209 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.phone-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .phone-container {
+    width: 100%;
+    max-width: none;
+    padding: 10px;
+  }
+}
+
+.avatar-container {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 10px auto 30px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bot-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.call-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  margin: 20px 0;
+  transition: all 0.3s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.call-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.call-button.active {
+  background: #ff4444;
+}
+
+.call-button:not(.active) {
+  background: #ffffff;
+}
+
+.mute-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 20px 10px;
+  transition: all 0.3s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mute-button:hover {
+  transform: scale(1.1);
+}
+
+.mute-button.muted {
+  background: #ffffff;
+}
+
+.mute-button:not(.muted) {
+  background: #808080;
+}
+
+.microphone-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.microphone-icon.muted {
+  fill: #ff0000;
+}
+
+.microphone-icon:not(.muted) {
+  fill: #ffffff;
+}
+
+.login-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.timer {
+  font-size: 24px;
+  color: #2c3e50;
+  margin: 10px 0;
+}
+
+.status {
+  font-size: 18px;
+  color: #34495e;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 14px;
+  margin-top: 10px;
+  padding: 8px;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.call-icon-svg {
+  width: 24px;
+  height: 24px;
+  fill: #4caf50;
+}
+
+.end-call-icon-svg {
+  width: 20px;
+  height: 20px;
+  fill: #ffffff;
+}
+
+@media (max-width: 480px) {
+  .call-button {
+    width: 50px;
+    height: 50px;
+  }
+
+  .call-icon-svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .end-call-icon-svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* 添加新的样式 */
+.title-text {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .title-text {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+}

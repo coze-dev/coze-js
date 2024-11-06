@@ -2,144 +2,8 @@ import { OAuthToken, type SimpleBot } from '@coze/api';
 import { RealtimeClient } from '@coze/realtime-api';
 import React, { useState, useEffect, useRef } from 'react';
 import useCozeAPI, { INVALID_ACCESS_TOKEN, VoiceOption } from './use-coze-api';
-
-const containerStyle = {
-  display: 'flex',
-  flexDirection: 'column' as const,
-  alignItems: 'center',
-  justifyContent: 'center',
-  minHeight: '100vh',
-  background: 'linear-gradient(135deg, #f6f9fc 0%, #e9f2f9 100%)',
-  padding: '10px',
-  boxSizing: 'border-box' as const,
-};
-
-const phoneContainerStyle = {
-  width: '100%',
-  maxWidth: '600px',
-  padding: '20px',
-  borderRadius: '20px',
-  background: 'rgba(255, 255, 255, 0.95)',
-  boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
-  backdropFilter: 'blur(4px)',
-  textAlign: 'center' as const,
-  '@media (max-width: 768px)': {
-    width: '50vw',
-    maxWidth: 'none',
-    padding: '10px',
-  },
-};
-
-const avatarStyle = {
-  width: '200px',
-  height: '200px',
-  borderRadius: '50%',
-  marginBottom: '30px',
-  border: '3px solid rgba(255, 255, 255, 0.8)',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  '@media (max-width: 768px)': {
-    width: '100%',
-    height: 'auto',
-    aspectRatio: '1',
-    marginBottom: '20px',
-  },
-};
-
-const botNameStyle = {
-  fontSize: '20px',
-  fontWeight: 'bold' as const,
-  color: '#2c3e50',
-  marginBottom: '10px',
-};
-
-const getCallButtonStyle = (active: boolean) => ({
-  width: '60px',
-  height: '60px',
-  borderRadius: '50%',
-  background: active ? '#ff4444' : '#4CAF50',
-  border: 'none',
-  color: 'white',
-  fontSize: '24px',
-  cursor: 'pointer',
-  margin: '20px 0',
-  transition: 'all 0.3s',
-  WebkitTapHighlightColor: 'transparent',
-  touchAction: 'manipulation',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-  '&:hover': {
-    transform: 'scale(1.1)',
-  },
-  '@media (max-width: 480px)': {
-    width: '50px',
-    height: '50px',
-    fontSize: '20px',
-  },
-});
-
-const getMuteButtonStyle = (muted: boolean) => ({
-  width: '60px',
-  height: '60px',
-  borderRadius: '50%',
-  background: muted ? '#ff9800' : '#2196F3',
-  border: 'none',
-  color: 'white',
-  fontSize: '24px',
-  cursor: 'pointer',
-  margin: '20px 10px',
-  transition: 'all 0.3s',
-  WebkitTapHighlightColor: 'transparent',
-  touchAction: 'manipulation',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-  '&:hover': {
-    transform: 'scale(1.1)',
-  },
-  '@media (max-width: 480px)': {
-    width: '50px',
-    height: '50px',
-    fontSize: '20px',
-  },
-});
-
-const loginButtonStyle = {
-  padding: '10px 20px',
-  fontSize: '16px',
-  backgroundColor: '#4CAF50',
-  color: 'white',
-  border: 'none',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  margin: '20px 0',
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-};
-
-const timerStyle = {
-  fontSize: '24px',
-  color: '#2c3e50',
-  margin: '10px 0',
-  '@media (max-width: 480px)': {
-    fontSize: '20px',
-  },
-};
-
-const statusStyle = {
-  fontSize: '18px',
-  color: '#34495e',
-  marginBottom: '20px',
-  '@media (max-width: 480px)': {
-    fontSize: '16px',
-  },
-};
-
-const errorMessageStyle = {
-  color: '#ff4444',
-  fontSize: '14px',
-  marginTop: '10px',
-  padding: '8px',
-  backgroundColor: 'rgba(255, 68, 68, 0.1)',
-  borderRadius: '4px',
-  width: '100%',
-  boxSizing: 'border-box' as const,
-};
+import cozeLogo from './coze.png';
+import './CallUp.css';
 
 const CallUp: React.FC = () => {
   const [isCallActive, setIsCallActive] = useState(false);
@@ -271,6 +135,7 @@ const CallUp: React.FC = () => {
       return true;
     } catch (error) {
       console.error('实时通话初始化失败:', error);
+      tryRefreshToken(`${error}`);
       setErrorMessage('通话初始化失败，请重试');
       return false;
     }
@@ -291,10 +156,13 @@ const CallUp: React.FC = () => {
     }
   };
 
-  const handleMute = () => {
+  const handleToggleMicrophone = () => {
     if (realtimeAPIRef.current) {
+      realtimeAPIRef.current.setAudioEnable(isMuted);
       setIsMuted(!isMuted);
-      realtimeAPIRef.current.setMuted(!isMuted);
+      // message.success(`Microphone ${!isMicrophoneOn ? 'unmuted' : 'muted'}`);
+    } else {
+      // message.error('Please click Settings to set configuration first');
     }
   };
 
@@ -358,10 +226,10 @@ const CallUp: React.FC = () => {
 
   if (!accessToken) {
     return (
-      <div style={containerStyle}>
-        <div style={phoneContainerStyle}>
-          <div style={botNameStyle}>欢迎使用语音通话</div>
-          <button style={loginButtonStyle} onClick={handleLogin}>
+      <div className="container">
+        <div className="phone-container">
+          <div className="bot-name">欢迎使用语音通话</div>
+          <button className="login-button" onClick={handleLogin}>
             立即登录体验
           </button>
         </div>
@@ -370,61 +238,47 @@ const CallUp: React.FC = () => {
   }
 
   return (
-    <div style={containerStyle}>
-      <div style={phoneContainerStyle}>
-        <img
-          src={bot?.icon_url || '/default-avatar.png'}
-          alt="Bot Avatar"
-          style={avatarStyle}
-        />
-        <div style={statusStyle}>
+    <div className="container">
+      <div className="phone-container">
+        <div className="title-text">Coze AI 助手</div>
+        <div className="avatar-container">
+          <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
+        </div>
+        <div className="status">
           {isCallActive ? '正在与智能助手通话中...' : '点击按钮开始通话'}
         </div>
-        {isCallActive && <div style={timerStyle}>{formatTime(timer)}</div>}
-        {errorMessage && <div style={errorMessageStyle}>{errorMessage}</div>}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        {isCallActive && <div className="timer">{formatTime(timer)}</div>}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        <div className="button-container">
           {isCallActive && (
             <button
-              style={getMuteButtonStyle(isMuted)}
-              onClick={handleMute}
-              onMouseOver={e => {
-                (e.target as HTMLButtonElement).style.transform = 'scale(1.1)';
-              }}
-              onMouseOut={e => {
-                (e.target as HTMLButtonElement).style.transform = 'scale(1)';
-              }}
+              className={`mute-button ${isMuted ? 'muted' : ''}`}
+              onClick={handleToggleMicrophone}
             >
-              <span style={{ fontSize: '24px' }}>{isMuted ? '🔇' : '🎤'}</span>
+              <svg
+                className={`microphone-icon ${isMuted ? 'muted' : ''}`}
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z" />
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+                {isMuted && (
+                  <path d="M3.27 3L2 4.27l4.19 4.19L6 9c0 3.53 2.61 6.43 6 6.92V19h2v-3.08c.57-.08 1.12-.24 1.64-.45L19.73 21 21 19.73 3.27 3z" />
+                )}
+              </svg>
             </button>
           )}
           <button
-            style={getCallButtonStyle(isCallActive)}
+            className={`call-button ${isCallActive ? 'active' : ''}`}
             onClick={handleCall}
-            onMouseOver={e => {
-              (e.target as HTMLButtonElement).style.transform = 'scale(1.1)';
-            }}
-            onMouseOut={e => {
-              (e.target as HTMLButtonElement).style.transform = 'scale(1)';
-            }}
           >
             {isCallActive ? (
-              <span style={{ fontSize: '24px' }}>✕</span>
+              <svg className="end-call-icon-svg" viewBox="0 0 24 24">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              </svg>
             ) : (
-              <span
-                style={{
-                  fontSize: '32px',
-                  transform: 'rotate(15deg)',
-                  display: 'inline-block',
-                }}
-              >
-                📞
-              </span>
+              <svg className="call-icon-svg" viewBox="0 0 24 24">
+                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z" />
+              </svg>
             )}
           </button>
         </div>
