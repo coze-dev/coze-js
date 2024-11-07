@@ -23,7 +23,6 @@ export class WorkSpaces extends APIResource {
       false,
       options,
     );
-    console.log(`list workspaces: ${response}`);
     return safeJsonParse(response, response).data;
   }
 }
