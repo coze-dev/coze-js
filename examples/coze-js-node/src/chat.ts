@@ -42,6 +42,8 @@ async function streamingChat(callback?: (v: CreateChatData) => void) {
       console.log(part.data.usage);
     } else if (part.event === ChatEventType.DONE) {
       console.log(part.data);
+    } else if (part.event === ChatEventType.ERROR) {
+      console.error(part.data);
     }
   }
 
