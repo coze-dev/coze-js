@@ -17,3 +17,14 @@ export const sleep = (milliseconds: number): Promise<void> => {
  */
 export const checkPermission: () => Promise<boolean> = async () =>
   (await VERTC.enableDevices({ audio: true, video: false })).audio;
+
+/**
+ * Get audio devices
+ */
+export const getAudioDevices = async () => {
+  const devices = await VERTC.enumerateDevices();
+  return {
+    audioInputs: devices.filter(i => i.deviceId && i.kind === 'audioinput'),
+    audioOutputs: devices.filter(i => i.deviceId && i.kind === 'audiooutput'),
+  };
+};

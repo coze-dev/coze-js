@@ -247,6 +247,24 @@ class RealtimeClient extends RealtimeEventHandler {
       );
     }
   }
+
+  /**
+   * en: Set the audio input device
+   *
+   * zh: 设置音频输入设备
+   */
+  async setAudioInputDevice(deviceId: string) {
+    await this._client?.setAudioInputDevice(deviceId);
+  }
+
+  /**
+   * en: Set the audio output device
+   *
+   * zh: 设置音频输出设备
+   */
+  async setAudioOutputDevice(deviceId: string) {
+    await this._client?.setAudioOutputDevice(deviceId);
+  }
 }
 
 export {

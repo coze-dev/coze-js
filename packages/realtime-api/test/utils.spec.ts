@@ -1,6 +1,6 @@
 import VERTC from '@volcengine/rtc';
 
-import { sleep, checkPermission } from '../src/utils';
+import { sleep, checkPermission, getAudioDevices } from '../src/utils';
 
 jest.mock('@volcengine/rtc');
 
@@ -26,6 +26,40 @@ describe('Utils', () => {
       (VERTC.enableDevices as jest.Mock).mockResolvedValue({ audio: false });
       const result = await checkPermission();
       expect(result).toBe(false);
+    });
+  });
+  describe('getAudioDevices', () => {
+    it('should return filtered audio input and output devices', async () => {
+      const mockDevices = [
+        { deviceId: '1', kind: 'audioinput', label: 'Mic 1' },
+        { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
+        { deviceId: '3', kind: 'videoinput', label: 'Camera 1' },
+        { deviceId: '', kind: 'audioinput', label: 'Invalid Device' },
+      ];
+
+      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
+
+      const result = await getAudioDevices();
+
+      expect(result).toEqual({
+        audioInputs: [{ deviceId: '1', kind: 'audioinput', label: 'Mic 1' }],
+        audioOutputs: [
+          { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
+        ],
+      });
+
+      expect(VERTC.enumerateDevices).toHaveBeenCalled();
+    });
+
+    it('should return empty arrays when no devices are found', async () => {
+      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([]);
+
+      const result = await getAudioDevices();
+
+      expect(result).toEqual({
+        audioInputs: [],
+        audioOutputs: [],
+      });
     });
   });
 });

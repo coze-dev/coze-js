@@ -45,6 +45,14 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     return savedValue ? JSON.parse(savedValue) : [];
   });
   const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
+  const [audioCapture, setAudioCapture] = useState<string>('default');
+  const [audioPlayback, setAudioPlayback] = useState<string>('default');
+  const [inputDeviceOptions, setInputDeviceOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [outputDeviceOptions, setOutputDeviceOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkPermission().then(isDeviceEnable => {
@@ -73,6 +81,30 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
       return () => clearInterval(timer);
     }
   }, [isConnected, connectLeftTime]);
+
+  useEffect(() => {
+    async function getDevices() {
+      try {
+        const devices = await RealtimeUtils.getAudioDevices();
+        const inputDevices = devices.audioInputs.map(device => ({
+          label: device.label || `Microphone ${device.deviceId}`,
+          value: device.deviceId,
+        }));
+        const outputDevices = devices.audioOutputs.map(device => ({
+          label: device.label || `Speaker ${device.deviceId}`,
+          value: device.deviceId,
+        }));
+
+        setInputDeviceOptions(inputDevices);
+        setOutputDeviceOptions(outputDevices);
+      } catch (err) {
+        console.error('Failed to get devices:', err);
+        message.error('Failed to get devices');
+      }
+    }
+
+    getDevices();
+  }, []);
 
   const handleRefreshMicrophone = () => {
     checkMicrophonePermission();
@@ -175,6 +207,16 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     }
   };
 
+  const handleAudioCaptureChange = (value: string) => {
+    setAudioCapture(value);
+    clientRef.current?.setAudioInputDevice(value);
+  };
+
+  const handleAudioPlaybackChange = (value: string) => {
+    setAudioPlayback(value);
+    clientRef.current?.setAudioOutputDevice(value);
+  };
+
   if (microphoneStatus === 'error') {
     return (
       <>
@@ -230,6 +272,33 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
         >
           {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
         </Button>
+        <div
+          style={{
+            marginTop: '10px',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '10px',
+          }}
+        >
+          <span style={{ marginBottom: '10px' }}>
+            <Text style={{ marginRight: 8 }}>Capture Device:</Text>
+            <Select
+              style={{ width: 200 }}
+              value={audioCapture}
+              onChange={handleAudioCaptureChange}
+              options={inputDeviceOptions}
+            />
+          </span>
+          <span>
+            <Text style={{ marginRight: 8 }}>Playback Device:</Text>
+            <Select
+              style={{ width: 200 }}
+              value={audioPlayback}
+              onChange={handleAudioPlaybackChange}
+              options={outputDeviceOptions}
+            />
+          </span>
+        </div>
       </>
     );
   }
