@@ -57,8 +57,8 @@ const CallUp: React.FC = () => {
     getAuthUrl,
     getToken,
     refreshToken,
-    getSomeVoice,
-    getOrCreateRealtimeCallUpBot,
+    getVoice,
+    getOrCreateRealtimeBot,
   } = useCozeAPI({
     accessToken,
     baseURL: 'https://api.coze.cn',
@@ -256,7 +256,7 @@ const CallUp: React.FC = () => {
 
       try {
         console.log('🤖 Getting or creating Bot...');
-        const newBot = await getOrCreateRealtimeCallUpBot();
+        const newBot = await getOrCreateRealtimeBot();
         console.log(
           '✅ Bot retrieved successfully:',
           newBot?.bot_name,
@@ -270,7 +270,7 @@ const CallUp: React.FC = () => {
 
       try {
         console.log('🎵 Getting voice configuration...');
-        const newVoice = await getSomeVoice();
+        const newVoice = await getVoice();
         console.log(
           '✅ Voice configuration retrieved successfully:',
           newVoice?.name,

@@ -7,7 +7,6 @@ import {
   refreshOAuthToken,
   type OAuthToken,
   type WorkSpace,
-  type CloneVoiceReq,
   type SimpleBot,
 } from '@coze/api';
 
@@ -196,7 +195,7 @@ const useCozeAPI = ({
     }
   };
 
-  const getSomeVoice = async (): Promise<VoiceOption | null> => {
+  const getVoice = async (): Promise<VoiceOption | null> => {
     const voices = await fetchAllVoices();
     // Return custom voice if exists, otherwise return the first voice
     const customVoice = voices.find(voice => !voice.is_system_voice);
@@ -206,17 +205,7 @@ const useCozeAPI = ({
     return voices[0];
   };
 
-  const cloneVoice = async (params: CloneVoiceReq): Promise<string> => {
-    try {
-      const response = await api?.audio.voices.clone(params);
-      return response?.voice_id || '';
-    } catch (error) {
-      console.error('clone voice error:', error);
-      throw error;
-    }
-  };
-
-  const getOrCreateRealtimeCallUpBot = async (): Promise<SimpleBot | null> => {
+  const getOrCreateRealtimeBot = async (): Promise<SimpleBot | null> => {
     try {
       // Get personal workspace
       const personalWorkspace = await getPersonalWorkspace();
@@ -241,6 +230,9 @@ const useCozeAPI = ({
         space_id: personalWorkspace.id,
         name: botName,
         description: 'A bot for realtime call up demo',
+        onboarding_info: {
+          prologue: '你好呀，我是你的智能助手，有什么可以帮到你的吗？',
+        },
       });
 
       if (!newBot) {
@@ -271,10 +263,8 @@ const useCozeAPI = ({
     getAuthUrl,
     getToken,
     refreshToken,
-    getSomeVoice,
-    fetchAllVoices,
-    cloneVoice,
-    getOrCreateRealtimeCallUpBot,
+    getVoice,
+    getOrCreateRealtimeBot,
   };
 };
 
