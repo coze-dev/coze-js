@@ -134,7 +134,7 @@ export class EngineClient extends RealtimeEventHandler {
     if (devices.audioInputs.findIndex(i => i.deviceId === deviceId) === -1) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
-        'Device not found',
+        `Audio input device not found: ${deviceId}`,
       );
     }
     this.engine.stopAudioCapture();
@@ -146,7 +146,7 @@ export class EngineClient extends RealtimeEventHandler {
     if (devices.audioOutputs.findIndex(i => i.deviceId === deviceId) === -1) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
-        'Device not found',
+        `Audio output device not found: ${deviceId}`,
       );
     }
     await this.engine.setAudioPlaybackDevice(deviceId);

@@ -255,6 +255,7 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async setAudioInputDevice(deviceId: string) {
     await this._client?.setAudioInputDevice(deviceId);
+    this.dispatch(EventNames.AUDIO_INPUT_DEVICE_CHANGED, { deviceId });
   }
 
   /**
@@ -264,6 +265,7 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async setAudioOutputDevice(deviceId: string) {
     await this._client?.setAudioOutputDevice(deviceId);
+    this.dispatch(EventNames.AUDIO_OUTPUT_DEVICE_CHANGED, { deviceId });
   }
 }
 

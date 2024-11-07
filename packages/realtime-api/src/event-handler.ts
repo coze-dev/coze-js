@@ -56,6 +56,16 @@ export enum EventNames {
    * zh: 抑制非平稳噪声
    */
   SUPPRESS_NON_STATIONARY_NOISE = 'client.suppress.non.stationary.noise',
+  /**
+   * en: Audio input device changed
+   * zh: 音频输入设备改变
+   */
+  AUDIO_INPUT_DEVICE_CHANGED = 'client.input.device.changed',
+  /**
+   * en: Audio output device changed
+   * zh: 音频输出设备改变
+   */
+  AUDIO_OUTPUT_DEVICE_CHANGED = 'client.output.device.changed',
 }
 type EventCallback = (eventName: string, event: unknown) => void;
 

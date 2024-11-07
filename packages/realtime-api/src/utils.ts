@@ -20,9 +20,13 @@ export const checkPermission: () => Promise<boolean> = async () =>
 
 /**
  * Get audio devices
+ * @returns Promise<AudioDevices> Object containing arrays of audio input and output devices
  */
 export const getAudioDevices = async () => {
   const devices = await VERTC.enumerateDevices();
+  if (!devices?.length) {
+    return { audioInputs: [], audioOutputs: [] };
+  }
   return {
     audioInputs: devices.filter(i => i.deviceId && i.kind === 'audioinput'),
     audioOutputs: devices.filter(i => i.deviceId && i.kind === 'audiooutput'),
