@@ -1,13 +1,40 @@
-import { OAuthToken, type SimpleBot } from '@coze/api';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
 import { RealtimeClient } from '@coze/realtime-api';
-import React, { useState, useEffect, useRef } from 'react';
-import useCozeAPI, { INVALID_ACCESS_TOKEN, VoiceOption } from './use-coze-api';
-import cozeLogo from './assets/coze.png';
+import { type OAuthToken, type SimpleBot } from '@coze/api';
+
+import useCozeAPI, {
+  INVALID_ACCESS_TOKEN,
+  type VoiceOption,
+} from './use-coze-api';
 import phoneIcon from './assets/phone.svg';
-import closeIcon from './assets/close.svg';
 import microphoneIcon from './assets/microphone.svg';
 import microphoneOffIcon from './assets/microphone-off.svg';
+import cozeLogo from './assets/coze.png';
+import closeIcon from './assets/close.svg';
 import './CallUp.css';
+
+const SECONDS_IN_MINUTE = 60;
+const PAD_LENGTH = 2;
+const TIMER_INTERVAL = 1000;
+const CONNECTOR_ID = '1024';
+
+// Extract some logic into separate components to reduce main component size
+const LoginView: React.FC<{ handleLogin: () => Promise<void> }> = ({
+  handleLogin,
+}) => (
+  <div className="container">
+    <div className="phone-container">
+      <div className="title-text">Coze AI Voice Call</div>
+      <div className="avatar-container">
+        <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
+      </div>
+      <button className="login-button" onClick={handleLogin}>
+        Login to Experience
+      </button>
+    </div>
+  </div>
+);
 
 const CallUp: React.FC = () => {
   const [isCallActive, setIsCallActive] = useState(false);
@@ -19,13 +46,10 @@ const CallUp: React.FC = () => {
   const [bot, setBot] = useState<SimpleBot | null>(null);
   const [voice, setVoice] = useState<VoiceOption | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [hasAudioPermission, setHasAudioPermission] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>(
     localStorage.getItem('accessToken') || '',
   );
-  const [refreshTokenData, setRefreshTokenData] = useState<string>(
-    localStorage.getItem('refreshToken') || '',
-  );
+  const refreshTokenData = localStorage.getItem('refreshToken') || '';
   const realtimeAPIRef = useRef<RealtimeClient | null>(null);
 
   const {
@@ -40,25 +64,28 @@ const CallUp: React.FC = () => {
     baseURL: 'https://api.coze.cn',
   });
 
-  const tryRefreshToken = async (err: string) => {
-    // no error 401
-    if (!`${err}`.includes(INVALID_ACCESS_TOKEN)) return;
+  const tryRefreshToken = useCallback(
+    async (errorMsg: string) => {
+      if (!`${errorMsg}`.includes(INVALID_ACCESS_TOKEN)) {
+        return;
+      }
 
-    if (!refreshTokenData) {
-      // remove access token, can't refresh
-      localStorage.removeItem('accessToken');
-      return;
-    }
+      if (!refreshTokenData) {
+        localStorage.removeItem('accessToken');
+        return;
+      }
 
-    try {
-      const token = await refreshToken(refreshTokenData);
-      storeToken(token);
-    } catch (err) {
-      console.log(`refresh token error: ${err}`);
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('accessToken');
-    }
-  };
+      try {
+        const newToken = await refreshToken(refreshTokenData);
+        storeToken(newToken);
+      } catch (err) {
+        console.log(`refresh token error: ${err}`);
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('accessToken');
+      }
+    },
+    [refreshToken, refreshTokenData],
+  );
 
   const storeToken = (token: OAuthToken) => {
     setAccessToken(token.access_token);
@@ -80,8 +107,8 @@ const CallUp: React.FC = () => {
 
       try {
         if (code && codeVerifier) {
-          const token = await getToken(code, codeVerifier);
-          storeToken(token);
+          const newToken = await getToken(code, codeVerifier);
+          storeToken(newToken);
         }
       } finally {
         window.history.replaceState(
@@ -91,12 +118,14 @@ const CallUp: React.FC = () => {
         );
       }
     })();
-  }, []);
+  }, [getToken]);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const mins = Math.floor(seconds / SECONDS_IN_MINUTE);
+    const secs = seconds % SECONDS_IN_MINUTE;
+    return `${mins.toString().padStart(PAD_LENGTH, '0')}:${secs
+      .toString()
+      .padStart(PAD_LENGTH, '0')}`;
   };
 
   const checkMicrophonePermission = async () => {
@@ -106,26 +135,24 @@ const CallUp: React.FC = () => {
         video: false,
       });
       stream.getTracks().forEach(track => track.stop());
-      setHasAudioPermission(true);
       setErrorMessage('');
-      console.log('✅ 麦克风权限获取成功');
+      console.log('✅ Microphone permission granted');
       return true;
     } catch (error) {
-      console.error('❌ 麦克风权限获取失败:', error);
-      setErrorMessage('请允许访问麦克风以开始通话');
-      setHasAudioPermission(false);
+      console.error('❌ Failed to get microphone permission:', error);
+      setErrorMessage('Please allow microphone access to start the call');
       return false;
     }
   };
 
   const initializeRealtimeCall = async () => {
     if (!bot?.bot_id) {
-      setErrorMessage('Bot未初始化');
+      setErrorMessage('Bot not initialized');
       return false;
     }
 
     try {
-      console.log('🚀 开始初始化实时通话客户端:', {
+      console.log('🚀 Initializing realtime call client:', {
         botId: bot.bot_id,
         voiceId: voice?.value,
       });
@@ -137,25 +164,24 @@ const CallUp: React.FC = () => {
         voiceId: voice?.value,
         debug: true,
         allowPersonalAccessTokenInBrowser: true,
-        connectorId: '1024',
+        connectorId: CONNECTOR_ID,
       });
 
-      console.log('📞 正在连接服务器...');
+      console.log('📞 Connecting to server...');
       await realtimeAPIRef.current.connect();
-      console.log('✅ 服务器连接成功');
+      console.log('✅ Server connected successfully');
 
-      // realtimeAPIRef.current.enableAudioPropertiesReport({});
       return true;
     } catch (error) {
-      console.error('❌ 实时通话初始化失败:', error);
+      console.error('❌ Failed to initialize realtime call:', error);
       tryRefreshToken(`${error}`);
-      setErrorMessage('通话初始化失败，请重试');
+      setErrorMessage('Call initialization failed, please try again');
       return false;
     }
   };
 
   const handleEndCall = () => {
-    console.log('👋 结束通话');
+    console.log('👋 Ending call');
     setIsCallActive(false);
     setIsMuted(false);
     if (timerInterval) {
@@ -165,7 +191,7 @@ const CallUp: React.FC = () => {
     setTimer(0);
 
     if (realtimeAPIRef.current) {
-      console.log('🔌 断开服务器连接');
+      console.log('🔌 Disconnecting from server');
       realtimeAPIRef.current.disconnect();
       realtimeAPIRef.current = null;
     }
@@ -173,39 +199,39 @@ const CallUp: React.FC = () => {
 
   const handleToggleMicrophone = () => {
     if (realtimeAPIRef.current) {
-      console.log(`🎤 ${isMuted ? '开启' : '关闭'}麦克风`);
+      console.log(`🎤 ${isMuted ? 'Unmute' : 'Mute'} microphone`);
       realtimeAPIRef.current.setAudioEnable(isMuted);
       setIsMuted(!isMuted);
     } else {
-      console.error('❌ RealtimeClient 未初始化');
-      setErrorMessage('通话未正确初始化，请重试');
+      console.error('❌ RealtimeClient not initialized');
+      setErrorMessage('Call not properly initialized, please try again');
     }
   };
 
   const handleCall = async () => {
     if (!isCallActive) {
-      console.log('🎤 正在请求麦克风权限...');
+      console.log('🎤 Requesting microphone permission...');
       const hasPermission = await checkMicrophonePermission();
       if (!hasPermission) {
-        console.log('❌ 麦克风权限被拒绝');
+        console.log('❌ Microphone permission denied');
         return;
       }
 
-      console.log('🔄 正在初始化通话...');
+      console.log('🔄 Initializing call...');
       const initialized = await initializeRealtimeCall();
       if (!initialized) {
-        console.log('❌ 通话初始化失败');
+        console.log('❌ Call initialization failed');
         return;
       }
 
-      console.log('✅ 通话已开始');
+      console.log('✅ Call started');
       setIsCallActive(true);
       const interval = setInterval(() => {
         setTimer(prev => prev + 1);
-      }, 1000);
+      }, TIMER_INTERVAL);
       setTimerInterval(interval);
     } else {
-      console.log('📞 通话已结束');
+      console.log('📞 Call ended');
       handleEndCall();
     }
   };
@@ -224,56 +250,61 @@ const CallUp: React.FC = () => {
 
   useEffect(() => {
     async function init() {
-      if (!accessToken) return;
+      if (!accessToken) {
+        return;
+      }
 
       try {
-        console.log('🤖 正在获取或创建 Bot...');
-        const bot = await getOrCreateRealtimeCallUpBot();
-        console.log('✅ 获取 Bot 成功:', bot?.bot_name, bot?.bot_id);
-        setBot(bot);
+        console.log('🤖 Getting or creating Bot...');
+        const newBot = await getOrCreateRealtimeCallUpBot();
+        console.log(
+          '✅ Bot retrieved successfully:',
+          newBot?.bot_name,
+          newBot?.bot_id,
+        );
+        setBot(newBot);
       } catch (err) {
-        console.error('❌ 获取 Bot 失败:', err);
+        console.error('❌ Failed to retrieve Bot:', err);
         tryRefreshToken(`${err}`);
       }
 
       try {
-        console.log('🎵 正在获取语音配置...');
-        const voice = await getSomeVoice();
-        console.log('✅ 获取语音配置成功:', voice?.name);
-        setVoice(voice);
+        console.log('🎵 Getting voice configuration...');
+        const newVoice = await getSomeVoice();
+        console.log(
+          '✅ Voice configuration retrieved successfully:',
+          newVoice?.name,
+        );
+        setVoice(newVoice);
       } catch (err) {
-        console.error('❌ 获取语音配置失败:', err);
+        console.error('❌ Failed to retrieve voice configuration:', err);
         tryRefreshToken(`${err}`);
       }
     }
     init();
-  }, [accessToken, api]);
+  }, [
+    accessToken,
+    api,
+    getOrCreateRealtimeCallUpBot,
+    getSomeVoice,
+    tryRefreshToken,
+  ]);
 
   if (!accessToken) {
-    return (
-      <div className="container">
-        <div className="phone-container">
-          <div className="title-text">Coze AI 语音通话</div>
-          <div className="avatar-container">
-            <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
-          </div>
-          <button className="login-button" onClick={handleLogin}>
-            立即登录体验
-          </button>
-        </div>
-      </div>
-    );
+    return <LoginView handleLogin={handleLogin} />;
   }
 
   return (
     <div className="container">
       <div className="phone-container">
-        <div className="title-text">Coze AI 语音通话</div>
+        <div className="title-text">Coze AI Voice Call</div>
         <div className="avatar-container">
           <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
         </div>
         <div className="status">
-          {isCallActive ? '正在与智能助手通话中...' : '点击按钮开始通话'}
+          {isCallActive
+            ? 'In call with AI Assistant...'
+            : 'Click button to start call'}
         </div>
         {isCallActive && <div className="timer">{formatTime(timer)}</div>}
         {errorMessage && <div className="error-message">{errorMessage}</div>}

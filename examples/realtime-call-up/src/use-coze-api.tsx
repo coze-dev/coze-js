@@ -65,44 +65,41 @@ const useCozeAPI = ({
   const getAuthUrl = async (): Promise<{
     url: string;
     codeVerifier: string;
-  }> => {
-    return getPKCEAuthenticationUrl({
-      baseURL: baseURL,
+  }> =>
+    getPKCEAuthenticationUrl({
+      baseURL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       redirectUrl: getCurrentLocation(),
     });
-  };
 
   const getToken = async (
     code: string,
     codeVerifier: string,
-  ): Promise<OAuthToken> => {
-    return await getPKCEOAuthToken({
+  ): Promise<OAuthToken> =>
+    await getPKCEOAuthToken({
       code,
       baseURL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       redirectUrl: getCurrentLocation(),
       codeVerifier,
     });
-  };
 
-  const refreshToken = async (refreshToken: string): Promise<OAuthToken> => {
-    return await refreshOAuthToken({
+  const refreshToken = async (refreshTokenStr: string): Promise<OAuthToken> =>
+    await refreshOAuthToken({
       baseURL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       clientSecret: '',
-      refreshToken,
+      refreshToken: refreshTokenStr,
     });
-  };
 
   const getPersonalWorkspace = async (): Promise<WorkSpace | null> => {
-    const page_size = 50;
-    let page_num = 1;
+    const pageSize = 50;
+    let pageNum = 1;
     let hasMore = true;
     while (hasMore) {
       const workspaces = await api?.workspaces.list({
-        page_num,
-        page_size,
+        page_num: pageNum,
+        page_size: pageSize,
       });
       console.log(`get workspaces 2: ${workspaces?.workspaces.length}`);
       for (const workspace of workspaces?.workspaces || []) {
@@ -111,8 +108,8 @@ const useCozeAPI = ({
           return workspace;
         }
       }
-      hasMore = workspaces?.workspaces.length === page_size;
-      page_num++;
+      hasMore = workspaces?.workspaces.length === pageSize;
+      pageNum++;
     }
     return null;
   };
@@ -201,44 +198,12 @@ const useCozeAPI = ({
 
   const getSomeVoice = async (): Promise<VoiceOption | null> => {
     const voices = await fetchAllVoices();
-    // 如果有自定义音色，返回，否则返回第一个
+    // Return custom voice if exists, otherwise return the first voice
     const customVoice = voices.find(voice => !voice.is_system_voice);
     if (customVoice) {
       return customVoice;
     }
     return voices[0];
-  };
-
-  const fetchAllWorkspaces = async (): Promise<WorkspaceOption[]> => {
-    let pageNum = 1;
-    const pageSize = 50;
-    let allWorkspaces: WorkspaceOption[] = [];
-    let hasMore = true;
-
-    try {
-      while (hasMore) {
-        const response = await api?.workspaces.list({
-          page_size: pageSize,
-          page_num: pageNum,
-        });
-
-        const workspaces =
-          response?.workspaces.map(workspace => ({
-            value: workspace.id,
-            label: workspace.name,
-          })) || [];
-
-        allWorkspaces = [...allWorkspaces, ...workspaces];
-
-        hasMore = response?.workspaces.length === pageSize;
-        pageNum++;
-      }
-
-      return allWorkspaces;
-    } catch (error) {
-      console.error('get workspaces error:', error);
-      throw error;
-    }
   };
 
   const cloneVoice = async (params: CloneVoiceReq): Promise<string> => {
@@ -253,15 +218,15 @@ const useCozeAPI = ({
 
   const getOrCreateRealtimeCallUpBot = async (): Promise<SimpleBot | null> => {
     try {
-      // 获取个人空间
+      // Get personal workspace
       const personalWorkspace = await getPersonalWorkspace();
       if (!personalWorkspace) {
-        throw new Error('未找到个人空间');
+        throw new Error('Personal workspace not found');
       }
 
       const botName = 'realtime-call-up';
 
-      // 获取所有机器人
+      // Get all bots
       const realtimeCallUpBot = await getBotByName(
         personalWorkspace.id,
         botName,
@@ -271,7 +236,7 @@ const useCozeAPI = ({
         return realtimeCallUpBot;
       }
 
-      // 如果不存在，创建新机器人
+      // Create new bot if it doesn't exist
       const newBot = await api?.bots.create({
         space_id: personalWorkspace.id,
         name: botName,
@@ -279,10 +244,10 @@ const useCozeAPI = ({
       });
 
       if (!newBot) {
-        throw new Error('创建机器人失败');
+        throw new Error('Failed to create bot');
       }
 
-      // 发布到 API 渠道
+      // Publish to API channel
       await api?.bots.publish({
         bot_id: newBot.bot_id,
         connector_ids: ['API'],
@@ -296,7 +261,7 @@ const useCozeAPI = ({
         publish_time: '',
       };
     } catch (error) {
-      console.error('获取或创建 realtime-call-up 机器人失败:', error);
+      console.error('Failed to get or create realtime-call-up bot:', error);
       throw error;
     }
   };
@@ -308,7 +273,6 @@ const useCozeAPI = ({
     refreshToken,
     getSomeVoice,
     fetchAllVoices,
-    fetchAllWorkspaces,
     cloneVoice,
     getOrCreateRealtimeCallUpBot,
   };
