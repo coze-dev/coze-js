@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import { RealtimeClient } from '@coze/realtime-api';
+import { RealtimeClient, RealtimeUtils } from '@coze/realtime-api';
 import { type OAuthToken, type SimpleBot } from '@coze/api';
 
 import useCozeAPI, {
@@ -129,14 +129,15 @@ const CallUp: React.FC = () => {
 
   const checkMicrophonePermission = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false,
-      });
-      stream.getTracks().forEach(track => track.stop());
-      setErrorMessage('');
-      console.log('✅ Microphone permission granted');
-      return true;
+      const permission = await RealtimeUtils.checkPermission();
+      if (permission) {
+        setErrorMessage('');
+        console.log('✅ Microphone permission granted');
+        return true;
+      } else {
+        setErrorMessage('Please allow microphone access to start the call');
+        return false;
+      }
     } catch (error) {
       console.error('❌ Failed to get microphone permission:', error);
       setErrorMessage('Please allow microphone access to start the call');
@@ -162,7 +163,6 @@ const CallUp: React.FC = () => {
         botId: bot.bot_id,
         voiceId: voice?.value,
         debug: true,
-        allowPersonalAccessTokenInBrowser: true,
         connectorId: CONNECTOR_ID,
       });
 
