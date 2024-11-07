@@ -4,6 +4,7 @@ import { RealtimeClient } from '@coze/realtime-api';
 import { type OAuthToken, type SimpleBot } from '@coze/api';
 
 import useCozeAPI, {
+  BASE_URL,
   INVALID_ACCESS_TOKEN,
   type VoiceOption,
 } from './use-coze-api';
@@ -61,7 +62,6 @@ const CallUp: React.FC = () => {
     getOrCreateRealtimeBot,
   } = useCozeAPI({
     accessToken,
-    baseURL: 'https://api.coze.cn',
   });
 
   const tryRefreshToken = useCallback(
@@ -159,7 +159,7 @@ const CallUp: React.FC = () => {
 
       realtimeAPIRef.current = new RealtimeClient({
         accessToken,
-        baseURL: 'https://api.coze.cn',
+        baseURL: BASE_URL,
         botId: bot.bot_id,
         voiceId: voice?.value,
         debug: true,

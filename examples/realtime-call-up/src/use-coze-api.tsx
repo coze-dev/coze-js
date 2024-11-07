@@ -34,29 +34,24 @@ export interface WorkspaceOption {
 }
 
 const DEFAULT_OAUTH_CLIENT_ID = '30367348905137699749500653976611.app.coze';
+export const BASE_URL = 'https://api.coze.cn';
 
 export const INVALID_ACCESS_TOKEN = 'code: 4100';
 
-const useCozeAPI = ({
-  accessToken,
-  baseURL = 'https://api.coze.cn',
-}: {
-  accessToken: string;
-  baseURL: string;
-}) => {
+const useCozeAPI = ({ accessToken }: { accessToken: string }) => {
   const [api, setApi] = useState<CozeAPI | null>(null);
 
   useEffect(() => {
-    if (accessToken && baseURL) {
+    if (accessToken) {
       setApi(
         new CozeAPI({
           token: accessToken,
-          baseURL,
+          baseURL: BASE_URL,
           allowPersonalAccessTokenInBrowser: true,
         }),
       );
     }
-  }, [accessToken, baseURL]);
+  }, [accessToken]);
 
   const getCurrentLocation = () =>
     `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
@@ -66,7 +61,7 @@ const useCozeAPI = ({
     codeVerifier: string;
   }> =>
     getPKCEAuthenticationUrl({
-      baseURL,
+      baseURL: BASE_URL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       redirectUrl: getCurrentLocation(),
     });
@@ -77,7 +72,7 @@ const useCozeAPI = ({
   ): Promise<OAuthToken> =>
     await getPKCEOAuthToken({
       code,
-      baseURL,
+      baseURL: BASE_URL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       redirectUrl: getCurrentLocation(),
       codeVerifier,
@@ -85,7 +80,7 @@ const useCozeAPI = ({
 
   const refreshToken = async (refreshTokenStr: string): Promise<OAuthToken> =>
     await refreshOAuthToken({
-      baseURL,
+      baseURL: BASE_URL,
       clientId: DEFAULT_OAUTH_CLIENT_ID,
       clientSecret: '',
       refreshToken: refreshTokenStr,
