@@ -45,6 +45,8 @@ const client = new RealtimeClient({
   debug: true,                        // Optional: Enable debug logging
   allowPersonalAccessTokenInBrowser: true,  // Optional: Enable PAT token usage in browser
   audioMutedDefault: false,           // Optional: Initial audio state (default: false)
+  suppressStationaryNoise: false,     // Optional: Enable stationary noise suppression(default: false)
+  suppressNonStationaryNoise: false,  // Optional: Enable non-stationary noise suppression(default: false)
 });
 
 // Essential Setup

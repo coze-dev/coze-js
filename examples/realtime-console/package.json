@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
+    "deploy": "npm run build && surge --project ./build --domain $SURGE_DOMAIN --token $SURGE_TOKEN",
     "start": "node scripts/start.js",
     "test": "exit 0"
   },
@@ -135,6 +136,7 @@
     "@types/node": "^20",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
+    "surge": "^0.24.6",
     "typescript": "^5.5.3"
   }
 }

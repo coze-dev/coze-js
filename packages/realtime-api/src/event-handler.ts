@@ -46,6 +46,16 @@ export enum EventNames {
    * zh: 客户端错误
    */
   ERROR = 'client.error',
+  /**
+   * en: Audio noise reduction enabled
+   * zh: 抑制平稳噪声
+   */
+  SUPPRESS_STATIONARY_NOISE = 'client.suppress.stationary.noise',
+  /**
+   * en: Suppress non-stationary noise
+   * zh: 抑制非平稳噪声
+   */
+  SUPPRESS_NON_STATIONARY_NOISE = 'client.suppress.non.stationary.noise',
 }
 type EventCallback = (eventName: string, event: unknown) => void;
 

@@ -17,6 +17,7 @@ import {
 } from '@coze/realtime-api';
 
 import Settings from './Settings';
+import logo from './logo.svg';
 import ConsoleFooter from './ConsoleFooter';
 
 const { Content, Footer } = Layout;
@@ -57,6 +58,9 @@ const RealtimeConsole: React.FC = () => {
     const botId = localStorage.getItem('botId');
     const voiceId = localStorage.getItem('voiceId') || '';
     const baseURL = localStorage.getItem('baseURL') || '';
+    const noiseSuppression = JSON.parse(
+      localStorage.getItem('noiseSuppression') || '[]',
+    );
 
     if (baseURL && !baseURL.trim().match(/^https?:\/\/.+/)) {
       message.error('Invalid base URL format');
@@ -64,7 +68,7 @@ const RealtimeConsole: React.FC = () => {
     }
 
     if (!accessToken || !botId) {
-      message.error('Please set accessToken and botId');
+      console.log('no access token or bot id, auto config');
       return;
     }
 
@@ -77,6 +81,9 @@ const RealtimeConsole: React.FC = () => {
       baseURL: baseURL.trim(),
       allowPersonalAccessTokenInBrowser: true,
       audioMutedDefault: !isMicrophoneOn,
+      suppressStationaryNoise: noiseSuppression.includes('stationary'),
+      suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
+      connectorId: '1024',
     });
 
     // Subscribe to all client and server events
@@ -195,6 +202,19 @@ const RealtimeConsole: React.FC = () => {
   const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    // set favicon
+    const link = document.querySelector("link[rel~='icon']");
+    if (link) {
+      link.setAttribute('href', logo);
+    } else {
+      const favicon = document.createElement('link');
+      favicon.rel = 'icon';
+      favicon.href = logo;
+      document.head.appendChild(favicon);
+    }
+  }, []);
 
   useEffect(() => {
     if (autoScrollEvents) {
