@@ -11,30 +11,10 @@ rush update
 npm run start
 ```
 
-![realtime-console](./assets/realtime-console.png)
+![realtime-call-up](./assets/realtime-call-up.jpg)
 
 ## Demo Features
 1. Visit [http://localhost:3000](http://localhost:3000)
-2. Configure your credentials in the settings panel:
-   - Access Token
-   - Bot ID
-   - Voice ID
-   - API Base URL
-3. Optional: Use browser extensions for custom headers during testing
-4. Grant microphone permissions when prompted
-5. Initialize connection via the "Connect" button
-
-## Available Operations
-- Microphone control (toggle on/off)
-- Bot interaction interruption
-- Connection management
-- Audio debugging tools:
-  - Playback device monitoring
-  - Device status logging
-  - Diagnostic features
-
-## Monitoring
-- Real-time event logging in the upper console
-- Bot response display in the lower panel
-- Detailed console logs for debugging
-
+2. Optional: Use browser extensions for custom headers during testing
+3. Grant microphone permissions when prompted
+4. Initialize connection via the "Start Call" button

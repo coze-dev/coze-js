@@ -13,7 +13,6 @@ import microphoneIcon from './assets/microphone.svg';
 import microphoneOffIcon from './assets/microphone-off.svg';
 import cozeLogo from './assets/coze.png';
 import closeIcon from './assets/close.svg';
-import './CallUp.css';
 
 const SECONDS_IN_MINUTE = 60;
 const PAD_LENGTH = 2;
