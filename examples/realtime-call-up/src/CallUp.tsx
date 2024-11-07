@@ -282,13 +282,7 @@ const CallUp: React.FC = () => {
       }
     }
     init();
-  }, [
-    accessToken,
-    api,
-    getOrCreateRealtimeCallUpBot,
-    getSomeVoice,
-    tryRefreshToken,
-  ]);
+  }, [accessToken, api]);
 
   if (!accessToken) {
     return <LoginView handleLogin={handleLogin} />;
