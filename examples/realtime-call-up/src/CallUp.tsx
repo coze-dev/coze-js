@@ -253,7 +253,7 @@ const CallUp: React.FC = () => {
     return (
       <div className="container">
         <div className="phone-container">
-          <div className="title-text">Coze 语音通话</div>
+          <div className="title-text">Coze AI 语音通话</div>
           <div className="avatar-container">
             <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
           </div>
@@ -268,7 +268,7 @@ const CallUp: React.FC = () => {
   return (
     <div className="container">
       <div className="phone-container">
-        <div className="title-text">Coze 语音通话</div>
+        <div className="title-text">Coze AI 语音通话</div>
         <div className="avatar-container">
           <img src={cozeLogo} alt="Bot Avatar" className="avatar-image" />
         </div>
