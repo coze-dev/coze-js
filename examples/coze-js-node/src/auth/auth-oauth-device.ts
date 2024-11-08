@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 /*
  * How to effectuate OpenAPI authorization through the OAuth Device Code flow.
  *
@@ -9,15 +7,12 @@
  * The process involves obtaining a device code, displaying it to the user, and then polling for the access token.
  */
 
-import fs from 'fs';
+import { APIError, getDeviceCode, getDeviceToken } from '@coze/api';
 
-import jwt from 'jsonwebtoken';
-import { APIError, CozeAPI, getDeviceCode, getDeviceToken } from '@coze/api';
+import config from '../config/config';
+import { sleep } from '../client';
 
-import { sleep } from '../client.mjs';
-import config from '../../config.js';
-
-// 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
+// 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';
 
 // Retrieve configuration values from the config file
@@ -31,13 +26,13 @@ const deviceCode = await getDeviceCode({
 });
 console.log('deviceCode', deviceCode);
 
+// Instruct the user to visit the verification URI and enter the user code
+console.log(
+  `please open ${deviceCode.verification_uri} and input the code ${deviceCode.user_code}`,
+);
+
 // Start the polling process to obtain the access token
 while (true) {
-  // Instruct the user to visit the verification URI and enter the user code
-  console.log(
-    `please open ${deviceCode.verification_uri} and input the code ${deviceCode.user_code}`,
-  );
-
   // Wait for 5 seconds before polling again
   await sleep(5000);
 

@@ -4,7 +4,7 @@
 
 import { CozeAPI } from '@coze/api';
 
-import config from '../../config.js';
+import config from '../config/config';
 
 // 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';
@@ -15,8 +15,8 @@ const apiKey = config[key].auth.pat.COZE_API_KEY;
 // The default base URL is https://api.coze.com
 const baseURL = config[key].COZE_BASE_URL;
 
-/* eslint-disable no-unused-vars */
 // Initialize a new Coze API client using the base URL and API key (Personal Access Token)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const client = new CozeAPI({
   baseURL,
   token: apiKey,

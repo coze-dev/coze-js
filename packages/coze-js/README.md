@@ -15,7 +15,7 @@ pnpm install @coze/api
 ### 2. Basic Usage
 
 ```javascript
-import { CozeAPI, COZE_COM_BASE_URL, ChatStatus } from '@coze/api';
+import { CozeAPI, COZE_COM_BASE_URL, ChatStatus, RoleType } from '@coze/api';
 
 // Initialize client with your Personal Access Token
 const client = new CozeAPI({
@@ -28,7 +28,7 @@ async function quickChat() {
   const v = await client.chat.createAndPoll({
     bot_id: 'your_bot_id',
     additional_messages: [{
-      role: 'user',
+      role: RoleType.User,
       content: 'Hello!',
       content_type: 'text',
     }],
@@ -73,13 +73,13 @@ const client = new CozeAPI({
 
 ### Streaming Chat
 ```javascript
-import { CozeAPI, ChatEventType } from '@coze/api';
+import { CozeAPI, ChatEventType, RoleType } from '@coze/api';
 
 async function streamChat() {
   const stream = await client.chat.stream({
     bot_id: 'your_bot_id',
     additional_messages: [{
-      role: 'user',
+      role: RoleType.User,
       content: 'Hello!',
       content_type: 'text',
     }],
@@ -97,11 +97,11 @@ async function streamChat() {
 
 | Feature | Description | Example |
 |---------|-------------|----------|
-| Chat | Text conversations | [chat.mjs](../../examples/coze-js-node/src/chat.mjs) |
-| Bot Management | Create and manage bots | [bot.mjs](../../examples/coze-js-node/src/bot.mjs) |
-| Knowledge | Document management | [knowledge.mjs](../../examples/coze-js-node/src/knowledge.mjs) |
-| Workflow | Run workflow | [workflow.mjs](../../examples/coze-js-node/src/workflow.mjs) |
-| Voice | Speech synthesis | [voice.mjs](../../examples/coze-js-node/src/voice.mjs) |
+| Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
+| Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
+| Knowledge | Document management | [knowledge.ts](../../examples/coze-js-node/src/knowledge.ts) |
+| Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
+| Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 
 [View all examples →](../../examples/coze-js-node/src/)
 
@@ -121,7 +121,7 @@ npm run test
 ```bash
 cd examples/coze-js-node
 cp config.default.js config.js  # Edit config.js with your credentials
-node chat.mjs
+npm start src/chat.ts
 ```
 
 ### Browser
@@ -135,4 +135,3 @@ npm run start
 For detailed API documentation and guides, visit:
 - [API Overview](https://www.coze.com/docs/developer_guides/api_overview)
 - [Authentication Guide](https://www.coze.com/docs/developer_guides/authentication)
-```

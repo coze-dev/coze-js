@@ -1,11 +1,10 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-unused-vars */
-import { clearLine, cursorTo } from 'node:readline';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 import assert from 'assert';
 
-import { CozeAPI } from '@coze/api';
+import { CozeAPI, RoleType } from '@coze/api';
 
-import { botId, baseURL, apiKey } from './client.mjs';
+import { botId, baseURL, apiKey } from './client';
 
 async function test_timeout_global() {
   try {
@@ -27,7 +26,7 @@ async function test_timeout_global() {
       auto_save_history: true,
       additional_messages: [
         {
-          role: 'user',
+          role: RoleType.User,
           content: 'give me a joke',
           content_type: 'text',
         },
@@ -60,7 +59,7 @@ async function test_timeout_with_options() {
         auto_save_history: true,
         additional_messages: [
           {
-            role: 'user',
+            role: RoleType.User,
             content: 'Hello',
             content_type: 'text',
           },
@@ -96,7 +95,7 @@ async function test_timeout_with_signal() {
         auto_save_history: true,
         additional_messages: [
           {
-            role: 'user',
+            role: RoleType.User,
             content: 'Hello',
             content_type: 'text',
           },
@@ -130,7 +129,7 @@ async function test_headers() {
         auto_save_history: true,
         additional_messages: [
           {
-            role: 'user',
+            role: RoleType.User,
             content: 'Hello',
             content_type: 'text',
           },

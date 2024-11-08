@@ -6,7 +6,7 @@
   "author": "",
   "type": "module",
   "scripts": {
-    "test": "exit 0"
+    "lint": "eslint ./ --cache --quiet"
   },
   "dependencies": {
     "@coze/api": "workspace:*",
@@ -14,6 +14,11 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@coze-infra/eslint-config": "workspace:*"
+    "@coze-infra/eslint-config": "workspace:*",
+    "@types/jsonwebtoken": "8.5.9",
+    "@types/node": "^20",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.3"
   }
 }

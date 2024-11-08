@@ -1,7 +1,6 @@
-/* eslint-disable no-unused-vars */
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
- * How to effectuate OpenAPI authorization through the OAuth PKCE (Proof Key for Code Exchange) method.
+ * How to effectuate OpenAPI authorization through the OAuth authorization code method.
  *
  * Firstly, users need to access https://www.coze.com/open/oauth/apps. For the cn environment,
  * users need to access https://www.coze.cn/open/oauth/apps to create an OAuth App of the type
@@ -11,28 +10,29 @@
  * https://www.coze.com/docs/developer_guides/oauth_code. For the cn environment, it can be
  * accessed at https://www.coze.cn/docs/developer_guides/oauth_code.
  *
- * After the creation is completed, the client ID and redirect link can be obtained.
- * Note that PKCE does not require a client secret, enhancing security for public clients.
+ * After the creation is completed, the client ID, client secret, and redirect link, can be
+ * obtained. For the client secret, users need to keep it securely to avoid leakage.
  */
 
 import {
   CozeAPI,
-  getPKCEAuthenticationUrl,
-  getPKCEOAuthToken,
+  getWebAuthenticationUrl,
+  getWebOAuthToken,
   refreshOAuthToken,
 } from '@coze/api';
 
-import config from '../../config.js';
+import config from '../config/config';
 
-// 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
+// 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';
 
-const clientId = config[key].auth.oauth_pkce.COZE_CLIENT_ID;
-const redirectUrl = config[key].auth.oauth_pkce.COZE_REDIRECT_URL;
+const clientId = config[key].auth.oauth_web.COZE_CLIENT_ID;
+const clientSecret = config[key].auth.oauth_web.COZE_CLIENT_SECRET;
+const redirectUrl = config[key].auth.oauth_web.COZE_REDIRECT_URL;
 const baseURL = config[key].COZE_BASE_URL;
 
-// Generate the PKCE authentication URL and code verifier
-const { url, codeVerifier } = await getPKCEAuthenticationUrl({
+// Generate the authentication URL using the provided parameters
+const authUrl = getWebAuthenticationUrl({
   clientId,
   redirectUrl,
   baseURL,
@@ -40,7 +40,7 @@ const { url, codeVerifier } = await getPKCEAuthenticationUrl({
 });
 
 console.log(
-  `please open ${url} and authorize and then get the code from the redirect url`,
+  `please open ${authUrl} and authorize and then get the code from the redirect url`,
 );
 
 import readline from 'readline';
@@ -60,19 +60,19 @@ const getCodeFromUser = () =>
   });
 
 // Get the authorization code from user input
-const code = await getCodeFromUser();
+const code = (await getCodeFromUser()) as string;
 console.log('Received code:', code);
 
-// Exchange the authorization code for an OAuth token using PKCE
-const oauthToken = await getPKCEOAuthToken({
+// Exchange the authorization code for an OAuth token
+const oauthToken = await getWebOAuthToken({
   clientId,
+  clientSecret,
   redirectUrl,
   baseURL,
   code,
-  codeVerifier,
 });
 
-console.log('getPKCEOAuthToken', oauthToken);
+console.log('getOAuthToken', oauthToken);
 
 // Initialize a new Coze API client using the obtained access token
 
@@ -88,7 +88,7 @@ const client = new CozeAPI({
 const refreshedOAuthToken = await refreshOAuthToken({
   clientId,
   refreshToken: oauthToken.refresh_token,
-  redirectUrl,
+  clientSecret,
   baseURL,
 });
 

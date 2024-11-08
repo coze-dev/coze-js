@@ -1,8 +1,14 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import fs from 'fs';
 
-import { client } from './client.mjs';
+import { client } from './client';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 async function main() {
-  const file = fs.readFileSync('../tmp/test.txt');
+  const file = fs.readFileSync(join(__dirname, '../tmp/test.txt'));
   const fileBase64 = file.toString('base64');
 
   const create = await client.knowledge.documents.create({
@@ -40,4 +46,4 @@ async function main() {
   console.log('client.knowledge.documents.list', list);
 }
 
-main();
+main().catch(console.error);
