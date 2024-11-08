@@ -4,7 +4,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export const defaultVitestConfig: ViteUserConfig = {
   plugins: [tsconfigPaths()],
   resolve: {
-    // 优先识别 main，如果没有配置 main，则识别 module
     mainFields: ['main', 'module', 'exports'],
   },
   test: {
