@@ -13,7 +13,7 @@ describe('Voices', () => {
   describe('create', () => {
     it('should generate speech synthesis', async () => {
       const mockResponse = new ArrayBuffer(8);
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         input: 'Hello world',

@@ -9,7 +9,7 @@ import {
   getJWTToken,
 } from '../src/auth';
 
-jest.mock('../src/core');
+vi.mock('../src/core');
 
 describe('Auth functions', () => {
   const mockConfig = {
@@ -20,11 +20,11 @@ describe('Auth functions', () => {
     clientSecret: 'test-client-secret',
   };
 
-  let isBrowserSpy: jest.SpyInstance;
+  let isBrowserSpy: vi.SpyInstance;
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    isBrowserSpy = jest.spyOn(utils, 'isBrowser');
+    vi.resetAllMocks();
+    isBrowserSpy = vi.spyOn(utils, 'isBrowser');
   });
 
   afterEach(() => {
@@ -34,18 +34,18 @@ describe('Auth functions', () => {
   describe('Browser environment checks', () => {
     describe('getDeviceCode', () => {
       it('should throw an error in browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(true);
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
         await expect(
           getDeviceCode({ clientId: 'test-client-id' }),
         ).rejects.toThrow('getDeviceCode is not supported in browser');
       });
 
       it('should not throw an error in non-browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(false);
-        const mockPost = jest
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(false);
+        const mockPost = vi
           .fn()
           .mockResolvedValue({ device_code: 'test-device-code' });
-        (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+        (APIClient as unknown as vi.Mock).mockImplementation(() => ({
           post: mockPost,
         }));
 
@@ -57,7 +57,7 @@ describe('Auth functions', () => {
 
     describe('getDeviceToken', () => {
       it('should throw an error in browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(true);
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
         await expect(
           getDeviceToken({
             clientId: 'test-client-id',
@@ -67,11 +67,11 @@ describe('Auth functions', () => {
       });
 
       it('should not throw an error in non-browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(false);
-        const mockPost = jest
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(false);
+        const mockPost = vi
           .fn()
           .mockResolvedValue({ access_token: 'test-token' });
-        (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+        (APIClient as unknown as vi.Mock).mockImplementation(() => ({
           post: mockPost,
         }));
 
@@ -86,18 +86,18 @@ describe('Auth functions', () => {
 
     describe('getJWTToken', () => {
       it('should throw an error in browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(true);
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
         await expect(getJWTToken({ token: 'test-token' })).rejects.toThrow(
           'getJWTToken is not supported in browser',
         );
       });
 
       it('should not throw an error in non-browser environment', async () => {
-        jest.spyOn(utils, 'isBrowser').mockReturnValue(false);
-        const mockPost = jest
+        vi.spyOn(utils, 'isBrowser').mockReturnValue(false);
+        const mockPost = vi
           .fn()
           .mockResolvedValue({ access_token: 'test-jwt-token' });
-        (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+        (APIClient as unknown as vi.Mock).mockImplementation(() => ({
           post: mockPost,
         }));
 
@@ -130,10 +130,10 @@ describe('Auth functions', () => {
 
   describe('getOAuthToken', () => {
     it('should call APIClient.post with correct parameters', async () => {
-      const mockPost = jest
+      const mockPost = vi
         .fn()
         .mockResolvedValue({ access_token: 'test-token' });
-      (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
         post: mockPost,
       }));
 
@@ -160,10 +160,10 @@ describe('Auth functions', () => {
 
   describe('getDeviceCode', () => {
     it('should call APIClient.post with correct parameters', async () => {
-      const mockPost = jest
+      const mockPost = vi
         .fn()
         .mockResolvedValue({ device_code: 'test-device-code' });
-      (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
         post: mockPost,
       }));
 
@@ -189,10 +189,10 @@ describe('Auth functions', () => {
 
   describe('getDeviceToken', () => {
     it('should call APIClient.post with correct parameters', async () => {
-      const mockPost = jest
+      const mockPost = vi
         .fn()
         .mockResolvedValue({ access_token: 'test-token' });
-      (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
         post: mockPost,
       }));
 
@@ -221,10 +221,10 @@ describe('Auth functions', () => {
 
   describe('getJWTToken', () => {
     it('should call APIClient.post with correct parameters', async () => {
-      const mockPost = jest
+      const mockPost = vi
         .fn()
         .mockResolvedValue({ access_token: 'test-jwt-token' });
-      (APIClient as unknown as jest.Mock).mockImplementation(() => ({
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
         post: mockPost,
       }));
 

@@ -13,7 +13,7 @@ describe('Voices', () => {
   describe('clone', () => {
     it('should clone a voice', async () => {
       const mockResponse = { data: { voice_id: 'test-voice-id' } };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const mockFile = {
         name: 'test.wav',
@@ -62,7 +62,7 @@ describe('Voices', () => {
           has_more: false,
         },
       };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const params = {
         filter_system_voice: true,

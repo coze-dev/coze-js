@@ -1,0 +1,14 @@
+{
+  "extends": "@coze-infra/ts-config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "outDir": "dist",
+    "types": ["vitest/globals"]
+  },
+  "include": ["src"]
+}

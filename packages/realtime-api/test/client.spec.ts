@@ -3,13 +3,21 @@ import VERTC from '@volcengine/rtc';
 import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
 
-jest.mock('@volcengine/rtc');
-jest.mock('@volcengine/rtc/extension-ainr', () =>
-  jest.fn().mockImplementation(() => ({
-    enable: jest.fn(),
-    disable: jest.fn(),
+vi.mock('@volcengine/rtc', async () => ({
+  default: {
+    createEngine: vi.fn(),
+    enumerateDevices: vi.fn(),
+    events: {},
+  },
+  MediaType: (await vi.importActual('@volcengine/rtc')).MediaType,
+}));
+
+vi.mock('@volcengine/rtc/extension-ainr', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    enable: vi.fn(),
+    disable: vi.fn(),
   })),
-);
+}));
 
 describe('EngineClient', () => {
   let client: EngineClient;
@@ -17,27 +25,28 @@ describe('EngineClient', () => {
 
   beforeEach(() => {
     mockEngine = {
-      on: jest.fn(),
-      off: jest.fn(),
-      joinRoom: jest.fn(),
-      startAudioCapture: jest.fn(),
-      unpublishStream: jest.fn(),
-      publishStream: jest.fn(),
-      leaveRoom: jest.fn(),
-      stopAudioCapture: jest.fn(),
-      stop: jest.fn(),
-      enableAudioPropertiesReport: jest.fn(),
-      startAudioPlaybackDeviceTest: jest.fn(),
-      stopAudioPlaybackDeviceTest: jest.fn(),
-      setAudioCaptureConfig: jest.fn(),
-      registerExtension: jest.fn(),
-      sendUserMessage: jest.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+      joinRoom: vi.fn(),
+      startAudioCapture: vi.fn(),
+      unpublishStream: vi.fn(),
+      publishStream: vi.fn(),
+      leaveRoom: vi.fn(),
+      stopAudioCapture: vi.fn(),
+      stop: vi.fn(),
+      enableAudioPropertiesReport: vi.fn(),
+      startAudioPlaybackDeviceTest: vi.fn(),
+      stopAudioPlaybackDeviceTest: vi.fn(),
+      setAudioCaptureConfig: vi.fn(),
+      registerExtension: vi.fn(),
+      sendUserMessage: vi.fn(),
     };
-    (VERTC.createEngine as jest.Mock).mockReturnValue(mockEngine);
-    (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([
+    (VERTC.createEngine as vi.Mock).mockReturnValue(mockEngine);
+    (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
       { deviceId: 'audio1', kind: 'audioinput' },
       { deviceId: 'audio2', kind: 'audioinput' },
     ]);
+
     client = new EngineClient('testAppId');
   });
 
@@ -90,7 +99,7 @@ describe('EngineClient', () => {
       expect(devices.audioInputs).toHaveLength(2);
     });
     it('should handle device enumeration errors', async () => {
-      (VERTC.enumerateDevices as jest.Mock).mockRejectedValue(
+      (VERTC.enumerateDevices as vi.Mock).mockRejectedValue(
         new Error('Enumeration failed'),
       );
       await expect(client.getDevices()).rejects.toThrow(Error);
@@ -104,7 +113,7 @@ describe('EngineClient', () => {
     });
 
     it('should throw error if no audio devices', async () => {
-      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([]);
+      (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([]);
       await expect(client.createLocalStream()).rejects.toThrow(
         RealtimeAPIError,
       );
