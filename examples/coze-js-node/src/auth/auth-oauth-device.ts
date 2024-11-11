@@ -7,7 +7,12 @@
  * The process involves obtaining a device code, displaying it to the user, and then polling for the access token.
  */
 
-import { APIError, getDeviceCode, getDeviceToken } from '@coze/api';
+import {
+  APIError,
+  getDeviceCode,
+  getDeviceToken,
+  refreshOAuthToken,
+} from '@coze/api';
 
 import config from '../config/config';
 import { sleep } from '../client';
@@ -47,6 +52,15 @@ while (true) {
     // If successful, log the token and exit the loop
     if (deviceToken.access_token) {
       console.log('deviceToken', deviceToken);
+
+      const refreshToken = deviceToken.refresh_token;
+      const refreshTokenResult = await refreshOAuthToken({
+        baseURL,
+        clientId,
+        refreshToken,
+      });
+      console.log('refreshTokenResult', refreshTokenResult);
+
       break;
     }
   } catch (error) {
