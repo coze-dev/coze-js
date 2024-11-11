@@ -38,8 +38,8 @@ jobs:
       - name: Build
         run: node common/scripts/install-run-rush.js build --verbose
 
-      - name: Test
-        run: node common/scripts/install-run-rush.js test --verbose
+      - name: Test:cov
+        run: node common/scripts/install-run-rush.js test:cov --verbose
 
       - name: Lint
         # for current stage, we got so much lint error, so we have to ignore it
