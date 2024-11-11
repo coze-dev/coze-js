@@ -20,7 +20,7 @@ export const defaultVitestConfig: ViteUserConfig = {
       all: true,
       exclude: coverageConfigDefaults.exclude,
       provider: 'v8',
-      reporter: ['text', 'html', 'clover', 'json', 'v8', 'istanbul'],
+      reporter: ['cobertura', 'text', 'html', 'clover', 'json', 'json-summary'],
     },
   },
 };

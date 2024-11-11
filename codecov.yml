@@ -1,0 +1,39 @@
+# valid this file: curl --data-binary @codecov.yml https://codecov.io/validate
+# reference doc: https://docs.codecov.com/docs/common-recipe-list#set-project-coverage-checks-on-a-pull-request
+
+codecov:
+  require_ci_to_pass: false
+  notify:
+    wait_for_ci: false
+
+comment:
+  layout: 'diff, components, files, header, footer'
+  behavior: default
+  require_changes: false # if true: only post the comment if coverage changes
+  require_base: false # [true :: must have a base report to post]
+  require_head: true # [true :: must have a head report to post]
+  hide_project_coverage: false # [true :: only show coverage on the git diff aka patch coverage]]
+
+# reference doc: https://docs.codecov.com/docs/components
+component_management:
+  default_rules: # default rules that will be inherited by all components
+    statuses:
+      - type: project # in this case every component that doens't have a status defined will have a project type one
+        target: auto
+        threshold: 1%
+        branches:
+          - '!main'
+      - type: patch
+        target: 100%
+        threshold: 1%
+
+  individual_components:
+    - component_id: coze-js # this is an identifier that should not be changed
+      name: coze-js # this is a display name, and can be changed freely
+      paths:
+        - packages/coze-js/**
+
+    - component_id: realtime-api # this is an identifier that should not be changed
+      name: realtime-api # this is a display name, and can be changed freely
+      paths:
+        - packages/realtime-api/**
