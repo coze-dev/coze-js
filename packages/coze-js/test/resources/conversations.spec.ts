@@ -13,7 +13,7 @@ describe('Conversations', () => {
   describe('create', () => {
     it('should create a conversation', async () => {
       const mockResponse = { data: { id: 'conversation-id' } };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         messages: [
@@ -43,7 +43,7 @@ describe('Conversations', () => {
       const mockResponse = {
         data: { id: 'conversation-id', meta_data: { key: 'value' } },
       };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const conversationId = 'conversation-id';
 

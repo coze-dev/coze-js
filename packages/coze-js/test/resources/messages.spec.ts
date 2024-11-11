@@ -34,7 +34,7 @@ describe('Messages', () => {
       };
 
       const mockResponse = { data: mockMessage };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: CreateMessageReq = {
         role: RoleType.User,
@@ -72,7 +72,7 @@ describe('Messages', () => {
       };
 
       const mockResponse = { message: mockMessage };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: UpdateMessageReq = {
         content: 'Updated message',
@@ -107,7 +107,7 @@ describe('Messages', () => {
       };
 
       const mockResponse = { data: mockMessage };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const result = await messages.retrieve('conv-1', 'msg-1');
 
@@ -157,7 +157,7 @@ describe('Messages', () => {
         has_more: false,
       };
 
-      jest.spyOn(client, 'post').mockResolvedValue(mockListData);
+      vi.spyOn(client, 'post').mockResolvedValue(mockListData);
 
       const params: ListMessageReq = {
         order: 'desc',
@@ -193,7 +193,7 @@ describe('Messages', () => {
       };
 
       const mockResponse = { data: [mockDeletedMessage] };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const result = await messages.delete('conv-1', 'msg-1');
 

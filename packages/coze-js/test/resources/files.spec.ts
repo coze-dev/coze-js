@@ -7,9 +7,9 @@ import {
 } from '../../src/resources/files/files';
 import { CozeAPI } from '../../src/index';
 
-jest.mock('axios', () => ({
-  ...jest.requireActual('axios'),
-  toFormData: jest.fn().mockImplementation(data => data),
+vi.mock('axios', () => ({
+  ...vi.importActual('axios'),
+  toFormData: vi.fn().mockImplementation(data => data),
 }));
 
 describe('Files', () => {
@@ -31,7 +31,7 @@ describe('Files', () => {
       };
 
       const mockResponse = { data: mockFileObject };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: CreateFileReq = {
         file: 'mock-file-content',
@@ -60,7 +60,7 @@ describe('Files', () => {
       };
 
       const mockResponse = { data: mockFileObject };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const fileId = 'file-1';
       const result = await files.retrieve(fileId);

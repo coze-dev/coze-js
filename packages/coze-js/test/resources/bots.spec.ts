@@ -13,7 +13,7 @@ describe('Bots', () => {
   describe('create', () => {
     it('should create a bot', async () => {
       const mockResponse = { data: { bot_id: 'test-bot-id' } };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         space_id: 'test-space-id',
@@ -35,7 +35,7 @@ describe('Bots', () => {
   describe('update', () => {
     it('should update a bot', async () => {
       const mockResponse = { data: undefined };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         bot_id: 'test-bot-id',
@@ -57,7 +57,7 @@ describe('Bots', () => {
   describe('list', () => {
     it('should list bots', async () => {
       const mockResponse = { data: { bots: [{ bot_id: 'test-bot-id' }] } };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const params = { space_id: 'test-space-id' };
 
@@ -76,7 +76,7 @@ describe('Bots', () => {
   describe('publish', () => {
     it('should publish a bot', async () => {
       const mockResponse = { data: undefined };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         bot_id: 'test-bot-id',
@@ -100,7 +100,7 @@ describe('Bots', () => {
       const mockResponse = {
         data: { bot_id: 'test-bot-id', name: 'Test Bot' },
       };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const params = { bot_id: 'test-bot-id' };
 

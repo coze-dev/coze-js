@@ -378,6 +378,10 @@
       "projectFolder": "config/ts-config"
     },
     {
+      "packageName": "@coze-infra/vitest-config",
+      "projectFolder": "config/vitest-config"
+    },
+    {
       "packageName": "@coze/api",
       "projectFolder": "packages/coze-js"
     },

@@ -5,8 +5,8 @@ import {
 } from '../../src/resources/audio/rooms/rooms';
 import { CozeAPI } from '../../src/index';
 
-jest.mock('../../src/utils', () => ({
-  isBrowser: jest.fn(),
+vi.mock('../../src/utils', () => ({
+  isBrowser: vi.fn(),
 }));
 
 describe('Rooms', () => {
@@ -28,7 +28,7 @@ describe('Rooms', () => {
       };
 
       const mockResponse = { data: mockCreateRoomData };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: CreateRoomReq = {
         bot_id: 'bot-123',
@@ -57,7 +57,7 @@ describe('Rooms', () => {
       };
 
       const mockResponse = { data: mockCreateRoomData };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: CreateRoomReq = {
         bot_id: 'bot-123',

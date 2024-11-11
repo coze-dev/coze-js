@@ -37,7 +37,7 @@ describe('Documents', () => {
       };
 
       const mockResponse = { document_infos: [mockDocumentInfo] };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: CreateDocumentReq = {
         dataset_id: 'dataset-id',
@@ -75,7 +75,7 @@ describe('Documents', () => {
   describe('update', () => {
     it('should update a document', async () => {
       const mockResponse = undefined;
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: UpdateDocumentReq = {
         document_id: 'doc-1',
@@ -100,7 +100,7 @@ describe('Documents', () => {
   describe('delete', () => {
     it('should delete documents', async () => {
       const mockResponse = undefined;
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: DeleteDocumentReq = {
         document_ids: ['doc-1', 'doc-2'],
@@ -156,7 +156,7 @@ describe('Documents', () => {
           },
         ],
       };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const params: ListDocumentReq = {
         dataset_id: 'dataset-id',

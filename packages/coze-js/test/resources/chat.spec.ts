@@ -15,7 +15,7 @@ describe('Chat', () => {
       const mockResponse = {
         data: { id: 'test-chat-id', conversation_id: 'test-conversation-id' },
       };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         bot_id: 'test-bot-id',
@@ -54,9 +54,11 @@ describe('Chat', () => {
         data: [{ id: 'test-message-id', content: 'Test message' }],
       };
 
-      jest.spyOn(client, 'post').mockResolvedValueOnce(createMockResponse);
-      jest.spyOn(client, 'post').mockResolvedValueOnce(retrieveMockResponse);
-      jest.spyOn(client, 'get').mockResolvedValueOnce(historyMockResponse);
+      vi.spyOn(client, 'post')
+        .mockResolvedValueOnce(createMockResponse)
+        .mockResolvedValueOnce(retrieveMockResponse);
+
+      vi.spyOn(client, 'get').mockResolvedValueOnce(historyMockResponse);
 
       const params = {
         bot_id: 'test-bot-id',
@@ -65,13 +67,15 @@ describe('Chat', () => {
 
       const result = await chat.createAndPoll(params);
 
-      expect(client.post).toHaveBeenCalledWith(
+      expect(client.post).toHaveBeenNthCalledWith(
+        1,
         '/v3/chat',
         { ...params, stream: false },
         false,
         undefined,
       );
-      expect(client.post).toHaveBeenCalledWith(
+      expect(client.post).toHaveBeenNthCalledWith(
+        2,
         '/v3/chat/retrieve?conversation_id=test-conversation-id&chat_id=test-chat-id',
         undefined,
         false,
@@ -100,7 +104,7 @@ describe('Chat', () => {
         yield { event: ChatEventType.DONE, data: '[DONE]' };
       };
 
-      jest.spyOn(client, 'post').mockResolvedValue(mockGenerator());
+      vi.spyOn(client, 'post').mockResolvedValue(mockGenerator());
 
       const params = {
         bot_id: 'test-bot-id',
@@ -127,7 +131,7 @@ describe('Chat', () => {
       const mockResponse = {
         data: { id: 'test-chat-id', conversation_id: 'test-conversation-id' },
       };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const result = await chat.retrieve(
         'test-conversation-id',
@@ -149,7 +153,7 @@ describe('Chat', () => {
       const mockResponse = {
         data: [{ id: 'test-message-id', content: 'Test message' }],
       };
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
 
       const result = await chat.messages.list(
         'test-conversation-id',
@@ -171,7 +175,7 @@ describe('Chat', () => {
       const mockResponse = {
         data: { id: 'test-chat-id', status: ChatStatus.FAILED },
       };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const result = await chat.cancel('test-conversation-id', 'test-chat-id');
 
@@ -190,7 +194,7 @@ describe('Chat', () => {
       const mockResponse = {
         data: { id: 'test-chat-id', status: ChatStatus.COMPLETED },
       };
-      jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params = {
         conversation_id: 'test-conversation-id',
@@ -223,7 +227,7 @@ describe('Chat', () => {
         yield { event: ChatEventType.DONE, data: '[DONE]' };
       };
 
-      jest.spyOn(client, 'post').mockResolvedValue(mockGenerator());
+      vi.spyOn(client, 'post').mockResolvedValue(mockGenerator());
 
       const params = {
         conversation_id: 'test-conversation-id',
