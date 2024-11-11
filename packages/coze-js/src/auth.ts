@@ -64,6 +64,12 @@ export const getPKCEAuthenticationUrl = async (
     code_challenge: codeChallenge,
     code_challenge_method: config.code_challenge_method || 'S256',
   });
+  if (config.workspace_id) {
+    return {
+      url: `${baseUrl}/api/permission/oauth2/workspace_id/${config.workspace_id}/authorize?${params.toString()}`,
+      codeVerifier,
+    };
+  }
   return {
     url: `${baseUrl}/api/permission/oauth2/authorize?${params.toString()}`,
     codeVerifier,
@@ -264,6 +270,7 @@ export interface WebAuthenticationConfig {
 
 export interface PKCEAuthenticationConfig extends WebAuthenticationConfig {
   code_challenge_method?: string;
+  workspace_id?: string;
 }
 
 export interface WebOAuthTokenConfig {

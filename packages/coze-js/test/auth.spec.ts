@@ -126,6 +126,18 @@ describe('Auth functions', () => {
       expect(url).toContain('&code_challenge_method=S256');
       expect(codeVerifier).toBeTruthy();
     });
+
+    it('should return the correct PKCE authentication URL with workspace_id', async () => {
+      const { url, codeVerifier } = await getPKCEAuthenticationUrl({
+        ...mockConfig,
+        workspace_id: '123',
+      });
+      expect(url).toContain(
+        'https://www.coze.com/api/permission/oauth2/workspace_id/123/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state&code_challenge=',
+      );
+      expect(url).toContain('&code_challenge_method=S256');
+      expect(codeVerifier).toBeTruthy();
+    });
   });
 
   describe('getOAuthToken', () => {
