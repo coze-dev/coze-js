@@ -8,6 +8,7 @@ import VERTC, {
   type UserMessageEvent,
 } from '@volcengine/rtc';
 
+import { getAudioDevices } from './utils';
 import { RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 
@@ -128,15 +129,31 @@ export class EngineClient extends RealtimeEventHandler {
     }
   }
 
-  async getDevices() {
-    const devices = await VERTC.enumerateDevices();
-    return {
-      audioInputs: devices.filter(i => i.deviceId && i.kind === 'audioinput'),
-    };
+  async setAudioInputDevice(deviceId: string) {
+    const devices = await getAudioDevices();
+    if (devices.audioInputs.findIndex(i => i.deviceId === deviceId) === -1) {
+      throw new RealtimeAPIError(
+        RealtimeError.DEVICE_ACCESS_ERROR,
+        `Audio input device not found: ${deviceId}`,
+      );
+    }
+    this.engine.stopAudioCapture();
+    await this.engine.startAudioCapture(deviceId);
+  }
+
+  async setAudioOutputDevice(deviceId: string) {
+    const devices = await getAudioDevices();
+    if (devices.audioOutputs.findIndex(i => i.deviceId === deviceId) === -1) {
+      throw new RealtimeAPIError(
+        RealtimeError.DEVICE_ACCESS_ERROR,
+        `Audio output device not found: ${deviceId}`,
+      );
+    }
+    await this.engine.setAudioPlaybackDevice(deviceId);
   }
 
   async createLocalStream() {
-    const devices = await this.getDevices();
+    const devices = await getAudioDevices();
     if (!devices.audioInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,

@@ -40,6 +40,7 @@ describe('EngineClient', () => {
       setAudioCaptureConfig: vi.fn(),
       registerExtension: vi.fn(),
       sendUserMessage: vi.fn(),
+      setAudioPlaybackDevice: vi.fn(),
     };
     (VERTC.createEngine as vi.Mock).mockReturnValue(mockEngine);
     (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
@@ -236,6 +237,58 @@ describe('EngineClient', () => {
     it('should call engine stopAudioPlaybackDeviceTest', async () => {
       await client.stopAudioPlaybackDeviceTest();
       expect(mockEngine.stopAudioPlaybackDeviceTest).toHaveBeenCalled();
+    });
+  });
+
+  describe('setAudioInputDevice', () => {
+    it('should set audio input device successfully', async () => {
+      const mockDevices = [
+        { deviceId: 'new-audio-input-id', kind: 'audioinput', label: 'Mic 1' },
+      ];
+
+      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
+
+      const deviceId = 'new-audio-input-id';
+      await client.setAudioInputDevice(deviceId);
+      expect(mockEngine.stopAudioCapture).toHaveBeenCalled();
+      expect(mockEngine.startAudioCapture).toHaveBeenCalledWith(deviceId);
+    });
+
+    it('should throw error if setting input device fails', async () => {
+      const deviceId = 'invalid-device';
+      mockEngine.startAudioCapture.mockRejectedValue(new Error('Device error'));
+
+      await expect(client.setAudioInputDevice(deviceId)).rejects.toThrow(
+        RealtimeAPIError,
+      );
+    });
+  });
+
+  describe('setAudioOutputDevice', () => {
+    it('should set audio output device successfully', async () => {
+      const mockDevices = [
+        {
+          deviceId: 'new-audio-output-id',
+          kind: 'audiooutput',
+          label: 'Speaker 1',
+        },
+      ];
+
+      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
+      const deviceId = 'new-audio-output-id';
+      await client.setAudioOutputDevice(deviceId);
+      expect(mockEngine.setAudioPlaybackDevice).toHaveBeenCalledWith(deviceId);
+    });
+
+    it('should throw error if setting output device fails', async () => {
+      const deviceId = 'invalid-device';
+      mockEngine.setAudioPlaybackDevice.mockRejectedValue(
+        new Error('Device error'),
+      );
+
+      await expect(client.setAudioOutputDevice(deviceId)).rejects.toThrow(
+        RealtimeAPIError,
+      );
     });
   });
 });
