@@ -11,6 +11,9 @@ export class Runs extends APIResource {
    * @param params.bot_id - Optional The ID of the bot associated with the workflow. | 可选 与工作流关联的机器人 ID。
    * @param params.parameters - Optional Parameters for the workflow execution. | 可选 工作流执行的参数。
    * @param params.ext - Optional Additional information for the workflow execution. | 可选 工作流执行的附加信息。
+   * @param params.execute_mode - Optional The mode in which to execute the workflow. | 可选 工作流执行的模式。
+   * @param params.connector_id - Optional The ID of the connector to use for the workflow. | 可选 用于工作流的连接器 ID。
+   * @param params.app_id - Optional The ID of the app.  | 可选 要进行会话聊天的 App ID
    * @returns RunWorkflowData | 工作流运行数据
    */
   async create(params: RunWorkflowReq, options?: RequestOptions) {
@@ -31,6 +34,9 @@ export class Runs extends APIResource {
    * @param params.bot_id - Optional The ID of the bot associated with the workflow. | 可选 与工作流关联的机器人 ID。
    * @param params.parameters - Optional Parameters for the workflow execution. | 可选 工作流执行的参数。
    * @param params.ext - Optional Additional information for the workflow execution. | 可选 工作流执行的附加信息。
+   * @param params.execute_mode - Optional The mode in which to execute the workflow. | 可选 工作流执行的模式。
+   * @param params.connector_id - Optional The ID of the connector to use for the workflow. | 可选 用于工作流的连接器 ID。
+   * @param params.app_id - Optional The ID of the app.  | 可选 要进行会话聊天的 App ID
    * @returns Stream<WorkflowEvent, { id: string; event: string; data: string }> | 工作流事件流
    */
   async *stream(params: RunWorkflowReq, options?: RequestOptions) {
@@ -68,7 +74,6 @@ export class Runs extends APIResource {
    * @param params.interrupt_type - Required The type of interruption to resume from. | 必选 要恢复的中断类型。
    * @returns { id: string; event: WorkflowEventType; data: WorkflowEventMessage | WorkflowEventInterrupt | WorkflowEventError | null } | 恢复的工作流事件数据
    */
-
   async resume(params: ResumeWorkflowReq, options?: RequestOptions) {
     const apiUrl = '/v1/workflow/stream_resume';
     const response = await this._client.post<
@@ -92,6 +97,9 @@ export interface RunWorkflowReq {
   bot_id?: string;
   parameters?: Record<string, unknown>;
   ext?: Record<string, string>;
+  execute_mode?: string;
+  connector_id?: string;
+  app_id?: string;
 }
 
 export interface RunWorkflowData {

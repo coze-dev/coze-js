@@ -1,5 +1,9 @@
 /* eslint-disable max-params */
-import { type AxiosRequestConfig, type AxiosResponseHeaders } from 'axios';
+import {
+  type AxiosRequestConfig,
+  type AxiosResponseHeaders,
+  type AxiosInstance,
+} from 'axios';
 
 import { getNodeClientUserAgent, getUserAgent } from './version.js';
 import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
@@ -11,7 +15,8 @@ import { COZE_COM_BASE_URL } from './constant.js';
 export type RequestOptions = Omit<
   AxiosRequestConfig,
   'url' | 'method' | 'baseURL' | 'data' | 'responseType'
->;
+> &
+  Record<string, unknown>;
 export interface ClientOptions {
   /** baseURL, default is https://api.coze.com, Use https://api.coze.cn if you use https://coze.cn */
   baseURL?: string;
@@ -19,10 +24,12 @@ export interface ClientOptions {
   token: string;
   /** see https://github.com/axios/axios?tab=readme-ov-file#request-config */
   axiosOptions?: RequestOptions;
+  /** Custom axios instance */
+  axiosInstance?: AxiosInstance | unknown;
   /** Whether to enable debug mode */
   debug?: boolean;
   /** Custom headers */
-  headers?: Headers | undefined;
+  headers?: Headers | Record<string, unknown>;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
   allowPersonalAccessTokenInBrowser?: boolean;
 }
@@ -32,15 +39,17 @@ export class APIClient {
   baseURL: string;
   token: string;
   axiosOptions?: RequestOptions;
+  axiosInstance?: AxiosInstance | unknown;
   debug: boolean;
   allowPersonalAccessTokenInBrowser: boolean;
-  headers?: Headers;
+  headers?: Headers | Record<string, unknown>;
 
   constructor(config: ClientOptions) {
     this._config = config;
     this.baseURL = config.baseURL || COZE_COM_BASE_URL;
     this.token = config.token;
     this.axiosOptions = config.axiosOptions || {};
+    this.axiosInstance = config.axiosInstance;
     this.debug = config.debug || false;
     this.allowPersonalAccessTokenInBrowser =
       config.allowPersonalAccessTokenInBrowser || false;
@@ -101,6 +110,7 @@ export class APIClient {
 
     const fetchOptions = this.buildOptions(method, body, options);
     fetchOptions.isStreaming = isStream;
+    fetchOptions.axiosInstance = this.axiosInstance;
 
     this.debugLog(`--- request url: ${fullUrl}`);
     this.debugLog('--- request options:', fetchOptions);
@@ -110,7 +120,9 @@ export class APIClient {
     this.debugLog(`--- response status: ${response.status}`);
     this.debugLog('--- response headers: ', response.headers);
 
-    const contentType = response.headers['content-type'];
+    // Taro use `header`
+    const contentType = (response.headers ??
+      (response as unknown as Record<string, string>).header)['content-type'];
 
     if (isStream) {
       if (contentType && contentType.includes('application/json')) {
