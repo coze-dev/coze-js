@@ -1,0 +1,26 @@
+{
+  "name": "@coze-infra/vitest-config",
+  "version": "0.0.1",
+  "author": "fanwenjie.fe@bytedance.com",
+  "maintainers": [],
+  "main": "src/index.js",
+  "types": "src/define-config.ts",
+  "scripts": {
+    "dev": "npm run build -- -w",
+    "lint": "eslint ./ --cache --quiet"
+  },
+  "dependencies": {
+    "vite-tsconfig-paths": "^4.2.1"
+  },
+  "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/ts-config": "workspace:*",
+    "@types/node": "^20",
+    "@vitejs/plugin-react": "~4.3.3",
+    "@vitest/coverage-v8": "~2.1.4",
+    "happy-dom": "~15.11.0",
+    "sucrase": "^3.32.0",
+    "typescript": "^5.5.3",
+    "vitest": "~2.1.4"
+  }
+}

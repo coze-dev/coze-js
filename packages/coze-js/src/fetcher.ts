@@ -73,6 +73,12 @@ export async function fetchAPI<ResultType>(
         while (true) {
           const { done, value } = await reader.next();
           if (done) {
+            if (buffer) {
+              // If the stream ends without a newline, it means an error occurred
+              fieldValues.event = 'error';
+              fieldValues.data = buffer;
+              yield fieldValues as ResultType;
+            }
             break;
           }
           buffer += decoder.decode(value, { stream: true });

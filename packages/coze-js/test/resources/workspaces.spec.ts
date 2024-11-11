@@ -6,9 +6,9 @@ import {
 } from '../../src/resources/workspaces/workspaces';
 import { CozeAPI } from '../../src/index';
 
-jest.mock('../../src/utils', () => ({
-  safeJsonParse: jest.fn(),
-  isBrowser: jest.fn(),
+vi.mock('../../src/utils', () => ({
+  safeJsonParse: vi.fn(),
+  isBrowser: vi.fn(),
 }));
 
 describe('Workspaces', () => {
@@ -43,8 +43,8 @@ describe('Workspaces', () => {
       };
 
       const mockResponse = JSON.stringify({ data: mockOpenSpaceData });
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
-      (utils.safeJsonParse as jest.Mock).mockReturnValue({
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      (utils.safeJsonParse as vi.Mock).mockReturnValue({
         data: mockOpenSpaceData,
       });
 
@@ -71,8 +71,8 @@ describe('Workspaces', () => {
       };
 
       const mockResponse = JSON.stringify({ data: mockOpenSpaceData });
-      jest.spyOn(client, 'get').mockResolvedValue(mockResponse);
-      (utils.safeJsonParse as jest.Mock).mockReturnValue({
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      (utils.safeJsonParse as vi.Mock).mockReturnValue({
         data: mockOpenSpaceData,
       });
 

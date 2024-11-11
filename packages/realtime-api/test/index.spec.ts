@@ -5,19 +5,19 @@ import {
 } from '../src/index.js';
 import { EngineClient } from '../src/client.js';
 
-jest.mock('../src/client.js');
-jest.mock('@volcengine/rtc/extension-ainr', () =>
-  jest.fn().mockImplementation(() => ({
-    enable: jest.fn(),
-    disable: jest.fn(),
+vi.mock('../src/client.js');
+vi.mock('@volcengine/rtc/extension-ainr', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    enable: vi.fn(),
+    disable: vi.fn(),
   })),
-);
+}));
 
-jest.mock('@coze/api', () => ({
-  CozeAPI: jest.fn().mockImplementation(() => ({
+vi.mock('@coze/api', () => ({
+  CozeAPI: vi.fn().mockImplementation(() => ({
     audio: {
       rooms: {
-        create: jest.fn().mockResolvedValue({
+        create: vi.fn().mockResolvedValue({
           app_id: 'test-app-id',
           room_id: 'test-room-id',
           uid: 'test-uid',
@@ -51,23 +51,23 @@ describe('RealtimeClient', () => {
   });
 
   describe('connect', () => {
-    let mockEngineClient: jest.Mocked<EngineClient>;
+    let mockEngineClient: vi.Mocked<EngineClient>;
 
     beforeEach(() => {
       mockEngineClient = {
-        joinRoom: jest.fn(),
-        createLocalStream: jest.fn(),
-        bindEngineEvents: jest.fn(),
-        on: jest.fn(),
-        enableAudioNoiseReduction: jest.fn(),
-        initAIAnsExtension: jest.fn(),
-        changeAIAnsExtension: jest.fn(),
+        joinRoom: vi.fn(),
+        createLocalStream: vi.fn(),
+        bindEngineEvents: vi.fn(),
+        on: vi.fn(),
+        enableAudioNoiseReduction: vi.fn(),
+        initAIAnsExtension: vi.fn(),
+        changeAIAnsExtension: vi.fn(),
       } as any;
-      (EngineClient as jest.Mock).mockImplementation(() => mockEngineClient);
+      (EngineClient as vi.Mock).mockImplementation(() => mockEngineClient);
     });
 
     it('should connect successfully', async () => {
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.connect();
 
@@ -93,7 +93,7 @@ describe('RealtimeClient', () => {
         suppressNonStationaryNoise: true,
       };
       client = new RealtimeClient(configWithNoise);
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.connect();
 
@@ -114,9 +114,9 @@ describe('RealtimeClient', () => {
 
   describe('interrupt', () => {
     it('should interrupt the conversation', async () => {
-      const mockStop = jest.fn();
+      const mockStop = vi.fn();
       (client as any)._client = { stop: mockStop };
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.interrupt();
 
@@ -127,9 +127,9 @@ describe('RealtimeClient', () => {
 
   describe('disconnect', () => {
     it('should disconnect from the session', async () => {
-      const mockDisconnect = jest.fn();
+      const mockDisconnect = vi.fn();
       (client as any)._client = { disconnect: mockDisconnect };
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.disconnect();
 
@@ -141,9 +141,9 @@ describe('RealtimeClient', () => {
 
   describe('setAudioEnable', () => {
     it('should enable audio', async () => {
-      const mockChangeAudioState = jest.fn();
+      const mockChangeAudioState = vi.fn();
       (client as any)._client = { changeAudioState: mockChangeAudioState };
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.setAudioEnable(true);
 
@@ -152,9 +152,9 @@ describe('RealtimeClient', () => {
     });
 
     it('should disable audio', async () => {
-      const mockChangeAudioState = jest.fn();
+      const mockChangeAudioState = vi.fn();
       (client as any)._client = { changeAudioState: mockChangeAudioState };
-      const dispatchSpy = jest.spyOn(client, 'dispatch');
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
 
       await client.setAudioEnable(false);
 
@@ -165,7 +165,7 @@ describe('RealtimeClient', () => {
 
   describe('enableAudioPropertiesReport', () => {
     it('should enable audio properties report in debug mode', async () => {
-      const mockEnableAudioPropertiesReport = jest.fn();
+      const mockEnableAudioPropertiesReport = vi.fn();
       (client as any)._client = {
         enableAudioPropertiesReport: mockEnableAudioPropertiesReport,
       };
@@ -182,7 +182,7 @@ describe('RealtimeClient', () => {
 
     it('should not enable audio properties report in non-debug mode', async () => {
       const nonDebugClient = new RealtimeClient({ ...config, debug: false });
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
       const result = await nonDebugClient.enableAudioPropertiesReport();
 
@@ -195,7 +195,7 @@ describe('RealtimeClient', () => {
 
   describe('startAudioPlaybackDeviceTest', () => {
     it('should start audio playback device test in debug mode', async () => {
-      const mockStartAudioPlaybackDeviceTest = jest.fn();
+      const mockStartAudioPlaybackDeviceTest = vi.fn();
       (client as any)._client = {
         startAudioPlaybackDeviceTest: mockStartAudioPlaybackDeviceTest,
       };
@@ -207,7 +207,7 @@ describe('RealtimeClient', () => {
 
     it('should not start audio playback device test in non-debug mode', async () => {
       const nonDebugClient = new RealtimeClient({ ...config, debug: false });
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
       await nonDebugClient.startAudioPlaybackDeviceTest();
 
@@ -219,7 +219,7 @@ describe('RealtimeClient', () => {
 
   describe('stopAudioPlaybackDeviceTest', () => {
     it('should stop audio playback device test in debug mode', async () => {
-      const mockStopAudioPlaybackDeviceTest = jest.fn();
+      const mockStopAudioPlaybackDeviceTest = vi.fn();
       (client as any)._client = {
         stopAudioPlaybackDeviceTest: mockStopAudioPlaybackDeviceTest,
       };
@@ -231,7 +231,7 @@ describe('RealtimeClient', () => {
 
     it('should not stop audio playback device test in non-debug mode', async () => {
       const nonDebugClient = new RealtimeClient({ ...config, debug: false });
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
 
       await nonDebugClient.stopAudioPlaybackDeviceTest();
 

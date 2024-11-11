@@ -11,23 +11,21 @@ Please refer to the root [README.md](../../README.md) for dependency installatio
 1. Create your configuration file:
 
 ```bash
-cp config.default.js config.js
+cp src/config/config.default.ts src/config/config.ts
 ```
 
-2. Update the following values in `config.js`:
-- `COZE_API_KEY`: Your Coze API key
+2. Update the following values in `config.ts`:
 - `COZE_BOT_ID`: Your bot ID
-- `COZE_SPACE_ID`: Your space ID（optional）
-- `COZE_WORKFLOW_ID`: Your workflow ID（optional）
 - `COZE_BASE_URL`: API base URL
+- `auth.pat.COZE_API_KEY`: Your Coze API key
 
 ### 3. Run the Example
 Choose one of the following commands based on your endpoint:
 
 ```bash
 # For China region (api.coze.cn)
-node chat.mjs
+COZE_ENV=zh npx tsx ./src/chat.ts
 
 # For Global region (api.coze.com)
-COZE_ENV=en node chat.mjs
+npx  tsx ./src/chat.ts
 ```

@@ -18,7 +18,7 @@ describe('Workflows', () => {
     describe('create', () => {
       it('should create a workflow run', async () => {
         const mockResponse = { data: { run_id: 'run-id' } };
-        jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+        vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
         const params: RunWorkflowReq = {
           workflow_id: 'workflow-id',
@@ -45,17 +45,17 @@ describe('Workflows', () => {
 
       beforeEach(() => {
         mockReader = {
-          read: jest.fn(),
+          read: vi.fn(),
         } as unknown as ReadableStreamDefaultReader;
 
         mockReadableStream = {
-          getReader: jest.fn().mockReturnValue(mockReader),
+          getReader: vi.fn().mockReturnValue(mockReader),
         } as unknown as ReadableStream;
       });
       it('should stream workflow run events', async () => {
-        jest
-          .spyOn(client, 'post')
-          .mockResolvedValue({ body: mockReadableStream });
+        vi.spyOn(client, 'post').mockResolvedValue({
+          body: mockReadableStream,
+        });
 
         const params: RunWorkflowReq = {
           workflow_id: 'workflow-id',
@@ -75,7 +75,7 @@ describe('Workflows', () => {
           event: WorkflowEventType.MESSAGE,
           data: { content: 'resumed content' },
         };
-        jest.spyOn(client, 'post').mockResolvedValue(mockResponse);
+        vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
         const params = {
           workflow_id: 'workflow-id',

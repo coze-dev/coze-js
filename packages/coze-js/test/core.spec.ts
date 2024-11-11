@@ -2,7 +2,7 @@ import { fetchAPI } from '../src/fetcher';
 import { APIError } from '../src/error';
 import { APIClient } from '../src/core';
 
-jest.mock('../src/fetcher');
+vi.mock('../src/fetcher');
 
 describe('APIClient', () => {
   const mockConfig = {
@@ -15,7 +15,7 @@ describe('APIClient', () => {
 
   beforeEach(() => {
     client = new APIClient(mockConfig);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('constructor', () => {
@@ -33,10 +33,8 @@ describe('APIClient', () => {
     };
 
     it('should make a successful request', async () => {
-      const mockJson = jest
-        .fn()
-        .mockResolvedValue({ code: 0, data: 'success' });
-      (fetchAPI as jest.Mock).mockResolvedValue({
+      const mockJson = vi.fn().mockResolvedValue({ code: 0, data: 'success' });
+      (fetchAPI as vi.Mock).mockResolvedValue({
         response: mockResponse,
         json: mockJson,
       });
@@ -55,10 +53,10 @@ describe('APIClient', () => {
     });
 
     it('should handle errors', async () => {
-      const mockJson = jest
+      const mockJson = vi
         .fn()
         .mockResolvedValue({ code: 400, msg: 'Bad Request' });
-      (fetchAPI as jest.Mock).mockResolvedValue({
+      (fetchAPI as vi.Mock).mockResolvedValue({
         response: { ...mockResponse, status: 400 },
         json: mockJson,
       });
@@ -69,8 +67,8 @@ describe('APIClient', () => {
     });
 
     it('should handle streaming responses', async () => {
-      const mockStream = jest.fn().mockReturnValue('stream-data');
-      (fetchAPI as jest.Mock).mockResolvedValue({
+      const mockStream = vi.fn().mockReturnValue('stream-data');
+      (fetchAPI as vi.Mock).mockResolvedValue({
         response: {
           ...mockResponse,
           headers: { 'content-type': 'application/octet-stream' },
@@ -86,7 +84,7 @@ describe('APIClient', () => {
 
   describe('HTTP methods', () => {
     beforeEach(() => {
-      jest.spyOn(client as any, 'makeRequest').mockResolvedValue('success');
+      vi.spyOn(client as any, 'makeRequest').mockResolvedValue('success');
     });
 
     it('should make a GET request', async () => {
@@ -136,14 +134,14 @@ describe('APIClient', () => {
 
   describe('debugLog', () => {
     it('should log when debug is true', () => {
-      const consoleSpy = jest.spyOn(console, 'debug').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation();
       client.debugLog('test message');
       expect(consoleSpy).toHaveBeenCalledWith('test message');
     });
 
     it('should not log when debug is false', () => {
       client.debug = false;
-      const consoleSpy = jest.spyOn(console, 'debug').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation();
       client.debugLog('test message');
       expect(consoleSpy).not.toHaveBeenCalled();
     });

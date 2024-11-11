@@ -123,7 +123,7 @@ export const refreshOAuthToken = async (
   options?: RequestOptions,
 ): Promise<OAuthToken> => {
   const api = new APIClient({
-    token: config.clientSecret,
+    token: config.clientSecret || '',
     baseURL: config.baseURL,
   });
   const apiUrl = '/api/permission/oauth2/token';
@@ -286,7 +286,7 @@ export interface RefreshOAuthTokenConfig {
   refreshToken: string;
   baseURL?: string;
   clientId: string;
-  clientSecret: string;
+  clientSecret?: string;
 }
 
 export interface DeviceCodeConfig {

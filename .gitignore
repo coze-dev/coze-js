@@ -164,4 +164,4 @@ dist
 
 # Temp file
 examples/coze-js-node/tmp/
-examples/coze-js-node/config.js
+examples/coze-js-node/src/config/config.ts

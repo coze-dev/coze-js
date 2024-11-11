@@ -5,7 +5,8 @@
     "rootDir": "./",
     "outDir": "./dist",
     "tsBuildInfoFile": "./dist/tsconfig.misc.tsbuildinfo",
-    "lib": ["es2015"]
+    "lib": ["es2015"],
+    "types": ["vitest/globals"]
   },
   "include": ["**/*.ts"],
   "exclude": ["src"]

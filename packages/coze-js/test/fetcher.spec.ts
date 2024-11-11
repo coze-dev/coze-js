@@ -3,13 +3,13 @@ import axios from 'axios';
 import { fetchAPI } from '../src/fetcher';
 import { TimeoutError, APIUserAbortError, CozeError } from '../src/error';
 
-jest.mock('axios');
+vi.mock('axios');
 
-const mockedAxios = jest.mocked(axios);
+const mockedAxios = vi.mocked(axios);
 
 describe('fetchAPI', () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should make a successful JSON request', async () => {
@@ -29,7 +29,7 @@ describe('fetchAPI', () => {
 
   it('should handle streaming requests', async () => {
     const mockStream = {
-      [Symbol.asyncIterator]: jest.fn().mockImplementation(function* () {
+      [Symbol.asyncIterator]: vi.fn().mockImplementation(function* () {
         yield new TextEncoder().encode('data: {"chunk": 1}\n\n');
         yield new TextEncoder().encode('data: {"chunk": 2}\n\n');
       }),

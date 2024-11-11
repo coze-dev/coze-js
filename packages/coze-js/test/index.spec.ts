@@ -7,7 +7,7 @@ describe('CozeAPI', () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should initialize with the correct API key', () => {
