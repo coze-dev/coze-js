@@ -1,5 +1,6 @@
 import VERTC from '@volcengine/rtc';
 
+import * as RealtimeUtils from '../src/utils';
 import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
 
@@ -96,14 +97,14 @@ describe('EngineClient', () => {
 
   describe('getDevices', () => {
     it('should return audio input devices', async () => {
-      const devices = await client.getDevices();
+      const devices = await RealtimeUtils.getAudioDevices();
       expect(devices.audioInputs).toHaveLength(2);
     });
     it('should handle device enumeration errors', async () => {
       (VERTC.enumerateDevices as vi.Mock).mockRejectedValue(
         new Error('Enumeration failed'),
       );
-      await expect(client.getDevices()).rejects.toThrow(Error);
+      await expect(RealtimeUtils.getAudioDevices()).rejects.toThrow(Error);
     });
   });
 

@@ -402,7 +402,7 @@ importers:
         version: link:../../packages/realtime-api
       '@pmmmwh/react-refresh-webpack-plugin':
         specifier: ^0.5.3
-        version: 0.5.15(react-refresh@0.11.0)(type-fest@0.21.3)(webpack-dev-server@4.15.2(webpack@5.95.0))(webpack@5.95.0)
+        version: 0.5.15(react-refresh@0.11.0)(type-fest@0.21.3)(webpack-dev-server@4.15.2(webpack@5.95.0(@swc/core@1.7.39)))(webpack@5.95.0(@swc/core@1.7.39))
       '@svgr/webpack':
         specifier: ^5.5.0
         version: 5.5.0
@@ -414,7 +414,7 @@ importers:
         version: 27.5.1(@babel/core@7.25.9)
       babel-loader:
         specifier: ^8.2.3
-        version: 8.4.1(@babel/core@7.25.9)(webpack@5.95.0)
+        version: 8.4.1(@babel/core@7.25.9)(webpack@5.95.0(@swc/core@1.7.39))
       babel-plugin-named-asset-import:
         specifier: ^0.3.8
         version: 0.3.8(@babel/core@7.25.9)
@@ -435,10 +435,10 @@ importers:
         version: 2.4.0
       css-loader:
         specifier: ^6.5.1
-        version: 6.11.0(webpack@5.95.0)
+        version: 6.11.0(webpack@5.95.0(@swc/core@1.7.39))
       css-minimizer-webpack-plugin:
         specifier: ^3.2.0
-        version: 3.4.1(webpack@5.95.0)
+        version: 3.4.1(webpack@5.95.0(@swc/core@1.7.39))
       dotenv:
         specifier: ^10.0.0
         version: 10.0.0
@@ -447,19 +447,19 @@ importers:
         version: 5.1.0
       file-loader:
         specifier: ^6.2.0
-        version: 6.2.0(webpack@5.95.0)
+        version: 6.2.0(webpack@5.95.0(@swc/core@1.7.39))
       fs-extra:
         specifier: ^10.0.0
         version: 10.1.0
       html-webpack-plugin:
         specifier: ^5.5.0
-        version: 5.6.3(webpack@5.95.0)
+        version: 5.6.3(webpack@5.95.0(@swc/core@1.7.39))
       identity-obj-proxy:
         specifier: ^3.0.0
         version: 3.0.0
       mini-css-extract-plugin:
         specifier: ^2.4.5
-        version: 2.9.1(webpack@5.95.0)
+        version: 2.9.1(webpack@5.95.0(@swc/core@1.7.39))
       postcss:
         specifier: ^8.4.4
         version: 8.4.47
@@ -468,7 +468,7 @@ importers:
         version: 5.0.2(postcss@8.4.47)
       postcss-loader:
         specifier: ^6.2.1
-        version: 6.2.1(postcss@8.4.47)(webpack@5.95.0)
+        version: 6.2.1(postcss@8.4.47)(webpack@5.95.0(@swc/core@1.7.39))
       postcss-normalize:
         specifier: ^10.0.1
         version: 10.0.1(browserslist@4.24.2)(postcss@8.4.47)
@@ -486,7 +486,7 @@ importers:
         version: 3.0.0
       react-dev-utils:
         specifier: ^12.0.1
-        version: 12.0.1(eslint@8.57.1)(typescript@5.6.3)(webpack@5.95.0)
+        version: 12.0.1(eslint@8.57.1)(typescript@5.6.3)(webpack@5.95.0(@swc/core@1.7.39))
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -501,37 +501,37 @@ importers:
         version: 4.0.0
       sass-loader:
         specifier: ^12.3.0
-        version: 12.6.0(webpack@5.95.0)
+        version: 12.6.0(webpack@5.95.0(@swc/core@1.7.39))
       semver:
         specifier: ^7.3.5
         version: 7.6.3
       source-map-loader:
         specifier: ^3.0.0
-        version: 3.0.2(webpack@5.95.0)
+        version: 3.0.2(webpack@5.95.0(@swc/core@1.7.39))
       style-loader:
         specifier: ^3.3.1
-        version: 3.3.4(webpack@5.95.0)
+        version: 3.3.4(webpack@5.95.0(@swc/core@1.7.39))
       tailwindcss:
         specifier: ^3.0.2
-        version: 3.4.14
+        version: 3.4.14(ts-node@10.9.2(@swc/core@1.7.39)(@types/node@20.16.15)(typescript@5.6.3))
       terser-webpack-plugin:
         specifier: ^5.2.5
-        version: 5.3.10(webpack@5.95.0)
+        version: 5.3.10(@swc/core@1.7.39)(webpack@5.95.0(@swc/core@1.7.39))
       web-vitals:
         specifier: ^2.1.4
         version: 2.1.4
       webpack:
         specifier: ^5.64.4
-        version: 5.95.0
+        version: 5.95.0(@swc/core@1.7.39)
       webpack-dev-server:
         specifier: ^4.6.0
-        version: 4.15.2(webpack@5.95.0)
+        version: 4.15.2(webpack@5.95.0(@swc/core@1.7.39))
       webpack-manifest-plugin:
         specifier: ^4.0.2
-        version: 4.1.1(webpack@5.95.0)
+        version: 4.1.1(webpack@5.95.0(@swc/core@1.7.39))
       workbox-webpack-plugin:
         specifier: ^6.4.1
-        version: 6.6.0(@types/babel__core@7.20.5)(webpack@5.95.0)
+        version: 6.6.0(@types/babel__core@7.20.5)(webpack@5.95.0(@swc/core@1.7.39))
     devDependencies:
       '@coze-infra/eslint-config':
         specifier: workspace:*
