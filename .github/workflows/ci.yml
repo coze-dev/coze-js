@@ -42,7 +42,7 @@ jobs:
         run: node common/scripts/install-run-rush.js test:cov --verbose
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v4
         with:
           files: packages/coze-js/coverage/coverage-final.json,packages/realtime-api/coverage/coverage-final.json
           token: ${{ secrets.CODECOV_TOKEN }}
