@@ -38,8 +38,17 @@ jobs:
       - name: Build
         run: node common/scripts/install-run-rush.js build --verbose
 
-      - name: Test
-        run: node common/scripts/install-run-rush.js test --verbose
+      - name: Test:cov
+        run: node common/scripts/install-run-rush.js test:cov --verbose
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4.2.0
+        with:
+          files: packages/coze-js/coverage/coverage-final.json,packages/realtime-api/coverage/coverage-final.json
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Lint
         # for current stage, we got so much lint error, so we have to ignore it
