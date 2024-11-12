@@ -179,6 +179,7 @@ const VoiceClone: React.FC<{
                   const mediaRecorder =
                     await navigator.mediaDevices.getUserMedia({
                       audio: true,
+                      video: false,
                     });
                   const recorder = new MediaRecorder(mediaRecorder);
                   setMediaRecorderState(mediaRecorder);

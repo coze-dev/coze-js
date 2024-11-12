@@ -9,6 +9,8 @@ export enum RealtimeError {
   NETWORK_ERROR = 'NETWORK_ERROR',
   INVALID_STATE = 'INVALID_STATE',
   CREATE_ROOM_ERROR = 'CREATE_ROOM_ERROR',
+  PARSE_MESSAGE_ERROR = 'PARSE_MESSAGE_ERROR',
+  HANDLER_MESSAGE_ERROR = 'HANDLER_MESSAGE_ERROR',
 }
 export const ErrorMessages: Record<RealtimeError, string> = {
   [RealtimeError.DEVICE_ACCESS_ERROR]: 'Failed to get devices',
@@ -22,6 +24,8 @@ export const ErrorMessages: Record<RealtimeError, string> = {
   [RealtimeError.NETWORK_ERROR]: 'Network connection error occurred',
   [RealtimeError.INVALID_STATE]: 'Operation invalid in current state',
   [RealtimeError.CREATE_ROOM_ERROR]: 'Failed to create room',
+  [RealtimeError.PARSE_MESSAGE_ERROR]: 'Failed to parse message',
+  [RealtimeError.HANDLER_MESSAGE_ERROR]: 'Failed to handle message',
 };
 
 export class RealtimeAPIError extends Error {

@@ -26,7 +26,6 @@ export interface RealtimeClientConfig {
 class RealtimeClient extends RealtimeEventHandler {
   private _config: RealtimeClientConfig;
   private _client: EngineClient | null = null;
-  private _roomInfo: CreateRoomData | null = null;
   public isConnected = false;
   private _api: CozeAPI;
   private _isTestEnv = false;
@@ -101,8 +100,6 @@ class RealtimeClient extends RealtimeEventHandler {
         error instanceof Error ? error.message : 'Unknown error',
       );
     }
-
-    this._roomInfo = roomInfo;
 
     // Step2 create engine
     this._client = new EngineClient(

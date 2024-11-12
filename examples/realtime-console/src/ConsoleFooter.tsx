@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, message, Typography, Select } from 'antd';
 import {
@@ -8,8 +8,10 @@ import {
 } from '@coze/realtime-api';
 import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 
-import MessageForm from './MessageForm';
+import MessageForm, { type MessageFormRef } from './MessageForm';
+
 import './App.css';
+import { ChatEventType } from '@coze/api';
 
 const { Text, Link } = Typography;
 
@@ -53,6 +55,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   const [outputDeviceOptions, setOutputDeviceOptions] = useState<
     { label: string; value: string }[]
   >([]);
+  const formRef = useRef<MessageFormRef>(null);
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkPermission().then(isDeviceEnable => {
@@ -105,6 +108,51 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
     getDevices();
   }, []);
+
+  useEffect(() => {
+    if (!clientRef.current) {
+      return;
+    }
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const onMessage = (event: string, data: any) => {
+      const functionCall =
+        data?.data?.required_action?.submit_tool_outputs?.tool_calls?.[0]
+          ?.function;
+      formRef.current?.showModal(
+        JSON.stringify(
+          {
+            id: '1',
+            event_type: 'conversation.chat.submit_tool_outputs',
+            data: {
+              chat_id: data?.data?.id,
+              tool_outputs: [
+                {
+                  tool_call_id:
+                    data?.data?.required_action?.submit_tool_outputs
+                      ?.tool_calls?.[0]?.id,
+                  output: '',
+                },
+              ],
+            },
+          },
+          null,
+          2,
+        ),
+        JSON.stringify(functionCall, null, 2),
+      );
+    };
+    const eventName = `server.${ChatEventType.CONVERSATION_CHAT_REQUIRES_ACTION}`;
+    clientRef.current.on(eventName, onMessage);
+
+    return () => {
+      try {
+        clientRef.current?.off(eventName, onMessage);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+  }, [clientRef.current]);
 
   const handleRefreshMicrophone = () => {
     checkMicrophonePermission();
@@ -257,7 +305,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
           s)
         </Button>
         <div style={{ marginTop: '10px' }}></div>
-        <MessageForm onSubmit={handleSendMessage} />
+        <MessageForm onSubmit={handleSendMessage} ref={formRef} />
         <Button
           type="primary"
           style={{ marginRight: '10px', marginLeft: '10px' }}

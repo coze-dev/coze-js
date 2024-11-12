@@ -9,7 +9,7 @@ import VERTC, {
 } from '@volcengine/rtc';
 
 import { getAudioDevices } from './utils';
-import { RealtimeEventHandler } from './event-handler';
+import { EventNames, RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 
 export class EngineClient extends RealtimeEventHandler {
@@ -73,29 +73,52 @@ export class EngineClient extends RealtimeEventHandler {
     }
   }
 
+  _parseMessage(event: UserMessageEvent) {
+    try {
+      return JSON.parse(event.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
+      throw new RealtimeAPIError(
+        RealtimeError.PARSE_MESSAGE_ERROR,
+        e?.message || 'Unknown error',
+      );
+    }
+  }
+
   handleMessage(event: UserMessageEvent) {
     try {
-      const message = JSON.parse(event.message);
+      const message = this._parseMessage(event);
       this.dispatch(`server.${message.event_type}`, message);
     } catch (e) {
-      this.dispatch('client.error', {
-        message: `Failed to parse message: ${event.message}`,
-        error: e,
-      });
+      if (e instanceof RealtimeAPIError) {
+        if (e.code === RealtimeError.PARSE_MESSAGE_ERROR) {
+          this.dispatch(EventNames.ERROR, {
+            message: `Failed to parse message: ${event.message}`,
+            error: e,
+          });
+        } else if (e.code === RealtimeError.HANDLER_MESSAGE_ERROR) {
+          this.dispatch(EventNames.ERROR, {
+            message: `Failed to handle message: ${event.message}`,
+            error: e,
+          });
+        }
+      } else {
+        this.dispatch(EventNames.ERROR, e);
+      }
     }
   }
 
   handleEventError(e: unknown) {
-    this.dispatch('client.error', e);
+    this.dispatch(EventNames.ERROR, e);
   }
 
   handleUserJoin(event: onUserJoinedEvent) {
     this.joinUserId = event.userInfo.userId;
-    this.dispatch('server.bot.join', event);
+    this.dispatch(EventNames.BOT_JOIN, event);
   }
 
   handleUserLeave(event: onUserLeaveEvent) {
-    this.dispatch('server.bot.leave', event);
+    this.dispatch(EventNames.BOT_LEAVE, event);
   }
 
   async joinRoom(options: {
@@ -171,7 +194,7 @@ export class EngineClient extends RealtimeEventHandler {
       await this.engine.leaveRoom();
       this.removeEventListener();
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
@@ -184,7 +207,7 @@ export class EngineClient extends RealtimeEventHandler {
         await this.engine.unpublishStream(MediaType.AUDIO);
       }
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
@@ -201,7 +224,7 @@ export class EngineClient extends RealtimeEventHandler {
       );
       this._log(`interrupt ${this.joinUserId} ${result}`);
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
@@ -216,7 +239,7 @@ export class EngineClient extends RealtimeEventHandler {
         `sendMessage ${this.joinUserId} ${JSON.stringify(message)} ${result}`,
       );
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
@@ -264,7 +287,7 @@ export class EngineClient extends RealtimeEventHandler {
     try {
       await this.engine.startAudioPlaybackDeviceTest('audio-test.wav', 200);
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
@@ -273,7 +296,7 @@ export class EngineClient extends RealtimeEventHandler {
     try {
       this.engine.stopAudioPlaybackDeviceTest();
     } catch (e) {
-      this.dispatch('client.error', e);
+      this.dispatch(EventNames.ERROR, e);
       throw e;
     }
   }
