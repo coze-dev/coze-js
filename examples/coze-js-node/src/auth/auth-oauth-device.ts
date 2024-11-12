@@ -49,10 +49,10 @@ while (true) {
       deviceCode: deviceCode.device_code,
     });
 
-    // If successful, log the token and exit the loop
     if (deviceToken.access_token) {
       console.log('deviceToken', deviceToken);
 
+      // You can refresh the access token if it expires
       const refreshToken = deviceToken.refresh_token;
       const refreshTokenResult = await refreshOAuthToken({
         baseURL,

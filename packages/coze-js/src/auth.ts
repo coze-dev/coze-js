@@ -64,9 +64,9 @@ export const getPKCEAuthenticationUrl = async (
     code_challenge: codeChallenge,
     code_challenge_method: config.code_challenge_method || 'S256',
   });
-  if (config.workspace_id) {
+  if (config.workspaceId) {
     return {
-      url: `${baseUrl}/api/permission/oauth2/workspace_id/${config.workspace_id}/authorize?${params.toString()}`,
+      url: `${baseUrl}/api/permission/oauth2/workspace_id/${config.workspaceId}/authorize?${params.toString()}`,
       codeVerifier,
     };
   }
@@ -157,7 +157,12 @@ export const getDeviceCode = async (
   }
   const api = new APIClient({ token: '', baseURL: config.baseURL });
 
-  const apiUrl = '/api/permission/oauth2/device/code';
+  let apiUrl;
+  if (config.workspaceId) {
+    apiUrl = `/api/permission/oauth2/workspace_id/${config.workspaceId}/device/code`;
+  } else {
+    apiUrl = '/api/permission/oauth2/device/code';
+  }
   const payload = {
     client_id: config.clientId,
   };
@@ -270,7 +275,7 @@ export interface WebAuthenticationConfig {
 
 export interface PKCEAuthenticationConfig extends WebAuthenticationConfig {
   code_challenge_method?: string;
-  workspace_id?: string;
+  workspaceId?: string;
 }
 
 export interface WebOAuthTokenConfig {
@@ -299,6 +304,7 @@ export interface RefreshOAuthTokenConfig {
 export interface DeviceCodeConfig {
   baseURL?: string;
   clientId: string;
+  workspaceId?: string;
 }
 
 export interface DeviceTokenConfig {
