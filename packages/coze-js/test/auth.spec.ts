@@ -126,6 +126,18 @@ describe('Auth functions', () => {
       expect(url).toContain('&code_challenge_method=S256');
       expect(codeVerifier).toBeTruthy();
     });
+
+    it('should return the correct PKCE authentication URL with workspaceId', async () => {
+      const { url, codeVerifier } = await getPKCEAuthenticationUrl({
+        ...mockConfig,
+        workspaceId: '123',
+      });
+      expect(url).toContain(
+        'https://www.coze.com/api/permission/oauth2/workspace_id/123/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state&code_challenge=',
+      );
+      expect(url).toContain('&code_challenge_method=S256');
+      expect(codeVerifier).toBeTruthy();
+    });
   });
 
   describe('getOAuthToken', () => {
@@ -178,6 +190,29 @@ describe('Auth functions', () => {
       });
       expect(mockPost).toHaveBeenCalledWith(
         '/api/permission/oauth2/device/code',
+        {
+          client_id: mockConfig.clientId,
+        },
+        false,
+        undefined,
+      );
+    });
+    it('should return the correct device code with workspaceId', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ device_code: 'test-device-code' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await getDeviceCode({
+        clientId: mockConfig.clientId,
+        baseURL: mockConfig.baseURL,
+        workspaceId: '123',
+      });
+
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/workspace_id/123/device/code',
         {
           client_id: mockConfig.clientId,
         },
