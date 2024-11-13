@@ -4,13 +4,9 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
+    "lint": "eslint --cache --quiet",
     "start": "node scripts/start.js",
     "test": "exit 0"
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
   },
   "browserslist": {
     "production": [

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
+    "lint": "eslint --cache --quiet",
     "start": "node scripts/start.js"
   },
   "browserslist": {
@@ -16,12 +17,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
     ]
   },
   "dependencies": {
@@ -72,16 +67,11 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
     "@types/jest": "^29.2.2",
     "@types/node": "^20",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.3",
-    "@coze-infra/eslint-config": "workspace:*"
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
+    "typescript": "^5.5.3"
   }
 }
