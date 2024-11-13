@@ -15,7 +15,9 @@ import {
   RealtimeAPIError,
   EventNames,
 } from '@coze/realtime-api';
+import { type APIError } from '@coze/api';
 
+import { useAccessToken } from './use-access-token';
 import Settings from './Settings';
 import logo from './logo.svg';
 import ConsoleFooter from './ConsoleFooter';
@@ -40,6 +42,10 @@ const RealtimeConsole: React.FC = () => {
   const eventsEndRef = useRef<HTMLDivElement>(null);
   const serverEventsEndRef = useRef<HTMLDivElement>(null);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(true);
+
+  const { getOrRefreshToken } = useAccessToken(
+    localStorage.getItem('baseURL') || 'https://api.coze.cn',
+  );
 
   const handleSaveSettings = () => {
     if (clientRef.current) {
@@ -92,7 +98,7 @@ const RealtimeConsole: React.FC = () => {
     clientRef.current = client;
   };
 
-  const handleConnect = async () => {
+  const handleConnect = async (reconnect = true) => {
     handleInitClient();
 
     if (!clientRef.current) {
@@ -106,6 +112,15 @@ const RealtimeConsole: React.FC = () => {
     } catch (e: unknown) {
       if (e instanceof RealtimeAPIError) {
         message.error(`Failed to connect: ${e.message}`);
+
+        // Refresh token when auth failed
+        if ((e.error as APIError)?.code === 4100 && reconnect) {
+          const newAccessToken = await getOrRefreshToken(true);
+          if (newAccessToken) {
+            clientRef.current = null;
+            handleConnect(false);
+          }
+        }
       } else if (e instanceof Error) {
         message.error(`An error occurred: ${e.message}`);
       } else {

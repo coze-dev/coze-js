@@ -98,6 +98,7 @@ class RealtimeClient extends RealtimeEventHandler {
       throw new RealtimeAPIError(
         RealtimeError.CREATE_ROOM_ERROR,
         error instanceof Error ? error.message : 'Unknown error',
+        error,
       );
     }
 

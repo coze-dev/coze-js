@@ -29,11 +29,17 @@ export const ErrorMessages: Record<RealtimeError, string> = {
 };
 
 export class RealtimeAPIError extends Error {
-  constructor(
-    public code: RealtimeError,
-    message: string,
-  ) {
+  public code: RealtimeError;
+  public error?: unknown;
+  /**
+   * @param code - Error code
+   * @param message - Error message
+   * @param error - Error object
+   */
+  constructor(code: RealtimeError, message: string, error?: unknown) {
     super(`[${code}] ${message}`);
     this.name = 'RealtimeAPIError';
+    this.code = code;
+    this.error = error;
   }
 }
