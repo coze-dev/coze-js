@@ -42,6 +42,21 @@ export enum EventNames {
    */
   AUDIO_MUTED = 'client.audio.muted',
   /**
+   * en: Client video on
+   * zh: 客户端视频开启
+   */
+  VIDEO_ON = 'client.video.on',
+  /**
+   * en: Client video off
+   * zh: 客户端视频关闭
+   */
+  VIDEO_OFF = 'client.video.off',
+  /**
+   * en: Client video event
+   * zh: 客户端视频事件
+   */
+  PLAYER_EVENT = 'client.video.event',
+  /**
    * en: Client error
    * zh: 客户端错误
    */

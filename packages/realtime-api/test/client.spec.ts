@@ -61,14 +61,14 @@ describe('EngineClient', () => {
   describe('bindEngineEvents', () => {
     it('should bind engine events', () => {
       client.bindEngineEvents();
-      expect(mockEngine.on).toHaveBeenCalledTimes(4);
+      expect(mockEngine.on).toHaveBeenCalledTimes(5);
     });
   });
 
   describe('removeEventListener', () => {
     it('should remove engine event listeners', () => {
       client.removeEventListener();
-      expect(mockEngine.off).toHaveBeenCalledTimes(4);
+      expect(mockEngine.off).toHaveBeenCalledTimes(5);
     });
   });
 

@@ -56,9 +56,13 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     { label: string; value: string }[]
   >([]);
   const formRef = useRef<MessageFormRef>(null);
+  const isShowVideo = !window.location.href.includes('coze.cn');
 
   const checkMicrophonePermission = () => {
-    RealtimeUtils.checkPermission().then(isDeviceEnable => {
+    RealtimeUtils.checkPermission({
+      audio: true,
+      video: isShowVideo,
+    }).then(isDeviceEnable => {
       if (isDeviceEnable) {
         setMicrophoneStatus('normal');
       } else {

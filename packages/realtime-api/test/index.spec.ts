@@ -76,6 +76,7 @@ describe('RealtimeClient', () => {
         roomId: 'test-room-id',
         uid: 'test-uid',
         audioMutedDefault: false,
+        videoOnDefault: true,
       });
       expect(mockEngineClient.createLocalStream).toHaveBeenCalled();
       expect(mockEngineClient.bindEngineEvents).toHaveBeenCalled();

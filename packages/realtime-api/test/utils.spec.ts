@@ -46,6 +46,8 @@ describe('Utils', () => {
         audioOutputs: [
           { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
         ],
+        videoInputs: [{ deviceId: '3', kind: 'videoinput', label: 'Camera 1' }],
+        videoOutputs: [],
       });
 
       expect(VERTC.enumerateDevices).toHaveBeenCalled();
@@ -59,6 +61,8 @@ describe('Utils', () => {
       expect(result).toEqual({
         audioInputs: [],
         audioOutputs: [],
+        videoInputs: [],
+        videoOutputs: [],
       });
     });
   });

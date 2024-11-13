@@ -50,3 +50,8 @@
   background-color: #52c41a;
   border-color: #52c41a;
 }
+
+.player-container {
+  width: 400px;
+  padding-left: 20px;
+}

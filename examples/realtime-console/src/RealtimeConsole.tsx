@@ -19,6 +19,7 @@ import { type APIError } from '@coze/api';
 
 import { useAccessToken } from './use-access-token';
 import Settings from './Settings';
+import Player from './Player';
 import logo from './logo.svg';
 import ConsoleFooter from './ConsoleFooter';
 
@@ -42,6 +43,7 @@ const RealtimeConsole: React.FC = () => {
   const eventsEndRef = useRef<HTMLDivElement>(null);
   const serverEventsEndRef = useRef<HTMLDivElement>(null);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(true);
+  const isShowVideo = !window.location.href.includes('coze.cn');
 
   const { getOrRefreshToken } = useAccessToken(
     localStorage.getItem('baseURL') || 'https://api.coze.cn',
@@ -90,6 +92,12 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
+      videoConfig: isShowVideo
+        ? {
+            renderDom: 'local-player',
+            videoOnDefault: localStorage.getItem('videoState') === 'true',
+          }
+        : undefined,
     });
 
     // Subscribe to all client and server events
@@ -256,6 +264,7 @@ const RealtimeConsole: React.FC = () => {
           isMicrophoneOn={isMicrophoneOn}
         />
       </Footer>
+      {isShowVideo && <Player clientRef={clientRef} />}
       <Content style={{ padding: '20px' }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>
