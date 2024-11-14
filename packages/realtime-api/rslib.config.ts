@@ -28,7 +28,10 @@ export default defineConfig({
         distPath: './dist/types',
       },
     },
+    {
+      ...getLibShared('umd'),
+      umdName: 'CozeRealtimeApi',
+    },
     getLibShared('cjs'),
-    getLibShared('umd'),
   ],
 });

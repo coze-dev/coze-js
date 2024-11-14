@@ -27,7 +27,10 @@ export default defineConfig({
         distPath: './dist/types',
       },
     },
+    {
+      ...getLibShared('umd'),
+      umdName: 'CozeJs',
+    },
     getLibShared('cjs'),
-    getLibShared('umd'),
   ],
 });
