@@ -41,16 +41,16 @@ jobs:
       - name: Test:cov
         run: node common/scripts/install-run-rush.js test:cov --verbose
 
-      - name: Get coverage files
-        id: coverage_files
-        run: |
-          files=$(find packages -name "coverage-final.json" | tr '\n' ',' | sed 's/,$//')
-          echo "files=$files" >> "$GITHUB_OUTPUT"
+      # - name: Get coverage files
+      #   id: coverage_files
+      #   run: |
+      #     files=$(find packages -name "coverage-final.json" | tr '\n' ',' | sed 's/,$//')
+      #     echo "files=$files" >> "$GITHUB_OUTPUT"
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         with:
-          files: ${{ steps.coverage_files.outputs.files }}
+          # files: ${{ steps.coverage_files.outputs.files }}
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
           fail_ci_if_error: true
