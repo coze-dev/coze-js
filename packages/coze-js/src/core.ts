@@ -1,7 +1,7 @@
 /* eslint-disable max-params */
 import { type AxiosRequestConfig, type AxiosResponseHeaders } from 'axios';
 
-import { getUserAgent } from './version.js';
+import { getNodeClientUserAgent, getUserAgent } from './version.js';
 import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
 import { type FetchAPIOptions, fetchAPI } from './fetcher.js';
 import { APIError, type ErrorRes } from './error.js';
@@ -78,7 +78,10 @@ export class APIClient {
     };
 
     if (!isBrowser()) {
-      headers['user-agent'] = getUserAgent();
+      headers['User-Agent'] = getUserAgent();
+      headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
+    } else {
+      // headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     }
 
     const config = mergeConfig(this.axiosOptions, options, { headers });
