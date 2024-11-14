@@ -1,4 +1,4 @@
-# Monorepo of Coze Orz
+# Monorepo of Coze Orz [![codecov](https://codecov.io/gh/coze-dev/coze-js/graph/badge.svg?token=W5EBMZ0NUE)](https://codecov.io/gh/coze-dev/coze-js) ![ci](https://github.com/coze-dev/coze-js/actions/workflows/ci.yml/badge.svg)
 
 ```
 _____________________________________
