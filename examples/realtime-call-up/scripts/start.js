@@ -76,7 +76,7 @@ checkBrowsers(paths.appPath, isInteractive)
     choosePort(HOST, DEFAULT_PORT),
   )
   .then(port => {
-    if (port === null) {
+    if (port === null || port === undefined) {
       // We have not found a port.
       return;
     }
