@@ -228,10 +228,10 @@ export const getDeviceToken = async (
     } catch (error) {
       if (error instanceof APIError) {
         // If the error is a 428 (authorization pending), continue polling
-        if (error.status === PKCEAuthErrorType.AUTHORIZATION_PENDING) {
+        if (error.rawError.error === PKCEAuthErrorType.AUTHORIZATION_PENDING) {
           await sleep(interval);
           continue;
-        } else if (error.status === PKCEAuthErrorType.SLOW_DOWN) {
+        } else if (error.rawError.error === PKCEAuthErrorType.SLOW_DOWN) {
           if (interval < MAX_POLL_INTERVAL) {
             interval += POLL_INTERVAL;
           }
@@ -365,6 +365,8 @@ export interface JWTTokenConfig {
 }
 
 export enum PKCEAuthErrorType {
-  AUTHORIZATION_PENDING = 428,
-  SLOW_DOWN = 429,
+  AUTHORIZATION_PENDING = 'authorization_pending',
+  SLOW_DOWN = 'slow_down',
+  ACCESS_DENIED = 'access_denied',
+  EXPIRED_TOKEN = 'expired_token',
 }
