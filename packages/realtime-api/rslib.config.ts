@@ -10,6 +10,7 @@ function getLibShared(format: LibConfig['format']) {
     format,
     syntax: 'es6',
     dts: true,
+    autoExternal: false,
   };
   return shared;
 }
