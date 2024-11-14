@@ -13,12 +13,10 @@ coverage:
       default:
         target: auto
         threshold: 1%
-        informational: true
     patch:
       default:
         target: auto
         threshold: 1%
-        informational: true
 
 comment:
   layout: 'header, diff, components, files' # show component info in the PR comment
@@ -34,11 +32,9 @@ component_management:
       - type: project # in this case every component that doens't have a status defined will have a project type one
         target: auto
         threshold: 1%
-        informational: true # TODO: set false to enable block
       - type: patch
         target: auto
         threshold: 1%
-        informational: true
 
   individual_components:
     - component_id: coze-js # this is an identifier that should not be changed
@@ -48,7 +44,6 @@ component_management:
       #   - type: project
       #     target: auto
       #     threshold: 1%
-      #     informational: true
 
     - component_id: realtime-api # this is an identifier that should not be changed
       name: realtime-api # this is a display name, and can be changed freely
