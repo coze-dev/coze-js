@@ -21,7 +21,8 @@
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "browser": {
-    "crypto": false
+    "crypto": false,
+    "os": false
   },
   "types": "dist/types/index.d.ts",
   "files": [

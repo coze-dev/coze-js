@@ -6,8 +6,9 @@ async function main() {
   assert(spaceId, 'spaceId is required');
   const bot = await client.bots.create({
     space_id: spaceId,
-    name: 'test',
-    description: 'test',
+    name: 'Translation Master',
+    description:
+      'A professional translator that helps translate between English and Chinese',
     prompt_info: {
       prompt:
         'your are a translator, translate the following text from English to Chinese',
