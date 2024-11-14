@@ -15,7 +15,7 @@
     ".": {
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.js",
-      "types": "./dist/esm/index.d.ts"
+      "types": "./dist/types/index.d.ts"
     }
   },
   "main": "dist/cjs/index.cjs",
@@ -23,7 +23,7 @@
   "browser": {
     "crypto": false
   },
-  "types": "dist/esm/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
@@ -32,7 +32,6 @@
   "scripts": {
     "build": "rm -rf dist && rslib build",
     "format": "prettier --write .",
-    "postinstall": "npm run build",
     "lint": "eslint ./ --cache --quiet",
     "prepublishOnly": "npm run build",
     "start": "rm -rf dist && rslib build -w",

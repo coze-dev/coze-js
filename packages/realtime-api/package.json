@@ -15,12 +15,12 @@
     ".": {
       "require": "./dist/cjs/index.cjs",
       "import": "./dist/esm/index.js",
-      "types": "./dist/esm/index.d.ts"
+      "types": "./dist/types/index.d.ts"
     }
   },
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
-  "typings": "dist/esm/index.d.ts",
+  "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
     "LICENSE",

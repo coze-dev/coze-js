@@ -9,7 +9,6 @@ function getLibShared(format: LibConfig['format']) {
     },
     format,
     syntax: 'es6',
-    dts: true,
     autoExternal: false,
   };
   return shared;
@@ -22,5 +21,14 @@ export default defineConfig({
   output: {
     target: 'web',
   },
-  lib: ['esm', 'cjs', 'umd'].map(r => getLibShared(r as LibConfig['format'])),
+  lib: [
+    {
+      ...getLibShared('esm'),
+      dts: {
+        distPath: './dist/types',
+      },
+    },
+    getLibShared('cjs'),
+    getLibShared('umd'),
+  ],
 });
