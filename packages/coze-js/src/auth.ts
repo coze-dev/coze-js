@@ -1,9 +1,14 @@
 /* eslint-disable prefer-destructuring */
 import * as nodeCrypto from 'crypto';
 
-import { isBrowser } from './utils.js';
+import { isBrowser, sleep } from './utils.js';
+import { APIError } from './error.js';
 import { APIClient, type RequestOptions } from './core.js';
-import { COZE_COM_BASE_URL } from './constant.js';
+import {
+  COZE_COM_BASE_URL,
+  MAX_POLL_INTERVAL,
+  POLL_INTERVAL,
+} from './constant.js';
 
 export const getWebAuthenticationUrl = (config: WebAuthenticationConfig) => {
   const baseUrl = (config.baseURL ?? COZE_COM_BASE_URL).replace(
@@ -176,7 +181,7 @@ export const getDeviceCode = async (
   return result;
 };
 
-export const getDeviceToken = async (
+const _getDeviceToken = async (
   config: DeviceTokenConfig,
   options?: RequestOptions,
 ): Promise<OAuthToken> => {
@@ -200,6 +205,44 @@ export const getDeviceToken = async (
   );
 
   return result;
+};
+
+export const getDeviceToken = async (
+  config: DeviceTokenConfig,
+  options?: RequestOptions,
+): Promise<OAuthToken> => {
+  if (isBrowser()) {
+    throw new Error('getDeviceToken is not supported in browser');
+  }
+
+  if (!config.poll) {
+    return _getDeviceToken(config, options);
+  }
+
+  let interval = POLL_INTERVAL;
+  while (true) {
+    try {
+      // Attempt to get the device token
+      const deviceToken = await _getDeviceToken(config, options);
+      return deviceToken;
+    } catch (error) {
+      if (error instanceof APIError) {
+        // If the error is a 428 (authorization pending), continue polling
+        if (error.status === PKCEAuthErrorType.AUTHORIZATION_PENDING) {
+          await sleep(interval);
+          continue;
+        } else if (error.status === PKCEAuthErrorType.SLOW_DOWN) {
+          if (interval < MAX_POLL_INTERVAL) {
+            interval += POLL_INTERVAL;
+          }
+          await sleep(interval);
+          continue;
+        }
+      }
+      // For any other error, throw it
+      throw error;
+    }
+  }
 };
 
 export const getJWTToken = async (
@@ -311,6 +354,7 @@ export interface DeviceTokenConfig {
   baseURL?: string;
   clientId: string;
   deviceCode: string;
+  poll?: boolean;
 }
 
 export interface JWTTokenConfig {
@@ -318,4 +362,9 @@ export interface JWTTokenConfig {
   token: string;
   duration_seconds?: number;
   scope?: JWTScope;
+}
+
+export enum PKCEAuthErrorType {
+  AUTHORIZATION_PENDING = 428,
+  SLOW_DOWN = 429,
 }
