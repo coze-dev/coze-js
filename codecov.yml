@@ -39,6 +39,8 @@ component_management:
   individual_components:
     - component_id: coze-js # this is an identifier that should not be changed
       name: coze-js # this is a display name, and can be changed freely
+      paths:
+        - packages/coze-js/**
       # set component statuses here
       # statuses:
       #   - type: project
