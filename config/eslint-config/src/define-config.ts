@@ -47,7 +47,7 @@ export const defineConfig = (config: EnhanceESLintConfig): ESLintConfig[] => {
 
   const defaultRules: Rules = {};
 
-  const ignorePath = path.resolve(packageRoot, 'gitignore');
+  const ignorePath = path.resolve(packageRoot, '.gitignore');
 
   return [
     ...require(`../eslint.config.${preset}.js`),
