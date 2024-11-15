@@ -18,7 +18,6 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import fs from 'fs';
 
-import jwt from 'jsonwebtoken';
 import { CozeAPI, getJWTToken, RoleType } from '@coze/api';
 
 import config from '../config/config';
@@ -37,63 +36,41 @@ const botIdList = [config[key].COZE_BOT_ID];
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const privateKey = fs.readFileSync(
-  join(__dirname, '../../tmp/private_key2.pem'),
+  join(__dirname, '../../tmp/private_key_channel.pem'),
 );
 
-// Prepare the payload for the JWT
-const payload = {
-  iss: appId,
-  aud,
-  iat: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 86399,
-  jti: `uuidxxx${Date.now()}`,
-};
-console.log('payload', payload);
-
-// Sign the JWT with the private key
-jwt.sign(
-  payload,
-  privateKey,
-  { algorithm: 'RS256', keyid },
-  async (err, token) => {
-    console.log('jwtToken', token);
-
-    // Define the scope for channel access
-    const scope = {
-      account_permission: {
-        permission_list: ['Connector.botChat'],
-      },
-      attribute_constraint: {
-        connector_bot_chat_attribute: {
-          bot_id_list: botIdList,
-        },
-      },
-    };
-
-    // Exchange the JWT for an OAuth token with specified scope
-    const result = await getJWTToken({
-      baseURL,
-      token,
-      duration_seconds: 86399,
-      scope,
-    });
-    console.log('getJWTToken', result);
-
-    // Initialize a new Coze API client using the obtained access token
-    const client = new CozeAPI({ baseURL, token: result.access_token });
-
-    // Example of how to use the client for chat creation
-    const data = await client.chat.create({
-      bot_id: botIdList[0],
-      user_id: '1234567890',
-      additional_messages: [
-        {
-          role: RoleType.User,
-          content: 'Hello',
-          content_type: 'text',
-        },
-      ],
-    });
-    console.log('client.chat.create', data);
+const scope = {
+  account_permission: {
+    permission_list: ['Connector.botChat'],
   },
-);
+  attribute_constraint: {
+    connector_bot_chat_attribute: {
+      bot_id_list: botIdList,
+    },
+  },
+};
+const result = await getJWTToken({
+  baseURL,
+  appId,
+  aud,
+  keyid,
+  privateKey,
+  scope,
+});
+console.log('getJWTToken', result);
+
+// Initialize a new Coze API client using the obtained access token
+const client = new CozeAPI({ baseURL, token: result.access_token });
+
+// Example of how to use the client for chat creation
+const data = await client.chat.create({
+  bot_id: botIdList[0],
+  additional_messages: [
+    {
+      role: RoleType.User,
+      content: 'Hello',
+      content_type: 'text',
+    },
+  ],
+});
+console.log('client.chat.create', data);

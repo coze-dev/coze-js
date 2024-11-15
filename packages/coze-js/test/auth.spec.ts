@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 import * as utils from '../src/utils.js';
 import { APIClient } from '../src/core.js';
 import {
@@ -10,6 +12,16 @@ import {
 } from '../src/auth';
 
 vi.mock('../src/core');
+
+vi.mock('jsonwebtoken', () => ({
+  default: {
+    // eslint-disable-next-line max-params
+    sign: vi.fn((payload, privateKey, options, callback) => {
+      callback(null, 'mock.jwt.token');
+      return undefined;
+    }),
+  },
+}));
 
 describe('Auth functions', () => {
   const mockConfig = {
@@ -87,23 +99,14 @@ describe('Auth functions', () => {
     describe('getJWTToken', () => {
       it('should throw an error in browser environment', async () => {
         vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
-        await expect(getJWTToken({ token: 'test-token' })).rejects.toThrow(
-          'getJWTToken is not supported in browser',
-        );
-      });
-
-      it('should not throw an error in non-browser environment', async () => {
-        vi.spyOn(utils, 'isBrowser').mockReturnValue(false);
-        const mockPost = vi
-          .fn()
-          .mockResolvedValue({ access_token: 'test-jwt-token' });
-        (APIClient as unknown as vi.Mock).mockImplementation(() => ({
-          post: mockPost,
-        }));
-
         await expect(
-          getJWTToken({ token: 'test-token' }),
-        ).resolves.not.toThrow();
+          getJWTToken({
+            appId: 'test-app-id',
+            aud: 'test-aud',
+            keyid: 'test-key-id',
+            privateKey: 'test-private-key',
+          }),
+        ).rejects.toThrow('getJWTToken is not supported in browser');
       });
     });
   });
@@ -255,6 +258,24 @@ describe('Auth functions', () => {
   });
 
   describe('getJWTToken', () => {
+    const mockPrivateKey = `-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC9QFi6I/l8UZLZ
+... (这里省略了中间内容)
+xrGqcXz5Qf+wdt0=
+-----END PRIVATE KEY-----`;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      // Mock jwt.sign to immediately resolve
+      (jwt.sign as vi.Mock).mockImplementation(
+        // eslint-disable-next-line max-params
+        (payload, privateKey, options, callback) => {
+          callback(null, 'mock.jwt.token');
+          return undefined;
+        },
+      );
+    });
+
     it('should call APIClient.post with correct parameters', async () => {
       const mockPost = vi
         .fn()
@@ -264,21 +285,93 @@ describe('Auth functions', () => {
       }));
 
       await getJWTToken({
-        token: 'test-token',
+        appId: 'test-app-id',
+        aud: 'test-aud',
+        keyid: 'test-key-id',
+        privateKey: mockPrivateKey,
         baseURL: mockConfig.baseURL,
-        duration_seconds: 3600,
       });
 
-      expect(APIClient).toHaveBeenCalledWith({
-        token: 'test-token',
-        baseURL: mockConfig.baseURL,
-      });
       expect(mockPost).toHaveBeenCalledWith(
         '/api/permission/oauth2/token',
         {
           grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-          duration_seconds: 3600,
+          duration_seconds: 900,
           scope: undefined,
+        },
+        false,
+        undefined,
+      );
+    });
+
+    it('should use default RS256 algorithm if not specified', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-jwt-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await getJWTToken({
+        appId: 'test-app-id',
+        aud: 'test-aud',
+        keyid: 'test-key-id',
+        privateKey: mockPrivateKey,
+        baseURL: mockConfig.baseURL,
+      });
+
+      expect(jwt.sign).toHaveBeenCalledWith(
+        {
+          iss: 'test-app-id',
+          aud: 'test-aud',
+          iat: expect.any(Number),
+          exp: expect.any(Number),
+          jti: expect.any(String),
+        },
+        mockPrivateKey,
+        {
+          algorithm: 'RS256',
+          keyid: 'test-key-id',
+        },
+        expect.any(Function),
+      );
+    });
+
+    it('should support custom duration and scope', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-jwt-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      const customScope = {
+        account_permission: {
+          permission_list: ['read'],
+        },
+        attribute_constraint: {
+          connector_bot_chat_attribute: {
+            bot_id_list: ['bot1'],
+          },
+        },
+      };
+
+      await getJWTToken({
+        appId: 'test-app-id',
+        aud: 'test-aud',
+        keyid: 'test-key-id',
+        privateKey: mockPrivateKey,
+        baseURL: mockConfig.baseURL,
+        durationSeconds: 1800,
+        scope: customScope,
+      });
+
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/token',
+        {
+          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          duration_seconds: 1800,
+          scope: customScope,
         },
         false,
         undefined,

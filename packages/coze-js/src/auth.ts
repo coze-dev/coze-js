@@ -1,6 +1,8 @@
 /* eslint-disable prefer-destructuring */
 import * as nodeCrypto from 'crypto';
 
+import jwt from 'jsonwebtoken';
+
 import { isBrowser, sleep } from './utils.js';
 import { APIError } from './error.js';
 import { APIClient, type RequestOptions } from './core.js';
@@ -245,19 +247,21 @@ export const getDeviceToken = async (
   }
 };
 
-export const getJWTToken = async (
-  config: JWTTokenConfig,
+export const _getJWTToken = async (
+  config: {
+    token: string;
+    baseURL?: string;
+    durationSeconds?: number;
+    scope?: JWTScope;
+  },
   options?: RequestOptions,
 ) => {
-  if (isBrowser()) {
-    throw new Error('getJWTToken is not supported in browser');
-  }
   const api = new APIClient({ token: config.token, baseURL: config.baseURL });
 
   const apiUrl = '/api/permission/oauth2/token';
   const payload = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-    duration_seconds: config.duration_seconds,
+    duration_seconds: config.durationSeconds ?? 900, // 15 minutes
     scope: config.scope,
   };
 
@@ -269,6 +273,48 @@ export const getJWTToken = async (
   );
 
   return result;
+};
+
+export const getJWTToken = async (
+  config: JWTTokenConfig,
+  options?: RequestOptions,
+): Promise<JWTToken> => {
+  if (isBrowser()) {
+    throw new Error('getJWTToken is not supported in browser');
+  }
+
+  // Prepare the payload for the JWT
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    iss: config.appId,
+    aud: config.aud,
+    iat: now,
+    exp: now + 3600, // 1 hour
+    jti: `${now.toString(16)}`,
+  };
+
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      config.privateKey,
+      { algorithm: config.algorithm ?? 'RS256', keyid: config.keyid },
+      async (err: Error | null, token: string | undefined) => {
+        if (err || !token) {
+          reject(err);
+          return;
+        }
+        // Exchange the JWT for an OAuth token
+        const result = await _getJWTToken(
+          {
+            ...config,
+            token,
+          },
+          options,
+        );
+        resolve(result);
+      },
+    );
+  });
 };
 
 export interface DeviceCodeData {
@@ -359,8 +405,12 @@ export interface DeviceTokenConfig {
 
 export interface JWTTokenConfig {
   baseURL?: string;
-  token: string;
-  duration_seconds?: number;
+  durationSeconds?: number;
+  appId: string;
+  aud: string;
+  keyid: string;
+  privateKey: string;
+  algorithm?: jwt.Algorithm;
   scope?: JWTScope;
 }
 

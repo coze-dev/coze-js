@@ -19,7 +19,6 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import fs from 'fs';
 
-import jwt from 'jsonwebtoken';
 import { CozeAPI, getJWTToken } from '@coze/api';
 
 import config from '../config/config';
@@ -36,40 +35,21 @@ const aud = config[key].auth.oauth_jwt.COZE_AUD;
 // Read the private key from a file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const privateKey = fs.readFileSync(
-  join(__dirname, '../../tmp/private_key.pem'),
-);
+const privateKey = fs
+  .readFileSync(join(__dirname, '../../tmp/private_key.pem'))
+  .toString();
 
-// Prepare the payload for the JWT
-const payload = {
-  iss: appId,
+const result = await getJWTToken({
+  baseURL,
+  appId,
   aud,
-  iat: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 86399,
-  jti: `uuidxxx${Date.now()}`,
-};
-console.log('payload', payload);
-
-// Sign the JWT with the private key
-jwt.sign(
-  payload,
+  keyid,
   privateKey,
-  { algorithm: 'RS256', keyid },
-  async (err, token) => {
-    console.log('token', token);
+});
+console.log('getJWTToken', result);
 
-    // Exchange the JWT for an OAuth token
-    const result = await getJWTToken({
-      baseURL,
-      token,
-      duration_seconds: 86399,
-    });
-    console.log('getJWTToken', result);
+// Initialize a new Coze API client using the obtained access token
+const client = new CozeAPI({ baseURL, token: result.access_token });
 
-    // Initialize a new Coze API client using the obtained access token
-    const client = new CozeAPI({ baseURL, token: result.access_token });
-
-    // Example of how to use the client (commented out)
-    // e.g. client.chat.stream(...);
-  },
-);
+// Example of how to use the client (commented out)
+// e.g. client.chat.stream(...);
