@@ -214,8 +214,8 @@ importers:
         specifier: workspace:*
         version: link:../../config/eslint-config
       '@types/jsonwebtoken':
-        specifier: 8.5.9
-        version: 8.5.9
+        specifier: ^9.0.0
+        version: 9.0.7
       '@types/node':
         specifier: ^20
         version: 20.16.15
@@ -740,6 +740,10 @@ importers:
         version: 5.6.3
 
   ../../../packages/coze-js:
+    dependencies:
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
     devDependencies:
       '@coze-infra/eslint-config':
         specifier: workspace:*
@@ -756,6 +760,9 @@ importers:
       '@swc/core':
         specifier: ^1.3.14
         version: 1.7.39(@swc/helpers@0.5.15)
+      '@types/jsonwebtoken':
+        specifier: ^9.0.0
+        version: 9.0.7
       '@types/node':
         specifier: ^20
         version: 20.16.15
@@ -2728,8 +2735,8 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  '@types/jsonwebtoken@8.5.9':
-    resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}
+  '@types/jsonwebtoken@9.0.7':
+    resolution: {integrity: sha512-ugo316mmTYBl2g81zDFnZ7cfxlut3o+/EQdaP7J8QN2kY6lJ22hmQYCK5EHcJHbrW+dkCGSCPgbG8JtYj6qSrg==}
 
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
@@ -9845,7 +9852,7 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/jsonwebtoken@8.5.9':
+  '@types/jsonwebtoken@9.0.7':
     dependencies:
       '@types/node': 20.16.15
 

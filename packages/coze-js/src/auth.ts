@@ -1,9 +1,16 @@
 /* eslint-disable prefer-destructuring */
 import * as nodeCrypto from 'crypto';
 
-import { isBrowser } from './utils.js';
+import jwt from 'jsonwebtoken';
+
+import { isBrowser, sleep } from './utils.js';
+import { APIError } from './error.js';
 import { APIClient, type RequestOptions } from './core.js';
-import { COZE_COM_BASE_URL } from './constant.js';
+import {
+  COZE_COM_BASE_URL,
+  MAX_POLL_INTERVAL,
+  POLL_INTERVAL,
+} from './constant.js';
 
 export const getWebAuthenticationUrl = (config: WebAuthenticationConfig) => {
   const baseUrl = (config.baseURL ?? COZE_COM_BASE_URL).replace(
@@ -176,13 +183,10 @@ export const getDeviceCode = async (
   return result;
 };
 
-export const getDeviceToken = async (
+const _getDeviceToken = async (
   config: DeviceTokenConfig,
   options?: RequestOptions,
 ): Promise<OAuthToken> => {
-  if (isBrowser()) {
-    throw new Error('getDeviceToken is not supported in browser');
-  }
   const api = new APIClient({ token: '', baseURL: config.baseURL });
 
   const apiUrl = '/api/permission/oauth2/token';
@@ -202,19 +206,62 @@ export const getDeviceToken = async (
   return result;
 };
 
-export const getJWTToken = async (
-  config: JWTTokenConfig,
+export const getDeviceToken = async (
+  config: DeviceTokenConfig,
+  options?: RequestOptions,
+): Promise<OAuthToken> => {
+  if (isBrowser()) {
+    throw new Error('getDeviceToken is not supported in browser');
+  }
+
+  if (!config.poll) {
+    return _getDeviceToken(config, options);
+  }
+
+  let interval = POLL_INTERVAL;
+  while (true) {
+    try {
+      // Attempt to get the device token
+      const deviceToken = await _getDeviceToken(config, options);
+      return deviceToken;
+    } catch (error) {
+      if (error instanceof APIError) {
+        // If the error is authorization_pending, continue polling
+        if (
+          error?.rawError?.error === PKCEAuthErrorType.AUTHORIZATION_PENDING
+        ) {
+          await sleep(interval);
+          continue;
+          // If the error is slow_down, increase the interval
+        } else if (error?.rawError?.error === PKCEAuthErrorType.SLOW_DOWN) {
+          if (interval < MAX_POLL_INTERVAL) {
+            interval += POLL_INTERVAL;
+          }
+          await sleep(interval);
+          continue;
+        }
+      }
+      // For any other error, throw it
+      throw error;
+    }
+  }
+};
+
+export const _getJWTToken = async (
+  config: {
+    token: string;
+    baseURL?: string;
+    durationSeconds?: number;
+    scope?: JWTScope;
+  },
   options?: RequestOptions,
 ) => {
-  if (isBrowser()) {
-    throw new Error('getJWTToken is not supported in browser');
-  }
   const api = new APIClient({ token: config.token, baseURL: config.baseURL });
 
   const apiUrl = '/api/permission/oauth2/token';
   const payload = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-    duration_seconds: config.duration_seconds,
+    duration_seconds: config.durationSeconds ?? 900, // 15 minutes
     scope: config.scope,
   };
 
@@ -226,6 +273,63 @@ export const getJWTToken = async (
   );
 
   return result;
+};
+
+export const getJWTToken = async (
+  config: JWTTokenConfig,
+  options?: RequestOptions,
+): Promise<JWTToken> => {
+  if (isBrowser()) {
+    throw new Error('getJWTToken is not supported in browser');
+  }
+
+  // Validate private key format
+  const keyFormat = config.privateKey.includes('BEGIN RSA PRIVATE KEY')
+    ? 'RSA'
+    : config.privateKey.includes('BEGIN PRIVATE KEY')
+      ? 'PKCS8'
+      : null;
+  if (!keyFormat) {
+    throw APIError.generate(
+      400,
+      undefined,
+      'Invalid private key format. Expected PEM format (RSA or PKCS8)',
+      undefined,
+    );
+  }
+
+  // Prepare the payload for the JWT
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    iss: config.appId,
+    aud: config.aud,
+    iat: now,
+    exp: now + 3600, // 1 hour
+    jti: `${now.toString(16)}`,
+  };
+
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      config.privateKey,
+      { algorithm: config.algorithm ?? 'RS256', keyid: config.keyid },
+      async (err: Error | null, token: string | undefined) => {
+        if (err || !token) {
+          reject(err);
+          return;
+        }
+        // Exchange the JWT for an OAuth token
+        const result = await _getJWTToken(
+          {
+            ...config,
+            token,
+          },
+          options,
+        );
+        resolve(result);
+      },
+    );
+  });
 };
 
 export interface DeviceCodeData {
@@ -311,11 +415,23 @@ export interface DeviceTokenConfig {
   baseURL?: string;
   clientId: string;
   deviceCode: string;
+  poll?: boolean;
 }
 
 export interface JWTTokenConfig {
   baseURL?: string;
-  token: string;
-  duration_seconds?: number;
+  durationSeconds?: number;
+  appId: string;
+  aud: string;
+  keyid: string;
+  privateKey: string;
+  algorithm?: jwt.Algorithm;
   scope?: JWTScope;
+}
+
+export enum PKCEAuthErrorType {
+  AUTHORIZATION_PENDING = 'authorization_pending',
+  SLOW_DOWN = 'slow_down',
+  ACCESS_DENIED = 'access_denied',
+  EXPIRED_TOKEN = 'expired_token',
 }

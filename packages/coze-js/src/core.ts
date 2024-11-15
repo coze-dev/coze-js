@@ -1,6 +1,7 @@
 /* eslint-disable max-params */
 import { type AxiosRequestConfig, type AxiosResponseHeaders } from 'axios';
 
+import { getNodeClientUserAgent, getUserAgent } from './version.js';
 import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
 import { type FetchAPIOptions, fetchAPI } from './fetcher.js';
 import { APIError, type ErrorRes } from './error.js';
@@ -75,10 +76,14 @@ export class APIClient {
     const headers: Record<string, string> = {
       authorization: `Bearer ${this.token}`,
     };
-    // FIXME: browser 下存在跨域问题，后续再看看
-    // if (!isBrowser()) {
-    //   headers['agw-js-conv'] = 'str';
-    // }
+
+    if (!isBrowser()) {
+      headers['User-Agent'] = getUserAgent();
+      headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
+    } else {
+      // headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
+    }
+
     const config = mergeConfig(this.axiosOptions, options, { headers });
     config.method = method;
     config.data = body;

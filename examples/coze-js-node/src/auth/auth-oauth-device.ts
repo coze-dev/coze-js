@@ -7,15 +7,9 @@
  * The process involves obtaining a device code, displaying it to the user, and then polling for the access token.
  */
 
-import {
-  APIError,
-  getDeviceCode,
-  getDeviceToken,
-  refreshOAuthToken,
-} from '@coze/api';
+import { getDeviceCode, getDeviceToken, refreshOAuthToken } from '@coze/api';
 
 import config from '../config/config';
-import { sleep } from '../client';
 
 // 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
 const key = process.env.COZE_ENV || 'en';
@@ -36,49 +30,22 @@ console.log(
   `please open ${deviceCode.verification_uri} and input the code ${deviceCode.user_code}`,
 );
 
-// Start the polling process to obtain the access token
-while (true) {
-  // Wait for 5 seconds before polling again
-  await sleep(5000);
+const deviceToken = await getDeviceToken({
+  baseURL,
+  clientId,
+  deviceCode: deviceCode.device_code,
+  poll: true,
+});
+console.log('deviceToken', deviceToken);
 
-  try {
-    // Attempt to get the device token
-    const deviceToken = await getDeviceToken({
-      baseURL,
-      clientId,
-      deviceCode: deviceCode.device_code,
-    });
-
-    if (deviceToken.access_token) {
-      console.log('deviceToken', deviceToken);
-
-      // You can refresh the access token if it expires
-      const refreshToken = deviceToken.refresh_token;
-      const refreshTokenResult = await refreshOAuthToken({
-        baseURL,
-        clientId,
-        refreshToken,
-      });
-      console.log('refreshTokenResult', refreshTokenResult);
-
-      break;
-    }
-  } catch (error) {
-    if (error instanceof APIError) {
-      console.log(
-        'rawError',
-        `error:${error.rawError.error}`,
-        `error_description:${error.rawError.error_message}`,
-      );
-      // If the error is a 428 (authorization pending), continue polling
-      if (error.status === 428) {
-        continue;
-      }
-    }
-    // For any other error, throw it
-    throw error;
-  }
-}
+// You can refresh the access token if it expires
+const refreshToken = deviceToken.refresh_token;
+const refreshTokenResult = await refreshOAuthToken({
+  baseURL,
+  clientId,
+  refreshToken,
+});
+console.log('refreshTokenResult', refreshTokenResult);
 
 // At this point, you have successfully obtained the access token
 // You can now use it to initialize the Coze API client and make API calls
