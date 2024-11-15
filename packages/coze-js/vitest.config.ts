@@ -5,5 +5,8 @@ export default defineConfig({
   preset: 'node',
   test: {
     testTimeout: 100000,
+    coverage: {
+      exclude: ['rslib.config.ts'],
+    },
   },
 });

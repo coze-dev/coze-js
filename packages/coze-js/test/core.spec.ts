@@ -1,3 +1,4 @@
+import * as utils from '../src/utils.js';
 import { fetchAPI } from '../src/fetcher';
 import { APIError } from '../src/error';
 import { APIClient } from '../src/core';
@@ -23,6 +24,18 @@ describe('APIClient', () => {
       expect(client.baseURL).toBe(mockConfig.baseURL);
       expect(client.token).toBe(mockConfig.token);
       expect(client.debug).toBe(mockConfig.debug);
+    });
+
+    it('should throw error when allowPersonalAccessTokenInBrowser is false', () => {
+      vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+      expect(
+        () =>
+          new APIClient({
+            token: 'pat_xxx',
+          }),
+      ).toThrow(
+        'Browser environments do not support authentication using Personal Access Token (PAT) by default.\nas it may expose secret API keys. \n\nPlease use OAuth2.0 authentication mechanism. see:\nhttps://www.coze.com/docs/developer_guides/oauth_apps?_lang=en \n\nIf you need to force use, please set the `allowPersonalAccessTokenInBrowser` option to `true`. \n\ne.g new CozeAPI({ token, allowPersonalAccessTokenInBrowser: true });\n\n',
+      );
     });
   });
 

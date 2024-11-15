@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 import * as utils from '../src/utils.js';
+import { APIError, BadRequestError } from '../src/error.js';
 import { APIClient } from '../src/core.js';
 import {
   getWebAuthenticationUrl,
@@ -9,6 +10,8 @@ import {
   getDeviceCode,
   getDeviceToken,
   getJWTToken,
+  getPKCEOAuthToken,
+  refreshOAuthToken,
 } from '../src/auth';
 
 vi.mock('../src/core');
@@ -94,6 +97,59 @@ describe('Auth functions', () => {
           }),
         ).resolves.not.toThrow();
       });
+
+      describe('with polling enabled', () => {
+        beforeEach(() => {
+          vi.spyOn(utils, 'isBrowser').mockReturnValue(false);
+          vi.spyOn(utils, 'sleep').mockImplementation(() => Promise.resolve());
+        });
+
+        it('should return token immediately when successful', async () => {
+          const mockPost = vi
+            .fn()
+            .mockResolvedValue({ access_token: 'test-token' });
+          (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+            post: mockPost,
+          }));
+
+          const result = await getDeviceToken({
+            clientId: mockConfig.clientId,
+            baseURL: mockConfig.baseURL,
+            deviceCode: 'test-device-code',
+            poll: true,
+          });
+
+          expect(result).toEqual({ access_token: 'test-token' });
+          expect(mockPost).toHaveBeenCalledTimes(1);
+          expect(utils.sleep).not.toHaveBeenCalled();
+        });
+
+        it('should throw error immediately for non-polling related errors', async () => {
+          const mockError = APIError.generate(
+            400,
+            undefined, // error code
+            'Test error', // error message
+            undefined, // raw error
+            // { error: 'invalid_request' }, // raw error
+          );
+          const mockPost = vi.fn().mockRejectedValue(mockError);
+          (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+            post: mockPost,
+          }));
+
+          await expect(
+            getDeviceToken({
+              clientId: mockConfig.clientId,
+              baseURL: mockConfig.baseURL,
+              deviceCode: 'test-device-code',
+              poll: true,
+            }),
+          ).rejects.toThrow('Test error');
+
+          expect(mockPost).toHaveBeenCalledTimes(1);
+          expect(utils.sleep).not.toHaveBeenCalled();
+        });
+      });
     });
 
     describe('getJWTToken', () => {
@@ -143,7 +199,7 @@ describe('Auth functions', () => {
     });
   });
 
-  describe('getOAuthToken', () => {
+  describe('getWebOAuthToken', () => {
     it('should call APIClient.post with correct parameters', async () => {
       const mockPost = vi
         .fn()
@@ -166,6 +222,133 @@ describe('Auth functions', () => {
           redirect_uri: mockConfig.redirectUrl,
           code: 'test-code',
           // code_verifier: undefined,
+        },
+        false,
+        undefined,
+      );
+    });
+  });
+
+  describe('getPKCEOAuthToken', () => {
+    it('should call APIClient.post with correct parameters', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await getPKCEOAuthToken({
+        ...mockConfig,
+        code: 'test-code',
+        codeVerifier: 'test-code-verifier',
+      });
+
+      expect(APIClient).toHaveBeenCalledWith({
+        token: '',
+        baseURL: mockConfig.baseURL,
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/token',
+        {
+          grant_type: 'authorization_code',
+          client_id: mockConfig.clientId,
+          redirect_uri: mockConfig.redirectUrl,
+          code: 'test-code',
+          code_verifier: 'test-code-verifier',
+        },
+        false,
+        undefined,
+      );
+    });
+
+    it('should handle workspace specific token endpoint', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await getPKCEOAuthToken({
+        ...mockConfig,
+        code: 'test-code',
+        codeVerifier: 'test-code-verifier',
+      });
+
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/token',
+        {
+          grant_type: 'authorization_code',
+          client_id: mockConfig.clientId,
+          redirect_uri: mockConfig.redirectUrl,
+          code: 'test-code',
+          code_verifier: 'test-code-verifier',
+        },
+        false,
+        undefined,
+      );
+    });
+  });
+
+  // ... existing code ...
+
+  describe('refreshOAuthToken', () => {
+    it('should call APIClient.post with correct parameters when clientSecret is provided', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await refreshOAuthToken({
+        clientId: mockConfig.clientId,
+        baseURL: mockConfig.baseURL,
+        clientSecret: mockConfig.clientSecret,
+        refreshToken: 'test-refresh-token',
+      });
+
+      expect(APIClient).toHaveBeenCalledWith({
+        token: mockConfig.clientSecret,
+        baseURL: mockConfig.baseURL,
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/token',
+        {
+          grant_type: 'refresh_token',
+          client_id: mockConfig.clientId,
+          refresh_token: 'test-refresh-token',
+        },
+        false,
+        undefined,
+      );
+    });
+
+    it('should call APIClient.post with empty token when clientSecret is not provided', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+
+      await refreshOAuthToken({
+        clientId: mockConfig.clientId,
+        baseURL: mockConfig.baseURL,
+        refreshToken: 'test-refresh-token',
+      });
+
+      expect(APIClient).toHaveBeenCalledWith({
+        token: '',
+        baseURL: mockConfig.baseURL,
+      });
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/token',
+        {
+          grant_type: 'refresh_token',
+          client_id: mockConfig.clientId,
+          refresh_token: 'test-refresh-token',
         },
         false,
         undefined,
@@ -376,6 +559,18 @@ xrGqcXz5Qf+wdt0=
         false,
         undefined,
       );
+    });
+
+    it('should throw an error if invalid private key', async () => {
+      await expect(
+        getJWTToken({
+          appId: 'test-app-id',
+          aud: 'test-aud',
+          privateKey: 'invalid-private-key',
+          baseURL: mockConfig.baseURL,
+          keyid: 'test-key-id',
+        }),
+      ).rejects.toThrow(BadRequestError);
     });
   });
 });

@@ -187,9 +187,6 @@ const _getDeviceToken = async (
   config: DeviceTokenConfig,
   options?: RequestOptions,
 ): Promise<OAuthToken> => {
-  if (isBrowser()) {
-    throw new Error('getDeviceToken is not supported in browser');
-  }
   const api = new APIClient({ token: '', baseURL: config.baseURL });
 
   const apiUrl = '/api/permission/oauth2/token';
@@ -230,11 +227,13 @@ export const getDeviceToken = async (
     } catch (error) {
       if (error instanceof APIError) {
         // If the error is authorization_pending, continue polling
-        if (error.rawError.error === PKCEAuthErrorType.AUTHORIZATION_PENDING) {
+        if (
+          error?.rawError?.error === PKCEAuthErrorType.AUTHORIZATION_PENDING
+        ) {
           await sleep(interval);
           continue;
           // If the error is slow_down, increase the interval
-        } else if (error.rawError.error === PKCEAuthErrorType.SLOW_DOWN) {
+        } else if (error?.rawError?.error === PKCEAuthErrorType.SLOW_DOWN) {
           if (interval < MAX_POLL_INTERVAL) {
             interval += POLL_INTERVAL;
           }
@@ -285,26 +284,16 @@ export const getJWTToken = async (
   }
 
   // Validate private key format
-  try {
-    const keyFormat = config.privateKey.includes('BEGIN RSA PRIVATE KEY')
-      ? 'RSA'
-      : config.privateKey.includes('BEGIN PRIVATE KEY')
-        ? 'PKCS8'
-        : null;
-    if (!keyFormat) {
-      throw APIError.generate(
-        400,
-        undefined,
-        'Invalid private key format. Expected PEM format (RSA or PKCS8)',
-        undefined,
-      );
-    }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+  const keyFormat = config.privateKey.includes('BEGIN RSA PRIVATE KEY')
+    ? 'RSA'
+    : config.privateKey.includes('BEGIN PRIVATE KEY')
+      ? 'PKCS8'
+      : null;
+  if (!keyFormat) {
     throw APIError.generate(
       400,
       undefined,
-      `Failed to validate private key: ${error?.message}`,
+      'Invalid private key format. Expected PEM format (RSA or PKCS8)',
       undefined,
     );
   }
