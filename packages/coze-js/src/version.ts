@@ -8,15 +8,23 @@ const getEnv = () => {
   const { platform } = process;
 
   let osName = platform.toLowerCase();
-  let osVersion = process.version;
+  let osVersion = os.release();
 
   if (platform === 'darwin') {
     osName = 'macos';
-    // macOS: Use os.release() to get kernel version
-    // e.g., '20.3.0' -> '10.16.0' (Big Sur)
-    const darwinVersion = os.release().split('.');
-    const majorVersion = parseInt(darwinVersion[0], 10) - 9;
-    osVersion = `10.${majorVersion}.${darwinVersion[1]}`;
+    // Try to parse the macOS version
+    try {
+      const darwinVersion = os.release().split('.');
+      if (darwinVersion.length >= 2) {
+        const majorVersion = parseInt(darwinVersion[0], 10);
+        if (!isNaN(majorVersion) && majorVersion >= 9) {
+          const macVersion = majorVersion - 9;
+          osVersion = `10.${macVersion}.${darwinVersion[1]}`;
+        }
+      }
+    } catch (error) {
+      // Keep the default os.release() value if parsing fails
+    }
   } else if (platform === 'win32') {
     osName = 'windows';
     osVersion = os.release();

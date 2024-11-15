@@ -229,10 +229,11 @@ export const getDeviceToken = async (
       return deviceToken;
     } catch (error) {
       if (error instanceof APIError) {
-        // If the error is a 428 (authorization pending), continue polling
+        // If the error is authorization_pending, continue polling
         if (error.rawError.error === PKCEAuthErrorType.AUTHORIZATION_PENDING) {
           await sleep(interval);
           continue;
+          // If the error is slow_down, increase the interval
         } else if (error.rawError.error === PKCEAuthErrorType.SLOW_DOWN) {
           if (interval < MAX_POLL_INTERVAL) {
             interval += POLL_INTERVAL;
@@ -281,6 +282,31 @@ export const getJWTToken = async (
 ): Promise<JWTToken> => {
   if (isBrowser()) {
     throw new Error('getJWTToken is not supported in browser');
+  }
+
+  // Validate private key format
+  try {
+    const keyFormat = config.privateKey.includes('BEGIN RSA PRIVATE KEY')
+      ? 'RSA'
+      : config.privateKey.includes('BEGIN PRIVATE KEY')
+        ? 'PKCS8'
+        : null;
+    if (!keyFormat) {
+      throw APIError.generate(
+        400,
+        undefined,
+        'Invalid private key format. Expected PEM format (RSA or PKCS8)',
+        undefined,
+      );
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw APIError.generate(
+      400,
+      undefined,
+      `Failed to validate private key: ${error?.message}`,
+      undefined,
+    );
   }
 
   // Prepare the payload for the JWT
