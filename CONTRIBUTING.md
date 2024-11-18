@@ -1,75 +1,94 @@
 # Contributing to coze-js
 
-We love your input! We want to make contributing to coze-js as easy and transparent as possible, whether it's:
+## Quick Start
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+### Prerequisites
 
-## Development Process
+- Node.js 18+ (LTS/Hydrogen recommended)
+- pnpm 9.12.0
+- Rush 5.14.0
 
-We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
+### Installation
 
-1. Fork the repo and create your branch from `main`
-2. If you've added code that should be tested, add tests
-3. If you've changed APIs, update the documentation
-4. Ensure the test suite passes
-5. Make sure your code lints
-6. Issue that pull request!
+1. **Install Node.js 18+**
 
-## Local Development Setup
-
-1. Clone the repository
-```bash
-git clone https://github.com/coze-dev/coze-js.git
+``` bash
+nvm install lts/hydrogen
+nvm alias default lts/hydrogen # set default node version
+nvm use lts/hydrogen
 ```
 
-2. Set up the development environment
-see [README.md](./README.md)
+2. **Clone the repository**
 
-3. Install dependencies
-```bash
+``` bash
+git clone git@github.com:coze-dev/coze-js.git
+```
+
+3. **Install required global dependencies**
+
+``` bash
+npm i -g pnpm@9.12.0 @microsoft/rush@5.14.0
+```
+
+4. **Install project dependencies**
+
+``` bash
 rush update
 ```
 
-4. Run tests
-```bash
-npm run test
-```
+After that, you can start to develop projects inside this repository.
 
 
-## Pull Request Process
+## Submitting Changes
 
-1. Update the README.md with details of changes to the interface, if applicable
-2. Update the documentation with details of any changes to the API
-3. The PR will be merged once you have the sign-off of at least one maintainer
+1. Create a new branch from `main` using the format:
+   - `feat/description` for features
+   - `fix/description` for bug fixes
+   - `docs/description` for documentation
+   - `chore/description` for maintenance
 
-## Any Contributions You Make Will Be Under the MIT Software License
+2. Write code and tests
+   - Follow our coding standards
+   - Add/update tests for changes
+   - Update documentation if needed
 
-In short, when you submit code changes, your submissions are understood to be under the same [MIT License](http://choosealicense.com/licenses/mit/) that covers the project. Feel free to contact the maintainers if that's a concern.
+3. Ensure quality
+   - Run `cd path/to/packageName && npm test` for all tests
+   - Run `rush lint` for code style
+   - Run `rush build` to verify build
 
-## Report Bugs Using GitHub Issues
+4. Create Pull Request
+   - Use the PR template
+   - Link related issues
+   - Provide clear description of changes
 
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/coze-dev/coze-js/issues/new/choose); it's that easy!
+5. Review Process
+   - Maintainers will review your PR
+   - Address review feedback if any
+   - Changes must pass CI checks
 
-## Write Bug Reports With Detail, Background, and Sample Code
+6. Commit Message Format
+   ```
+   type(scope): subject
+   body
+   ```
+   Types: feat, fix, docs, style, refactor, test, chore
 
-**Great Bug Reports** tend to have:
+## Reporting Bugs
 
-- A quick summary and/or background
+Report bugs via [GitHub Issues](https://github.com/coze-dev/coze-js/issues/new/choose). Please include:
+
+- Issue description
 - Steps to reproduce
-  - Be specific!
-  - Give sample code if you can
-- What you expected would happen
-- What actually happens
-- Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
+- Expected behavior
+- Actual behavior
+- Code examples (if applicable)
+
+## Documentation
+
+- Update API documentation for interface changes
+- Update README.md if usage is affected
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under its MIT License.
-
-## References
-
-This document was adapted from the open-source contribution guidelines for [Facebook's Draft](https://github.com/facebook/draft-js/blob/master/CONTRIBUTING.md).
+This project is under the [MIT License](http://choosealicense.com/licenses/mit/). By submitting code, you agree to these terms.
