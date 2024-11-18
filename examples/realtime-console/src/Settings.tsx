@@ -453,7 +453,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
               >
                 <BotSelect
                   bots={bots}
-                  disabled={!selectedWorkspace}
+                  disabled={!selectedWorkspace && bots?.length === 0}
                   loading={loadingBots}
                   value={form.getFieldValue('botId')}
                   onChange={value => form.setFieldsValue({ botId: value })}
