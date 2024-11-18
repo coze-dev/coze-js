@@ -12,7 +12,7 @@
     "test:cov": "exit 0"
   },
   "devDependencies": {
-    "eslint": "^8.54.0",
+    "eslint": "9.14.0",
     "typescript": "^5.5.3"
   }
 }

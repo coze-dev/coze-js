@@ -1,10 +1,14 @@
 import path from 'path';
+import fs from 'fs';
 
-import type { ESLintConfig, Rules } from 'eslint-define-config';
-
-import { includeIgnoreFile } from './ignore-files';
+import type { Linter } from 'eslint';
+import { includeIgnoreFile } from '@eslint/compat';
 
 type ESLintConfigMode = 'web' | 'node' | 'base';
+
+type ESLintConfig = Linter.Config;
+
+type Rules = Linter.RulesRecord;
 
 export interface EnhanceESLintConfig extends ESLintConfig {
   /**
@@ -15,6 +19,8 @@ export interface EnhanceESLintConfig extends ESLintConfig {
    * config mode
    */
   preset: ESLintConfigMode;
+  /** overrides config */
+  overrides: ESLintConfig[];
 }
 
 /**
@@ -23,39 +29,54 @@ export interface EnhanceESLintConfig extends ESLintConfig {
  * @param config ESLint config.
  * @returns ESLint config.
  */
-export const defineConfig = (config: EnhanceESLintConfig): ESLintConfig => {
+export const defineConfig = (config: EnhanceESLintConfig): ESLintConfig[] => {
   const {
     packageRoot,
     preset,
+    overrides = [],
+    ignores = [],
+    rules,
     settings,
-    extends: extendsCfg = [],
-    rules = {},
+
     ...userConfig
   } = config;
+
   if (!packageRoot) {
     throw new Error('should provider "packageRoot" params');
   }
 
   const defaultRules: Rules = {};
 
-  return {
-    extends: [
-      path.resolve(__dirname, `../.eslintrc.${preset}.js`),
-      ...extendsCfg,
-    ],
-    ignorePatterns: [...includeIgnoreFile(packageRoot)],
-    settings: {
-      ...settings,
-      'import/resolver': {
-        typescript: {
-          project: packageRoot,
+  const ignorePath = path.resolve(packageRoot, '.gitignore');
+
+  return [
+    ...require(`../eslint.config.${preset}.js`),
+
+    fs.existsSync(ignorePath) ? includeIgnoreFile(ignorePath) : {},
+    // root ignore file
+    includeIgnoreFile(path.resolve(__dirname, '../../../.gitignore')),
+
+    {
+      ignores,
+    },
+
+    {
+      files: ['**/*.?(m|c)?(j|t)s?(x)'],
+      settings: {
+        ...settings,
+        'import/resolver': {
+          typescript: {
+            project: packageRoot,
+          },
         },
       },
+      plugins: {},
+      rules: {
+        ...defaultRules,
+        ...rules,
+      },
+      ...userConfig,
     },
-    rules: {
-      ...defaultRules,
-      ...rules,
-    },
-    ...userConfig,
-  };
+    ...overrides,
+  ];
 };
