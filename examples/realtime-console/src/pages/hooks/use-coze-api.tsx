@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { CozeAPI, type CloneVoiceReq } from '@coze/api';
+import { CozeAPI, type WorkSpace, type CloneVoiceReq } from '@coze/api';
+
+import { getBaseUrl, getOrRefreshToken, redirectToLogin } from '../utils/utils';
+import { LocalManager } from '../utils/local-manager';
 
 export interface VoiceOption {
   label: React.ReactNode;
@@ -25,26 +28,28 @@ export interface WorkspaceOption {
   label: string;
 }
 
-const useCozeAPI = ({
-  accessToken,
-  baseURL,
-}: {
-  accessToken: string;
-  baseURL: string;
-}) => {
+const useCozeAPI = () => {
   const [api, setApi] = useState<CozeAPI | null>(null);
+  const localManager = new LocalManager();
 
   useEffect(() => {
-    if (accessToken && baseURL) {
-      setApi(
-        new CozeAPI({
-          token: accessToken,
-          baseURL,
-          allowPersonalAccessTokenInBrowser: true,
-        }),
-      );
-    }
-  }, [accessToken, baseURL]);
+    const init = async () => {
+      const accessToken = await getOrRefreshToken(localManager);
+      const baseURL = getBaseUrl();
+      if (accessToken && baseURL) {
+        setApi(
+          new CozeAPI({
+            token: accessToken,
+            baseURL,
+          }),
+        );
+      } else {
+        console.error('accessToken is not found');
+        await redirectToLogin(false);
+      }
+    };
+    init();
+  }, []);
 
   const fetchAllBots = async (workspaceId?: string): Promise<BotOption[]> => {
     let pageIndex = 1;
@@ -54,11 +59,16 @@ const useCozeAPI = ({
     if (!workspaceId) {
       throw new Error('workspaceId is required');
     }
+    if (!workspaceId.includes('_')) {
+      throw new Error('workspaceId is invalid');
+    }
+
+    const pureWorkspaceId = workspaceId.split('_')[1];
 
     try {
       while (hasMore) {
         const response = await api?.bots.list({
-          space_id: workspaceId,
+          space_id: pureWorkspaceId,
           page_size: pageSize,
           page_index: pageIndex,
         });
@@ -146,9 +156,18 @@ const useCozeAPI = ({
           page_num: pageNum,
         });
 
+        const getWorkspacePrefix = (workspace: WorkSpace) => {
+          if (
+            workspace.workspace_type === 'personal' ||
+            workspace.role_type === 'owner'
+          ) {
+            return 'personal';
+          }
+          return 'team';
+        };
         const workspaces =
           response?.workspaces.map(workspace => ({
-            value: workspace.id,
+            value: `${getWorkspacePrefix(workspace)}_${workspace.id}`,
             label: workspace.name,
           })) || [];
 

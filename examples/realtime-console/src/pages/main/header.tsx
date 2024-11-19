@@ -8,14 +8,17 @@ import {
 } from '@coze/realtime-api';
 import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 
-import MessageForm, { type MessageFormRef } from './MessageForm';
+import MessageForm, { type MessageFormRef } from './message-form';
 
-import './App.css';
+import '../../App.css';
 import { ChatEventType } from '@coze/api';
+
+import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+import { DISCONNECT_TIME } from '../utils/constants';
 
 const { Text, Link } = Typography;
 
-interface ConsoleFooterProps {
+interface HeaderProps {
   onConnect: () => Promise<void>;
   onDisconnect: () => void;
   onToggleMicrophone: (isMicrophoneOn: boolean) => void;
@@ -24,11 +27,7 @@ interface ConsoleFooterProps {
   clientRef: React.MutableRefObject<RealtimeClient | null>;
 }
 
-const STORAGE_KEY = 'noiseSuppression';
-
-const DISCONNECT_TIME = 1800; // 30 minutes
-
-const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
+const Header: React.FC<HeaderProps> = ({
   onConnect,
   onDisconnect,
   onToggleMicrophone,
@@ -36,6 +35,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   clientRef,
   isMicrophoneOn,
 }) => {
+  const localManager = new LocalManager();
   const [isConnecting, setIsConnecting] = useState(false);
   const [microphoneStatus, setMicrophoneStatus] = useState<'normal' | 'error'>(
     'normal',
@@ -43,7 +43,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
     useState(false);
   const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
-    const savedValue = localStorage.getItem(STORAGE_KEY);
+    const savedValue = localManager.get(LocalStorageKey.NOISE_SUPPRESSION);
     return savedValue ? JSON.parse(savedValue) : [];
   });
   const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
@@ -164,7 +164,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
 
   const handleNoiseSuppressionChange = (value: string[]) => {
     setNoiseSuppression(value);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+    localManager.set(LocalStorageKey.NOISE_SUPPRESSION, JSON.stringify(value));
   };
 
   const handleConnect = () => {
@@ -380,4 +380,4 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   );
 };
 
-export default ConsoleFooter;
+export default Header;
