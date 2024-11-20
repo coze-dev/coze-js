@@ -7,6 +7,8 @@ import React, {
 
 import { Button, Modal, Form, Input, message } from 'antd';
 
+import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+
 const { TextArea } = Input;
 
 // Add ref interface
@@ -24,6 +26,7 @@ const MessageForm = forwardRef<MessageFormRef, MessageFormProps>(
   ({ onSubmit }, ref) => {
     const [visible, setVisible] = useState(false);
     const [form] = Form.useForm();
+    const localManager = new LocalManager();
 
     const showModal = (eventData?: string, functionCall?: string) => {
       if (eventData) {
@@ -43,7 +46,7 @@ const MessageForm = forwardRef<MessageFormRef, MessageFormProps>(
 
     useEffect(() => {
       // Load saved data from localStorage when component mounts
-      const savedEventData = localStorage.getItem('savedEventData');
+      const savedEventData = localManager.get(LocalStorageKey.EVENT_DATA);
 
       if (savedEventData) {
         form.setFieldsValue({
@@ -58,7 +61,7 @@ const MessageForm = forwardRef<MessageFormRef, MessageFormProps>(
         onSubmit(values);
 
         // Save form data to localStorage
-        localStorage.setItem('savedEventData', values.eventData);
+        localManager.set(LocalStorageKey.EVENT_DATA, values.eventData);
 
         hideModal();
         // form.resetFields();
