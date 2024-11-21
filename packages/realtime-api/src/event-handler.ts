@@ -42,6 +42,21 @@ export enum EventNames {
    */
   AUDIO_MUTED = 'client.audio.muted',
   /**
+   * en: Client video on
+   * zh: 客户端视频开启
+   */
+  VIDEO_ON = 'client.video.on',
+  /**
+   * en: Client video off
+   * zh: 客户端视频关闭
+   */
+  VIDEO_OFF = 'client.video.off',
+  /**
+   * en: Client video event
+   * zh: 客户端视频事件
+   */
+  PLAYER_EVENT = 'client.video.event',
+  /**
    * en: Client error
    * zh: 客户端错误
    */
@@ -66,6 +81,16 @@ export enum EventNames {
    * zh: 音频输出设备改变
    */
   AUDIO_OUTPUT_DEVICE_CHANGED = 'client.output.device.changed',
+  /**
+   * en: Bot joined
+   * zh: Bot 加入
+   */
+  BOT_JOIN = 'server.bot.join',
+  /**
+   * en: Bot left
+   * zh: Bot 离开
+   */
+  BOT_LEAVE = 'server.bot.leave',
 }
 type EventCallback = (eventName: string, event: unknown) => void;
 
@@ -117,7 +142,14 @@ export class RealtimeEventHandler {
   ) {
     for (const handler of handlers) {
       if (!prefix || eventName.startsWith(prefix)) {
-        handler(eventName, event);
+        try {
+          handler(eventName, event);
+        } catch (e) {
+          throw new RealtimeAPIError(
+            RealtimeError.HANDLER_MESSAGE_ERROR,
+            `Failed to handle message: ${eventName}`,
+          );
+        }
       }
     }
   }

@@ -15,8 +15,21 @@ export const sleep = (milliseconds: number): Promise<void> => {
 /**
  * Check microphone permission，return boolean
  */
-export const checkPermission: () => Promise<boolean> = async () =>
-  (await VERTC.enableDevices({ audio: true, video: false })).audio;
+export const checkPermission = async ({
+  audio = true,
+  video = false,
+}: {
+  audio?: boolean;
+  video?: boolean;
+} = {}): Promise<boolean> => {
+  try {
+    const result = await VERTC.enableDevices({ audio, video });
+    return result.audio;
+  } catch (error) {
+    console.error('Failed to check device permissions:', error);
+    return false;
+  }
+};
 
 /**
  * Get audio devices
@@ -25,10 +38,17 @@ export const checkPermission: () => Promise<boolean> = async () =>
 export const getAudioDevices = async () => {
   const devices = await VERTC.enumerateDevices();
   if (!devices?.length) {
-    return { audioInputs: [], audioOutputs: [] };
+    return {
+      audioInputs: [],
+      audioOutputs: [],
+      videoInputs: [],
+      videoOutputs: [],
+    };
   }
   return {
     audioInputs: devices.filter(i => i.deviceId && i.kind === 'audioinput'),
     audioOutputs: devices.filter(i => i.deviceId && i.kind === 'audiooutput'),
+    videoInputs: devices.filter(i => i.deviceId && i.kind === 'videoinput'),
+    videoOutputs: devices.filter(i => i.deviceId && i.kind === 'videooutput'),
   };
 };

@@ -27,6 +27,11 @@ describe('Utils', () => {
       const result = await checkPermission();
       expect(result).toBe(false);
     });
+    it('should throw error when enableDevices failed', async () => {
+      (VERTC.enableDevices as vi.Mock).mockRejectedValue(new Error('test'));
+      const result = await checkPermission();
+      expect(result).toBe(false);
+    });
   });
   describe('getAudioDevices', () => {
     it('should return filtered audio input and output devices', async () => {
@@ -46,6 +51,8 @@ describe('Utils', () => {
         audioOutputs: [
           { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
         ],
+        videoInputs: [{ deviceId: '3', kind: 'videoinput', label: 'Camera 1' }],
+        videoOutputs: [],
       });
 
       expect(VERTC.enumerateDevices).toHaveBeenCalled();
@@ -59,6 +66,8 @@ describe('Utils', () => {
       expect(result).toEqual({
         audioInputs: [],
         audioOutputs: [],
+        videoInputs: [],
+        videoOutputs: [],
       });
     });
   });

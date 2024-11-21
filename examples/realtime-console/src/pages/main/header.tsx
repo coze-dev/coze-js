@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, message, Typography, Select } from 'antd';
 import {
@@ -8,12 +8,17 @@ import {
 } from '@coze/realtime-api';
 import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 
-import MessageForm from './MessageForm';
-import './App.css';
+import MessageForm, { type MessageFormRef } from './message-form';
+
+import '../../App.css';
+import { ChatEventType } from '@coze/api';
+
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
+import { DISCONNECT_TIME } from '../../utils/constants';
 
 const { Text, Link } = Typography;
 
-interface ConsoleFooterProps {
+interface HeaderProps {
   onConnect: () => Promise<void>;
   onDisconnect: () => void;
   onToggleMicrophone: (isMicrophoneOn: boolean) => void;
@@ -22,11 +27,7 @@ interface ConsoleFooterProps {
   clientRef: React.MutableRefObject<RealtimeClient | null>;
 }
 
-const STORAGE_KEY = 'noiseSuppression';
-
-const DISCONNECT_TIME = 1800; // 30 minutes
-
-const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
+const Header: React.FC<HeaderProps> = ({
   onConnect,
   onDisconnect,
   onToggleMicrophone,
@@ -34,6 +35,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   clientRef,
   isMicrophoneOn,
 }) => {
+  const localManager = new LocalManager();
   const [isConnecting, setIsConnecting] = useState(false);
   const [microphoneStatus, setMicrophoneStatus] = useState<'normal' | 'error'>(
     'normal',
@@ -41,7 +43,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
     useState(false);
   const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
-    const savedValue = localStorage.getItem(STORAGE_KEY);
+    const savedValue = localManager.get(LocalStorageKey.NOISE_SUPPRESSION);
     return savedValue ? JSON.parse(savedValue) : [];
   });
   const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
@@ -53,9 +55,14 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   const [outputDeviceOptions, setOutputDeviceOptions] = useState<
     { label: string; value: string }[]
   >([]);
+  const formRef = useRef<MessageFormRef>(null);
+  const isShowVideo = !window.location.href.includes('coze.cn');
 
   const checkMicrophonePermission = () => {
-    RealtimeUtils.checkPermission().then(isDeviceEnable => {
+    RealtimeUtils.checkPermission({
+      audio: true,
+      video: isShowVideo,
+    }).then(isDeviceEnable => {
       if (isDeviceEnable) {
         setMicrophoneStatus('normal');
       } else {
@@ -106,13 +113,58 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
     getDevices();
   }, []);
 
+  useEffect(() => {
+    if (!clientRef.current) {
+      return;
+    }
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const onMessage = (event: string, data: any) => {
+      const functionCall =
+        data?.data?.required_action?.submit_tool_outputs?.tool_calls?.[0]
+          ?.function;
+      formRef.current?.showModal(
+        JSON.stringify(
+          {
+            id: '1',
+            event_type: 'conversation.chat.submit_tool_outputs',
+            data: {
+              chat_id: data?.data?.id,
+              tool_outputs: [
+                {
+                  tool_call_id:
+                    data?.data?.required_action?.submit_tool_outputs
+                      ?.tool_calls?.[0]?.id,
+                  output: '',
+                },
+              ],
+            },
+          },
+          null,
+          2,
+        ),
+        JSON.stringify(functionCall, null, 2),
+      );
+    };
+    const eventName = `server.${ChatEventType.CONVERSATION_CHAT_REQUIRES_ACTION}`;
+    clientRef.current.on(eventName, onMessage);
+
+    return () => {
+      try {
+        clientRef.current?.off(eventName, onMessage);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+  }, [clientRef.current]);
+
   const handleRefreshMicrophone = () => {
     checkMicrophonePermission();
   };
 
   const handleNoiseSuppressionChange = (value: string[]) => {
     setNoiseSuppression(value);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+    localManager.set(LocalStorageKey.NOISE_SUPPRESSION, JSON.stringify(value));
   };
 
   const handleConnect = () => {
@@ -257,7 +309,7 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
           s)
         </Button>
         <div style={{ marginTop: '10px' }}></div>
-        <MessageForm onSubmit={handleSendMessage} />
+        <MessageForm onSubmit={handleSendMessage} ref={formRef} />
         <Button
           type="primary"
           style={{ marginRight: '10px', marginLeft: '10px' }}
@@ -328,4 +380,4 @@ const ConsoleFooter: React.FC<ConsoleFooterProps> = ({
   );
 };
 
-export default ConsoleFooter;
+export default Header;

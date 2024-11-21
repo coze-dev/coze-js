@@ -15,10 +15,15 @@ import {
   RealtimeAPIError,
   EventNames,
 } from '@coze/realtime-api';
+import { type APIError } from '@coze/api';
 
-import Settings from './Settings';
-import logo from './logo.svg';
-import ConsoleFooter from './ConsoleFooter';
+import { getBaseUrl, isShowVideo, redirectToLogin } from '../../utils/utils';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
+import logo from '../../logo.svg';
+import { useAccessToken } from '../../hooks/use-access-token';
+import Settings from './settings';
+import Player from './player';
+import Header from './header';
 
 const { Content, Footer } = Layout;
 const { Text } = Typography;
@@ -40,13 +45,19 @@ const RealtimeConsole: React.FC = () => {
   const eventsEndRef = useRef<HTMLDivElement>(null);
   const serverEventsEndRef = useRef<HTMLDivElement>(null);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(true);
+  const localManager = new LocalManager();
+  const { accessToken, removeAccessToken, isTeamWorkspace, initAccessToken } =
+    useAccessToken();
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     if (clientRef.current) {
       clientRef.current.disconnect();
       clientRef.current = null;
     }
-    handleInitClient();
+    await initAccessToken();
+    setTimeout(() => {
+      handleInitClient();
+    });
   };
 
   const handleInitClient = () => {
@@ -54,26 +65,20 @@ const RealtimeConsole: React.FC = () => {
       return;
     }
 
-    const accessToken = localStorage.getItem('accessToken');
-    const botId = localStorage.getItem('botId');
-    const voiceId = localStorage.getItem('voiceId') || '';
-    const baseURL = localStorage.getItem('baseURL') || '';
+    const botId = localManager.get(LocalStorageKey.BOT_ID);
+    const voiceId = localManager.get(LocalStorageKey.VOICE_ID);
+    const baseURL = getBaseUrl();
     const noiseSuppression = JSON.parse(
-      localStorage.getItem('noiseSuppression') || '[]',
+      localManager.get(LocalStorageKey.NOISE_SUPPRESSION) || '[]',
     );
 
-    if (baseURL && !baseURL.trim().match(/^https?:\/\/.+/)) {
-      message.error('Invalid base URL format');
-      return;
-    }
-
-    if (!accessToken || !botId) {
-      console.log('no access token or bot id, auto config');
+    if (!botId) {
+      message.error('Please select a bot');
       return;
     }
 
     const client = new RealtimeClient({
-      accessToken: accessToken.trim(),
+      accessToken: accessToken ?? '',
       botId: botId.trim(),
       voiceId: voiceId.trim(),
       // conversationId: '1234567890', // Optional
@@ -84,6 +89,13 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
+      videoConfig: isShowVideo
+        ? {
+            renderDom: 'local-player',
+            videoOnDefault:
+              localManager.get(LocalStorageKey.VIDEO_STATE) === 'true',
+          }
+        : undefined,
     });
 
     // Subscribe to all client and server events
@@ -92,7 +104,7 @@ const RealtimeConsole: React.FC = () => {
     clientRef.current = client;
   };
 
-  const handleConnect = async () => {
+  const handleConnect = async (reconnect = true) => {
     handleInitClient();
 
     if (!clientRef.current) {
@@ -106,6 +118,17 @@ const RealtimeConsole: React.FC = () => {
     } catch (e: unknown) {
       if (e instanceof RealtimeAPIError) {
         message.error(`Failed to connect: ${e.message}`);
+
+        // Refresh token when auth failed
+        if ((e.error as APIError)?.code === 4100 && reconnect) {
+          const isOK = await redirectToLogin(
+            isTeamWorkspace(),
+            localStorage.getItem(LocalStorageKey.WORKSPACE_ID) ?? undefined,
+          );
+          if (!isOK) {
+            removeAccessToken();
+          }
+        }
       } else if (e instanceof Error) {
         message.error(`An error occurred: ${e.message}`);
       } else {
@@ -118,9 +141,14 @@ const RealtimeConsole: React.FC = () => {
   const handleAllMessage = useCallback((eventName: string, data: any) => {
     console.log('event', eventName, data);
 
+    if (eventName === EventNames.PLAYER_EVENT) {
+      return;
+    }
+
     const time = new Date().toLocaleTimeString();
     const type = eventName.split('.')[0]; // server or client
     const event = eventName.substring(eventName.indexOf('.') + 1); // event name
+
     setEvents(prevEvents => [...prevEvents, { time, type, event }]);
 
     if (
@@ -193,11 +221,14 @@ const RealtimeConsole: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!accessToken) {
+      return;
+    }
     handleInitClient();
     return () => {
       handleDisconnect();
     };
-  }, []);
+  }, [accessToken]);
 
   const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -232,7 +263,7 @@ const RealtimeConsole: React.FC = () => {
     <Layout style={{ minHeight: '100vh' }}>
       <Settings onSaveSettings={handleSaveSettings} />
       <Footer style={{ textAlign: 'center' }}>
-        <ConsoleFooter
+        <Header
           onConnect={handleConnect}
           onDisconnect={handleDisconnect}
           isConnected={clientRef.current?.isConnected}
@@ -241,6 +272,7 @@ const RealtimeConsole: React.FC = () => {
           isMicrophoneOn={isMicrophoneOn}
         />
       </Footer>
+      {isShowVideo && <Player clientRef={clientRef} />}
       <Content style={{ padding: '20px' }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>

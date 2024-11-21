@@ -19,7 +19,7 @@ import {
   AudioOutlined,
 } from '@ant-design/icons';
 
-import { type VoiceOption } from './use-coze-api';
+import { type VoiceOption } from '../../hooks/use-coze-api';
 
 const VoiceClone: React.FC<{
   visible: boolean;
@@ -179,6 +179,7 @@ const VoiceClone: React.FC<{
                   const mediaRecorder =
                     await navigator.mediaDevices.getUserMedia({
                       audio: true,
+                      video: false,
                     });
                   const recorder = new MediaRecorder(mediaRecorder);
                   setMediaRecorderState(mediaRecorder);
@@ -263,6 +264,9 @@ const VoiceSelect: React.FC<{
 
   const handleClone = (voice: VoiceOption, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!voice) {
+      return;
+    }
     // Check if cloning is allowed
     if (
       voice.is_system_voice === false &&

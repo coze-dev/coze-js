@@ -5,7 +5,10 @@ import * as RealtimeUtils from './utils';
 import { RealtimeEventHandler, EventNames } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { EngineClient } from './client';
-
+export interface VideoConfig {
+  videoOnDefault?: boolean /** optional, Whether to turn on video by default, defaults to true */;
+  renderDom?: string /** optional, The DOM element to render the video stream to */;
+}
 export interface RealtimeClientConfig {
   accessToken: string /** required, Access Token */;
   botId: string /** required, Bot Id */;
@@ -21,15 +24,16 @@ export interface RealtimeClientConfig {
   connectorId: string /** required, Connector Id */;
   suppressStationaryNoise?: boolean /** optional, Suppress stationary noise, defaults to false */;
   suppressNonStationaryNoise?: boolean /** optional, Suppress non-stationary noise, defaults to false */;
+  videoConfig?: VideoConfig /** optional, Video configuration */;
 }
 
 class RealtimeClient extends RealtimeEventHandler {
   private _config: RealtimeClientConfig;
   private _client: EngineClient | null = null;
-  private _roomInfo: CreateRoomData | null = null;
   public isConnected = false;
   private _api: CozeAPI;
   private _isTestEnv = false;
+  public _isSupportVideo = false;
 
   /**
    * Constructor for initializing a RealtimeClient instance.
@@ -75,6 +79,7 @@ class RealtimeClient extends RealtimeEventHandler {
         this._config.allowPersonalAccessTokenInBrowser,
     });
     this._isTestEnv = defaultBaseURL !== 'https://api.coze.cn';
+    this._isSupportVideo = !!config.videoConfig;
   }
 
   /**
@@ -99,16 +104,16 @@ class RealtimeClient extends RealtimeEventHandler {
       throw new RealtimeAPIError(
         RealtimeError.CREATE_ROOM_ERROR,
         error instanceof Error ? error.message : 'Unknown error',
+        error,
       );
     }
-
-    this._roomInfo = roomInfo;
 
     // Step2 create engine
     this._client = new EngineClient(
       roomInfo.app_id,
       this._config.debug,
       this._isTestEnv,
+      this._isSupportVideo,
     );
 
     // Step3 bind engine events
@@ -134,10 +139,14 @@ class RealtimeClient extends RealtimeEventHandler {
       roomId: roomInfo.room_id,
       uid: roomInfo.uid,
       audioMutedDefault: this._config.audioMutedDefault ?? false,
+      videoOnDefault: this._config.videoConfig?.videoOnDefault ?? true,
     });
 
     // Step5 create local stream
-    await this._client.createLocalStream();
+    await this._client.createLocalStream(
+      roomInfo.uid,
+      this._config.videoConfig,
+    );
 
     // step6 set connected and dispatch connected event
     this.isConnected = true;
@@ -198,6 +207,15 @@ class RealtimeClient extends RealtimeEventHandler {
       this.dispatch(EventNames.AUDIO_UNMUTED, {});
     } else {
       this.dispatch(EventNames.AUDIO_MUTED, {});
+    }
+  }
+
+  async setVideoEnable(isEnable: boolean) {
+    await this._client?.changeVideoState(isEnable);
+    if (isEnable) {
+      this.dispatch(EventNames.VIDEO_ON, {});
+    } else {
+      this.dispatch(EventNames.VIDEO_OFF, {});
     }
   }
 
