@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import assert from 'assert';
 
-import { CozeAPI, RoleType } from '@coze/api';
+import { ChatEventType, CozeAPI, RoleType } from '@coze/api';
 
 import { botId, baseURL, apiKey } from './client';
 
@@ -147,7 +147,62 @@ async function test_headers() {
   }
 }
 
+async function test_stream_with_signal() {
+  assert(baseURL, 'baseURL is required');
+  assert(apiKey, 'apiKey is required');
+
+  const client = new CozeAPI({
+    baseURL,
+    token: apiKey,
+  });
+
+  const controller = new AbortController();
+  setTimeout(() => {
+    console.log('\n=====abort=====');
+    controller.abort();
+  }, 1500);
+  const result = await client.chat.stream(
+    {
+      bot_id: botId,
+      user_id: '123',
+      auto_save_history: true,
+      additional_messages: [
+        {
+          role: RoleType.User,
+          content: 'Tell me a story about being in the forest.',
+          content_type: 'text',
+        },
+      ],
+    },
+    {
+      signal: controller.signal,
+    },
+  );
+
+  for await (const chunk of result) {
+    if (chunk.event === ChatEventType.CONVERSATION_CHAT_CREATED) {
+      console.log('[START]');
+    } else if (chunk.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+      process.stdout.write(chunk.data.content);
+    } else if (chunk.event === ChatEventType.CONVERSATION_MESSAGE_COMPLETED) {
+      const { role, type, content } = chunk.data;
+      if (role === 'assistant' && type === 'answer') {
+        process.stdout.write('\n');
+      } else {
+        console.log('[%s]:[%s]:%s', role, type, content);
+      }
+    } else if (chunk.event === ChatEventType.CONVERSATION_CHAT_COMPLETED) {
+      console.log(chunk.data.usage);
+    } else if (chunk.event === ChatEventType.DONE) {
+      console.log(chunk.data);
+    } else if (chunk.event === ChatEventType.ERROR) {
+      console.error(chunk.data);
+    }
+  }
+}
+
 await test_timeout_global();
 await test_timeout_with_options();
 await test_timeout_with_signal();
 await test_headers();
+await test_stream_with_signal();

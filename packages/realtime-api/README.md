@@ -1,5 +1,11 @@
 # Coze Realtime API
 
+[![npm version](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api)
+[![npm downloads](https://img.shields.io/npm/dm/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api)
+[![license](https://img.shields.io/npm/l/@coze/realtime-api.svg)](https://github.com/coze-dev/coze-js/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/coze-dev/coze-js/pulls)
+
 A powerful real-time communication SDK for voice interactions with Coze AI bots.
 
 ## Features
