@@ -31,6 +31,7 @@ vi.mock('@coze/api', () => ({
 describe('RealtimeClient', () => {
   let client: RealtimeClient;
   let config: RealtimeClientConfig;
+  let mockEngineClient: vi.Mocked<EngineClient>;
 
   beforeEach(() => {
     config = {
@@ -41,6 +42,19 @@ describe('RealtimeClient', () => {
       debug: true,
       connectorId: '999',
     };
+
+    mockEngineClient = {
+      joinRoom: vi.fn(),
+      createLocalStream: vi.fn(),
+      bindEngineEvents: vi.fn(),
+      on: vi.fn(),
+      enableAudioNoiseReduction: vi.fn(),
+      initAIAnsExtension: vi.fn(),
+      changeAIAnsExtension: vi.fn(),
+      sendMessage: vi.fn(),
+    } as any;
+    (EngineClient as vi.Mock).mockImplementation(() => mockEngineClient);
+
     client = new RealtimeClient(config);
   });
 
@@ -51,21 +65,6 @@ describe('RealtimeClient', () => {
   });
 
   describe('connect', () => {
-    let mockEngineClient: vi.Mocked<EngineClient>;
-
-    beforeEach(() => {
-      mockEngineClient = {
-        joinRoom: vi.fn(),
-        createLocalStream: vi.fn(),
-        bindEngineEvents: vi.fn(),
-        on: vi.fn(),
-        enableAudioNoiseReduction: vi.fn(),
-        initAIAnsExtension: vi.fn(),
-        changeAIAnsExtension: vi.fn(),
-      } as any;
-      (EngineClient as vi.Mock).mockImplementation(() => mockEngineClient);
-    });
-
     it('should connect successfully', async () => {
       const dispatchSpy = vi.spyOn(client, 'dispatch');
 
@@ -110,6 +109,13 @@ describe('RealtimeClient', () => {
         {},
       );
       // ... existing expectations ...
+    });
+
+    it('should throw error when joinRoom throw error', async () => {
+      (mockEngineClient.joinRoom as vi.Mock).mockRejectedValue(
+        new Error('test'),
+      );
+      await expect(client.connect()).rejects.toThrow('test');
     });
   });
 
@@ -161,6 +167,59 @@ describe('RealtimeClient', () => {
 
       expect(mockChangeAudioState).toHaveBeenCalledWith(false);
       expect(dispatchSpy).toHaveBeenCalledWith(EventNames.AUDIO_MUTED, {});
+    });
+  });
+
+  describe('setVideoEnable', () => {
+    it('should enable video', async () => {
+      const mockChangeVideoState = vi.fn();
+      (client as any)._client = { changeVideoState: mockChangeVideoState };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setVideoEnable(true);
+
+      expect(mockChangeVideoState).toHaveBeenCalledWith(true);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.VIDEO_ON, {});
+    });
+  });
+
+  describe('setAudioInputDevice', () => {
+    it('should set audio input device', async () => {
+      const mockSetAudioInputDevice = vi.fn();
+      (client as any)._client = {
+        setAudioInputDevice: mockSetAudioInputDevice,
+      };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setAudioInputDevice('test-device');
+
+      expect(mockSetAudioInputDevice).toHaveBeenCalledWith('test-device');
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.AUDIO_INPUT_DEVICE_CHANGED,
+        {
+          deviceId: 'test-device',
+        },
+      );
+    });
+  });
+
+  describe('setAudioOutputDevice', () => {
+    it('should set audio output device', async () => {
+      const mockSetAudioOutputDevice = vi.fn();
+      (client as any)._client = {
+        setAudioOutputDevice: mockSetAudioOutputDevice,
+      };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setAudioOutputDevice('test-device');
+
+      expect(mockSetAudioOutputDevice).toHaveBeenCalledWith('test-device');
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.AUDIO_OUTPUT_DEVICE_CHANGED,
+        {
+          deviceId: 'test-device',
+        },
+      );
     });
   });
 
@@ -239,6 +298,16 @@ describe('RealtimeClient', () => {
       expect(consoleSpy).toHaveBeenCalledWith(
         'stopAudioPlaybackDeviceTest is not supported in non-debug mode',
       );
+    });
+  });
+
+  describe('sendMessage', () => {
+    it('should send message to server', async () => {
+      await client.connect();
+      await client.sendMessage({ message: 'test' });
+      expect(mockEngineClient.sendMessage).toHaveBeenCalledWith({
+        message: 'test',
+      });
     });
   });
 });

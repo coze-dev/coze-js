@@ -83,6 +83,15 @@ describe('RealtimeEventHandler', () => {
       handler.dispatch('server.test', { data: 'test' });
       expect(callback).toHaveBeenCalledWith('server.test', { data: 'test' });
     });
+    it('should throw error when handler throw error', () => {
+      const callback = vi.fn().mockImplementation(() => {
+        throw new Error('test');
+      });
+      handler.on(EventNames.CONNECTED, callback);
+      expect(() => handler.dispatch(EventNames.CONNECTED, {})).toThrow(
+        RealtimeAPIError,
+      );
+    });
   });
 
   describe('clearEventHandlers', () => {

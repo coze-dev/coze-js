@@ -165,10 +165,6 @@ export class EngineClient extends RealtimeEventHandler {
       if (e instanceof Error) {
         throw new RealtimeAPIError(RealtimeError.CONNECTION_ERROR, e.message);
       }
-      throw new RealtimeAPIError(
-        RealtimeError.CONNECTION_ERROR,
-        'Unknown error',
-      );
     }
   }
 
@@ -197,7 +193,6 @@ export class EngineClient extends RealtimeEventHandler {
 
   async createLocalStream(userId?: string, videoConfig?: VideoConfig) {
     const devices = await getAudioDevices();
-    console.log('devices', devices);
     if (!devices.audioInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,

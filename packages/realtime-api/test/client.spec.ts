@@ -1,16 +1,24 @@
-import VERTC from '@volcengine/rtc';
+import VERTC, { UserOfflineReason } from '@volcengine/rtc';
 
 import * as RealtimeUtils from '../src/utils';
 import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
+import { EventNames } from '../src';
 
 vi.mock('@volcengine/rtc', async () => ({
   default: {
     createEngine: vi.fn(),
     enumerateDevices: vi.fn(),
     events: {},
+    setParameter: vi.fn(),
   },
   MediaType: (await vi.importActual('@volcengine/rtc')).MediaType,
+  StreamIndex: {
+    STREAM_INDEX_MAIN: 0,
+    STREAM_INDEX_SCREEN: 1,
+  },
+  UserOfflineReason: (await vi.importActual('@volcengine/rtc'))
+    .UserOfflineReason,
 }));
 
 vi.mock('@volcengine/rtc/extension-ainr', () => ({
@@ -42,14 +50,18 @@ describe('EngineClient', () => {
       registerExtension: vi.fn(),
       sendUserMessage: vi.fn(),
       setAudioPlaybackDevice: vi.fn(),
+      stopVideoCapture: vi.fn(),
+      setLocalVideoPlayer: vi.fn(),
+      startVideoCapture: vi.fn(),
     };
     (VERTC.createEngine as vi.Mock).mockReturnValue(mockEngine);
     (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
       { deviceId: 'audio1', kind: 'audioinput' },
       { deviceId: 'audio2', kind: 'audioinput' },
+      { deviceId: 'video1', kind: 'videoinput' },
     ]);
 
-    client = new EngineClient('testAppId');
+    client = new EngineClient('testAppId', true, true, true);
   });
 
   describe('constructor', () => {
@@ -61,14 +73,14 @@ describe('EngineClient', () => {
   describe('bindEngineEvents', () => {
     it('should bind engine events', () => {
       client.bindEngineEvents();
-      expect(mockEngine.on).toHaveBeenCalledTimes(5);
+      expect(mockEngine.on).toHaveBeenCalledTimes(7);
     });
   });
 
   describe('removeEventListener', () => {
     it('should remove engine event listeners', () => {
       client.removeEventListener();
-      expect(mockEngine.off).toHaveBeenCalledTimes(5);
+      expect(mockEngine.off).toHaveBeenCalledTimes(7);
     });
   });
 
@@ -129,6 +141,12 @@ describe('EngineClient', () => {
       expect(mockEngine.unpublishStream).toHaveBeenCalled();
       expect(mockEngine.leaveRoom).toHaveBeenCalled();
     });
+    it('should throw error if disconnecting fails', async () => {
+      mockEngine.stopAudioCapture.mockRejectedValue(
+        new Error('Failed to stop'),
+      );
+      await expect(client.disconnect()).rejects.toThrow(Error);
+    });
   });
 
   describe('changeAudioState', () => {
@@ -140,6 +158,29 @@ describe('EngineClient', () => {
     it('should unpublish stream when mic is off', async () => {
       await client.changeAudioState(false);
       expect(mockEngine.unpublishStream).toHaveBeenCalled();
+    });
+
+    it('should throw error if changing audio state fails', async () => {
+      mockEngine.publishStream.mockRejectedValue(new Error('Failed to start'));
+      await expect(client.changeAudioState(true)).rejects.toThrow(Error);
+    });
+  });
+
+  describe('changeVideoState', () => {
+    it('should publish stream when camera is on', async () => {
+      await client.changeVideoState(true);
+      expect(mockEngine.startVideoCapture).toHaveBeenCalled();
+    });
+
+    it('should unpublish stream when camera is off', async () => {
+      await client.changeVideoState(false);
+      expect(mockEngine.stopVideoCapture).toHaveBeenCalled();
+    });
+    it('should throw error if changing video state fails', async () => {
+      mockEngine.startVideoCapture.mockRejectedValue(
+        new Error('Failed to start'),
+      );
+      await expect(client.changeVideoState(true)).rejects.toThrow(Error);
     });
   });
 
@@ -232,12 +273,27 @@ describe('EngineClient', () => {
         200,
       );
     });
+
+    it('should handle errors when starting audio playback device test', async () => {
+      mockEngine.startAudioPlaybackDeviceTest.mockRejectedValue(
+        new Error('Failed to start'),
+      );
+      await expect(client.startAudioPlaybackDeviceTest()).rejects.toThrow(
+        Error,
+      );
+    });
   });
 
   describe('stopAudioPlaybackDeviceTest', () => {
     it('should call engine stopAudioPlaybackDeviceTest', async () => {
       await client.stopAudioPlaybackDeviceTest();
       expect(mockEngine.stopAudioPlaybackDeviceTest).toHaveBeenCalled();
+    });
+    it('should handle errors when stopping audio playback device test', async () => {
+      mockEngine.stopAudioPlaybackDeviceTest.mockRejectedValue(
+        new Error('Failed to stop'),
+      );
+      await expect(client.stopAudioPlaybackDeviceTest()).toThrow(Error);
     });
   });
 
@@ -262,6 +318,80 @@ describe('EngineClient', () => {
       await expect(client.setAudioInputDevice(deviceId)).rejects.toThrow(
         RealtimeAPIError,
       );
+    });
+  });
+
+  describe('handleMessage', () => {
+    it('should handle message', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      client.handleMessage({
+        userId: 'test-user-id',
+        message: JSON.stringify({
+          event_type: 'test-event-type',
+        }),
+      });
+      expect(dispatchSpy).toHaveBeenCalledWith('server.test-event-type', {
+        event_type: 'test-event-type',
+      });
+    });
+
+    it('should handle error when parsing message', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      client.handleMessage({
+        userId: 'test-user-id',
+        message: 'invalid-message',
+      });
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.ERROR, {
+        message: 'Failed to parse message: invalid-message',
+        error: expect.any(Error),
+      });
+    });
+  });
+
+  describe('handleEventError', () => {
+    it('should handle event error', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      client.handleEventError({});
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.ERROR, {});
+    });
+  });
+
+  describe('handleUserJoin', () => {
+    it('should handle user join', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      const event = {
+        userInfo: { userId: 'test-user-id' },
+        publishState: {
+          audio: true,
+          video: true,
+          screenAudio: true,
+          screenVideo: true,
+        },
+      };
+      client.handleUserJoin(event);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_JOIN, event);
+    });
+  });
+
+  describe('handleUserLeave', () => {
+    it('should handle user leave', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      client.handleUserLeave({
+        userInfo: { userId: 'test-user-id' },
+        reason: UserOfflineReason.QUIT,
+      });
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_LEAVE, {
+        userInfo: { userId: 'test-user-id' },
+        reason: UserOfflineReason.QUIT,
+      });
+    });
+  });
+
+  describe('handlePlayerEvent', () => {
+    it('should handle player event', () => {
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+      client.handlePlayerEvent({});
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.PLAYER_EVENT, {});
     });
   });
 

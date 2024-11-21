@@ -27,6 +27,11 @@ describe('Utils', () => {
       const result = await checkPermission();
       expect(result).toBe(false);
     });
+    it('should throw error when enableDevices failed', async () => {
+      (VERTC.enableDevices as vi.Mock).mockRejectedValue(new Error('test'));
+      const result = await checkPermission();
+      expect(result).toBe(false);
+    });
   });
   describe('getAudioDevices', () => {
     it('should return filtered audio input and output devices', async () => {
