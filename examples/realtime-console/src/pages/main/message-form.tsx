@@ -7,7 +7,7 @@ import React, {
 
 import { Button, Modal, Form, Input, message } from 'antd';
 
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 
 const { TextArea } = Input;
 

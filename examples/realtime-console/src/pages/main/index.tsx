@@ -17,10 +17,10 @@ import {
 } from '@coze/realtime-api';
 import { type APIError } from '@coze/api';
 
-import { getBaseUrl, isShowVideo, redirectToLogin } from '../utils/utils';
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
-import { useAccessToken } from '../hooks/use-access-token';
+import { getBaseUrl, isShowVideo, redirectToLogin } from '../../utils/utils';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import logo from '../../logo.svg';
+import { useAccessToken } from '../../hooks/use-access-token';
 import Settings from './settings';
 import Player from './player';
 import Header from './header';

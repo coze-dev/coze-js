@@ -13,8 +13,8 @@ import MessageForm, { type MessageFormRef } from './message-form';
 import '../../App.css';
 import { ChatEventType } from '@coze/api';
 
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
-import { DISCONNECT_TIME } from '../utils/constants';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
+import { DISCONNECT_TIME } from '../../utils/constants';
 
 const { Text, Link } = Typography;
 

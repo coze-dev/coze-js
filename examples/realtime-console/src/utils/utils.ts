@@ -5,16 +5,15 @@ import { type LocalManager, LocalStorageKey } from './local-manager';
 import { DEFAULT_OAUTH_CLIENT_ID } from './constants';
 
 export const getBaseUrl = (): string => {
-  const defaultBaseUrl = window.location.href.includes('boe')
-    ? 'https://bot-open-api.bytedance.net'
-    : 'https://api.coze.cn';
+  const defaultBaseUrl =
+    process.env.REACT_APP_BASE_URL || 'https://api.coze.cn';
   return localStorage.getItem('base_url') || defaultBaseUrl;
 };
 
 export const getCurrentLocation = () =>
   `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
 
-export const isShowVideo = !window.location.href.includes('coze.cn');
+export const isShowVideo = process.env.REACT_APP_ENABLE_VIDEO === 'true';
 
 export const redirectToLogin = (
   isTeamWorkspace?: boolean,

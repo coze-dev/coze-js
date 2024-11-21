@@ -4,8 +4,8 @@ import Link from 'antd/es/typography/Link';
 import { Layout, Button, Modal } from 'antd';
 import { SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
-import { DOCS_URL } from '../utils/constants';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
+import { DOCS_URL } from '../../utils/constants';
 import logo from '../../logo.svg';
 import SettingForm from './setting-form';
 const { Header } = Layout;

@@ -7,9 +7,13 @@ import {
   refreshOAuthToken,
 } from '@coze/api';
 
-import { getBaseUrl, getCurrentLocation, saveOAuthToken } from '../utils/utils';
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
-import { DEFAULT_OAUTH_CLIENT_ID } from '../utils/constants';
+import {
+  getBaseUrl,
+  getCurrentLocation,
+  saveOAuthToken,
+} from '../../utils/utils';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
+import { DEFAULT_OAUTH_CLIENT_ID } from '../../utils/constants';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();

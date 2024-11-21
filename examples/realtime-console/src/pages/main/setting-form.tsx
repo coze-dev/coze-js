@@ -17,13 +17,13 @@ import {
 import { AuthenticationError } from '@coze/api';
 import { RobotOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
-import { redirectToLogin } from '../utils/utils';
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+import { redirectToLogin } from '../../utils/utils';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import useCozeAPI, {
   type WorkspaceOption,
   type BotOption,
   type VoiceOption,
-} from '../hooks/use-coze-api';
+} from '../../hooks/use-coze-api';
 import VoiceSelect from './voice-select';
 const { Text } = Typography;
 

@@ -19,7 +19,7 @@ import {
   AudioOutlined,
 } from '@ant-design/icons';
 
-import { type VoiceOption } from '../hooks/use-coze-api';
+import { type VoiceOption } from '../../hooks/use-coze-api';
 
 const VoiceClone: React.FC<{
   visible: boolean;

@@ -3,7 +3,7 @@ import '../../App.css';
 import { type RealtimeClient } from '@coze/realtime-api';
 import { type CheckboxChangeEvent } from 'antd/es/checkbox';
 
-import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 
 const Player: React.FC<{
   clientRef: React.MutableRefObject<RealtimeClient | null>;
