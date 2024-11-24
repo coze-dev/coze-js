@@ -45,6 +45,7 @@ const result = await getJWTToken({
   aud,
   keyid,
   privateKey,
+  sessionName: 'test', // optional Isolate different sub-resources under the same jwt account
 });
 console.log('getJWTToken', result);
 

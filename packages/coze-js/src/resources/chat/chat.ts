@@ -369,6 +369,7 @@ export enum ChatStatus {
   COMPLETED = 'completed',
   FAILED = 'failed',
   REQUIRES_ACTION = 'requires_action',
+  CANCELED = 'canceled',
 }
 
 export interface CreateChatData {

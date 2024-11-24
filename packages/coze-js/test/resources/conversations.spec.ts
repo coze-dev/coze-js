@@ -59,5 +59,45 @@ describe('Conversations', () => {
     });
   });
 
+  describe('list', () => {
+    it('should list conversations', async () => {
+      const mockResponse = { data: { id: 'conversation-id' } };
+      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
+
+      const params = {
+        bot_id: 'test-bot-id',
+      };
+
+      const result = await conversations.list(params);
+
+      expect(client.get).toHaveBeenCalledWith(
+        '/v1/conversations',
+        params,
+        false,
+        undefined,
+      );
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
+  describe('clear', () => {
+    it('should clear a conversation', async () => {
+      const mockResponse = { data: { id: 'conversation-id' } };
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
+
+      const conversationId = 'conversation-id';
+
+      const result = await conversations.clear(conversationId);
+
+      expect(client.post).toHaveBeenCalledWith(
+        `/v1/conversations/${conversationId}/clear`,
+        null,
+        false,
+        undefined,
+      );
+      expect(result).toEqual(mockResponse.data);
+    });
+  });
+
   // Add more tests for other methods as needed
 });

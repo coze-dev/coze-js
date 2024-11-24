@@ -300,13 +300,18 @@ export const getJWTToken = async (
 
   // Prepare the payload for the JWT
   const now = Math.floor(Date.now() / 1000);
-  const payload = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const payload: Record<string, any> = {
     iss: config.appId,
     aud: config.aud,
     iat: now,
     exp: now + 3600, // 1 hour
     jti: `${now.toString(16)}`,
   };
+
+  if (config.sessionName) {
+    payload.session_name = config.sessionName;
+  }
 
   return new Promise((resolve, reject) => {
     jwt.sign(
@@ -427,6 +432,8 @@ export interface JWTTokenConfig {
   privateKey: string;
   algorithm?: jwt.Algorithm;
   scope?: JWTScope;
+  /**Isolate different sub-resources under the same jwt account */
+  sessionName?: string;
 }
 
 export enum PKCEAuthErrorType {

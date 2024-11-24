@@ -1,9 +1,13 @@
+import assert from 'assert';
+
 import { RoleType } from '@coze/api';
 
-import { client } from './client';
+import { botId, client } from './client';
 
-async function main() {
+// eslint-disable-next-line @typescript-eslint/naming-convention
+async function createConversation(bot_id?: string) {
   const conversation = await client.conversations.create({
+    bot_id,
     messages: [
       {
         role: RoleType.Assistant,
@@ -29,6 +33,11 @@ async function main() {
       k: 'z',
     },
   });
+  return conversation;
+}
+
+async function main() {
+  const conversation = await createConversation();
   console.log('client.conversations.create', conversation);
 
   const conversation2 = await client.conversations.retrieve(conversation.id);
@@ -82,4 +91,21 @@ async function main() {
   console.log('client.conversations.messages.list', messages);
 }
 
+async function withBotId() {
+  assert(botId, 'botId is required');
+  const conversation = await createConversation(botId);
+  console.log('client.conversations.create', conversation);
+
+  const list = await client.conversations.list({
+    bot_id: botId,
+    page_num: 1,
+    page_size: 50,
+  });
+  console.log('client.conversations.list', list);
+
+  const session = await client.conversations.clear(conversation.id);
+  console.log('client.conversations.clear', session);
+}
+
 main().catch(console.error);
+withBotId().catch(console.error);
