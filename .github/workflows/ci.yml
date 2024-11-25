@@ -22,6 +22,25 @@ jobs:
         with:
           fetch-depth: 1
 
+      # https://stackoverflow.com/a/74268200/11424816
+      # get modify files in pull_request and push event.
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+      - name: Get changed files
+        id: changed-files
+        run: |
+          if ${{ github.event_name == 'pull_request' }}; then
+              echo "changed_files=$(git diff --name-only HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
+          else
+              echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+          fi
+      - name: List changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.changed_files }}; do
+              echo "$file was changed"
+          done
+
       - name: Config Git User
         # should be turn to ci user
         run: |
@@ -35,11 +54,15 @@ jobs:
       - name: Install Dependencies
         run: node common/scripts/install-run-rush.js install
 
+      # increment build
       - name: Build
         run: node common/scripts/install-run-rush.js build --verbose
 
+      # increment test:cov
       - name: Test:cov
         run: node common/scripts/install-run-rush.js test:cov --verbose
+
+      # TODO: increment upload coverage to codecov?
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -53,3 +76,9 @@ jobs:
         # TODO: it should be fixed ASAP
         continue-on-error: true
         run: node common/scripts/install-run-rush.js lint --verbose
+# increment action:
+#
+# - build
+# - test:cov
+# - lint
+# - stylelint
