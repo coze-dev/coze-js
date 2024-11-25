@@ -20,24 +20,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 1
+          fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 2 }}
 
-      # https://stackoverflow.com/a/74268200/11424816
-      # get modify files in pull_request and push event.
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
       - name: Get changed files
         id: changed-files
-        run: |
-          if ${{ github.event_name == 'pull_request' }}; then
-              echo "changed_files=$(git diff --name-only HEAD^1 HEAD | xargs)" >> $GITHUB_OUTPUT
-          else
-              echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-          fi
+        uses: tj-actions/changed-files@v45
+
       - name: List changed files
         run: |
-          for file in ${{ steps.changed-files.outputs.changed_files }}; do
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
               echo "$file was changed"
           done
 
