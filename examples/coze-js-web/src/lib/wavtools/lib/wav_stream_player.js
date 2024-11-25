@@ -73,7 +73,12 @@ export class WavStreamPlayer {
    * @private
    * @returns {Promise<true>}
    */
-  _start() {
+  async _start() {
+    // Ensure worklet is loaded
+    if (!this.context) {
+      await this.connect();
+    }
+
     const streamNode = new AudioWorkletNode(this.context, 'stream_processor');
     streamNode.connect(this.context.destination);
     streamNode.port.onmessage = (e) => {
@@ -87,6 +92,7 @@ export class WavStreamPlayer {
         this.trackSampleOffsets[requestId] = { trackId, offset, currentTime };
       }
     };
+
     this.analyser.disconnect();
     streamNode.connect(this.analyser);
     this.stream = streamNode;
@@ -100,14 +106,14 @@ export class WavStreamPlayer {
    * @param {string} [trackId]
    * @returns {Int16Array}
    */
-  add16BitPCM(arrayBuffer, trackId = 'default') {
+  async add16BitPCM(arrayBuffer, trackId = 'default') {
     if (typeof trackId !== 'string') {
       throw new Error(`trackId must be a string`);
     } else if (this.interruptedTrackIds[trackId]) {
       return;
     }
     if (!this.stream) {
-      this._start();
+      await this._start();
     }
     let buffer;
     if (arrayBuffer instanceof Int16Array) {

@@ -17,11 +17,11 @@ const useCozeAPI = () => {
   const [content, setContent] = useState('');
   const [client, setClient] = useState<CozeAPI | null>(null);
   const isConnected = useRef(false);
+  const trackId = useRef('my-track');
 
   const initClient = () => {
     const baseUrl = config.getBaseUrl();
     const pat = config.getPat();
-
     setClient(
       new CozeAPI({
         token: pat,
@@ -38,12 +38,13 @@ const useCozeAPI = () => {
 
     const voiceFileId = config.getVoiceFileId();
     const botId = config.getBotId();
+    trackId.current = `my-track-${new Date().getTime()}`;
 
     const messages = [
       {
         role: RoleType.User,
         type: 'question' as MessageType,
-        content: `[{"type":"audio","file_id":"${voiceFileId}"}]`,
+        content: `[{"type":"audio","file_id":"${voiceFileId}"},{"type":"text","content":"${query}"}]`,
         content_type: 'object_string' as const,
       },
     ];
@@ -98,12 +99,25 @@ const useCozeAPI = () => {
       view[i] = decodedContent.charCodeAt(i);
     }
 
-    wavStreamPlayer.add16BitPCM(arrayBuffer, 'my-track');
+    wavStreamPlayer.add16BitPCM(arrayBuffer, trackId.current);
   }, []);
 
   const interruptAudio = useCallback(() => {
     wavStreamPlayer.interrupt();
   }, []);
+
+  const uploadFile = useCallback(
+    async (file: File) => {
+      if (!client) {
+        throw new Error('Client not initialized');
+      }
+      const res = await client?.files.upload({
+        file,
+      });
+      return res;
+    },
+    [client],
+  );
 
   return {
     content,
@@ -112,6 +126,7 @@ const useCozeAPI = () => {
     initClient,
     streamingChat,
     interruptAudio,
+    uploadFile,
   };
 };
 
