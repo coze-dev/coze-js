@@ -382,6 +382,22 @@
       "projectFolder": "config/vitest-config"
     },
     {
+      "packageName": "@coze-infra/rush-x",
+      "projectFolder": "infra/rush-x"
+    },
+    {
+      "packageName": "@coze-infra/fs-enhance",
+      "projectFolder": "infra/utils/fs-enhance"
+    },
+    {
+      "packageName": "@coze-infra/rush-logger",
+      "projectFolder": "infra/utils/rush-logger"
+    },
+    {
+      "packageName": "@coze-infra/package-audit",
+      "projectFolder": "infra/package-audit"
+    },
+    {
       "packageName": "@coze/api",
       "projectFolder": "packages/coze-js"
     },

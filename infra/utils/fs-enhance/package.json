@@ -1,0 +1,28 @@
+{
+  "name": "@coze-infra/fs-enhance",
+  "version": "0.0.1",
+  "description": "Utils to enhance fs dx",
+  "license": "ISC",
+  "author": "fanwenjie.fe@bytedance.com",
+  "maintainers": [],
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "lint": "eslint ./ --cache",
+    "test": "vitest --run --passWithNoTests",
+    "test:cov": "npm run test -- --coverage"
+  },
+  "dependencies": {
+    "json5": "^2.2.1",
+    "yaml": "^2.2.2"
+  },
+  "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/ts-config": "workspace:*",
+    "@coze-infra/vitest-config": "workspace:*",
+    "@types/node": "^20",
+    "@vitest/coverage-v8": "~2.1.4",
+    "sucrase": "^3.32.0",
+    "vitest": "~2.1.4"
+  }
+}

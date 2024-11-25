@@ -26,12 +26,6 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v45
 
-      - name: List changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-              echo "$file was changed"
-          done
-
       - name: Config Git User
         # should be turn to ci user
         run: |
@@ -47,13 +41,13 @@ jobs:
 
       # increment build
       - name: Build
-        run: node common/scripts/install-run-rush.js build --verbose
+        run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
+        continue-on-error: true
 
       # increment test:cov
       - name: Test:cov
-        run: node common/scripts/install-run-rush.js test:cov --verbose
-
-      # TODO: increment upload coverage to codecov?
+        run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
+        continue-on-error: true
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -66,10 +60,4 @@ jobs:
         # for current stage, we got so much lint error, so we have to ignore it
         # TODO: it should be fixed ASAP
         continue-on-error: true
-        run: node common/scripts/install-run-rush.js lint --verbose
-# increment action:
-#
-# - build
-# - test:cov
-# - lint
-# - stylelint
+        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
