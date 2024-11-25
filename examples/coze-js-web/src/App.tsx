@@ -6,7 +6,7 @@ import Voice from './pages/voice';
 
 function App() {
   return (
-    <Router>
+    <Router basename={`${process.env.PUBLIC_URL}`}>
       <div className="App">
         <Routes>
           <Route path="/chat" element={<Chat />} />
