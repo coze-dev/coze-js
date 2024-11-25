@@ -1,4 +1,5 @@
 {
+  // fooo
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
