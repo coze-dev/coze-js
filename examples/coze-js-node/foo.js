@@ -1,1 +1,0 @@
-const foo = () => echo "foo"
