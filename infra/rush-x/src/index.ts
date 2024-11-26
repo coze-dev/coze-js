@@ -4,6 +4,8 @@ import { logger } from '@coze-infra/rush-logger';
 
 import { IncrementAction } from './actions';
 
+const a = 'foo';
+
 export class RushCICommandLine extends CommandLineParser {
   readonly rushConfiguration!: RushConfiguration;
 
