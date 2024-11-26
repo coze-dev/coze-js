@@ -19,7 +19,7 @@ const isNeedLint = (file: string) =>
 
 const DISABLED_RULES: string[] = [];
 
-const DISABLED_PACKAGES = ['@/eslint-config'];
+const DISABLED_PACKAGES = ['@coze-infra/eslint-config'];
 
 interface ExecResult {
   code: number;
@@ -123,15 +123,14 @@ export const runLint = async (
     return res;
   };
   const batchJobs = splitBatchJobs(changedFileGroup);
+  log.info(`batchJobs:${JSON.stringify(batchJobs)}`);
   const batchResult = await batchRun<{
     packageName: string;
     diagnostics: string;
     code: number;
   }>(
     batchJobs
-      .filter(
-        ([packageName]) => DISABLED_PACKAGES.includes(packageName) === false,
-      )
+      .filter(([packageName]) => !DISABLED_PACKAGES.includes(packageName))
       .map(([packageName, batchFiles]) => async () => {
         log.debug(`Run Lint in ${packageName}`);
         const res = await runLintInProject(packageName, batchFiles);

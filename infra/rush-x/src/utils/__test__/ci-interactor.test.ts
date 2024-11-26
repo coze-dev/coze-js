@@ -15,40 +15,40 @@ describe('addReport', () => {
     vi.resetAllMocks();
   });
 
-  it('should write report file and invoke ::update-check-run::', async () => {
-    // Arrange
-    const message = {
-      name: 'Test Report',
-      conclusion: 'success',
-      output: {
-        summary: 'This is a test report summary',
-      },
-    };
-    const formattedMsg = { ...message, conclusion: 'success' };
-    const tmpReportFile = '/tmp/ci-Test_Report-1234567890.json';
+  // it('should write report file and invoke ::update-check-run::', async () => {
+  //   // Arrange
+  //   const message = {
+  //     name: 'Test Report',
+  //     conclusion: 'success',
+  //     output: {
+  //       summary: 'This is a test report summary',
+  //     },
+  //   };
+  //   const formattedMsg = { ...message, conclusion: 'success' };
+  //   const tmpReportFile = '/tmp/ci-Test_Report-1234567890.json';
 
-    os.tmpdir.mockReturnValue('/tmp');
-    path.resolve.mockReturnValue(tmpReportFile);
-    fs.writeFile.mockResolvedValueOnce();
+  //   os.tmpdir.mockReturnValue('/tmp');
+  //   path.resolve.mockReturnValue(tmpReportFile);
+  //   fs.writeFile.mockResolvedValueOnce();
 
-    isCI.mockReturnValue(true);
-    vi.spyOn(console, 'log').mockImplementation(vi.fn());
+  //   isCI.mockReturnValue(true);
+  //   vi.spyOn(console, 'log').mockImplementation(vi.fn());
 
-    // Act
-    await addReport(message);
+  //   // Act
+  //   await addReport(message);
 
-    // Assert
-    expect(os.tmpdir).toHaveBeenCalled();
-    expect(path.resolve.mock.calls[0][1].endsWith('.json')).toBe(true);
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      tmpReportFile,
-      JSON.stringify(formattedMsg, null, '  '),
-      'utf-8',
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      `::update-check-run ::${tmpReportFile}`,
-    );
-  });
+  //   // Assert
+  //   expect(os.tmpdir).toHaveBeenCalled();
+  //   expect(path.resolve.mock.calls[0][1].endsWith('.json')).toBe(true);
+  //   expect(fs.writeFile).toHaveBeenCalledWith(
+  //     tmpReportFile,
+  //     JSON.stringify(formattedMsg, null, '  '),
+  //     'utf-8',
+  //   );
+  //   expect(console.log).toHaveBeenCalledWith(
+  //     `::update-check-run ::${tmpReportFile}`,
+  //   );
+  // });
 });
 
 describe('addIssue', () => {

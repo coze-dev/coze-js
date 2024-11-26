@@ -24,6 +24,7 @@
     "test:cov": "npm run test -- --coverage"
   },
   "dependencies": {
+    "@actions/core": "~1.11.1",
     "@babel/core": "^7.16.0",
     "@babel/types": "^7.20.7",
     "@coze-infra/fs-enhance": "workspace:*",

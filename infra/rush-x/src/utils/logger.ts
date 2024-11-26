@@ -1,7 +1,7 @@
 import { logger as log } from '@coze-infra/rush-logger';
+import * as core from '@actions/core';
 
 import { isCI } from './env';
-import { addMessage as addMessageInCI, CIMessageLevel } from './ci-interactor';
 
 interface Logger {
   info: (message: string) => void;
@@ -10,9 +10,9 @@ interface Logger {
 }
 
 const loggerForCI: Logger = {
-  info: addMessageInCI.bind(null, CIMessageLevel.INFO),
-  error: addMessageInCI.bind(null, CIMessageLevel.ERROR),
-  warning: addMessageInCI.bind(null, CIMessageLevel.WARNING),
+  info: core.info,
+  error: core.error,
+  warning: core.warning,
 };
 
 const loggerForShell: Logger = {

@@ -73,7 +73,8 @@ rush increment -a ts-check -b origin/${process.env.targetBranch}
       name: reportName,
       conclusion: CIReportConclusion.FAILED,
       output: {
-        summary: `Typescript Check Failure With **${errorCount}** Issue(s):
+        summary: ` # ❌  Typescript Check Failure
+Typescript Check Failure With **${errorCount}** Issue(s):
 
 ${localHelperTips}
 
@@ -116,7 +117,7 @@ ${content}
       name: reportName,
       conclusion: CIReportConclusion.SUCCESS,
       output: {
-        summary: 'GOOD',
+        summary: '',
         description: '',
       },
     });

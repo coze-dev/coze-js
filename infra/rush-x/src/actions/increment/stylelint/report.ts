@@ -28,7 +28,7 @@ export const report = async (
         name: reportName,
         conclusion: CIReportConclusion.SUCCESS,
         output: {
-          summary: 'GOOD',
+          summary: '',
           description: '',
         },
       });
@@ -59,7 +59,7 @@ rush increment -a style -b origin/${process.env.targetBranch}
     name: reportName,
     conclusion: CIReportConclusion.FAILED,
     output: {
-      summary: `# Stylelint Detect Result
+      summary: `# ❌ Stylelint Detect Result
 
 ${localHelperTips}
 

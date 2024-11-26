@@ -14,7 +14,7 @@ export const report = async (
         name: reportName,
         conclusion: CIReportConclusion.SUCCESS,
         output: {
-          summary: 'GOOD',
+          summary: '',
           description: '',
         },
       });
@@ -45,7 +45,7 @@ rush increment -a lint -b origin/${process.env.targetBranch}
     name: reportName,
     conclusion: CIReportConclusion.FAILED,
     output: {
-      summary: `# ESLint Detect Result
+      summary: `# ❌ ${reportName}
 
 ${localHelperTips}
 

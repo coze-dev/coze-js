@@ -13,8 +13,6 @@ interface RushErrors {
   failureLogs: [string, string][];
 }
 
-// 这种依赖于 rush 输出的方式是不靠谱的，未来输出格式变化可能导致这里失败
-// FIXME: 因此，抽空改成直接调用 rush 接口，拿到结构化数据之后，再输出
 // eslint-disable-next-line max-lines-per-function
 export const reportRushLog = (
   res: shell.ShellString,
@@ -94,7 +92,7 @@ export const reportRushLog = (
       });
       return;
     }
-    const reportText = ['# Rush increment operate failure'];
+    const reportText = [`# ❌ Rush ${name} failure`];
     reportText.push(
       ...errors.failureLogs.map(
         ([packageName, errorLog]) => `## \`${packageName}\` Report Error(s):

@@ -41,12 +41,12 @@ jobs:
 
       # increment build
       - name: Build
-        run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
+        run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
         continue-on-error: true
 
       # increment test:cov
       - name: Test:cov
-        run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
+        run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
         continue-on-error: true
 
       - name: Upload coverage reports
@@ -60,4 +60,4 @@ jobs:
         # for current stage, we got so much lint error, so we have to ignore it
         # TODO: it should be fixed ASAP
         continue-on-error: true
-        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s '\n'
+        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '

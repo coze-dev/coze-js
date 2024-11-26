@@ -21,7 +21,7 @@ export const report = async (diagnostics: AuditPackageReports) => {
         ? CIReportConclusion.WARNING
         : CIReportConclusion.SUCCESS;
     const reportName = 'Package Audit Checker';
-    const summary = [`# ${reportName}`];
+    const summary = [`# ❌ ${reportName}`];
 
     if (hasError || hasWarning) {
       const localHelperTips = process.env.targetBranch
@@ -38,7 +38,7 @@ Please fix these problems:
 
 `
         : '';
-      const headers = ['Level', '包名', '规则', '详情'];
+      const headers = ['Level', 'packageName', 'rule', 'detail'];
       const table = [
         joinAsRow(headers),
         joinAsRow(headers.map(() => '----')),
