@@ -44,8 +44,8 @@ const createLocalWorker = (workerPath: string) => {
   const close = () => {
     if (worker) {
       worker.removeAllListeners();
+      worker.terminate();
       worker = null;
-      // parentPort.postMessage('closed');
     }
   };
 
