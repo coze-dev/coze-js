@@ -15,19 +15,20 @@ export const checkEssentialConfigFiles: AuditRule<{
     const essentialFiles = config?.essentialFiles || defaultEssentialFiles;
     return (
       await Promise.all(
-        // @ts-expect-error -- ignore
-        essentialFiles.map(async (file: string): Promise<AuditDetectResult> => {
-          const filePath = path.resolve(projectFolder, file);
-          const exists = await isFileExists(filePath);
+        essentialFiles.map(
+          async (file: string): Promise<AuditDetectResult | undefined> => {
+            const filePath = path.resolve(projectFolder, file);
+            const exists = await isFileExists(filePath);
 
-          if (!exists) {
-            return {
-              content: `\`${path.basename(
-                file,
-              )}\` does not exist, please add it to your package.`,
-            };
-          }
-        }),
+            if (!exists) {
+              return {
+                content: `\`${path.basename(
+                  file,
+                )}\` does not exist, please add it to your package.`,
+              };
+            }
+          },
+        ),
       )
     ).filter(r => !!r);
   },
