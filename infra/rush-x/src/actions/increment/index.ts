@@ -71,7 +71,6 @@ export class IncrementAction extends CommandLineAction {
         'coverage',
         'test:cov',
         'lint',
-        'perf-defender',
         'ts-check',
         'style',
         'package-audit',

@@ -55,6 +55,14 @@ jobs:
         continue-on-error: true
         run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
+      - name: Increment TS Check
+        continue-on-error: true
+        run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+
+      - name: Increment Package Audit
+        continue-on-error: true
+        run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+
       - name: Fail if any step failed
         if: failure()
         run: exit 1
