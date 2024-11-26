@@ -62,8 +62,7 @@ export const checkPackage = async (context: {
 
   let tsconfigFile = '';
   try {
-    // 某些项目可能没有 tsconfig 文件
-    // 这里直接跳过
+    // skip NO ts-config project
     tsconfigFile = await resolveTsconfigFile(projectFolder);
   } catch (e) {
     printLog((e as Error).message, 'error');
@@ -88,8 +87,8 @@ export const checkPackage = async (context: {
       projectFolder,
     )} in ${duration}ms.`,
   );
+  // TODO: enable all project config reference correctly.
   // error TS2307:  Cannot find module 'xxx' or its corresponding type declarations
-  // 用于支持依赖产物的增量检测效果
   // const TS_ERROR_2307 = 2307;
   // const matchedDiagnostics = diagnostics
   //   .filter(r => !r.file || changedFiles.includes(r.file.fileName))

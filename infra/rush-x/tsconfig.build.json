@@ -14,9 +14,9 @@
   "exclude": ["./src/**/*.test.ts"],
   "include": ["./src", "./src/**/*.json"],
   "references": [
-    // {
-    //   "path": "../package-audit/tsconfig.build.json"
-    // },
+    {
+      "path": "../package-audit/tsconfig.build.json"
+    },
     {
       "path": "../utils/fs-enhance/tsconfig.build.json"
     },

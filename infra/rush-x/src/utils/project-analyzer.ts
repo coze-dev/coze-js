@@ -57,7 +57,7 @@ export const groupChangedFilesByProject = (
   return changedProjects;
 };
 
-//  TODO: deprecated, 后面应该可以收敛这个函数
+// TODO: deprecated, can be merged with getChangedProjectsFromRemote
 export function getChangedProjectsFromRemote(
   files: string | string[],
 ): RushConfigurationProject[] {

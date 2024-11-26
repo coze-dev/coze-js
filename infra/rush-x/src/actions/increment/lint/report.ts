@@ -55,5 +55,4 @@ ${ciReportContent}
   });
 
   stopProcess(1);
-  // throw new Error(`Run Lint Failure`);
 };

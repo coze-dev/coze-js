@@ -83,14 +83,10 @@ interface CIReportDefinition {
 }
 
 export interface CIIssueDef {
-  // 规则名称，自定义
   rule: string;
-  // issue的等级
   severity: 'info' | 'warning' | 'error';
-  // issue 指定的文件，相对于仓库根目录的路径，如 main.go、handler/handle.go
+  // file path relative to repo root.
   path?: string;
-  // issue 出现的行
   line?: number;
-  // issue 信息
   message: string;
 }

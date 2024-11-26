@@ -82,7 +82,7 @@ const createLocalWorker = (workerPath: string) => {
 
 export class WorkerPool {
   #workers: LocalWorker[] = [];
-  // 等待执行的异步任务
+  // waiting for execution async tasks
   #tasks: ((worker: LocalWorker) => Promise<unknown>)[] = [];
 
   constructor(workerFile: string, size: number) {

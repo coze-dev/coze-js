@@ -10,19 +10,19 @@ import { presetRules } from './rules';
 
 interface AuditEngineConfig {
   /**
-   * 是否启用 audit 分析
+   * Whether to enable audit analysis
    */
   enable: boolean;
   /**
-   * 需要执行校验的规则
+   * Rules to be checked
    */
   rules: RuleConfigTuple[];
   /**
-   * 需要执行检测的包名
+   * Package name to be checked
    */
   project: RushConfigurationProject;
   /**
-   * 格式化方案，目前仅支持 text 格式
+   * Formatting scheme, currently only supports text format
    */
   reporter: AuditReporter;
 }
@@ -34,9 +34,9 @@ const zip = <T extends Record<string, unknown>>(obj: T): Partial<T> =>
   Object.keys(obj).reduce((acc, k) => {
     const v = obj[k];
     if (
-      // 空对象
+      // Empty object
       typeof v === 'undefined' ||
-      // 空数组
+      // Empty array
       (Array.isArray(v) && v.length === 0)
     ) {
       return acc;

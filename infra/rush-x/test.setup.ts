@@ -4,16 +4,6 @@ import type * as Utilities from '@rushstack/rush-sdk/lib/utilities/Utilities';
 import type * as PublishUtilities from '@rushstack/rush-sdk/lib/logic/PublishUtilities';
 import type * as NodeCoreLib from '@rushstack/node-core-library';
 
-vi.mock('@evem/cli', async () => {
-  const actual: Record<string, unknown> = await vi.importActual('@evem/cli');
-  return {
-    ...actual,
-    Evem: vi.fn().mockImplementation(() => ({
-      execute: vi.fn(),
-    })),
-  };
-});
-
 vi.mock('axios');
 vi.mock('@rushstack/node-core-library', async () => {
   const actual: typeof NodeCoreLib = await vi.importActual(

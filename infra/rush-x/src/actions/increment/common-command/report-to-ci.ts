@@ -35,7 +35,6 @@ export const reportRushLog = (
     // do nothing
     return;
   }
-  // 替换掉所有颜色制表符
   // eslint-disable-next-line no-control-regex
   const rushLog = res.stdout.toString().replace(/\[\d+m/g, '');
   const extractErrors = (): RushErrors => {

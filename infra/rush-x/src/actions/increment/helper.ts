@@ -9,7 +9,7 @@ export const stopProcess = (code: number): void => {
     setTimeout(() => {
       process.exitCode = code;
       process.exit(code);
-      // 预留 1s，给 CI 清理
+      // 1s delay for CI.
     }, ONE_SEC);
   } else {
     process.exitCode = code;
@@ -34,7 +34,9 @@ ${res.stderr.toString()}
 };
 
 export const extractChangedFilesByGitDiff = (branch: string): string[] => {
-  logger.info('建议在执行改命令前，先执行 `git fetch`，以确保结果的及时性');
+  logger.info(
+    'Please run `git fetch` before this command to ensure up-to-date results',
+  );
   try {
     return execGitDiffFiles(branch);
   } catch (e) {

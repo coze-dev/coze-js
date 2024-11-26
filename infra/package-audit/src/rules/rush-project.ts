@@ -20,13 +20,13 @@ export const checkRushProjectFile: AuditRule<unknown> = {
     if (commands.every(c => isEmptyCmd(packageJson.scripts?.[c]))) {
       return res;
     }
-    // 有 build 或 test 命令，但没有 project config 文件
+    // If there are build or test commands, but no project config file
     else if (!(await isFileExists(rushProjectFilePath))) {
       res.push({
         content: 'should provide "config/rush-project.json" file.',
       });
     } else {
-      // TODO: 这里要补充 readJsonFile 抛错的处理逻辑
+      // TODO: Add error handling for readJsonFile
       const projectConfig = await readJsonFile<{
         operationSettings: {
           operationName: string;

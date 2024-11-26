@@ -17,7 +17,6 @@ export const runLintInProject = async (params: {
   logger.info(`Start run stylelint at ${cwd}`);
   const lastConfig = await stylelint.resolveConfig(configFile);
 
-  // 这个属性需要保留，否则没有检测到 需要 lint 文件的时候会报错
   lastConfig.allowEmptyInput = true;
 
   const { results } = await stylelint.lint({

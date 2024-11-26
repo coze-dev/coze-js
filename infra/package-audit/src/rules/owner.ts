@@ -49,7 +49,7 @@ export const checkReviewerCount: AuditRule<{
       requireReviewers = DEFAULT_MIN_REVIEWER_COUNT,
       requireApprovals = DEFAULT_MIN_APPROVALS_REQUIRED,
     } = config || {};
-    // 有无 owners 文件的检测已经在 `essential-configs` 实现了，这里不重复
+    // The detection of the presence of the owners file is already implemented in `essential-configs`, so it is not repeated here.
     if (!(await isFileExists(ownerFilePath))) {
       return res;
     }

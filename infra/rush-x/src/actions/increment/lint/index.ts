@@ -8,10 +8,10 @@ import { getRushConfiguration } from '../../../utils/project-analyzer';
 import { getCPUSize } from '../../../utils/env';
 import { report } from './report';
 
-// 限制单次执行分析的文件数，防止单次命令行超过 terminal 限制导致命令失败
+// Limit the number of files analyzed at once to prevent command failure due to terminal limitations
 const LINT_BATCH_SIZE = 30;
 
-// 并行执行的 eslint 实例数
+// Number of eslint instances running in parallel
 const PARALLEL_SIZE = Math.max(getCPUSize() - 1, 1);
 
 const isNeedLint = (file: string) =>
@@ -91,8 +91,8 @@ const batchRun = <T>(
   });
 };
 
-// lint 比较特殊，需要按文件粒度跑
-// @params batchSize: 单次执行 lint 的文件数
+// lint is special, it needs to run by file granularity
+// @params batchSize: the number of files to run lint at once
 export const runLint = async (
   changedFileGroup: Record<string, string[]>,
 ): Promise<void> => {

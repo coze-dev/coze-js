@@ -52,20 +52,20 @@ export class IncrementAction extends CommandLineAction {
       argumentName: 'CHANGED_FILES',
       parameterLongName: '--changed-files',
       parameterShortName: '-f',
-      description: '变更文件列表',
+      description: 'List of changed files',
     });
 
     this.separator = this.defineStringParameter({
       argumentName: 'SEPARATOR',
       parameterLongName: '--separator',
       parameterShortName: '-s',
-      description: '变更文件列表分隔符',
+      description: 'Separator for the list of changed files',
       defaultValue: ',',
     });
 
     this.action = this.defineChoiceParameter({
       parameterLongName: '--action',
-      description: '支持的增量操作命令',
+      description: 'Supported incremental operation commands',
       alternatives: [
         'build',
         'coverage',
@@ -82,7 +82,7 @@ export class IncrementAction extends CommandLineAction {
       argumentName: 'CHANGED_PATH',
       parameterLongName: '--changed-path',
       parameterShortName: '-p',
-      description: '变更文件列表所在文件路径',
+      description: 'File path containing the list of changed files',
     });
 
     this.comparedBranch = this.defineStringParameter({
@@ -90,7 +90,7 @@ export class IncrementAction extends CommandLineAction {
       parameterLongName: '--branch',
       parameterShortName: '-b',
       description:
-        '需要作对比的目标分支，使用该参数前建议先执行 `git fetch`，确保对比结果的正确性',
+        'Target branch for comparison. Before using this parameter, it is recommended to execute `git fetch` first to ensure the accuracy of the comparison results',
     });
   }
 }

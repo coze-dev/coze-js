@@ -6,7 +6,6 @@ import { type AuditRule, type AuditDetectResult } from '../types';
 
 const defaultEssentialFiles = ['eslint.config.js', 'tsconfig.json', 'OWNERS'];
 
-// 以上这些文件都必须存在
 export const checkEssentialConfigFiles: AuditRule<{
   essentialFiles?: string[];
 }> = {

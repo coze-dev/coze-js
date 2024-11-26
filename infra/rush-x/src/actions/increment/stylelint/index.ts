@@ -5,7 +5,7 @@ import { logger } from '../../../utils/logger';
 import { runLintInProject } from './stylelint';
 import { report } from './report';
 
-// 目前只需要针对这两部分文件做检测
+// Only need to check these two types of files
 const ALLOW_EXTS = ['.less', '.css'];
 
 export const runStylelint = async (
