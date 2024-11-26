@@ -1,13 +1,12 @@
 import { type Mock } from 'vitest';
-
-import { auditPackage } from '@/package-audit';
+import { auditPackage } from '@coze-infra/package-audit';
 
 import { report } from '../package-audit/report';
 import { runPackageAudit } from '../package-audit';
 
-vi.mock('@/package-audit');
+vi.mock('@coze-infra/package-audit');
 vi.mock('../package-audit/report');
-vi.mock('../../../utils', () => ({
+vi.mock('../../../utils/project-analyzer', () => ({
   getRushConfiguration: vi.fn(() => ({
     rushJsonFolder: 'path/to/rushJsonFolder',
     getProjectByName: vi.fn(packageName => ({

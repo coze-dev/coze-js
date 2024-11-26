@@ -1,10 +1,10 @@
 import stylelint from 'stylelint';
-
-import { isFileExists } from '@/fs-enhance';
+import { isFileExists } from '@coze-infra/fs-enhance';
 
 import { runLintInProject } from '../stylelint/stylelint';
 
-vi.mock('@/fs-enhance');
+vi.mock('@coze-infra/fs-enhance');
+
 vi.mock('../../../utils/logger', () => ({
   logger: { info: vi.fn(), error: vi.fn() },
 }));

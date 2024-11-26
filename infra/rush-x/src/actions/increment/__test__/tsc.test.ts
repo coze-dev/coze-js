@@ -1,21 +1,20 @@
-import { logger as log } from '@/rush-logger';
+import { logger as log } from '@coze-infra/rush-logger';
 
 import { reportError } from '../ts-check/report-error';
 import { runTsCheck } from '../ts-check/index';
 
 // Mock dependencies
-vi.mock('@/rush-logger', () => ({
-  default: {
-    info: vi.fn(),
-    error: vi.fn(),
-  },
+vi.mock('@coze-infra/rush-logger', () => ({
+  logger: { info: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock('../../../utils', () => ({
+vi.mock('../../../utils/project-analyzer', () => ({
   getRushConfiguration: vi.fn(() => ({
     rushJsonFolder: 'path/to/rushJsonFolder',
     getProjectByName: vi.fn(packageName => ({
+      packageName,
       projectFolder: `path/to/${packageName}`,
+      projectRelativeFolder: packageName,
     })),
   })),
 }));

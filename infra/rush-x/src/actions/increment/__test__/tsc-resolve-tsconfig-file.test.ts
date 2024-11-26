@@ -1,11 +1,15 @@
 import path from 'path';
 
-import { isFileExists } from '@/fs-enhance';
+import { isFileExists } from '@coze-infra/fs-enhance';
 
 import { resolveTsconfigFile } from '../ts-check/resolve-tsconfig-file';
 
-vi.mock('@/fs-enhance', () => ({
-  isFileExists: vi.fn(),
+vi.mock('@coze-infra/fs-enhance', () => ({
+  isFileExists: vi
+    .fn()
+    .mockResolvedValueOnce(false) // tsconfig.check.json
+    .mockResolvedValueOnce(true) // tsconfig.build.json
+    .mockResolvedValueOnce(false), // tsconfig.json
 }));
 
 describe('resolveTsconfigFile', () => {

@@ -22,6 +22,7 @@ vi.mock('@rushstack/node-core-library', async () => {
     }),
   };
 });
+
 vi.mock('@rushstack/rush-sdk/lib/utilities/Utilities', async () => {
   const actual: typeof Utilities = await vi.importActual(
     '@rushstack/rush-sdk/lib/utilities/Utilities',

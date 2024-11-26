@@ -11,12 +11,13 @@ vi.mock('../../../utils/logger', () => ({
 }));
 vi.mock('path', () => ({ default: { relative: vi.fn() } }));
 
-vi.mock('../../../utils', () => ({
+vi.mock('../../../utils/project-analyzer', () => ({
   getRushConfiguration: vi.fn(() => ({
     rushJsonFolder: 'path/to/rushJsonFolder',
     getProjectByName: vi.fn(packageName => ({
+      packageName,
       projectFolder: `/path/to/${packageName}`,
-      projectRelativeFolder: `path/to/${packageName}`,
+      projectRelativeFolder: packageName,
     })),
   })),
 }));

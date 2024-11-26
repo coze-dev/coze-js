@@ -96,29 +96,38 @@ describe('checkPackage', () => {
 
     expect(result).toEqual([
       {
+        error: 'diagnosticText',
         filename: 'relative/project',
+        line: 1,
         message: 'diagnostic1',
-        line: 1,
-        error: 'diagnosticText',
       },
       {
+        error: 'diagnosticText',
         filename: 'relative/project',
+        line: 1,
         message: 'diagnostic2',
+      },
+      {
+        error: 'diagnosticText',
+        message: 'diagnostic3',
+      },
+      {
+        error: 'diagnosticText',
+        filename: 'relative/project',
         line: 1,
-        error: 'diagnosticText',
+        message: 'diagnostic4',
       },
-      { message: 'diagnostic3', error: 'diagnosticText' },
       {
+        error: 'diagnosticText',
+        filename: 'relative/project',
+        line: 3,
         message: 'diagnostic5',
-        filename: 'relative/project',
-        line: 3,
-        error: 'diagnosticText',
       },
       {
-        message: 'diagnostic6',
+        error: 'diagnosticText',
         filename: 'relative/project',
         line: 3,
-        error: 'diagnosticText',
+        message: 'diagnostic6',
       },
     ]);
     expect(createTsProgramMock).toHaveBeenCalledWith(fullConfig, projectFolder);

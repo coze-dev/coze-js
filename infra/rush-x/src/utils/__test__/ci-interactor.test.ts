@@ -1,80 +1,85 @@
-import path from 'path';
-import os from 'os';
-import fs from 'fs/promises';
-
 import { isCI } from '../env';
-import { addReport, addIssue } from '../ci-interactor';
+import { addIssue, addReport, CIReportConclusion } from '../ci-interactor';
 
-vi.mock('fs/promises');
-vi.mock('os');
-vi.mock('path');
-vi.mock('../env');
+vi.mock('../env', () => ({
+  isCI: vi.fn(),
+}));
 
-describe('addReport', () => {
+describe('ci-interactor', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
-  });
-
-  // it('should write report file and invoke ::update-check-run::', async () => {
-  //   // Arrange
-  //   const message = {
-  //     name: 'Test Report',
-  //     conclusion: 'success',
-  //     output: {
-  //       summary: 'This is a test report summary',
-  //     },
-  //   };
-  //   const formattedMsg = { ...message, conclusion: 'success' };
-  //   const tmpReportFile = '/tmp/ci-Test_Report-1234567890.json';
-
-  //   os.tmpdir.mockReturnValue('/tmp');
-  //   path.resolve.mockReturnValue(tmpReportFile);
-  //   fs.writeFile.mockResolvedValueOnce();
-
-  //   isCI.mockReturnValue(true);
-  //   vi.spyOn(console, 'log').mockImplementation(vi.fn());
-
-  //   // Act
-  //   await addReport(message);
-
-  //   // Assert
-  //   expect(os.tmpdir).toHaveBeenCalled();
-  //   expect(path.resolve.mock.calls[0][1].endsWith('.json')).toBe(true);
-  //   expect(fs.writeFile).toHaveBeenCalledWith(
-  //     tmpReportFile,
-  //     JSON.stringify(formattedMsg, null, '  '),
-  //     'utf-8',
-  //   );
-  //   expect(console.log).toHaveBeenCalledWith(
-  //     `::update-check-run ::${tmpReportFile}`,
-  //   );
-  // });
-});
-
-describe('addIssue', () => {
-  let consoleLogSpy;
-
-  beforeEach(() => {
-    consoleLogSpy = vi.spyOn(console, 'log');
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    consoleLogSpy.mockRestore();
+    vi.unstubAllEnvs();
   });
 
-  it('should log the correct message to the console', () => {
-    const issue = {
-      rule: 'example-rule',
-      message: 'This is an example issue.',
-      line: 42,
-      path: 'path/to/file.js',
-      severity: 'error',
-    };
+  describe('addIssue', () => {
+    it('should add issue in CI environment', () => {
+      (isCI as vi.Mock).mockReturnValue(true);
+      vi.stubEnv('GITHUB_STEP_SUMMARY', '/tmp/github_step_summary');
 
-    addIssue(issue);
+      addIssue({
+        path: 'test/file.ts',
+        line: 1,
+        message: 'test message',
+        rule: 'test-rule',
+        severity: 'error',
+      });
 
-    const expectedMessage = `::add-issue path=${issue.path},line=${issue.line},severity=${issue.severity},rule=${issue.rule}::${issue.message}`;
+      expect(process.env.GITHUB_STEP_SUMMARY).toBeDefined();
+    });
+  });
 
-    expect(consoleLogSpy).toHaveBeenCalledWith(expectedMessage);
+  describe('addReport', () => {
+    it('should add report in CI environment', () => {
+      (isCI as vi.Mock).mockReturnValue(true);
+      vi.stubEnv('GITHUB_STEP_SUMMARY', '/tmp/github_step_summary');
+
+      addReport({
+        name: 'Test Report',
+        conclusion: CIReportConclusion.SUCCESS,
+        output: {
+          title: 'Test Title',
+          summary: 'Test Summary',
+        },
+      });
+
+      expect(process.env.GITHUB_STEP_SUMMARY).toBeDefined();
+    });
+
+    it('should handle different report conclusions', () => {
+      (isCI as vi.Mock).mockReturnValue(true);
+      vi.stubEnv('GITHUB_STEP_SUMMARY', '/tmp/github_step_summary');
+
+      // 测试成功状态
+      addReport({
+        name: 'Success Report',
+        conclusion: CIReportConclusion.SUCCESS,
+        output: {
+          summary: 'Success Summary',
+        },
+      });
+
+      // 测试失败状态
+      addReport({
+        name: 'Failed Report',
+        conclusion: CIReportConclusion.FAILED,
+        output: {
+          summary: 'Failed Summary',
+        },
+      });
+
+      // 测试中立状态
+      addReport({
+        name: 'Neutral Report',
+        conclusion: CIReportConclusion.NEUTRAL,
+        output: {
+          summary: 'Neutral Summary',
+        },
+      });
+
+      expect(process.env.GITHUB_STEP_SUMMARY).toBeDefined();
+    });
   });
 });

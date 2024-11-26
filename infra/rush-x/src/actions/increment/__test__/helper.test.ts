@@ -1,14 +1,14 @@
 import { exec } from 'shelljs';
-
-import { logger as log } from '@/rush-logger';
+import { logger as log } from '@coze-infra/rush-logger';
 
 import { extractChangedFilesByGitDiff, stopProcess } from '../helper';
 import { isCI } from '../../../utils/env';
 
 // Mocking the log and shell objects
-vi.mock('@/rush-logger', () => ({
-  default: { debug: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
+vi.mock('@coze-infra/rush-logger', () => ({
+  logger: { debug: vi.fn(), success: vi.fn(), info: vi.fn(), error: vi.fn() },
 }));
+
 vi.mock('shelljs', () => ({ exec: vi.fn() }));
 
 vi.mock('../../../utils/env', () => ({
@@ -34,7 +34,7 @@ describe('helper', () => {
       const result = extractChangedFilesByGitDiff(branch);
 
       expect(exec).toHaveBeenCalledWith(
-        'git diff --name-only origin/test-branch...',
+        'git diff --name-only upstream/test-branch...',
       );
       expect(result).toEqual(['file1.js', 'file2.js', 'file3.js']);
       expect(process.exit).not.toHaveBeenCalled();
@@ -58,7 +58,7 @@ describe('helper', () => {
       );
 
       expect(exec).toHaveBeenCalledWith(
-        'git diff --name-only origin/invalid-branch...',
+        'git diff --name-only upstream/invalid-branch...',
       );
       expect(process.exit).toHaveBeenCalledWith(1);
     });

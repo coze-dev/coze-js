@@ -1,3 +1,4 @@
+import process from 'process';
 import os from 'os';
 
 import { exec } from './exec';

@@ -261,7 +261,7 @@
    * separated by hyphens or slashes, where a word may contain lowercase ASCII letters, digits,
    * ".", and "@" characters.
    */
-  "allowedProjectTags": [],
+  "allowedProjectTags": ["rush-x"],
   /**
    * (Required) This is the inventory of projects to be managed by Rush.
    *
@@ -383,7 +383,8 @@
     },
     {
       "packageName": "@coze-infra/rush-x",
-      "projectFolder": "infra/rush-x"
+      "projectFolder": "infra/rush-x",
+      "tags": ["rush-x"]
     },
     {
       "packageName": "@coze-infra/fs-enhance",

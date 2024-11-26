@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { logger as log } from '@/rush-logger';
+import { logger as log } from '@coze-infra/rush-logger';
 
 import { reportError } from '../ts-check/report-error';
 import { formatTsDiagnostics } from '../../../utils/ts-helper';
@@ -15,8 +15,8 @@ vi.mock('../../../utils/ts-helper', () => ({
   formatTsDiagnostics: vi.fn(),
 }));
 
-vi.mock('@/rush-logger', () => ({
-  default: { error: vi.fn(), success: vi.fn() },
+vi.mock('@coze-infra/rush-logger', () => ({
+  logger: { error: vi.fn(), success: vi.fn() },
 }));
 
 vi.mock('../../../utils/ci-interactor', () => ({
@@ -149,19 +149,15 @@ describe('reportError', () => {
   });
 
   it('should report success in ci env.', async () => {
-    const diagnostics = [];
-    const rootFolder = '/path/to/project';
-
-    formatTsDiagnostics.mockReturnValue('Formatted error message');
-
-    isCI.mockReturnValue(true);
+    const diagnostics: DiagnosticGroup[] = [];
+    const rootFolder = 'path/to/rushJsonFolder';
 
     await reportError(diagnostics, rootFolder);
     expect(addReport).toHaveBeenCalledWith({
       name: 'Typescript check',
       conclusion: CIReportConclusion.SUCCESS,
       output: {
-        summary: 'GOOD',
+        summary: '',
         description: '',
       },
     });

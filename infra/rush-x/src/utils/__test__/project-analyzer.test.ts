@@ -10,10 +10,16 @@ import {
 
 vi.mock('child_process');
 
-const rushConfiguration = getRushConfiguration();
-rushConfiguration.versionPolicyConfiguration.update = () => {
-  // mock update
-};
+vi.mock('../../../utils', () => ({
+  getRushConfiguration: vi.fn(() => ({
+    rushJsonFolder: 'path/to/rushJsonFolder',
+    getProjectByName: vi.fn(packageName => ({
+      packageName: `@/${packageName}`,
+      projectFolder: `path/to/${packageName}`,
+      projectRelativeFolder: packageName,
+    })),
+  })),
+}));
 
 describe('project-analyzer', () => {
   beforeAll(() => {
@@ -81,6 +87,8 @@ describe('project-analyzer', () => {
   });
 
   it('getChangedProjectsNameByTag', () => {
-    expect(getChangedProjectsNameByTag(['rush-x'])).toEqual(['@/rush-x']);
+    expect(getChangedProjectsNameByTag(['rush-x'])).toEqual([
+      '@coze-infra/rush-x',
+    ]);
   });
 });

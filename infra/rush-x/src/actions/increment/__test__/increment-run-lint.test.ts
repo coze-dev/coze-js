@@ -7,7 +7,7 @@ import { exec } from 'shelljs';
 import { type RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
 
 import { runLint } from '../lint';
-import * as utils from '../../../utils';
+import { getRushConfiguration } from '../../../utils/project-analyzer';
 
 vi.mock('shelljs', () => ({ exec: vi.fn() }));
 vi.mock('@/rush-logger', () => ({
@@ -15,8 +15,10 @@ vi.mock('@/rush-logger', () => ({
 }));
 
 // Mock dependencies
-vi.mock('../../../utils');
-const mockedUtils = utils as Mocked<typeof utils>;
+vi.mock('../../../utils/project-analyzer', () => ({
+  getRushConfiguration: vi.fn(),
+}));
+
 vi.mock('fs');
 const mockedFs = fs as Mocked<typeof fs>;
 
@@ -44,7 +46,7 @@ describe('runLint', () => {
         .mockReturnValueOnce({ projectFolder: 'path/to/projectFolder' })
         .mockReturnValueOnce({ projectFolder: 'path/to/projectFolder2' }),
     };
-    mockedUtils.getRushConfiguration.mockReturnValue(
+    getRushConfiguration.mockReturnValue(
       rushConfiguration as unknown as RushConfiguration,
     );
     vi.spyOn(path, 'resolve').mockImplementation((...args: any) =>
@@ -70,7 +72,7 @@ describe('runLint', () => {
     await runLint(changedFileGroup);
 
     // Assertions
-    expect(mockedUtils.getRushConfiguration).toHaveBeenCalledTimes(1);
+    expect(getRushConfiguration).toHaveBeenCalledTimes(1);
 
     expect((exec as Mock).mock.calls[0]?.[0]).toMatch(
       [
@@ -105,7 +107,7 @@ describe('runLint', () => {
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    mockedUtils.getRushConfiguration.mockReturnValue(rushConfiguration);
+    getRushConfiguration.mockReturnValue(rushConfiguration);
     vi.spyOn(path, 'resolve').mockImplementation((...args) =>
       [...args].join('/'),
     );
@@ -137,7 +139,7 @@ describe('runLint', () => {
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    mockedUtils.getRushConfiguration.mockReturnValue(rushConfiguration);
+    getRushConfiguration.mockReturnValue(rushConfiguration);
     vi.spyOn(path, 'resolve').mockImplementation((...args) =>
       [...args].join('/'),
     );
