@@ -1,6 +1,7 @@
-name: CI
+# should be optimize as increment build & test
+name: CI@main
 on:
-  pull_request:
+  push:
     branches: ['main']
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,11 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 2 }}
-
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v45
+          fetch-depth: 1
 
       - name: Config Git User
         # should be turn to ci user
@@ -36,13 +33,11 @@ jobs:
       - name: Install Dependencies
         run: node common/scripts/install-run-rush.js install
 
-      - name: Increment Build
-        run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-        continue-on-error: true
+      - name: Build all
+        run: node common/scripts/install-run-rush.js build --verbose
 
-      - name: Increment Test:cov
-        run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-        continue-on-error: true
+      - name: Test:cov all
+        run: node common/scripts/install-run-rush.js test:cov --verbose
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -51,10 +46,5 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-      - name: Increment Lint
-        continue-on-error: true
-        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-
-      - name: Fail if any step failed
-        if: failure()
-        run: exit 1
+      - name: Lint all
+        run: node common/scripts/install-run-rush.js lint --verbose
