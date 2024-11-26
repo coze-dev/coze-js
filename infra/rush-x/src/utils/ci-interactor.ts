@@ -27,6 +27,10 @@ export const addReport = async (message: CIReportDefinition): Promise<void> => {
   if (conclusion) {
     setOutput('conclusion', conclusion);
   }
+
+  if (conclusion === CIReportConclusion.FAILED) {
+    process.exitCode = 1;
+  }
 };
 
 export const addIssue = (issue: CIIssueDef): void => {

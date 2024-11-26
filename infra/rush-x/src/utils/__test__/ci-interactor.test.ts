@@ -1,3 +1,5 @@
+import * as core from 'core';
+
 import { isCI } from '../env';
 import { addIssue, addReport, CIReportConclusion } from '../ci-interactor';
 
@@ -19,6 +21,8 @@ describe('ci-interactor', () => {
       (isCI as vi.Mock).mockReturnValue(true);
       vi.stubEnv('GITHUB_STEP_SUMMARY', '/tmp/github_step_summary');
 
+      const errorSpy = vi.spyOn(core, 'error').mockImplementation();
+
       addIssue({
         path: 'test/file.ts',
         line: 1,
@@ -28,6 +32,7 @@ describe('ci-interactor', () => {
       });
 
       expect(process.env.GITHUB_STEP_SUMMARY).toBeDefined();
+      expect(errorSpy).toHaveBeenCalled();
     });
   });
 

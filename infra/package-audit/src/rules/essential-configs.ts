@@ -4,7 +4,11 @@ import { isFileExists } from '@coze-infra/fs-enhance';
 
 import { type AuditRule, type AuditDetectResult } from '../types';
 
-const defaultEssentialFiles = ['eslint.config.js', 'tsconfig.json', 'OWNERS'];
+const defaultEssentialFiles = [
+  'eslint.config.js',
+  'tsconfig.json',
+  // 'OWNERS'
+];
 
 export const checkEssentialConfigFiles: AuditRule<{
   essentialFiles?: string[];

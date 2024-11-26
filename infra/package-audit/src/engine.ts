@@ -78,11 +78,7 @@ export class AuditEngine {
     const res = (
       await Promise.all(
         ruleFuncs.map(async r => {
-          const result = await r.fn(
-            project,
-            // @ts-expect-error hard to fix this
-            r.extractConfig,
-          );
+          const result = await r.fn(project, r.extractConfig);
           return result.map(d => ({
             ...d,
             level: r.level || RuleReportLevel.ERROR,
