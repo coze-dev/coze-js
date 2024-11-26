@@ -22,13 +22,13 @@ export const setEnv = (envName: string, envValue: string): void => {
 export const addReport = async (message: CIReportDefinition): Promise<void> => {
   const { output, conclusion } = message;
 
-  await appendToStepSummary(output.summary);
-
   if (conclusion) {
     setOutput('conclusion', conclusion);
   }
 
+  // TODO: ignore warning for now
   if (conclusion === CIReportConclusion.FAILED) {
+    await appendToStepSummary(output.summary);
     process.exitCode = 1;
   }
 };

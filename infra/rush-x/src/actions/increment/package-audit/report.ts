@@ -21,9 +21,10 @@ export const report = async (diagnostics: AuditPackageReports) => {
         ? CIReportConclusion.WARNING
         : CIReportConclusion.SUCCESS;
     const reportName = 'Package Audit Checker';
-    const summary = [`# ❌ ${reportName}`];
+    const summary = [];
 
     if (hasError || hasWarning) {
+      summary.push(`# ❌ ${reportName}`);
       const localHelperTips = process.env.targetBranch
         ? `You can retry this with such command locally:
 
@@ -53,9 +54,8 @@ Please fix these problems:
       ].join('\n');
 
       summary.push(localHelperTips, table);
-    } else {
-      summary.push('Every things looks fine.');
     }
+
     await addReport({
       name: reportName,
       conclusion: ciConclusion,

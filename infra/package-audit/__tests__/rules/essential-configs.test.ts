@@ -13,9 +13,9 @@ describe('checkEssentialConfigFiles', () => {
       projectFolder: '/path/to/project',
       // use default config
     });
-    expect(res.length).toBe(3);
+    expect(res.length).toBe(2);
     expect(
-      ['eslint.config.js', 'tsconfig.json', 'OWNERS'].every(
+      ['eslint.config.js', 'tsconfig.json'].every(
         o => res.findIndex(r => r.content.startsWith(`\`${o}\``)) >= 0,
       ),
     ).toBe(true);

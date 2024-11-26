@@ -1,4 +1,4 @@
-import * as core from 'core';
+import * as core from '@actions/core';
 
 import { isCI } from '../env';
 import { addIssue, addReport, CIReportConclusion } from '../ci-interactor';

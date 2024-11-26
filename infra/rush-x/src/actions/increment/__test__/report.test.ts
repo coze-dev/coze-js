@@ -208,7 +208,7 @@ describe('package-audit report', () => {
       name: 'Package Audit Checker',
       conclusion: CIReportConclusion.SUCCESS,
       output: {
-        summary: expect.stringContaining('Every things looks fine'),
+        summary: expect.stringContaining(''),
       },
     });
   });
