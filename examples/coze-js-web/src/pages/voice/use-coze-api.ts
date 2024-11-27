@@ -4,7 +4,7 @@ import {
   ChatEventType,
   type ChatV3Message,
   CozeAPI,
-  type MessageType,
+  type EnterMessage,
   RoleType,
 } from '@coze/api';
 
@@ -40,12 +40,21 @@ const useCozeAPI = () => {
     const botId = config.getBotId();
     trackId.current = `my-track-${new Date().getTime()}`;
 
-    const messages = [
+    const messages: EnterMessage[] = [
       {
         role: RoleType.User,
-        type: 'question' as MessageType,
-        content: `[{"type":"audio","file_id":"${voiceFileId}"},{"type":"text","content":"${query}"}]`,
-        content_type: 'object_string' as const,
+        type: 'question',
+        content: [
+          {
+            type: 'audio',
+            file_id: voiceFileId,
+          },
+          {
+            type: 'text',
+            text: query,
+          },
+        ],
+        content_type: 'object_string',
       },
     ];
 

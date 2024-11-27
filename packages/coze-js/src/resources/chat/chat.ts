@@ -6,8 +6,15 @@ import { Messages } from './messages/index.js';
 
 const uuid = () => (Math.random() * new Date().getTime()).toString();
 
+const handleAdditionalMessages = (additional_messages?: EnterMessage[]) =>
+  additional_messages?.map(i => ({
+    ...i,
+    content:
+      typeof i.content === 'object' ? JSON.stringify(i.content) : i.content,
+  }));
 export class Chat extends APIResource {
   messages: Messages = new Messages(this._client);
+
   /**
    * Call the Chat API to send messages to a published Coze agent. | 调用此接口发起一次对话，支持添加上下文
    * @docs en:https://www.coze.com/docs/developer_guides/chat_v3?_lang=en
@@ -34,6 +41,7 @@ export class Chat extends APIResource {
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
       ...rest,
+      additional_messages: handleAdditionalMessages(params.additional_messages),
       stream: false,
     };
     const result = (await this._client.post(
@@ -71,6 +79,7 @@ export class Chat extends APIResource {
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
       ...rest,
+      additional_messages: handleAdditionalMessages(params.additional_messages),
       stream: false,
     };
     const result = (await this._client.post(
@@ -128,6 +137,7 @@ export class Chat extends APIResource {
     const apiUrl = `/v3/chat${conversation_id ? `?conversation_id=${conversation_id}` : ''}`;
     const payload = {
       ...rest,
+      additional_messages: handleAdditionalMessages(params.additional_messages),
       stream: true,
     };
 
@@ -776,4 +786,6 @@ export type ObjectStringItem =
   | { type: 'file'; file_id: string }
   | { type: 'file'; file_url: string }
   | { type: 'image'; file_id: string }
-  | { type: 'image'; file_url: string };
+  | { type: 'image'; file_url: string }
+  | { type: 'audio'; file_id: string }
+  | { type: 'audio'; file_url: string };

@@ -1,4 +1,10 @@
-import { Chat, ChatStatus, ChatEventType } from '../../src/resources/chat/chat';
+import {
+  Chat,
+  ChatStatus,
+  ChatEventType,
+  type CreateChatReq,
+  RoleType,
+} from '../../src/resources/chat/chat';
 import { CozeAPI } from '../../src/index';
 
 describe('Chat', () => {
@@ -17,16 +23,64 @@ describe('Chat', () => {
       };
       vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
-      const params = {
+      const params: CreateChatReq = {
         bot_id: 'test-bot-id',
         user_id: 'test-user-id',
+        additional_messages: [
+          { role: RoleType.User, content: 'Hello', content_type: 'text' },
+          {
+            role: RoleType.User,
+            content: [{ type: 'text', text: 'Hello' }],
+            content_type: 'object_string',
+          },
+        ],
       };
 
       const result = await chat.create(params);
 
       expect(client.post).toHaveBeenCalledWith(
         '/v3/chat',
-        { ...params, stream: false },
+        {
+          ...params,
+          stream: false,
+          additional_messages: [
+            { role: RoleType.User, content: 'Hello', content_type: 'text' },
+            {
+              role: RoleType.User,
+              content: JSON.stringify([{ type: 'text', text: 'Hello' }]),
+              content_type: 'object_string',
+            },
+          ],
+        },
+        false,
+        undefined,
+      );
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it('should generate uuid when user_id is not provided', async () => {
+      const mockResponse = {
+        data: { id: 'test-chat-id', conversation_id: 'test-conversation-id' },
+      };
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
+
+      const params: CreateChatReq = {
+        bot_id: 'test-bot-id',
+        additional_messages: [
+          { role: RoleType.User, content: 'Hello', content_type: 'text' },
+        ],
+      };
+
+      const result = await chat.create(params);
+
+      // Verify that the post call included a generated user_id
+      expect(client.post).toHaveBeenCalledWith(
+        '/v3/chat',
+        {
+          ...params,
+          user_id: expect.any(String), // verify user_id was generated
+          stream: false,
+        },
         false,
         undefined,
       );
@@ -62,7 +116,6 @@ describe('Chat', () => {
 
       const params = {
         bot_id: 'test-bot-id',
-        user_id: 'test-user-id',
       };
 
       const result = await chat.createAndPoll(params);
@@ -70,7 +123,7 @@ describe('Chat', () => {
       expect(client.post).toHaveBeenNthCalledWith(
         1,
         '/v3/chat',
-        { ...params, stream: false },
+        { ...params, stream: false, user_id: expect.any(String) },
         false,
         undefined,
       );
@@ -108,7 +161,6 @@ describe('Chat', () => {
 
       const params = {
         bot_id: 'test-bot-id',
-        user_id: 'test-user-id',
       };
 
       const result = chat.stream(params);
@@ -119,7 +171,7 @@ describe('Chat', () => {
 
       expect(client.post).toHaveBeenCalledWith(
         '/v3/chat',
-        { ...params, stream: true },
+        { ...params, stream: true, user_id: expect.any(String) },
         true,
         undefined,
       );
