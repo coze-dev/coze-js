@@ -11,6 +11,7 @@ export class Conversations extends APIResource {
    * @param params - Required The parameters for creating a conversation | 创建会话所需的参数
    * @param params.messages - Optional Messages in the conversation. | 会话中的消息内容。
    * @param params.meta_data - Optional Additional information when creating a message. | 创建消息时的附加消息。
+   * @param params.bot_id - Optional Bind and isolate conversation on different bots. | 绑定和隔离不同Bot的会话。
    * @returns Information about the created conversation. | 会话的基础信息。
    */
   async create(params: CreateConversationReq, options?: RequestOptions) {
@@ -39,6 +40,42 @@ export class Conversations extends APIResource {
     );
     return response.data;
   }
+  /**
+   * List all conversations. | 列出 Bot 下所有会话。
+   * @param params
+   * @param params.bot_id - Required Bot ID. | Bot ID。
+   * @param params.page_num - Optional The page number. | 页码，默认值为 1。
+   * @param params.page_size - Optional The number of conversations per page. | 每页的会话数量，默认值为 50。
+   * @returns Information about the conversations. | 会话的信息。
+   */
+  async list(
+    params: ListConversationReq,
+    options?: RequestOptions,
+  ): Promise<ListConversationsData> {
+    const apiUrl = '/v1/conversations';
+    const response = await this._client.get<
+      ListConversationReq,
+      { data: ListConversationsData }
+    >(apiUrl, params, false, options);
+    return response.data;
+  }
+
+  /**
+   * Clear a conversation. | 清空会话。
+   * @param conversation_id - Required The ID of the conversation. | Conversation ID，即会话的唯一标识。
+   * @returns Information about the conversation session. | 会话的会话 ID。
+   */
+  async clear(
+    conversation_id: string,
+    options?: RequestOptions,
+  ): Promise<ConversationSession> {
+    const apiUrl = `/v1/conversations/${conversation_id}/clear`;
+    const response = await this._client.post<
+      null,
+      { data: ConversationSession }
+    >(apiUrl, null, false, options);
+    return response.data;
+  }
 
   messages: Messages = new Messages(this._client);
 }
@@ -46,24 +83,44 @@ export class Conversations extends APIResource {
 export interface CreateConversationReq {
   messages?: EnterMessage[];
   meta_data?: MetaDataType;
+  bot_id?: string;
+}
+
+export interface ListConversationReq {
+  bot_id: string;
+  page_num?: number;
+  page_size?: number;
+}
+
+export interface ListConversationsData {
+  conversations: Conversation[];
+  has_more: boolean;
 }
 
 export interface Conversation {
   /**
-   * Conversation ID，即会话的唯一标识。
+   *  Conversation ID
    */
   id: string;
 
   /**
-   * 会话创建的时间。格式为 10 位的 Unixtime 时间戳，单位为秒。
+   * Session creation time. The format is a 10-digit Unixtime timestamp in seconds.
    */
   created_at: number;
 
   /**
-   * 创建消息时的附加消息，获取消息时也会返回此附加消息。
-   * 自定义键值对，应指定为 Map 对象格式。长度为 16 对键值对，其中键（key）的长度范围为 1～64 个字符，值（value）的长度范围为 1～512 个字符。
+   * Custom key-value pairs, specified as a Map object format. The length is 16 pairs of key-value pairs, where the key (key) is 1～64 characters long and the value (value) is 1～512 characters long.
    */
   meta_data: MetaDataType;
+  /**
+   * The section_id of the last message in the session.
+   */
+  last_section_id?: string;
+}
+
+export interface ConversationSession {
+  id: string;
+  conversation_id: string;
 }
 
 export * from './messages/index.js';

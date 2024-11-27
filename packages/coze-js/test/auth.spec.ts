@@ -473,6 +473,7 @@ xrGqcXz5Qf+wdt0=
         keyid: 'test-key-id',
         privateKey: mockPrivateKey,
         baseURL: mockConfig.baseURL,
+        sessionName: 'test-session-name',
       });
 
       expect(mockPost).toHaveBeenCalledWith(
