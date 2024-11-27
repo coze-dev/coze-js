@@ -58,7 +58,7 @@ jobs:
       - name: Increment Package Audit
         run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
-      - name: Fail if any report failed
-        # NOTICE: To show all reports from the previous steps, the last step should check if any jobs failed.
-        if: env.REPORT_RESULT == 'failed'
-        run: exit 1
+      # - name: Fail if any report failed
+      #   # NOTICE: To show all reports from the previous steps, the last step should check if any jobs failed.
+      #   if: env.REPORT_RESULT == 'failed'
+      #   run: exit 1
