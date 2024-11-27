@@ -38,9 +38,27 @@ jobs:
 
       - name: Increment Build
         run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
 
       - name: Increment Test:cov
         run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment Lint
+        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment TS Check
+        run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment Package Audit
+        run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+
+      - name: Fail if any report failed
+        # NOTICE: To show all reports from the previous steps, the last step should check if any jobs failed.
+        if: env.REPORT_RESULT == 'failed'
+        run: echo "::notice::Please check 「 Summary 」 for detail info" && exit 1
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -48,17 +66,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           verbose: true
-
-      - name: Increment Lint
-        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-
-      - name: Increment TS Check
-        run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-
-      - name: Increment Package Audit
-        run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-
-      # - name: Fail if any report failed
-      #   # NOTICE: To show all reports from the previous steps, the last step should check if any jobs failed.
-      #   if: env.REPORT_RESULT == 'failed'
-      #   run: exit 1
