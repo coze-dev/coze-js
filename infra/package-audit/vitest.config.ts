@@ -5,6 +5,7 @@ export default defineConfig({
   preset: 'node',
   test: {
     coverage: {
+      exclude: ['src/rules/index.ts'],
       all: true,
     },
   },
