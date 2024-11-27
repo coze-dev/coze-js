@@ -64,5 +64,5 @@ jobs:
         run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
       - name: Fail if any step failed
-        if: failure()
+        if: ${{ failure() }}
         run: exit 1
