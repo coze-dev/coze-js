@@ -4,7 +4,7 @@ import { runTsCheck } from '../ts-check';
 import { runStylelint } from '../stylelint';
 import { runPackageAudit } from '../package-audit';
 import { runLint } from '../lint';
-import { incrementAction } from '../action';
+import { incrementActions } from '../actions';
 import { groupChangedFilesByProject } from '../../../utils/project-analyzer';
 
 // Mock shelljs
@@ -64,7 +64,7 @@ describe('increment', () => {
       runLint: vi.mocked(runLint).mock.calls,
     });
 
-    await incrementAction(mockFiles, 'lint');
+    await incrementActions(mockFiles, 'lint');
 
     console.log('Mock state after test:', {
       groupChangedFilesByProject: vi.mocked(groupChangedFilesByProject).mock
@@ -80,7 +80,7 @@ describe('increment', () => {
     const mockFiles = ['some/file'];
     const expectedArg = { '@coze-infra/rush-x': mockFiles };
     console.log('Running style action test');
-    await incrementAction(mockFiles, 'style');
+    await incrementActions(mockFiles, 'style');
     expect(runStylelint).toHaveBeenCalledWith(expectedArg);
   });
 
@@ -88,7 +88,7 @@ describe('increment', () => {
     const mockFiles = ['some/file'];
     const expectedArg = { '@coze-infra/rush-x': mockFiles };
     console.log('Running ts-check action test');
-    await incrementAction(mockFiles, 'ts-check');
+    await incrementActions(mockFiles, 'ts-check');
     expect(runTsCheck).toHaveBeenCalledWith(expectedArg);
   });
 
@@ -96,7 +96,7 @@ describe('increment', () => {
     const mockFiles = ['some/file'];
     const expectedArg = { '@coze-infra/rush-x': mockFiles };
     console.log('Running package-audit action test');
-    await incrementAction(mockFiles, 'package-audit');
+    await incrementActions(mockFiles, 'package-audit');
     expect(runPackageAudit).toHaveBeenCalledWith(expectedArg);
   });
 });

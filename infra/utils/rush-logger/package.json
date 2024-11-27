@@ -24,6 +24,7 @@
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",
     "@vitest/coverage-v8": "~2.1.4",
+    "typescript": "^5.5.3",
     "vitest": "~2.1.4"
   }
 }

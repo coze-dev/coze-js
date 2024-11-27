@@ -5,4 +5,4 @@ require('sucrase/register/ts');
 const path = require('path');
 
 // eslint-disable-next-line import/no-dynamic-require
-require(path.resolve(__dirname, '../src/debug.ts'));
+require(path.resolve(__dirname, '../src/index.ts'));

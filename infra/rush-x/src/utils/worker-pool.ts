@@ -118,6 +118,8 @@ export class WorkerPool {
 
   runJobs(jobParams: unknown[]): Promise<unknown[]> {
     const result = new Array(jobParams.length).fill(null);
+    let completedJobs = 0;
+
     return new Promise(resolve => {
       const jobs = jobParams.map(
         (param, index) => async (worker: LocalWorker) => {
@@ -127,7 +129,8 @@ export class WorkerPool {
           } catch (e) {
             result[index] = e;
           }
-          if (result.every(r => !!r)) {
+          completedJobs++;
+          if (completedJobs === jobParams.length) {
             resolve(result);
           }
         },

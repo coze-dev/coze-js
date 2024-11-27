@@ -1,1 +1,1 @@
-export { IncrementAction } from './increment';
+export { incrementActions } from './increment/actions';
