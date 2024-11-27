@@ -9,7 +9,7 @@ import {
   type OAuthToken,
 } from '@coze/api';
 
-import { type SettingConfig } from './Setting';
+import { type SettingConfig } from './setting';
 
 let client: CozeAPI;
 const redirectUrl = 'http://localhost:3000';

@@ -1,73 +1,34 @@
-import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
+import Chat from './pages/chat';
 import './App.css';
-import { useCozeAPI } from './use-coze-api';
-import Setting, { type SettingConfig } from './Setting';
+import Voice from './pages/voice';
 
 function App() {
-  const { initClient, message, sendMessage, isReady, uploadFile } =
-    useCozeAPI();
-  const [isModify, setIsModify] = useState(false);
-  const [query, setQuery] = useState('');
-  const [file, setFile] = useState<File | null>(null);
-
-  const handleSubmit = (settingConfig: SettingConfig) => {
-    initClient(settingConfig);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpload = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      if (file) {
-        uploadFile(file);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
-    <div className="App">
-      <Setting onSubmit={handleSubmit} onChange={setIsModify} />
-      <div className="header">
-        <div>
-          <form onSubmit={handleUpload}>
-            <input type="file" onChange={handleFileChange} name="file" />
-            <button type="submit" disabled={isModify || !isReady}>
-              Upload
-            </button>
-          </form>
-        </div>
-        <div>
-          <input
-            value={query}
-            onChange={e => {
-              setQuery(e.target.value);
-            }}
-            placeholder={`It's ${isReady && !isModify ? 'ready' : 'not ready'}`}
-          ></input>
-
-          <button
-            disabled={isModify || !isReady}
-            onClick={() => {
-              sendMessage(query);
-              setQuery('');
-            }}
-          >
-            send message
-          </button>
-        </div>
+    <Router basename={`${process.env.PUBLIC_URL}`}>
+      <div className="App">
+        <Routes>
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/voice" element={<Voice />} />
+          <Route
+            path="/"
+            element={
+              <div>
+                <h1>Welcome to Coze Demo</h1>
+                <p>Please select a demo:</p>
+                <div>
+                  <Link to="/chat">Chat Demo</Link>
+                </div>
+                <div>
+                  <Link to="/voice">Voice Demo</Link>
+                </div>
+              </div>
+            }
+          />
+        </Routes>
       </div>
-      <pre className="content">
-        <code>{message}</code>
-      </pre>
-    </div>
+    </Router>
   );
 }
 
