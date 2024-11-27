@@ -43,7 +43,7 @@ export class Conversations extends APIResource {
   /**
    * List all conversations. | 列出 Bot 下所有会话。
    * @param params
-   * @param params.bot_id - Required The ID of the bot.
+   * @param params.bot_id - Required Bot ID. | Bot ID。
    * @param params.page_num - Optional The page number. | 页码，默认值为 1。
    * @param params.page_size - Optional The number of conversations per page. | 每页的会话数量，默认值为 50。
    * @returns Information about the conversations. | 会话的信息。
