@@ -38,11 +38,9 @@ jobs:
 
       - name: Increment Build
         run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-        continue-on-error: true
 
       - name: Increment Test:cov
         run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-        continue-on-error: true
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -52,15 +50,12 @@ jobs:
           verbose: true
 
       - name: Increment Lint
-        continue-on-error: true
         run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
       - name: Increment TS Check
-        continue-on-error: true
         run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
       - name: Increment Package Audit
-        continue-on-error: true
         run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
 
       - name: Fail if any report failed
