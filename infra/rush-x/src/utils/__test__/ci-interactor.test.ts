@@ -7,6 +7,8 @@ vi.mock('../env', () => ({
   isCI: vi.fn(),
 }));
 
+vi.mock('@actions/core');
+
 describe('ci-interactor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -21,7 +23,7 @@ describe('ci-interactor', () => {
       (isCI as vi.Mock).mockReturnValue(true);
       vi.stubEnv('GITHUB_STEP_SUMMARY', '/tmp/github_step_summary');
 
-      const errorSpy = vi.spyOn(core, 'error').mockImplementation();
+      const errorSpy = vi.spyOn(core, 'error');
 
       addIssue({
         path: 'test/file.ts',
@@ -32,7 +34,12 @@ describe('ci-interactor', () => {
       });
 
       expect(process.env.GITHUB_STEP_SUMMARY).toBeDefined();
-      expect(errorSpy).toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalledWith('test message', {
+        endLine: 1,
+        file: 'test/file.ts',
+        startLine: 1,
+        title: 'test-rule',
+      });
     });
   });
 
