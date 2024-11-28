@@ -53,6 +53,17 @@ export async function fetchAPI<ResultType>(
   options: FetchAPIOptions = {},
 ) {
   const axiosInstance = options.axiosInstance || axios;
+
+  // Add version check for streaming requests
+  if (options.isStreaming) {
+    const axiosVersion = axiosInstance.VERSION || axios.VERSION;
+    if (!axiosVersion || compareVersions(axiosVersion, '1.7.1') < 0) {
+      throw new CozeError(
+        'Streaming requests require axios version 1.7.1 or higher. Please upgrade your axios version.',
+      );
+    }
+  }
+
   const response: AxiosResponse = await axiosInstance({
     url,
     responseType: options.isStreaming ? 'stream' : 'json',
@@ -105,4 +116,22 @@ export async function fetchAPI<ResultType>(
     json: () => response.data as ResultType,
     response,
   };
+}
+
+// Add version comparison utility
+function compareVersions(v1: string, v2: string): number {
+  const v1Parts = v1.split('.').map(Number);
+  const v2Parts = v2.split('.').map(Number);
+
+  for (let i = 0; i < 3; i++) {
+    const part1 = v1Parts[i] || 0;
+    const part2 = v2Parts[i] || 0;
+    if (part1 > part2) {
+      return 1;
+    }
+    if (part1 < part2) {
+      return -1;
+    }
+  }
+  return 0;
 }

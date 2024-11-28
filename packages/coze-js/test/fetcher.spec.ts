@@ -115,4 +115,27 @@ describe('fetchAPI', () => {
       CozeError,
     );
   });
+
+  it('should throw an error if axios version is less than 1.7.1', async () => {
+    // Mock axios.version to be an older version
+    const originalVersion = axios.VERSION;
+    Object.defineProperty(axios, 'VERSION', {
+      value: '1.7.0',
+      configurable: true,
+    });
+
+    await expect(
+      fetchAPI('https://api.example.com/data', {
+        isStreaming: true,
+      }),
+    ).rejects.toThrow(
+      'Streaming requests require axios version 1.7.1 or higher. Please upgrade your axios version.',
+    );
+
+    // Restore original version
+    Object.defineProperty(axios, 'VERSION', {
+      value: originalVersion,
+      configurable: true,
+    });
+  });
 });
