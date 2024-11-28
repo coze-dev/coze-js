@@ -25,6 +25,7 @@ export interface RealtimeClientConfig {
   suppressStationaryNoise?: boolean /** optional, Suppress stationary noise, defaults to false */;
   suppressNonStationaryNoise?: boolean /** optional, Suppress non-stationary noise, defaults to false */;
   videoConfig?: VideoConfig /** optional, Video configuration */;
+  isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
 }
 
 class RealtimeClient extends RealtimeEventHandler {
@@ -64,6 +65,7 @@ class RealtimeClient extends RealtimeEventHandler {
    *                                       可选，默认是否抑制静态噪声，默认值为 false。
    * @param config.suppressNonStationaryNoise - Optional, suppress non-stationary noise, defaults to false. |
    *                                         可选，默认是否抑制非静态噪声，默认值为 false。
+   * @param config.isAutoSubscribeAudio - Optional, whether to automatically subscribe to bot reply audio streams, defaults to true. |
    */
   constructor(config: RealtimeClientConfig) {
     super(config.debug);
@@ -119,7 +121,7 @@ class RealtimeClient extends RealtimeEventHandler {
     // Step3 bind engine events
     this._client.bindEngineEvents();
     this._client.on(EventNames.ALL, (eventName: string, data: unknown) => {
-      this.dispatch(eventName, data);
+      this.dispatch(eventName, data, false);
     });
 
     if (this._config.suppressStationaryNoise) {
@@ -140,6 +142,7 @@ class RealtimeClient extends RealtimeEventHandler {
       uid: roomInfo.uid,
       audioMutedDefault: this._config.audioMutedDefault ?? false,
       videoOnDefault: this._config.videoConfig?.videoOnDefault ?? true,
+      isAutoSubscribeAudio: this._config.isAutoSubscribeAudio ?? true,
     });
 
     // Step5 create local stream
@@ -156,7 +159,6 @@ class RealtimeClient extends RealtimeEventHandler {
       token: roomInfo.token,
       appId: roomInfo.app_id,
     });
-    this._log('dispatch client.connected event');
   }
 
   /**
@@ -167,7 +169,6 @@ class RealtimeClient extends RealtimeEventHandler {
   async interrupt() {
     await this._client?.stop();
     this.dispatch(EventNames.INTERRUPTED, {});
-    this._log('dispatch client.interrupted event');
   }
 
   /**

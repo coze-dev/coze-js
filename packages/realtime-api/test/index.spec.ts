@@ -76,6 +76,7 @@ describe('RealtimeClient', () => {
         uid: 'test-uid',
         audioMutedDefault: false,
         videoOnDefault: true,
+        isAutoSubscribeAudio: true,
       });
       expect(mockEngineClient.createLocalStream).toHaveBeenCalled();
       expect(mockEngineClient.bindEngineEvents).toHaveBeenCalled();

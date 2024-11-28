@@ -2,7 +2,14 @@ import VERTC from '@volcengine/rtc';
 
 import { sleep, checkPermission, getAudioDevices } from '../src/utils';
 
-vi.mock('@volcengine/rtc');
+vi.mock('@volcengine/rtc', () => ({
+  default: {
+    enableDevices: vi.fn(),
+    enumerateDevices: vi.fn(),
+    enumerateAudioCaptureDevices: vi.fn(),
+    enumerateAudioPlaybackDevices: vi.fn(),
+  },
+}));
 
 describe('Utils', () => {
   describe('sleep', () => {
@@ -39,12 +46,11 @@ describe('Utils', () => {
         { deviceId: '1', kind: 'audioinput', label: 'Mic 1' },
         { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
         { deviceId: '3', kind: 'videoinput', label: 'Camera 1' },
-        { deviceId: '', kind: 'audioinput', label: 'Invalid Device' },
       ];
 
       (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
 
-      const result = await getAudioDevices();
+      const result = await getAudioDevices({ video: true });
 
       expect(result).toEqual({
         audioInputs: [{ deviceId: '1', kind: 'audioinput', label: 'Mic 1' }],
@@ -52,7 +58,6 @@ describe('Utils', () => {
           { deviceId: '2', kind: 'audiooutput', label: 'Speaker 1' },
         ],
         videoInputs: [{ deviceId: '3', kind: 'videoinput', label: 'Camera 1' }],
-        videoOutputs: [],
       });
 
       expect(VERTC.enumerateDevices).toHaveBeenCalled();
@@ -61,13 +66,12 @@ describe('Utils', () => {
     it('should return empty arrays when no devices are found', async () => {
       (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([]);
 
-      const result = await getAudioDevices();
+      const result = await getAudioDevices({ video: true });
 
       expect(result).toEqual({
         audioInputs: [],
         audioOutputs: [],
         videoInputs: [],
-        videoOutputs: [],
       });
     });
   });

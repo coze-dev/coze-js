@@ -145,7 +145,10 @@ const RealtimeConsole: React.FC = () => {
       return;
     }
 
-    const time = new Date().toLocaleTimeString();
+    const now = new Date();
+    const time = `${now.toTimeString().split(' ')[0]}.${String(
+      now.getMilliseconds(),
+    ).padStart(3, '0')}`;
     const type = eventName.split('.')[0]; // server or client
     const event = eventName.substring(eventName.indexOf('.') + 1); // event name
 
@@ -336,6 +339,7 @@ const RealtimeConsole: React.FC = () => {
                         }}
                         style={{ margin: 0, width: '100%' }}
                       >
+                        {item.time}&nbsp;&nbsp;
                         {item.event}&nbsp;[{item.data?.data?.role}]&nbsp;
                         {item.data?.data?.content}
                       </Typography.Paragraph>

@@ -15,6 +15,7 @@ import { ChatEventType } from '@coze/api';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
+import { isShowVideo } from '../../utils/utils';
 
 const { Text, Link } = Typography;
 
@@ -56,7 +57,6 @@ const Header: React.FC<HeaderProps> = ({
     { label: string; value: string }[]
   >([]);
   const formRef = useRef<MessageFormRef>(null);
-  const isShowVideo = !window.location.href.includes('coze.cn');
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkPermission({
