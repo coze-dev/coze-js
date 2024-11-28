@@ -64,7 +64,7 @@ describe('readConfig', () => {
 
   it('should suit to empty rules', async () => {
     (isFileExists as Mock).mockResolvedValue(true);
-    // 没有提供 rules 配置项的场景
+    // Case: no rules config provided
     (readJsonFile as Mock).mockResolvedValueOnce({
       packageAudit: {},
     });
@@ -72,7 +72,7 @@ describe('readConfig', () => {
       enable: true,
     });
 
-    // 过滤 rules 数组中的空值
+    // Filter empty values in rules array
     (readJsonFile as Mock).mockResolvedValueOnce({
       packageAudit: {
         rules: [undefined],
@@ -83,7 +83,7 @@ describe('readConfig', () => {
       rules: [],
     });
 
-    // 没有配置 packageAudit 配置项的场景
+    // Case: no packageAudit config provided
     (readJsonFile as Mock).mockResolvedValueOnce({});
     expect(await readConfig('/path/to/file')).toEqual({
       enable: true,

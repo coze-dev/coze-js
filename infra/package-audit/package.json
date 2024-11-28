@@ -2,9 +2,9 @@
   "name": "@coze-infra/package-audit",
   "version": "0.0.1",
   "description": "A series of rules to detect if a package is healthy and valid",
-  "license": "ISC",
-  "author": "liukaizhan.038@bytedance.com",
-  "maintainers": [],
+  "maintainers": [
+    "wenming.2020@bytedance.com"
+  ],
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc -b tsconfig.build.json",

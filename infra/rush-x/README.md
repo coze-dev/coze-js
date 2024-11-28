@@ -1,8 +1,8 @@
-# @byted-apaas/rush-ci
+# @coze-infra/rush-x
 
 ## Introduction
 
 Toolkit for integrating Rush monorepo, can work with CI to complete automation.
 
 ## Detail
-please run `node infra/rush-x/bin/run --help` to get more information.
+Please run `node infra/rush-x/bin/run --help` to get more information.

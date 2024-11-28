@@ -29,7 +29,7 @@ describe('rule-rush-project', () => {
     expect(res.length).toBe(0);
   });
 
-  // 接受有 配置单没有命令的情况
+  // Accept cases where there is configuration but no command
   it('Should success if script dismiss', async () => {
     (isFileExists as Mock).mockResolvedValueOnce(true);
     const mockProject = {
