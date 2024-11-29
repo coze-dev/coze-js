@@ -144,6 +144,13 @@ describe('EngineClient', () => {
         RealtimeAPIError,
       );
     });
+
+    it('should throw error if no video devices', async () => {
+      (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
+        { deviceId: 'audio1', kind: 'audioinput' },
+      ]);
+      await expect(client.createLocalStream()).rejects.toThrow(Error);
+    });
   });
 
   describe('disconnect', () => {

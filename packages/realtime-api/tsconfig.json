@@ -1,9 +1,6 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
   "extends": "@coze-infra/ts-config/tsconfig.web.json",
-  "compilerOptions": {
-    "lib": ["es2015", "dom"]
-  },
   "include": ["src/**/*.ts"],
   "references": [
     { "path": "./tsconfig.build.json" },

@@ -52,6 +52,7 @@ describe('RealtimeClient', () => {
       initAIAnsExtension: vi.fn(),
       changeAIAnsExtension: vi.fn(),
       sendMessage: vi.fn(),
+      dispatch: vi.fn(),
     } as any;
     (EngineClient as vi.Mock).mockImplementation(() => mockEngineClient);
 

@@ -9,6 +9,7 @@ export interface VideoConfig {
   videoOnDefault?: boolean /** optional, Whether to turn on video by default, defaults to true */;
   renderDom?: string /** optional, The DOM element to render the video stream to */;
 }
+
 export interface RealtimeClientConfig {
   accessToken: string /** required, Access Token */;
   botId: string /** required, Bot Id */;

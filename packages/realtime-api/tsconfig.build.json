@@ -4,8 +4,7 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
-    "lib": ["es2015", "dom"]
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
   },
   "include": ["src/**/*.ts"]
 }
