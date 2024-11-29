@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 import * as nodeCrypto from 'crypto';
 
 import jwt from 'jsonwebtoken';
@@ -12,17 +11,16 @@ import {
   POLL_INTERVAL,
 } from './constant.js';
 
-const generateRandomString = () => {
-  let crypto;
+const getCrypto = () => {
   if (isBrowser()) {
-    crypto = window.crypto;
-  } else {
-    crypto = nodeCrypto;
+    return window.crypto;
   }
-
+  return nodeCrypto;
+};
+const generateRandomString = () => {
   const array = new Uint8Array(32);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (crypto as any).getRandomValues(array);
+  (getCrypto() as any).getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 };
 
@@ -47,12 +45,7 @@ export const getPKCEAuthenticationUrl = async (
     'https://api',
     'https://www',
   );
-  let crypto;
-  if (isBrowser()) {
-    crypto = window.crypto;
-  } else {
-    crypto = nodeCrypto;
-  }
+  const crypto = getCrypto();
 
   // Generate code_challenge from code_verifier
   const generateCodeChallenge = async (codeVerifier: string) => {

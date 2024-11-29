@@ -573,5 +573,21 @@ xrGqcXz5Qf+wdt0=
         }),
       ).rejects.toThrow(BadRequestError);
     });
+
+    it('should throw an error when jwt sign failed', async () => {
+      (jwt.sign as vi.Mock).mockImplementationOnce(() => {
+        throw new Error('jwt sign failed');
+      });
+
+      await expect(
+        getJWTToken({
+          appId: 'test-app-id',
+          aud: 'test-aud',
+          keyid: 'test-key-id',
+          privateKey: mockPrivateKey,
+          baseURL: mockConfig.baseURL,
+        }),
+      ).rejects.toThrow('jwt sign failed');
+    });
   });
 });
