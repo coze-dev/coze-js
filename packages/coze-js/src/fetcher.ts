@@ -57,9 +57,8 @@ export async function fetchAPI<ResultType>(
   const axiosInstance = options.axiosInstance || axios;
 
   // Add version check for streaming requests
-  if (options.isStreaming && (axiosInstance as AxiosStatic).Axios) {
-    const axiosVersion =
-      (axiosInstance as AxiosStatic).VERSION || axios.VERSION;
+  if (options.isStreaming && isAxiosStatic(axiosInstance)) {
+    const axiosVersion = axiosInstance.VERSION || axios.VERSION;
     if (!axiosVersion || compareVersions(axiosVersion, '1.7.1') < 0) {
       throw new CozeError(
         'Streaming requests require axios version 1.7.1 or higher. Please upgrade your axios version.',
@@ -141,4 +140,8 @@ function compareVersions(v1: string, v2: string): number {
     }
   }
   return 0;
+}
+
+function isAxiosStatic(instance: unknown): instance is AxiosStatic {
+  return !!(instance as AxiosStatic)?.Axios;
 }
