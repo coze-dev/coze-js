@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import * as utils from '../src/utils.js';
 import { APIError, BadRequestError } from '../src/error.js';
 import { APIClient } from '../src/core.js';
+import { POLL_INTERVAL } from '../src/constant.js';
 import {
   getWebAuthenticationUrl,
   getPKCEAuthenticationUrl,
@@ -12,6 +13,7 @@ import {
   getJWTToken,
   getPKCEOAuthToken,
   refreshOAuthToken,
+  PKCEAuthErrorType,
 } from '../src/auth';
 
 vi.mock('../src/core');
@@ -149,6 +151,74 @@ describe('Auth functions', () => {
           expect(mockPost).toHaveBeenCalledTimes(1);
           expect(utils.sleep).not.toHaveBeenCalled();
         });
+
+        it('should retry on authorization_pending and succeed', async () => {
+          const mockPost = vi
+            .fn()
+            // First call throws authorization_pending error
+            .mockRejectedValueOnce(
+              APIError.generate(
+                400,
+                {
+                  error: PKCEAuthErrorType.AUTHORIZATION_PENDING,
+                } as any,
+                'Authorization pending',
+                undefined,
+              ),
+            )
+            // Second call succeeds
+            .mockResolvedValueOnce({ access_token: 'test-token' });
+
+          (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+            post: mockPost,
+          }));
+
+          const result = await getDeviceToken({
+            clientId: mockConfig.clientId,
+            baseURL: mockConfig.baseURL,
+            deviceCode: 'test-device-code',
+            poll: true,
+          });
+
+          expect(result).toEqual({ access_token: 'test-token' });
+          expect(mockPost).toHaveBeenCalledTimes(2);
+          expect(utils.sleep).toHaveBeenCalledTimes(1);
+          expect(utils.sleep).toHaveBeenCalledWith(POLL_INTERVAL);
+        });
+
+        it('should retry on slow_down and succeed', async () => {
+          const mockPost = vi
+            .fn()
+            // First call throws slow_down error
+            .mockRejectedValueOnce(
+              APIError.generate(
+                400,
+                {
+                  error: PKCEAuthErrorType.SLOW_DOWN,
+                } as any,
+                'Slow down',
+                undefined,
+              ),
+            )
+            // Second call succeeds
+            .mockResolvedValueOnce({ access_token: 'test-token' });
+
+          (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+            post: mockPost,
+          }));
+
+          const result = await getDeviceToken({
+            clientId: mockConfig.clientId,
+            baseURL: mockConfig.baseURL,
+            deviceCode: 'test-device-code',
+            poll: true,
+          });
+
+          expect(result).toEqual({ access_token: 'test-token' });
+          expect(mockPost).toHaveBeenCalledTimes(2);
+          expect(utils.sleep).toHaveBeenCalledTimes(1);
+          expect(utils.sleep).toHaveBeenCalledWith(POLL_INTERVAL * 2);
+        });
       });
     });
 
@@ -196,6 +266,47 @@ describe('Auth functions', () => {
       );
       expect(url).toContain('&code_challenge_method=S256');
       expect(codeVerifier).toBeTruthy();
+    });
+
+    it('should work in browser environment', async () => {
+      // Mock browser environment
+      vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+
+      // Mock window.crypto
+      const mockSubtle = {
+        digest: vi.fn().mockResolvedValue(new Uint8Array([1, 2, 3, 4])),
+      };
+
+      const mockCrypto = {
+        subtle: mockSubtle,
+        getRandomValues: vi.fn(array => {
+          for (let i = 0; i < array.length; i++) {
+            array[i] = i % 256; // Fill with predictable values
+          }
+          return array;
+        }),
+      };
+
+      // Mock window object
+      const mockWindow = {
+        crypto: mockCrypto,
+      };
+
+      // @ts-expect-error - Mocking global window
+      vi.stubGlobal('window', mockWindow);
+
+      const { url, codeVerifier } = await getPKCEAuthenticationUrl(mockConfig);
+
+      expect(url).toContain(
+        'https://www.coze.com/api/permission/oauth2/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state&code_challenge=',
+      );
+      expect(url).toContain('&code_challenge_method=S256');
+      expect(codeVerifier).toBeTruthy();
+      expect(mockCrypto.getRandomValues).toHaveBeenCalled();
+      expect(mockSubtle.digest).toHaveBeenCalled();
+
+      // Clean up
+      vi.unstubAllGlobals();
     });
   });
 
