@@ -4,6 +4,8 @@ import axios, {
   type AxiosResponseHeaders,
   type AxiosRequestConfig,
   type AxiosResponse,
+  type AxiosInstance,
+  type AxiosStatic,
 } from 'axios';
 
 import {
@@ -16,7 +18,7 @@ import {
 
 export interface FetchAPIOptions extends AxiosRequestConfig {
   // Custom axios instance
-  axiosInstance?: typeof axios;
+  axiosInstance?: AxiosInstance | unknown;
   // Whether to use streaming mode
   isStreaming?: boolean;
 }
@@ -55,7 +57,7 @@ export async function fetchAPI<ResultType>(
   const axiosInstance = options.axiosInstance || axios;
 
   // Add version check for streaming requests
-  if (options.isStreaming) {
+  if (options.isStreaming && isAxiosStatic(axiosInstance)) {
     const axiosVersion = axiosInstance.VERSION || axios.VERSION;
     if (!axiosVersion || compareVersions(axiosVersion, '1.7.1') < 0) {
       throw new CozeError(
@@ -64,7 +66,7 @@ export async function fetchAPI<ResultType>(
     }
   }
 
-  const response: AxiosResponse = await axiosInstance({
+  const response: AxiosResponse = await (axiosInstance as AxiosInstance)({
     url,
     responseType: options.isStreaming ? 'stream' : 'json',
     adapter: options.isStreaming ? 'fetch' : undefined,
@@ -77,12 +79,16 @@ export async function fetchAPI<ResultType>(
     async *stream(): AsyncGenerator<ResultType> {
       try {
         const stream = response.data;
-        const reader = stream[Symbol.asyncIterator]();
+        const reader = stream[Symbol.asyncIterator]
+          ? stream[Symbol.asyncIterator]()
+          : stream.getReader();
         const decoder = new TextDecoder();
         const fieldValues: Record<string, string> = {};
         let buffer = '';
         while (true) {
-          const { done, value } = await reader.next();
+          const { done, value } = await (reader.next
+            ? reader.next()
+            : reader.read());
           if (done) {
             if (buffer) {
               // If the stream ends without a newline, it means an error occurred
@@ -134,4 +140,8 @@ function compareVersions(v1: string, v2: string): number {
     }
   }
   return 0;
+}
+
+function isAxiosStatic(instance: unknown): instance is AxiosStatic {
+  return !!(instance as AxiosStatic)?.Axios;
 }

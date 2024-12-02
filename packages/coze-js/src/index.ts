@@ -11,6 +11,7 @@ export class CozeAPI extends APIClient {
   workspaces: API.WorkSpaces = new API.WorkSpaces(this);
   audio: API.Audio = new API.Audio(this);
 }
+export { type ClientOptions, type RequestOptions } from './core.js';
 export * from './auth.js';
 export * from './resources/index.js';
 export * from './fetcher.js';
