@@ -42,6 +42,9 @@ function getRslibConfig(options: Options) {
     source: {
       tsconfigPath,
     },
+    output: {
+      target: 'web',
+    },
     lib: libs,
   });
 }
