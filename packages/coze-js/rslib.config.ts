@@ -4,6 +4,7 @@ export default defineConfig(
   getRslibConfig({
     format: ['esm', 'cjs', 'umd'],
     bundle: 'excludeExternal',
+    umdName: 'CozeJs',
     tsconfigPath: './tsconfig.build.json',
   }),
 );
