@@ -4,6 +4,5 @@ export default defineConfig(
   getRslibConfig({
     format: ['esm', 'cjs', 'umd'],
     umdName: 'CozeRealtimeApi',
-    tsconfigPath: './tsconfig.build.json',
   }),
 );

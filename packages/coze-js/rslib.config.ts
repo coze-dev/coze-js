@@ -5,6 +5,5 @@ export default defineConfig(
     format: ['esm', 'cjs', 'umd'],
     bundle: 'excludeExternal',
     umdName: 'CozeJs',
-    tsconfigPath: './tsconfig.build.json',
   }),
 );
