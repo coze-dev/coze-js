@@ -777,6 +777,9 @@ importers:
       '@rushstack/rush-sdk':
         specifier: 5.100.2
         version: 5.100.2(@types/node@20.16.15)
+      fast-glob:
+        specifier: ^3.2.11
+        version: 3.3.2
     devDependencies:
       '@coze-infra/eslint-config':
         specifier: workspace:*

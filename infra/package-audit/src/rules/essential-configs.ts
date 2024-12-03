@@ -1,11 +1,11 @@
 import path from 'path';
 
-import { isFileExists } from '@coze-infra/fs-enhance';
+import { glob } from 'fast-glob';
 
-import { type AuditRule, type AuditDetectResult } from '../types';
+import { type AuditDetectResult, type AuditRule } from '../types';
 
 const defaultEssentialFiles = [
-  'eslint.config.js',
+  'eslint.config.{cjs,mjs,js,ts,mts,cts}',
   'tsconfig.json',
   // 'OWNERS'
 ];
@@ -21,10 +21,11 @@ export const checkEssentialConfigFiles: AuditRule<{
       await Promise.all(
         essentialFiles.map(
           async (file: string): Promise<AuditDetectResult | undefined> => {
-            const filePath = path.resolve(projectFolder, file);
-            const exists = await isFileExists(filePath);
+            const files = await glob(file, {
+              cwd: projectFolder,
+            });
 
-            if (!exists) {
+            if (!files.length) {
               return {
                 content: `\`${path.basename(
                   file,

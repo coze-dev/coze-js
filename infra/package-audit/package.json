@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@coze-infra/fs-enhance": "workspace:*",
-    "@rushstack/rush-sdk": "5.100.2"
+    "@rushstack/rush-sdk": "5.100.2",
+    "fast-glob": "^3.2.11"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
