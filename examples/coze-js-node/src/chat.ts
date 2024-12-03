@@ -7,7 +7,7 @@ import {
   RoleType,
 } from '@coze/api';
 
-import { client, botId, sleep } from './client';
+import { client, botId, sleep } from './client.js';
 
 const query = 'give me a joke';
 

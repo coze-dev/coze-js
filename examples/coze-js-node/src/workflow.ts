@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { client, botId, workflowId } from './client';
+import { client, botId, workflowId } from './client.js';
 async function streamWorkflow() {
   assert(botId, 'botId is required');
   assert(workflowId, 'workflowId is required');

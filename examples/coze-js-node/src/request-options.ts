@@ -4,7 +4,7 @@ import assert from 'assert';
 
 import { ChatEventType, CozeAPI, RoleType } from '@coze/api';
 
-import { botId, baseURL, apiKey } from './client';
+import { botId, baseURL, apiKey } from './client.js';
 
 async function test_timeout_global() {
   try {

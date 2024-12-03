@@ -21,10 +21,10 @@ import {
   refreshOAuthToken,
 } from '@coze/api';
 
-import config from '../config/config';
+import config from '../config/config.default.js';
 
 // 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
-const key = process.env.COZE_ENV || 'en';
+const key = (process.env.COZE_ENV || 'en') as keyof typeof config;
 
 const clientId = config[key].auth.oauth_pkce.COZE_CLIENT_ID;
 const redirectUrl = config[key].auth.oauth_pkce.COZE_REDIRECT_URL;
@@ -67,7 +67,7 @@ const oauthToken = await getPKCEOAuthToken({
   clientId,
   redirectUrl,
   baseURL,
-  code,
+  code: code as string,
   codeVerifier,
 });
 

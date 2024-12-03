@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { RoleType } from '@coze/api';
 
-import { botId, client } from './client';
+import { botId, client } from './client.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 async function createConversation(bot_id?: string) {
