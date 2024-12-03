@@ -1,8 +1,5 @@
-# should be optimize as increment build & test
 name: CI
 on:
-  push:
-    branches: ['main']
   pull_request:
     branches: ['main']
   # Allows you to run this workflow manually from the Actions tab
@@ -22,6 +19,10 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+
       - name: Config Git User
         # should be turn to ci user
         run: |
@@ -35,11 +36,29 @@ jobs:
       - name: Install Dependencies
         run: node common/scripts/install-run-rush.js install
 
-      - name: Build
-        run: node common/scripts/install-run-rush.js build --verbose
+      - name: Increment Build
+        run: node infra/rush-x/bin/run increment --action build -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
 
-      - name: Test:cov
-        run: node common/scripts/install-run-rush.js test:cov --verbose
+      - name: Increment Test:cov
+        run: node infra/rush-x/bin/run increment --action test:cov -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment Lint
+        run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment TS Check
+        run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+        continue-on-error: true
+
+      - name: Increment Package Audit
+        run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+
+      - name: Fail if any report failed
+        # NOTICE: To show all reports from the previous steps, the last step should check if any jobs failed.
+        if: env.REPORT_RESULT == 'failed'
+        run: echo "::notice::Please check 「 Summary 」 for detail info" && exit 1
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
@@ -47,9 +66,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           verbose: true
-
-      - name: Lint
-        # for current stage, we got so much lint error, so we have to ignore it
-        # TODO: it should be fixed ASAP
-        continue-on-error: true
-        run: node common/scripts/install-run-rush.js lint --verbose

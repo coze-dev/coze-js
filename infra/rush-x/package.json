@@ -1,0 +1,74 @@
+{
+  "name": "@coze-infra/rush-x",
+  "version": "0.0.1",
+  "description": "Integration action",
+  "license": "ISC",
+  "author": "fanwenjie.fe@bytedance.com",
+  "maintainers": [
+    "wenming.2020@bytedance.com",
+    "wangfocheng@bytedance.com"
+  ],
+  "bin": {
+    "rush-x": "bin/run"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "dev": "node -r sucrase/register src/debug.ts",
+    "lint": "reslint ./src --cache",
+    "test": "NODE_OPTIONS='--max_old_space_size=2048' NODE_ENV=test vitest --run",
+    "test:cov": "npm run test -- --coverage"
+  },
+  "dependencies": {
+    "@actions/core": "~1.11.1",
+    "@babel/core": "^7.16.0",
+    "@babel/types": "^7.20.7",
+    "@coze-infra/fs-enhance": "workspace:*",
+    "@coze-infra/package-audit": "workspace:*",
+    "@coze-infra/rush-logger": "workspace:*",
+    "@inquirer/prompts": "^3.2.0",
+    "@larksuiteoapi/node-sdk": "1.33.1",
+    "@pnpm/lockfile-file": "^8.0.2",
+    "@rushstack/node-core-library": "3.55.2",
+    "@rushstack/rush-sdk": "5.100.2",
+    "axios": "^1.7.7",
+    "commander": "~12.1.0",
+    "conventional-changelog-angular": "^5.0.13",
+    "conventional-commits-parser": "^3.2.4",
+    "dayjs": "^1.11.7",
+    "fast-glob": "^3.2.11",
+    "flow-parser": "~0.204.0",
+    "fs-extra": "^10.0.0",
+    "json5": "^2.2.1",
+    "lodash": "^4.17.21",
+    "prettier": "~3.3.3",
+    "semver": "^7.3.5",
+    "shelljs": "^0.8.5",
+    "stylelint": "^15.11.0",
+    "tar": "^6.1.11",
+    "typescript": "^5.5.3",
+    "yaml": "^2.2.2"
+  },
+  "devDependencies": {
+    "@commitlint/types": "^17.4.0",
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/ts-config": "workspace:*",
+    "@coze-infra/vitest-config": "workspace:*",
+    "@pnpm/logger": "^5.0.0",
+    "@types/eslint": "~9.6.1",
+    "@types/lodash": "~4.17.13",
+    "@types/node": "^20",
+    "@types/shelljs": "^0.8.5",
+    "@vitest/coverage-v8": "~2.1.4",
+    "debug": "^4.3.4",
+    "eslint": "9.14.0",
+    "sucrase": "^3.32.0",
+    "tsconfig-paths": "4.1.0",
+    "vitest": "~2.1.4"
+  },
+  "// deps": "debug@^4.3.4 为脚本自动补齐，请勿改动"
+}
