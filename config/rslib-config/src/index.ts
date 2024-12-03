@@ -1,4 +1,8 @@
-import { defineConfig, LibConfig } from '@rslib/core';
+import {
+  defineConfig,
+  LibConfig,
+  RsbuildConfigOutputTarget,
+} from '@rslib/core';
 
 type LibFormat = LibConfig['format'];
 export type BundleType = boolean | 'excludeExternal';
@@ -8,14 +12,16 @@ interface Options {
   bundle?: BundleType;
   tsconfigPath?: string;
   umdName?: string;
+  target?: RsbuildConfigOutputTarget;
 }
 const defaultOptions = {
   format: ['esm', 'cjs'] as LibFormat[],
   bundle: true,
+  target: 'web' as RsbuildConfigOutputTarget,
 };
 
 function getRslibConfig(options: Options) {
-  const { format, bundle, umdName, tsconfigPath } = {
+  const { format, bundle, umdName, tsconfigPath, target } = {
     ...defaultOptions,
     ...options,
   };
@@ -43,7 +49,7 @@ function getRslibConfig(options: Options) {
       tsconfigPath,
     },
     output: {
-      target: 'web',
+      target,
     },
     lib: libs,
   });
