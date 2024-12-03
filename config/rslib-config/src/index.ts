@@ -18,6 +18,7 @@ const defaultOptions = {
   format: ['esm', 'cjs'] as LibFormat[],
   bundle: true,
   target: 'web' as RsbuildConfigOutputTarget,
+  tsconfigPath: './tsconfig.build.json',
 };
 
 function getRslibConfig(options: Options) {
