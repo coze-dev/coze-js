@@ -6,7 +6,7 @@ import fs from 'fs';
 
 import { type Voice } from '@coze/api';
 
-import { client } from './client';
+import { client } from './client.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -20,10 +20,10 @@ import fs from 'fs';
 
 import { CozeAPI, getJWTToken, RoleType } from '@coze/api';
 
-import config from '../config/config';
+import config from '../config/config.default.js';
 
 // 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
-const key = process.env.COZE_ENV || 'en';
+const key = (process.env.COZE_ENV || 'en') as keyof typeof config;
 
 // Retrieve configuration values from the config file
 const baseURL = config[key].COZE_BASE_URL;
@@ -54,7 +54,7 @@ const result = await getJWTToken({
   appId,
   aud,
   keyid,
-  privateKey,
+  privateKey: privateKey.toString(),
   scope,
 });
 console.log('getJWTToken', result);

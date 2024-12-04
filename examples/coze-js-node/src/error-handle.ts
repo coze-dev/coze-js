@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import { CozeAPI } from '@coze/api';
 
-import { client, spaceId } from './client';
+import { client, spaceId } from './client.js';
 
 async function test_BadRequestError() {
   try {
