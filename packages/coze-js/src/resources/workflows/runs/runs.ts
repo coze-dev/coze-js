@@ -119,7 +119,6 @@ export interface ResumeWorkflowReq {
 export enum WorkflowEventType {
   // The output message from the workflow node, such as the output message from
   // the message node or end node. You can view the specific message content in data.
-  // 工作流节点输出消息，例如消息节点、结束节点的输出消息。可以在 data 中查看具体的消息内容。
   MESSAGE = 'Message',
 
   // An error has occurred. You can view the error_code and error_message in data to
@@ -186,7 +185,6 @@ export interface WorkflowEventError {
   error_code: number;
 
   // Status message. You can get detailed error information when the API call fails.
-  // 状态信息。API 调用失败时可通过此字段查看详细错误信息。
   error_message: string;
 }
 

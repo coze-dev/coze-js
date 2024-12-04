@@ -291,7 +291,7 @@ const ChatX: React.FC = () => {
         />
       </div>
       <div className={styles.chat}>
-        {/* 🌟 消息列表 */}
+        {/* 🌟 Message List */}
         <Bubble.List
           items={
             items.length > 0
