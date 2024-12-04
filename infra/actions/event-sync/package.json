@@ -1,0 +1,30 @@
+{
+  "name": "@coze-infra/event-sync-action",
+  "version": "0.0.1",
+  "description": "Event sync github action",
+  "license": "ISC",
+  "author": "wenming.2020@bytedance.com",
+  "maintainers": [],
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "lint": "eslint ./ --cache",
+    "test": "vitest --run --passWithNoTests",
+    "test:cov": "npm run test -- --coverage"
+  },
+  "dependencies": {
+    "@actions/core": "~1.11.1",
+    "@actions/github": "^5.1.1",
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/ts-config": "workspace:*",
+    "@coze-infra/vitest-config": "workspace:*",
+    "@types/node": "^20",
+    "@vitest/coverage-v8": "~2.1.4",
+    "sucrase": "^3.32.0",
+    "typescript": "^5.5.3",
+    "vitest": "~2.1.4"
+  }
+}
