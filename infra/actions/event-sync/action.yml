@@ -1,9 +1,0 @@
-name: 'GitHub Event Sync to Lark'
-description: 'Sync GitHub events (PR, Issues, CI) to Lark group'
-inputs:
-  webhook_url:
-    description: 'Lark group webhook URL'
-    required: true
-runs:
-  using: 'node16'
-  main: 'dist/index.js'

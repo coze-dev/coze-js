@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext"
   },
   "references": [
     {

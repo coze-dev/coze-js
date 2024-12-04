@@ -10,6 +10,52 @@ importers:
 
   .: {}
 
+  ../../../.github/actions/event-sync:
+    dependencies:
+      '@actions/core':
+        specifier: ~1.11.1
+        version: 1.11.1
+      '@actions/github':
+        specifier: ^5.1.1
+        version: 5.1.1
+      '@octokit/webhooks-definitions':
+        specifier: ~3.67.3
+        version: 3.67.3
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7(debug@4.3.7)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.19.2
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../../config/eslint-config
+      '@coze-infra/ts-config':
+        specifier: workspace:*
+        version: link:../../../config/ts-config
+      '@coze-infra/vitest-config':
+        specifier: workspace:*
+        version: link:../../../config/vitest-config
+      '@types/node':
+        specifier: ^20
+        version: 20.16.15
+      '@vercel/ncc':
+        specifier: ~0.38.3
+        version: 0.38.3
+      '@vitest/coverage-v8':
+        specifier: ~2.1.4
+        version: 2.1.4(vitest@2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(terser@5.36.0))
+      sucrase:
+        specifier: ^3.32.0
+        version: 3.35.0
+      typescript:
+        specifier: ^5.5.3
+        version: 5.6.3
+      vitest:
+        specifier: ~2.1.4
+        version: 2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(terser@5.36.0)
+
   ../../../config/eslint-config:
     dependencies:
       '@babel/eslint-parser':
@@ -768,43 +814,6 @@ importers:
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
-
-  ../../../infra/actions/event-sync:
-    dependencies:
-      '@actions/core':
-        specifier: ~1.11.1
-        version: 1.11.1
-      '@actions/github':
-        specifier: ^5.1.1
-        version: 5.1.1
-      axios:
-        specifier: ^1.7.7
-        version: 1.7.7(debug@4.3.7)
-    devDependencies:
-      '@coze-infra/eslint-config':
-        specifier: workspace:*
-        version: link:../../../config/eslint-config
-      '@coze-infra/ts-config':
-        specifier: workspace:*
-        version: link:../../../config/ts-config
-      '@coze-infra/vitest-config':
-        specifier: workspace:*
-        version: link:../../../config/vitest-config
-      '@types/node':
-        specifier: ^20
-        version: 20.16.15
-      '@vitest/coverage-v8':
-        specifier: ~2.1.4
-        version: 2.1.4(vitest@2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(terser@5.36.0))
-      sucrase:
-        specifier: ^3.32.0
-        version: 3.35.0
-      typescript:
-        specifier: ^5.5.3
-        version: 5.6.3
-      vitest:
-        specifier: ~2.1.4
-        version: 2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(terser@5.36.0)
 
   ../../../infra/package-audit:
     dependencies:
@@ -2599,6 +2608,10 @@ packages:
   '@octokit/types@6.41.0':
     resolution: {integrity: sha512-eJ2jbzjdijiL3B4PrSQaSjuF2sPEQPVCPzBvTHJD9Nz+9dw2SGH4K4xeQJ77YfTq5bRQ+bD8wT11JbeDPmxmGg==}
 
+  '@octokit/webhooks-definitions@3.67.3':
+    resolution: {integrity: sha512-do4Z1r2OVhuI0ihJhQ8Hg+yPWnBYEBNuFNCrvtPKoYT1w81jD7pBXgGe86lYuuNirkDHb0Nxt+zt4O5GiFJfgA==}
+    deprecated: Use @octokit/webhooks-types, @octokit/webhooks-schemas, or @octokit/webhooks-examples instead. See https://github.com/octokit/webhooks/issues/447
+
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
@@ -3602,6 +3615,10 @@ packages:
   '@typescript-eslint/visitor-keys@8.11.0':
     resolution: {integrity: sha512-EaewX6lxSjRJnc+99+dqzTeoDZUfyrA52d2/HRrkI830kgovWsmIiTfmr0NZorzqic7ga+1bS60lRBUgR3n/Bw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@vercel/ncc@0.38.3':
+    resolution: {integrity: sha512-rnK6hJBS6mwc+Bkab+PGPs9OiS0i/3kdTO+CkI8V0/VrW3vmz7O2Pxjw/owOlmo6PKEIxRSeZKv/kuL9itnpYA==}
+    hasBin: true
 
   '@vitejs/plugin-react@4.3.3':
     resolution: {integrity: sha512-NooDe9GpHGqNns1i8XDERg0Vsg5SSYRhRxxyTGogUdkdNt47jal+fbuYi+Yfq6pzRCKXyoPcWisfxE6RIM3GKA==}
@@ -10619,6 +10636,8 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 12.11.0
 
+  '@octokit/webhooks-definitions@3.67.3': {}
+
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -11747,6 +11766,8 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.11.0
       eslint-visitor-keys: 3.4.3
+
+  '@vercel/ncc@0.38.3': {}
 
   '@vitejs/plugin-react@4.3.3(vite@5.4.10(@types/node@20.16.15)(terser@5.36.0))':
     dependencies:

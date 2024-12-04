@@ -1,13 +1,9 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'GitHub Event Sync to Lark'
+description: 'Sync GitHub events (PR, Issues, CI) to Lark group'
 inputs:
-  who-to-greet: # id of input
-    description: 'Who to greet'
+  webhook_url:
+    description: 'Lark group webhook URL'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
 runs:
   using: 'node20'
-  main: 'index.js'
+  main: 'lib/index.js'

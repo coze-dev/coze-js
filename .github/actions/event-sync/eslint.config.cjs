@@ -4,4 +4,5 @@ module.exports = defineConfig({
   packageRoot: __dirname,
   preset: 'node',
   rules: {},
+  ignores: ['lib/**'],
 });

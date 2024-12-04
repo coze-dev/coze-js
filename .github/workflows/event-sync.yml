@@ -1,19 +1,23 @@
-on: [push]
+# event list: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows
+on:
+  issues:
+    types: [opened, closed]
+  pull_request:
+    types: [opened, closed]
+    branches: ['main']
+  workflow_run:
+    workflows: ['CI']
+    types: [completed]
 
 jobs:
-  hello_world_job:
+  event_sync_job:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: A job to sync events to Lark
     steps:
-      # To use this repository's private action,
-      # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Hello world action step
+      - name: Event sync action step
         uses: ./.github/actions/event-sync
-        id: hello
+        id: event_sync
         with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+          lark_webhook_url: ${{ secrets.LARK_WEBHOOK_URL }}

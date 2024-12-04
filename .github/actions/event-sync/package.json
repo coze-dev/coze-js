@@ -5,9 +5,10 @@
   "license": "ISC",
   "author": "wenming.2020@bytedance.com",
   "maintainers": [],
-  "main": "src/index.ts",
+  "type": "module",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build": "ncc build src/index.ts -t -o lib",
     "lint": "eslint ./ --cache",
     "test": "vitest --run --passWithNoTests",
     "test:cov": "npm run test -- --coverage"
@@ -15,13 +16,16 @@
   "dependencies": {
     "@actions/core": "~1.11.1",
     "@actions/github": "^5.1.1",
-    "axios": "^1.7.7"
+    "@octokit/webhooks-definitions": "~3.67.3",
+    "axios": "^1.7.7",
+    "tsx": "^4.19.2"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",
     "@types/node": "^20",
+    "@vercel/ncc": "~0.38.3",
     "@vitest/coverage-v8": "~2.1.4",
     "sucrase": "^3.32.0",
     "typescript": "^5.5.3",
