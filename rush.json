@@ -399,6 +399,10 @@
       "projectFolder": "infra/package-audit"
     },
     {
+      "packageName": "@coze-infra/rslib-config",
+      "projectFolder": "config/rslib-config"
+    },
+    {
       "packageName": "@coze/api",
       "projectFolder": "packages/coze-js"
     },
