@@ -342,7 +342,7 @@ export interface CreateChatReq {
    */
   conversation_id?: string;
 
-  extra_params?: string[];
+  extra_params?: Record<string, string>;
 }
 
 export interface CreateChatRes {
@@ -517,7 +517,7 @@ export interface StreamChatReq {
    */
   conversation_id?: string;
 
-  extra_params?: string[];
+  extra_params?: Record<string, string>;
 }
 
 export enum ChatEventType {

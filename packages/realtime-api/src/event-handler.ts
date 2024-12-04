@@ -91,8 +91,43 @@ export enum EventNames {
    * zh: Bot 离开
    */
   BOT_LEAVE = 'server.bot.leave',
+  /**
+   * en: Audio speech started
+   * zh: 开始说话
+   */
+  AUDIO_AGENT_SPEECH_STARTED = 'server.audio.agent.speech_started',
+  /**
+   * en: Audio speech stopped
+   * zh: 停止说话
+   */
+  AUDIO_SPEECH_STOPPED = 'server.audio.speech_stopped',
+  /**
+   * en: Server error
+   * zh: 服务端错误
+   */
+  SERVER_ERROR = 'server.error',
+  /**
+   * en: User speech started
+   * zh: 用户开始说话
+   */
+  AUDIO_USER_SPEECH_STARTED = 'server.audio.user.speech_started',
+  /**
+   * en: User speech stopped
+   * zh: 用户停止说话
+   */
+  AUDIO_USER_SPEECH_STOPPED = 'server.audio.user.speech_stopped',
+  /**
+   * en: User successfully enters the room
+   * zh: 用户成功进入房间后，会收到该事件
+   */
+  SESSION_CREATED = 'server.session.created',
+  /**
+   * en: Session updated
+   * zh: 会话更新
+   */
+  SESSION_UPDATE = 'server.session.update',
 }
-type EventCallback = (eventName: string, event: unknown) => void;
+export type EventCallback = (eventName: string, event: unknown) => void;
 
 export class RealtimeEventHandler {
   private eventHandlers: Record<string, EventCallback[]>;
@@ -154,8 +189,10 @@ export class RealtimeEventHandler {
     }
   }
 
-  dispatch(eventName: string, event: unknown) {
-    this._log(`dispatch ${eventName} event`);
+  dispatch(eventName: string, event: unknown, consoleLog = true) {
+    if (consoleLog) {
+      this._log(`dispatch ${eventName} event`);
+    }
 
     const handlers = (
       this.eventHandlers[eventName] || []

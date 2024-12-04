@@ -11,6 +11,8 @@ vi.mock('@volcengine/rtc', async () => ({
     enumerateDevices: vi.fn(),
     events: {},
     setParameter: vi.fn(),
+    enumerateAudioCaptureDevices: vi.fn(),
+    enumerateAudioPlaybackDevices: vi.fn(),
   },
   MediaType: (await vi.importActual('@volcengine/rtc')).MediaType,
   StreamIndex: {
@@ -109,28 +111,45 @@ describe('EngineClient', () => {
 
   describe('getDevices', () => {
     it('should return audio input devices', async () => {
-      const devices = await RealtimeUtils.getAudioDevices();
+      const devices = await RealtimeUtils.getAudioDevices({ video: true });
       expect(devices.audioInputs).toHaveLength(2);
     });
     it('should handle device enumeration errors', async () => {
       (VERTC.enumerateDevices as vi.Mock).mockRejectedValue(
         new Error('Enumeration failed'),
       );
-      await expect(RealtimeUtils.getAudioDevices()).rejects.toThrow(Error);
+      await expect(
+        RealtimeUtils.getAudioDevices({ video: true }),
+      ).rejects.toThrow(Error);
     });
   });
 
   describe('createLocalStream', () => {
     it('should start audio capture with first device', async () => {
+      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([
+        { deviceId: 'audio1', kind: 'audioinput' },
+      ]);
+      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
+
       await client.createLocalStream();
       expect(mockEngine.startAudioCapture).toHaveBeenCalledWith('audio1');
     });
 
     it('should throw error if no audio devices', async () => {
       (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([]);
+      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([]);
+      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
+
       await expect(client.createLocalStream()).rejects.toThrow(
         RealtimeAPIError,
       );
+    });
+
+    it('should throw error if no video devices', async () => {
+      (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
+        { deviceId: 'audio1', kind: 'audioinput' },
+      ]);
+      await expect(client.createLocalStream()).rejects.toThrow(Error);
     });
   });
 
@@ -303,7 +322,10 @@ describe('EngineClient', () => {
         { deviceId: 'new-audio-input-id', kind: 'audioinput', label: 'Mic 1' },
       ];
 
-      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
+      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue(
+        mockDevices,
+      );
+      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
 
       const deviceId = 'new-audio-input-id';
       await client.setAudioInputDevice(deviceId);
@@ -404,8 +426,11 @@ describe('EngineClient', () => {
           label: 'Speaker 1',
         },
       ];
+      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue(
+        mockDevices,
+      );
+      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([]);
 
-      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
       const deviceId = 'new-audio-output-id';
       await client.setAudioOutputDevice(deviceId);
       expect(mockEngine.setAudioPlaybackDevice).toHaveBeenCalledWith(deviceId);

@@ -55,7 +55,10 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.on(VERTC.events.onUserJoined, this.handleUserJoin);
     this.engine.on(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.on(VERTC.events.onError, this.handleEventError);
-    this.engine.on(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
+
+    if (this._isSupportVideo) {
+      this.engine.on(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
+    }
 
     if (this._debug) {
       this.engine.on(
@@ -74,7 +77,10 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.off(VERTC.events.onUserJoined, this.handleUserJoin);
     this.engine.off(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.off(VERTC.events.onError, this.handleEventError);
-    this.engine.off(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
+
+    if (this._isSupportVideo) {
+      this.engine.off(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
+    }
 
     if (this._debug) {
       this.engine.off(
@@ -146,8 +152,16 @@ export class EngineClient extends RealtimeEventHandler {
     uid: string;
     audioMutedDefault?: boolean;
     videoOnDefault?: boolean;
+    isAutoSubscribeAudio?: boolean;
   }) {
-    const { token, roomId, uid, audioMutedDefault, videoOnDefault } = options;
+    const {
+      token,
+      roomId,
+      uid,
+      audioMutedDefault,
+      videoOnDefault,
+      isAutoSubscribeAudio,
+    } = options;
     try {
       await this.engine.joinRoom(
         token,
@@ -157,7 +171,7 @@ export class EngineClient extends RealtimeEventHandler {
         },
         {
           isAutoPublish: !audioMutedDefault,
-          isAutoSubscribeAudio: true,
+          isAutoSubscribeAudio,
           isAutoSubscribeVideo: this._isSupportVideo && videoOnDefault,
         },
       );
@@ -181,7 +195,7 @@ export class EngineClient extends RealtimeEventHandler {
   }
 
   async setAudioOutputDevice(deviceId: string) {
-    const devices = await getAudioDevices();
+    const devices = await getAudioDevices({ video: false });
     if (devices.audioOutputs.findIndex(i => i.deviceId === deviceId) === -1) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
@@ -192,17 +206,17 @@ export class EngineClient extends RealtimeEventHandler {
   }
 
   async createLocalStream(userId?: string, videoConfig?: VideoConfig) {
-    const devices = await getAudioDevices();
+    const devices = await getAudioDevices({ video: this._isSupportVideo });
     if (!devices.audioInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
-        'Failed to get devices',
+        'Failed to get audio devices',
       );
     }
     if (this._isSupportVideo && !devices.videoInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
-        'Failed to get devices',
+        'Failed to get video devices',
       );
     }
 

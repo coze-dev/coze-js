@@ -1,4 +1,3 @@
-/* eslint-disable prefer-destructuring */
 import * as nodeCrypto from 'crypto';
 
 import jwt from 'jsonwebtoken';
@@ -11,6 +10,19 @@ import {
   MAX_POLL_INTERVAL,
   POLL_INTERVAL,
 } from './constant.js';
+
+const getCrypto = () => {
+  if (isBrowser()) {
+    return window.crypto;
+  }
+  return nodeCrypto;
+};
+const generateRandomString = () => {
+  const array = new Uint8Array(32);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (getCrypto() as any).getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+};
 
 export const getWebAuthenticationUrl = (config: WebAuthenticationConfig) => {
   const baseUrl = (config.baseURL ?? COZE_COM_BASE_URL).replace(
@@ -33,21 +45,7 @@ export const getPKCEAuthenticationUrl = async (
     'https://api',
     'https://www',
   );
-  let crypto;
-  if (isBrowser()) {
-    crypto = window.crypto;
-  } else {
-    crypto = nodeCrypto;
-  }
-  // Generate a random code_verifier
-  const generateCodeVerifier = () => {
-    const array = new Uint8Array(32);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (crypto as any).getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join(
-      '',
-    );
-  };
+  const crypto = getCrypto();
 
   // Generate code_challenge from code_verifier
   const generateCodeChallenge = async (codeVerifier: string) => {
@@ -60,7 +58,8 @@ export const getPKCEAuthenticationUrl = async (
       .replace(/\//g, '_');
   };
 
-  const codeVerifier = generateCodeVerifier();
+  // Generate a random code_verifier
+  const codeVerifier = generateRandomString();
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
   const params = new URLSearchParams({
@@ -306,7 +305,7 @@ export const getJWTToken = async (
     aud: config.aud,
     iat: now,
     exp: now + 3600, // 1 hour
-    jti: `${now.toString(16)}`,
+    jti: generateRandomString(),
   };
 
   if (config.sessionName) {
