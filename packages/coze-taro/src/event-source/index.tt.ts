@@ -37,6 +37,7 @@ export class EventSource extends BaseEventSource {
   abort() {
     if (!this.isAborted) {
       this.task?.close();
+      this.isAborted = true;
     }
   }
 }

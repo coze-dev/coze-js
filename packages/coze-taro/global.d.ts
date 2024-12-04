@@ -13,7 +13,7 @@ type TTCreateEVentSource = (args: {
   onError(cb: (msg: { errMsg: string }) => void): void;
 };
 
-declare module globalThis {
+declare namespace globalThis {
   const tt: {
     createEventSource: TTCreateEVentSource;
   };

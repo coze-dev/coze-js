@@ -187,12 +187,12 @@ export function getUploadFileMixin(api: CozeAPI) {
           }
         },
         fail(res) {
-          reject(res.errMsg);
+          reject(new Error(res.errMsg));
         },
       });
 
       if (options?.signal) {
-        options.signal.addEventListener?.(() => {
+        options.signal.addEventListener?.('abort', () => {
           task.abort();
         });
       }

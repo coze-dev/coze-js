@@ -3,7 +3,7 @@ import { Events } from '@tarojs/taro';
 type EventListener = () => void;
 
 class AbortSignalPonyfill {
-  readonly events = new Events();
+  private events = new Events();
   aborted = false;
   reason: unknown;
 
