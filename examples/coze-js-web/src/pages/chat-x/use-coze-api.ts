@@ -14,9 +14,10 @@ import { config } from './config';
 
 const useCozeAPI = () => {
   const clientRef = useRef<CozeAPI | null>(null);
-  const [botInfo, setBotInfo] = useState<BotInfo | null>(null);
+  const [botInfo, setBotInfo] = useState<BotInfo | undefined>();
 
-  const fileInfoRef = useRef<FileObject | null>(null);
+  const fileInfoRef = useRef<FileObject | undefined>();
+  const [uploading, setUploading] = useState(false);
 
   const initClient = () => {
     const baseUrl = config.getBaseUrl();
@@ -26,6 +27,37 @@ const useCozeAPI = () => {
       baseURL: baseUrl,
       allowPersonalAccessTokenInBrowser: true,
     });
+  };
+
+  const createMessage = (
+    query: string,
+    fileInfo?: FileObject,
+  ): EnterMessage[] => {
+    const baseMessage: EnterMessage = {
+      role: RoleType.User,
+      type: 'question',
+    };
+
+    if (fileInfo) {
+      return [
+        {
+          ...baseMessage,
+          content: [
+            { type: 'text', text: query },
+            { type: 'file', file_id: fileInfo.id },
+          ],
+          content_type: 'object_string',
+        },
+      ];
+    }
+
+    return [
+      {
+        ...baseMessage,
+        content: [{ type: 'text', text: query }],
+        content_type: 'text',
+      },
+    ];
   };
 
   const streamingChat = async ({
@@ -46,40 +78,7 @@ const useCozeAPI = () => {
     }
 
     const botId = config.getBotId();
-    let messages: EnterMessage[] = [];
-    if (fileInfoRef.current) {
-      messages = [
-        {
-          role: RoleType.User,
-          type: 'question',
-          content: [
-            {
-              type: 'text',
-              text: query,
-            },
-            {
-              type: 'file',
-              file_id: fileInfoRef.current.id,
-            },
-          ],
-          content_type: 'object_string',
-        },
-      ];
-    } else {
-      messages = [
-        {
-          role: RoleType.User,
-          type: 'question',
-          content: [
-            {
-              type: 'text',
-              text: query,
-            },
-          ],
-          content_type: 'text',
-        },
-      ];
-    }
+    const messages = createMessage(query, fileInfoRef.current);
 
     const v = await clientRef.current.chat.stream({
       bot_id: botId,
@@ -115,13 +114,22 @@ const useCozeAPI = () => {
     console.log('=== End of Streaming Chat ===');
   };
 
-  const uploadFile = useCallback(async (file: File) => {
+  const uploadFile = useCallback(async (file?: File) => {
     if (!clientRef.current) {
       throw new Error('Client not initialized');
     }
-    const res = await clientRef.current.files.upload({
-      file,
-    });
+    if (!file) {
+      fileInfoRef.current = undefined;
+      return;
+    }
+    setUploading(true);
+    const res = await clientRef.current.files
+      .upload({
+        file,
+      })
+      .finally(() => {
+        setUploading(false);
+      });
     fileInfoRef.current = res;
   }, []);
 
@@ -142,6 +150,7 @@ const useCozeAPI = () => {
     uploadFile,
     getBotInfo,
     botInfo,
+    uploading,
   };
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { Badge, Button, type GetProp, message, Space } from 'antd';
+import { type CreateChatData } from '@coze/api';
 import { type MessageInfo } from '@ant-design/x/es/useXChat';
 import {
   Attachments,
@@ -67,6 +68,15 @@ const ChatX: React.FC = () => {
   );
   const isTypingRef = React.useRef(false);
 
+  const {
+    initClient,
+    streamingChat,
+    botInfo,
+    getBotInfo,
+    uploadFile,
+    uploading,
+  } = useCozeAPI();
+
   // ==================== Runtime ====================
   const [agent] = useXAgent({
     request: ({ message: query }, { onUpdate, onSuccess }) => {
@@ -76,11 +86,11 @@ const ChatX: React.FC = () => {
         query: query ?? '',
         conversationId: conversationId === '0' ? undefined : conversationId,
         onUpdate,
-        onSuccess: delta => {
+        onSuccess: (delta: string) => {
           onSuccess(delta);
           isTypingRef.current = false;
         },
-        onCreated: data => {
+        onCreated: (data: CreateChatData) => {
           setConversationsItems(prev => {
             const exist = prev.find(
               item => item.key === data.conversation_id || item.key === '0',
@@ -117,9 +127,6 @@ const ChatX: React.FC = () => {
   const { onRequest, messages, setMessages } = useXChat({
     agent,
   });
-
-  const { initClient, streamingChat, botInfo, getBotInfo, uploadFile } =
-    useCozeAPI();
 
   useEffect(() => {
     const baseUrl = config.getBaseUrl();
@@ -182,7 +189,7 @@ const ChatX: React.FC = () => {
 
   const handleFileChange: GetProp<typeof Attachments, 'onChange'> = info => {
     setAttachedFiles(info.fileList);
-    uploadFile(info.fileList[0].originFileObj as File);
+    uploadFile(info.fileList[0]?.originFileObj as File);
   };
 
   const onSettingsChange = () => {
@@ -300,7 +307,7 @@ const ChatX: React.FC = () => {
           onSubmit={onSubmit}
           onChange={setContent}
           prefix={attachmentsNode}
-          loading={agent.isRequesting()}
+          loading={agent.isRequesting() || uploading}
           className={styles.sender}
         />
       </div>
