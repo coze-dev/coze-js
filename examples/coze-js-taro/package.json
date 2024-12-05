@@ -1,0 +1,65 @@
+{
+  "name": "@coze/taro-api-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "coze js for taro",
+  "author": "",
+  "scripts": {
+    "build:h5": "taro build --type h5",
+    "build:tt": "taro build --type tt",
+    "build:weapp": "taro build --type weapp",
+    "dev:h5": "npm run build:h5 -- --watch",
+    "dev:tt": "npm run build:tt -- --watch",
+    "dev:weapp": "npm run build:weapp -- --watch"
+  },
+  "browserslist": [
+    "defaults and fully supports es6-module",
+    "maintained node versions"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.24.4",
+    "@coze/api": "workspace:*",
+    "@coze/taro-api": "workspace:*",
+    "@tarojs/components": "4.0.7",
+    "@tarojs/helper": "4.0.7",
+    "@tarojs/plugin-framework-react": "4.0.7",
+    "@tarojs/plugin-platform-alipay": "4.0.7",
+    "@tarojs/plugin-platform-h5": "4.0.7",
+    "@tarojs/plugin-platform-harmony-hybrid": "4.0.7",
+    "@tarojs/plugin-platform-jd": "4.0.7",
+    "@tarojs/plugin-platform-qq": "4.0.7",
+    "@tarojs/plugin-platform-swan": "4.0.7",
+    "@tarojs/plugin-platform-tt": "4.0.7",
+    "@tarojs/plugin-platform-weapp": "4.0.7",
+    "@tarojs/react": "4.0.7",
+    "@tarojs/runtime": "4.0.7",
+    "@tarojs/shared": "4.0.7",
+    "@tarojs/taro": "4.0.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "~7.18.6",
+    "@babel/preset-react": "~7.13.13",
+    "@coze-infra/eslint-config": "workspace:*",
+    "@swc/types": "^0.1.17",
+    "@tarojs/cli": "4.0.7",
+    "@tarojs/vite-runner": "4.0.7",
+    "@types/react": "^18.3.11",
+    "@vitejs/plugin-react": "~4.3.3",
+    "babel-preset-taro": "4.0.7",
+    "postcss": "^8.4.4",
+    "react-refresh": "^0.11.0",
+    "stylelint": "^15.11.0",
+    "terser": "^5.30.4",
+    "typescript": "^5.5.3",
+    "vite": "^4.2.0"
+  },
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "None",
+    "framework": "React"
+  }
+}

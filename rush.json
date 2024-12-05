@@ -415,12 +415,20 @@
       "projectFolder": "packages/realtime-api"
     },
     {
+      "packageName": "@coze/taro-api",
+      "projectFolder": "packages/coze-taro"
+    },
+    {
       "packageName": "@coze/realtime-api-example",
       "projectFolder": "examples/realtime-console"
     },
     {
       "packageName": "@coze/realtime-call-up",
       "projectFolder": "examples/realtime-call-up"
+    },
+    {
+      "packageName": "@coze/taro-api-example",
+      "projectFolder": "examples/coze-js-taro"
     }
   ]
 }
