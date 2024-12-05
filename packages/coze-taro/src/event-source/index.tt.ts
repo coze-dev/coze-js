@@ -37,6 +37,8 @@ export class EventSource extends BaseEventSource {
   abort() {
     if (!this.isAborted) {
       this.task?.close();
+      // fire "fail" manualy
+      this.trigger(EventName.Fail, new Error('abort'));
       this.isAborted = true;
     }
   }

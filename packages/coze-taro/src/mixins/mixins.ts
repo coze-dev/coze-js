@@ -86,7 +86,8 @@ export function getWorkflowStreamMixin(api: CozeAPI) {
         }
       }
     } catch (e) {
-      throw new CozeError(`Could not handle message: ${e}`);
+      const msg = e instanceof Error ? e.message : e;
+      throw new CozeError(`Could not handle message: ${msg}`);
     }
   };
 }
@@ -157,7 +158,8 @@ export function getChatStreamMixin(api: CozeAPI) {
         }
       }
     } catch (e) {
-      throw new CozeError(`Could not handle message: ${e}`);
+      const msg = e instanceof Error ? e.message : e;
+      throw new CozeError(`Could not handle message: ${msg}`);
     }
   };
 }

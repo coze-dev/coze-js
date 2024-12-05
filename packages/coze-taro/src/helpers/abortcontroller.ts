@@ -30,11 +30,13 @@ class AbortControllerPonyfill {
   }
 }
 
-const supportAbortController = typeof globalThis.AbortController === 'function';
+// globalThis is undefined duriing initialization in Bytedance mini program
+const supportAbortController =
+  typeof (globalThis || window).AbortController === 'function';
 
 export const AbortController = supportAbortController
-  ? globalThis.AbortController
+  ? (globalThis || window).AbortController
   : AbortControllerPonyfill;
 export const AbortSignal = supportAbortController
-  ? globalThis.AbortSignal
+  ? (globalThis || window).AbortSignal
   : AbortSignalPonyfill;
