@@ -17,7 +17,7 @@ pnpm install @coze/taro-api @coze/api
 ### 2. Basic Usage
 
 ```javascript
-import { COZE_COM_BASE_URL } from '@coze/api';
+import { COZE_COM_BASE_URL, RoleType, ChatStatus } from '@coze/api';
 import { CozeAPI } from '@coze/taro-api';
 
 // Initialize client with your Personal Access Token
@@ -28,22 +28,27 @@ const client = new CozeAPI({
 
 // Simple chat example
 async function quickChat() {
-  const v = await client.chat.createAndPoll({
-    bot_id: 'your_bot_id',
-    additional_messages: [
-      {
-        role: RoleType.User,
-        content: 'Hello!',
-        content_type: 'text',
-      },
-    ],
-  });
+  try {
+    const v = await client.chat.createAndPoll({
+      bot_id: 'your_bot_id',
+      additional_messages: [
+        {
+          role: RoleType.User,
+          content: 'Hello!',
+          content_type: 'text',
+        },
+      ],
+    });
 
-  if (v.chat.status === ChatStatus.COMPLETED) {
-    for (const item of v.messages) {
-      console.log('[%s]:[%s]:%s', item.role, item.type, item.content);
+    if (v.chat.status === ChatStatus.COMPLETED) {
+      for (const item of v.messages) {
+        console.log('[%s]:[%s]:%s', item.role, item.type, item.content);
+      }
+      console.log('usage', v.chat.usage);
     }
-    console.log('usage', v.chat.usage);
+  } catch (error) {
+    console.error('Chat error:', error);
+    throw error;
   }
 }
 ```
