@@ -96,6 +96,39 @@ const client = new CozeAPI({
 });
 ```
 
+### Abort streaming chat
+
+```javascript
+import { ChatEventType } from '@coze/api';
+import { CozeAPI, AbortController } from '@coze/taro-api';
+
+async function streamChat() {
+  const controller = new AbortController();
+  setTimeout(() => {
+    controller.abort();
+  }, 10);
+
+  const stream = await client.chat.stream({
+    bot_id: 'your_bot_id',
+    additional_messages: [
+      {
+        role: RoleType.User,
+        content: 'Hello!',
+        content_type: 'text',
+      },
+    ],
+  }, {
+    signal: controller.signal,
+  });
+
+  for await (const part of stream) {
+    if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+      console.log(part.data.content); // Real-time response
+    }
+  }
+}
+```
+
 ## Try Examples
 
 ```bash
