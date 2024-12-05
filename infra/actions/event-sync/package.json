@@ -8,7 +8,8 @@
   "type": "module",
   "main": "lib/index.js",
   "scripts": {
-    "build": "ncc build src/index.ts -t -o lib",
+    "build": "tsc -b tsconfig.build.json",
+    "deploy": "ncc build src/index.ts -t -o ../../../.github/actions/event-sync/lib",
     "lint": "eslint ./ --cache",
     "test": "vitest --run --passWithNoTests",
     "test:cov": "npm run test -- --coverage"

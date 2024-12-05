@@ -7,15 +7,6 @@ inputs:
   lark_person_open_ids:
     description: 'Lark person open ids'
     required: false
-# runs:
-#   using: 'composite'
-#   steps:
-#     - name: Install Dependencies
-#       shell: bash
-#       run: node common/scripts/install-run-rush.js install -t @coze-infra/event-sync-action
-#     - name: Run Action
-#       shell: bash
-#       run: node ${{ github.action_path }}/src/index.js
 runs:
   using: 'node20'
   main: 'lib/index.js'
