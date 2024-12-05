@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 import { useLoad } from '@tarojs/taro';
 import { View, Text, Button } from '@tarojs/components';
 import { CozeAPI } from '@coze/taro-api';
-import { RoleType } from '@coze/api';
+import { RoleType, ChatEventType } from '@coze/api';
 import './index.css';
 
 export default function Index() {
@@ -29,7 +29,7 @@ export default function Index() {
         ],
       });
       for await (const chunk of res) {
-        if (chunk.event === 'conversation.message.delta') {
+        if (chunk.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
           setMessage(msg => msg + chunk.data.content);
         }
         console.log(chunk);

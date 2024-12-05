@@ -34,7 +34,7 @@ describe('CozeAPI', () => {
   it('should refresh token', async () => {
     const cozeApi = new CozeAPI({
       token: '',
-      onBeforeAPICall: () => 'newToken',
+      onBeforeAPICall: () => ({ token: 'newToken' }),
     });
     expect(cozeApi.token).toEqual('');
     const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });

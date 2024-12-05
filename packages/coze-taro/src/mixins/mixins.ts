@@ -206,13 +206,14 @@ async function refreshToken(
   options?: RequestOptions,
 ) {
   if (api.options.onBeforeAPICall) {
-    const token = await api.options.onBeforeAPICall({
-      ...options,
-      data: params,
-    });
-    if (token) {
-      api.options.token = token;
-      api.token = token;
+    const config =
+      (await api.options.onBeforeAPICall({
+        ...options,
+        data: params,
+      })) ?? {};
+    if (config.token) {
+      api.options.token = config.token;
+      api.token = config.token;
     }
   }
 }

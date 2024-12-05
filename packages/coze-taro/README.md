@@ -91,7 +91,7 @@ const client = new CozeAPI({
   token: 'your_pat_token', // https://www.coze.com/open/oauth/pats
   baseURL: COZE_COM_BASE_URL,
   onBeforeAPICall: () => {
-    return 'your_new_pat_token';
+    return { token: 'your_new_pat_token' };
   },
 });
 ```

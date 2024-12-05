@@ -11,7 +11,7 @@ import { platformMixins } from './mixins/platform';
 export interface ClientOptions extends InnerClientOptions {
   onBeforeAPICall?: (
     options: unknown,
-  ) => (string | void) | Promise<string | void>;
+  ) => ({ token?: string } | void) | Promise<{ token?: string } | void>;
 }
 
 export class CozeAPI extends InnerCozeAPI {
@@ -33,13 +33,13 @@ export class CozeAPI extends InnerCozeAPI {
 
   private async wrapRequest(options: Taro.request.Option) {
     if (this.options.onBeforeAPICall) {
-      const token = await this.options.onBeforeAPICall(options);
-      if (token) {
-        this.token = token;
+      const config = (await this.options.onBeforeAPICall(options)) ?? {};
+      if (config.token) {
+        this.token = config.token;
         (this.axiosOptions?.header as Record<string, string>).Authorization =
-          `Bearer ${token}`;
+          `Bearer ${config.token}`;
         (options.header as Record<string, string>).Authorization =
-          `Bearer ${token}`;
+          `Bearer ${config.token}`;
       }
     }
     return Taro.request(options);
