@@ -10,6 +10,7 @@ async function run() {
     const larkPersonOpenIds = JSON.parse(
       getInput('lark_person_open_ids', { required: false }) || '{}',
     );
+
     const platform = new LarkPlatform(larkWebhookUrl, larkPersonOpenIds);
 
     const handler = handlerFactory.createHandler(context.eventName, platform);

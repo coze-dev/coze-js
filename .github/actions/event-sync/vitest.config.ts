@@ -6,6 +6,12 @@ export default defineConfig({
   test: {
     coverage: {
       all: true,
+      exclude: [
+        'src/tsx-index.js',
+        'src/index.ts',
+        'lib/index.js',
+        'src/types.ts',
+      ],
     },
   },
 });
