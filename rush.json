@@ -391,6 +391,10 @@
       "projectFolder": "infra/utils/fs-enhance"
     },
     {
+      "packageName": "@coze-infra/event-sync-action",
+      "projectFolder": ".github/actions/event-sync"
+    },
+    {
       "packageName": "@coze-infra/rush-logger",
       "projectFolder": "infra/utils/rush-logger"
     },
