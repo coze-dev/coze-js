@@ -129,41 +129,41 @@ export class Bots extends APIResource {
 export interface CreateBotReq {
   space_id: string;
   /**
-   * Bot 的名称。
+   * The name of the Bot.
    */
   name: string;
 
   /**
-   * Bot 的描述信息。
+   * The description of the Bot.
    */
   description?: string;
 
   /**
-   * Bot 的头像地址。
+   * The avatar url of the Bot.
    */
   icon_file_id?: string;
 
   /**
-   * Bot 的提示词配置，参考 Prompt object 说明。
+   * The prompt configuration of the Bot, refer to the Prompt object for details.
    */
   prompt_info?: {
     /**
-     * Bot 配置的提示词。
+     * The prompt configured for the Bot.
      */
     prompt: string;
   };
 
   /**
-   * Bot 的开场白配置，参考 Onboarding object 说明。
+   * The onboarding configuration of the Bot, refer to the Onboarding object for details.
    */
   onboarding_info?: {
     /**
-     * Bot 配置的开场白内容。
+     * The prologue content configured for the Bot.
      */
     prologue: string;
 
     /**
-     * Bot 配置的推荐问题列表。未开启用户问题建议时，不返回此字段。
+     * The list of recommended questions configured for the Bot. This field is not returned if the user question suggestion feature is not enabled.
      */
     suggested_questions?: string[];
   };
@@ -210,88 +210,87 @@ export interface CreateBotData {
 
 export interface BotInfo {
   /**
-   * Bot 的唯一标识。
+   * The unique identifier of the Bot.
    */
   bot_id: string;
 
   /**
-   * Bot 的名称。
+   * The name of the Bot.
    */
   name: string;
 
   /**
-   * Bot 的描述信息。
+   * The description of the Bot.
    */
   description: string;
 
   /**
-   * Bot 的头像地址。
+   * The avatar url of the Bot.
    */
   icon_url: string;
 
   /**
-   * 创建时间，格式为 10 位的 Unixtime 时间戳，单位为秒（s）。
+   * The creation time, formatted as a 10-digit Unix timestamp, in seconds.
    */
   create_time: number;
 
   /**
-   * 更新时间，格式为 10 位的 Unixtime 时间戳，单位为秒（s）。
+   * The update time, formatted as a 10-digit Unix timestamp, in seconds.
    */
   update_time: number;
 
   /**
-   * Bot 最新版本的版本号。
+   * The latest version number of the Bot.
    */
   version: string;
 
   /**
-   * Bot 的提示词配置，参考 Prompt object 说明。
+   * The prompt configuration of the Bot, refer to the Prompt object for details.
    */
   prompt_info: {
     /**
-     * Bot 配置的提示词。
+     * The prompt configured for the Bot.
      */
     prompt: string;
   };
 
   /**
-   * Bot 的开场白配置，参考 Onboarding object 说明。
+   * The onboarding configuration of the Bot, refer to the Onboarding object for details.
    */
   onboarding_info: {
     /**
-     * Bot 配置的开场白内容。
+     * The prologue content configured for the Bot.
      */
     prologue: string;
 
     /**
-     * Bot 配置的推荐问题列表。未开启用户问题建议时，不返回此字段。
+     * The list of recommended questions configured for the Bot. This field is not returned if the user question suggestion feature is not enabled.
      */
     suggested_questions?: string[];
   };
 
   /**
-   * Bot 模式，取值：
-   * - 0：单 Agent 模式
-   * - 1：多 Agent 模式
+   * - 0: Single Agent mode
+   * - 1: Multi Agent mode
    */
   bot_mode: Bots.BotModeType;
 
   /**
-   * Bot 配置的插件，参考 Plugin object 说明。
+   * The plugins configured for the Bot, refer to the Plugin object for details.
    */
   plugin_info_list: BotPlugin[];
 
   /**
-   * Bot 配置的模型，参考 Model object 说明。
+   * The model configured for the Bot, refer to the Model object for details.
    */
   model_info: {
     /**
-     * 模型的唯一标识。
+     * The unique identifier of the model.
      */
     model_id: string;
 
     /**
-     * 模型名称。
+     * The name of the model.
      */
     model_name: string;
   };
@@ -299,41 +298,41 @@ export interface BotInfo {
 
 export interface BotPlugin {
   /**
-   * 插件唯一标识。
+   * The unique identifier of the plugin.
    */
   plugin_id: string;
 
   /**
-   * 插件名称。
+   * The name of the plugin.
    */
   name: string;
 
   /**
-   * 插件描述。
+   * The description of the plugin.
    */
   description: string;
 
   /**
-   * 插件头像。
+   * The avatar of the plugin.
    */
   icon_url: string;
 
   /**
-   * 插件的工具列表信息
+   * The list of tools for the plugin.
    */
   api_info_list: {
     /**
-     * 工具的唯一标识。
+     * The unique identifier of the tool.
      */
     api_id: string;
 
     /**
-     * 工具的名称。
+     * The name of the tool.
      */
     name: string;
 
     /**
-     * 工具的描述。
+     * The description of the tool.
      */
     description: string;
   }[];
@@ -341,27 +340,27 @@ export interface BotPlugin {
 
 export interface SimpleBot {
   /**
-   * Bot 的唯一标识。
+   * The unique identifier of the Bot.
    */
   bot_id: string;
 
   /**
-   * Bot 的名称。
+   * The name of the Bot.
    */
   bot_name: string;
 
   /**
-   * Bot 的描述信息。
+   * The description of the Bot.
    */
   description: string;
 
   /**
-   * Bot 的头像地址。
+   * The avatar url of the Bot.
    */
   icon_url: string;
 
   /**
-   * Bot 的最近一次发布时间，格式为 10 位的 Unixtime 时间戳。此 API 返回的 Bot 列表按照此字段降序排列。
+   * The time of the last publication of the Bot, formatted as a 10-digit Unix timestamp. The Bot list returned by this API is sorted in descending order by this field.
    */
   publish_time: string;
 }
@@ -376,9 +375,9 @@ export interface KnowledgeInfo {
 
 export namespace Bots {
   /**
-   * Bot 模式，取值：
-   * - 0：单 Agent 模式
-   * - 1：多 Agent 模式
+   * Bot mode, the value is:
+   * - 0: Single Agent mode
+   * - 1: Multi Agent mode
    */
   export type BotModeType = 0 | 1;
 }

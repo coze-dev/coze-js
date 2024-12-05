@@ -46,22 +46,22 @@ export interface CreateFileReq {
 
 export interface FileObject {
   /**
-   * 已上传的文件 ID。
+   * The ID of the uploaded file.
    */
   id: string;
 
   /**
-   * 文件的总字节数。
+   * The total number of bytes in the file.
    */
   bytes: number;
 
   /**
-   * 文件的上传时间，格式为 10 位的 Unixtime 时间戳，单位为秒（s）。
+   * The upload time of the file, formatted as a 10-digit Unix timestamp, in seconds (s).
    */
   created_at: number;
 
   /**
-   * 文件名称。
+   * The name of the file.
    */
   file_name: string;
 }
