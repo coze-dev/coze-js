@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- some types are not defined in @octokit/webhooks-definitions */
 import {
   type PullRequestEvent,
   type IssuesEvent,
@@ -11,6 +12,8 @@ import { type NotificationMessage, type NotificationPlatform } from '../types';
 type ActionMessageMap<T extends { action: string }> = Partial<
   Record<T['action'], NotificationMessage>
 >;
+
+// TODO: some event need to be filtered out or send to specific person
 
 export abstract class EventHandler {
   constructor(protected platform: NotificationPlatform) {}
@@ -114,11 +117,19 @@ export class CIFailureHandler extends EventHandler {
       return;
     }
 
+    // for debug
+    console.log(JSON.stringify(workflow_run, null, 2));
+
     const messageActionMap: ActionMessageMap<WorkflowRunEvent> = {
       completed: {
         title: '❗ Workflow run failed',
-        content: `Workflow name: ${workflow_run.name}, Event: ${workflow_run.event},Head Branch: ${workflow_run.head_branch}`,
+        content: `\
+**Workflow name**: ${workflow_run.name}
+**Workflow title**: ${(workflow_run as any).display_title}
+${workflow_run.pull_requests?.length ? `**PRs**: ${workflow_run.pull_requests.map(pr => `[#${pr.number}](${pr.url})]`).join('、')}` : ''}`,
         url: workflow_run.html_url,
+        // @ts-expect-error -- type ignore
+        creator: workflow_run.actor?.login,
       },
     };
 

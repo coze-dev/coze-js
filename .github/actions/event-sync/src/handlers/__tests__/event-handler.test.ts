@@ -161,8 +161,9 @@ describe('CIFailureHandler', () => {
     expect(platform.sentMessages).toHaveLength(1);
     expect(platform.sentMessages[0]).toEqual({
       title: '❗ Workflow run failed',
-      content: 'Workflow name: CI, Event: push,Head Branch: main',
+      content: '**Workflow name**: CI\n**Workflow title**: undefined\n',
       url: 'https://github.com/test/actions/runs/1',
+      creator: undefined,
     });
   });
 

@@ -35975,6 +35975,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CIFailureHandler = exports.IssueHandler = exports.PullRequestHandler = exports.EventHandler = void 0;
 const github = __importStar(__nccwpck_require__(988));
 const core_1 = __nccwpck_require__(357);
+// TODO: some event need to be filtered out or send to specific person
 class EventHandler {
     platform;
     constructor(platform) {
@@ -36069,13 +36070,18 @@ class CIFailureHandler extends EventHandler {
             (0, core_1.warning)(`Workflow run is not failed. Conclusion: ${workflow_run.conclusion}`);
             return;
         }
+        // for debug
+        console.log(JSON.stringify(workflow_run, null, 2));
         const messageActionMap = {
             completed: {
                 title: '❗ Workflow run failed',
-                content: `Workflow name: ${JSON.stringify(workflow_run)}, PRs: ${workflow_run.pull_requests
-                    .map(pr => JSON.stringify(pr))
-                    .join(', ')}`,
+                content: `\
+**Workflow name**: ${workflow_run.name}
+**Workflow title**: ${workflow_run.display_title}
+${workflow_run.pull_requests?.length ? `**PRs**: ${workflow_run.pull_requests.map(pr => `[#${pr.number}](${pr.url})]`).join('、')}` : ''}`,
                 url: workflow_run.html_url,
+                // @ts-expect-error -- type ignore
+                creator: workflow_run.actor?.login,
             },
         };
         const message = messageActionMap[action];
@@ -36160,7 +36166,7 @@ class LarkPlatform {
     }
     getPerson(personName) {
         return this.personOpenIds?.[personName]
-            ? `<at id=${this.personOpenIds[personName]}></at>`
+            ? `<at id=${this.personOpenIds[personName]}></at>(${personName})`
             : personName;
     }
     formatMessage(message) {
@@ -36221,7 +36227,9 @@ class LarkPlatform {
         try {
             const formattedMessage = this.formatMessage(message);
             const res = await axios_1.default.post(this.webhookUrl, formattedMessage);
-            console.log(res.data);
+            if (res.data.code !== 0) {
+                throw new Error(res.data.msg);
+            }
         }
         catch (error) {
             core.setFailed(`Failed to send message to Lark: ${error}.message`);
@@ -42929,10 +42937,15 @@ const github_1 = __nccwpck_require__(988);
 const core_1 = __nccwpck_require__(357);
 const lark_1 = __nccwpck_require__(7069);
 const handler_factory_1 = __nccwpck_require__(3105);
+const parsePersonOpenIds = (personOpenIds) => personOpenIds.split('\n').reduce((acc, line) => {
+    const [name, id] = line.split(':');
+    acc[name] = id;
+    return acc;
+}, {});
 async function run() {
     try {
         const larkWebhookUrl = (0, core_1.getInput)('lark_webhook_url', { required: true });
-        const larkPersonOpenIds = JSON.parse((0, core_1.getInput)('lark_person_open_ids', { required: false }) || '{}');
+        const larkPersonOpenIds = parsePersonOpenIds((0, core_1.getInput)('lark_person_open_ids', { required: false }));
         const platform = new lark_1.LarkPlatform(larkWebhookUrl, larkPersonOpenIds);
         const handler = handler_factory_1.handlerFactory.createHandler(github_1.context.eventName, platform);
         if (!handler) {

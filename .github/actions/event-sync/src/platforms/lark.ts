@@ -11,7 +11,7 @@ export class LarkPlatform implements NotificationPlatform {
 
   private getPerson(personName: string) {
     return this.personOpenIds?.[personName]
-      ? `<at id=${this.personOpenIds[personName]}></at>`
+      ? `<at id=${this.personOpenIds[personName]}></at>(${personName})`
       : personName;
   }
 
@@ -74,7 +74,9 @@ export class LarkPlatform implements NotificationPlatform {
     try {
       const formattedMessage = this.formatMessage(message);
       const res = await axios.post(this.webhookUrl, formattedMessage);
-      console.log(res.data);
+      if (res.data.code !== 0) {
+        throw new Error(res.data.msg);
+      }
     } catch (error) {
       core.setFailed(
         `Failed to send message to Lark: ${error as Error}.message`,
