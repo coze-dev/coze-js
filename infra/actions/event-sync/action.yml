@@ -10,8 +10,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
     - name: Cache
       uses: actions/cache@v4
       with:
@@ -19,10 +17,18 @@ runs:
           common/temp/pnpm-local
           common/temp/pnpm-store
           common/temp/install-run
-        key: rush-store-main
+        key: ${{ runner.os }}-rush-store-eventSync
+        restore-keys: |
+          ${{ runner.os }}-rush-store-main
+          ${{ runner.os }}-rush-store
     - name: Install dependencies
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: node common/scripts/install-run-rush.js install -t @coze-infra/event-sync-action
     - name: Start
       shell: bash
-      run: node common/scripts/install-run-rush.js start -o @coze-infra/event-sync-action -v
+      working-directory: ${{ github.workspace }}/infra/actions/event-sync
+      run: npm run start
+      env:
+        INPUT_LARK_WEBHOOK_URL: ${{ inputs.lark_webhook_url }}
+        INPUT_LARK_PERSON_OPEN_IDS: ${{ inputs.lark_person_open_ids }}
