@@ -9,8 +9,8 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
-    "deploy": "ncc build src/index.ts -t -o ../../../.github/actions/event-sync/lib",
     "lint": "eslint ./ --cache",
+    "start": "tsx src/index.ts",
     "test": "vitest --run --passWithNoTests",
     "test:cov": "npm run test -- --coverage"
   },
@@ -18,8 +18,7 @@
     "@actions/core": "~1.11.1",
     "@actions/github": "^5.1.1",
     "@octokit/webhooks-definitions": "~3.67.3",
-    "axios": "^1.7.7",
-    "tsx": "^4.19.2"
+    "axios": "^1.7.7"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
@@ -29,6 +28,7 @@
     "@vercel/ncc": "~0.38.3",
     "@vitest/coverage-v8": "~2.1.4",
     "sucrase": "^3.32.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.5.3",
     "vitest": "~2.1.4"
   }

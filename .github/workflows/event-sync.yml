@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Event sync action step
-        uses: ./.github/actions/event-sync
+        uses: ./infra/actions/event-sync
         id: event_sync
         with:
           lark_webhook_url: ${{ secrets.LARK_WEBHOOK_URL }}
