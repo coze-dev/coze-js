@@ -1,0 +1,26 @@
+# event list: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows
+# new event should be handled in handlerFactory
+name: Event sync
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request:
+    types: [opened, closed, reopened]
+    branches: ['main']
+  workflow_run:
+    workflows: ['CI', 'CI@main']
+    types: [completed]
+
+jobs:
+  event_sync_job:
+    runs-on: ubuntu-latest
+    name: A job to sync events to Lark
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Event sync action step
+        uses: ./infra/actions/event-sync
+        id: event_sync
+        with:
+          lark_webhook_url: ${{ secrets.LARK_WEBHOOK_URL }}
+          lark_person_open_ids: ${{ secrets.LARK_PERSON_OPEN_IDS }}
