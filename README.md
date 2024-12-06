@@ -27,7 +27,7 @@ Find usage examples for each package in the [examples](./examples) directory:
 
 - Node.js 18+ (LTS/Hydrogen recommended)
 - pnpm 9.12.0
-- Rush 5.14.0
+- Rush 5.140.0
 
 ### Installation
 
@@ -48,7 +48,7 @@ git clone git@github.com:coze-dev/coze-js.git
 3. **Install required global dependencies**
 
 ``` bash
-npm i -g pnpm@9.12.0 @microsoft/rush@5.14.0
+npm i -g pnpm@9.12.0 @microsoft/rush@5.140.0
 ```
 
 4. **Install project dependencies**
