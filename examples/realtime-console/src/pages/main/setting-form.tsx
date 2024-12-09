@@ -140,8 +140,13 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       if (err instanceof AuthenticationError) {
         console.log(`remove token when load ${objectName} failed: ${err}`);
 
-        const isOK = await redirectToLogin(false);
-        if (isOK) {
+        let isOk = false;
+        if (objectName === LocalStorageKey.BOT_ID) {
+          isOk = await redirectToLogin(isTeamWorkspace, parentId);
+        } else {
+          isOk = await redirectToLogin(false);
+        }
+        if (isOk) {
           localManager.remove(LocalStorageKey.ACCESS_TOKEN);
         }
       } else {
