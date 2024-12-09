@@ -1,0 +1,34 @@
+name: 'GitHub Event Sync to Lark'
+description: 'Sync GitHub events (PR, Issues, CI) to Lark group'
+inputs:
+  lark_webhook_url:
+    description: 'Lark group webhook URL'
+    required: true
+  lark_person_open_ids:
+    description: 'Lark person open ids'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          common/temp/pnpm-local
+          common/temp/pnpm-store
+          common/temp/install-run
+        key: ${{ runner.os }}-rush-store-eventSync
+        restore-keys: |
+          ${{ runner.os }}-rush-store-main
+          ${{ runner.os }}-rush-store
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: node common/scripts/install-run-rush.js install -t @coze-infra/event-sync-action
+    - name: Start
+      shell: bash
+      working-directory: ${{ github.workspace }}/infra/actions/event-sync
+      run: npm run start
+      env:
+        INPUT_LARK_WEBHOOK_URL: ${{ inputs.lark_webhook_url }}
+        INPUT_LARK_PERSON_OPEN_IDS: ${{ inputs.lark_person_open_ids }}
