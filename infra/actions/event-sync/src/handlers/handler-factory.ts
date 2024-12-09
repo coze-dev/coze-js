@@ -12,7 +12,7 @@ export const handlerFactory = {
     platform: NotificationPlatform,
   ): EventHandler | null {
     switch (eventName) {
-      case 'pull_request':
+      case 'pull_request_target':
         return new PullRequestHandler(platform);
       case 'issues':
         return new IssueHandler(platform);

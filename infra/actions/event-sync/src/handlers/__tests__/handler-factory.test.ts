@@ -21,8 +21,11 @@ class MockPlatform implements NotificationPlatform {
 describe('handlerFactory', () => {
   const platform = new MockPlatform();
 
-  it('should create PullRequestHandler for pull_request event', () => {
-    const handler = handlerFactory.createHandler('pull_request', platform);
+  it('should create PullRequestHandler for pull_request_target event', () => {
+    const handler = handlerFactory.createHandler(
+      'pull_request_target',
+      platform,
+    );
     expect(handler).toBeInstanceOf(PullRequestHandler);
   });
 
@@ -44,7 +47,7 @@ describe('handlerFactory', () => {
   it('should create handlers with the provided platform', () => {
     const customPlatform = new MockPlatform();
     const handler = handlerFactory.createHandler(
-      'pull_request',
+      'pull_request_target',
       customPlatform,
     );
     // @ts-expect-error accessing protected property for testing
