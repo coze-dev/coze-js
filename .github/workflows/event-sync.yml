@@ -1,5 +1,5 @@
 # event list: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows
-# new event should be handled in handlerFactory
+# new event should be handled in handlerFactory.
 name: Event sync
 on:
   issues:
