@@ -97,6 +97,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
       <Modal
         title="Settings"
         open={isModalVisible}
+        onCancel={hideModal}
         footer={null}
         destroyOnClose={true}
       >
