@@ -17,7 +17,7 @@ import {
 import { AuthenticationError } from '@coze/api';
 import { RobotOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
-import { redirectToLogin } from '../../utils/utils';
+import { isTeamWorkspace, redirectToLogin } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import useCozeAPI, {
   type WorkspaceOption,
@@ -141,13 +141,20 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         console.log(`remove token when load ${objectName} failed: ${err}`);
 
         let isOk = false;
-        if (objectName === LocalStorageKey.BOT_ID) {
-          isOk = await redirectToLogin(isTeamWorkspace, parentId);
+        if (
+          dataLocalKey === LocalStorageKey.BOT_ID &&
+          isTeamWorkspace(parentId)
+        ) {
+          const pureWorkspaceId = parentId?.split('_')[1];
+          isOk = await redirectToLogin(true, pureWorkspaceId);
+          if (isOk) {
+            localManager.removeAll(LocalStorageKey.WORKSPACE_PREFIX);
+          }
         } else {
           isOk = await redirectToLogin(false);
-        }
-        if (isOk) {
-          localManager.remove(LocalStorageKey.ACCESS_TOKEN);
+          if (isOk) {
+            localManager.remove(LocalStorageKey.ACCESS_TOKEN);
+          }
         }
       } else {
         throw err;
@@ -162,6 +169,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspaceId);
     localManager.remove(LocalStorageKey.WORKSPACE_ACCESS_TOKEN);
     form.setFieldsValue({ [LocalStorageKey.BOT_ID]: undefined });
+    localManager.remove(LocalStorageKey.BOT_ID);
 
     loadData(
       'Bots',
@@ -217,10 +225,6 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       console.error(err);
     });
   }, [form, api]);
-
-  const isTeamWorkspace = form
-    .getFieldValue(LocalStorageKey.WORKSPACE_ID)
-    ?.startsWith('team_');
 
   const saveSettings = () => {
     const { workspace_id, bot_id, voice_id } = form.getFieldsValue();
@@ -326,7 +330,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             </Form.Item>
           </Col>
         </Row>
-        {isTeamWorkspace && (
+        {isTeamWorkspace(form.getFieldValue(LocalStorageKey.WORKSPACE_ID)) && (
           <Row gutter={8}>
             <Col span={24}>
               <Form.Item

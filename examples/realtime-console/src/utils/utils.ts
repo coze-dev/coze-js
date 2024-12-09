@@ -4,6 +4,12 @@ import { type OAuthToken, refreshOAuthToken } from '@coze/api';
 import { type LocalManager, LocalStorageKey } from './local-manager';
 import { DEFAULT_OAUTH_CLIENT_ID } from './constants';
 
+declare global {
+  interface Window {
+    isConfirming?: boolean;
+  }
+}
+
 export const getBaseUrl = (): string => {
   const defaultBaseUrl =
     process.env.REACT_APP_BASE_URL || 'https://api.coze.cn';
@@ -28,17 +34,30 @@ export const redirectToLogin = (
       }${workspaceId ? `&workspace_id=${workspaceId}` : ''}`;
       return;
     }
+    if (window.isConfirming) {
+      return;
+    }
+    window.isConfirming = true;
+    let content = 'You need to authenticate to continue';
+    if (isTeamWorkspace) {
+      content =
+        'You need to authenticate to continue, or you can cancel and switch to another workspace';
+    }
     Modal.confirm({
       title: 'Please authenticate',
-      content: 'You need to authenticate to continue',
+      content,
       onOk: () => {
         resolve(true);
-        window.location.href = `${process.env.PUBLIC_URL}/login?state=${
+        const url = `${process.env.PUBLIC_URL}/login?state=${
           isTeamWorkspace ? 'workspace' : ''
         }${workspaceId ? `&workspace_id=${workspaceId}` : ''}`;
+
+        window.location.href = url;
+        window.isConfirming = false;
       },
       onCancel: () => {
         resolve(false);
+        window.isConfirming = false;
       },
     });
   });
@@ -87,7 +106,7 @@ export const getOrRefreshToken = async (localManager: LocalManager) => {
   }
 };
 
-export const isTeamWorkspace = () => {
-  const workspaceId = localStorage.getItem(LocalStorageKey.WORKSPACE_ID);
-  return workspaceId?.startsWith('team_');
+export const isTeamWorkspace = (workspaceId?: string) => {
+  const id = workspaceId || localStorage.getItem(LocalStorageKey.WORKSPACE_ID);
+  return id?.startsWith('team_');
 };
