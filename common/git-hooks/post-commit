@@ -1,2 +1,3 @@
 #!/bin/bash
 
+node infra/rush-x/bin/run change -a || exit 1
