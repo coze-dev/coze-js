@@ -7,7 +7,7 @@ import { runPackageAudit } from './package-audit';
 import { runLint } from './lint';
 import { runCommonCommands } from './common-command';
 
-export const incrementActions = async (
+export const incrementlyRunCommands = async (
   changedFiles: string[],
   action: string,
 ): Promise<void> => {
