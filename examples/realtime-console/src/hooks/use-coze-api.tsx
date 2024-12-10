@@ -2,8 +2,13 @@ import { useEffect, useState } from 'react';
 
 import { CozeAPI, type WorkSpace, type CloneVoiceReq } from '@coze/api';
 
-import { getBaseUrl, getOrRefreshToken, redirectToLogin } from '../utils/utils';
-import { LocalManager } from '../utils/local-manager';
+import {
+  getBaseUrl,
+  getOrRefreshToken,
+  isTeamWorkspace,
+  redirectToLogin,
+} from '../utils/utils';
+import { LocalManager, LocalStorageKey } from '../utils/local-manager';
 
 export interface VoiceOption {
   label: React.ReactNode;
@@ -64,10 +69,21 @@ const useCozeAPI = () => {
     }
 
     const pureWorkspaceId = workspaceId.split('_')[1];
+    const lm = new LocalManager(
+      isTeamWorkspace(workspaceId) ? LocalStorageKey.WORKSPACE_PREFIX : '',
+    );
+    const token = await getOrRefreshToken(lm);
+    if (!token) {
+      await redirectToLogin(isTeamWorkspace(), pureWorkspaceId);
+      return [];
+    }
 
     try {
       while (hasMore) {
-        const response = await api?.bots.list({
+        const response = await new CozeAPI({
+          token,
+          baseURL: getBaseUrl(),
+        }).bots.list({
           space_id: pureWorkspaceId,
           page_size: pageSize,
           page_index: pageIndex,
