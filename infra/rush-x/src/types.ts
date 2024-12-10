@@ -1,3 +1,5 @@
+import { type Command } from 'commander';
+
 export interface Branches {
   current: string;
   target: string;
@@ -78,3 +80,5 @@ export interface ProtectRule {
 export interface BranchProtectionRules {
   branch_protection_rules: ProtectRule[];
 }
+
+export type InstallAction = (program: Command) => void;
