@@ -404,7 +404,8 @@
     },
     {
       "packageName": "@coze/api",
-      "projectFolder": "packages/coze-js"
+      "projectFolder": "packages/coze-js",
+      "shouldPublish": true
     },
     {
       "packageName": "@coze/api-node-example",
@@ -416,11 +417,13 @@
     },
     {
       "packageName": "@coze/realtime-api",
-      "projectFolder": "packages/realtime-api"
+      "projectFolder": "packages/realtime-api",
+      "shouldPublish": true
     },
     {
       "packageName": "@coze/taro-api",
-      "projectFolder": "packages/coze-taro"
+      "projectFolder": "packages/coze-taro",
+      "shouldPublish": true
     },
     {
       "packageName": "@coze/realtime-api-example",
