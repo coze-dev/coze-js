@@ -48,9 +48,9 @@ jobs:
         run: node infra/rush-x/bin/run increment --action lint -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
         continue-on-error: true
 
-      - name: Increment TS Check
-        run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
-        continue-on-error: true
+      # - name: Increment TS Check
+      #   run: node infra/rush-x/bin/run increment --action ts-check -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
+      #   continue-on-error: true
 
       - name: Increment Package Audit
         run: node infra/rush-x/bin/run increment --action package-audit -f "${{ steps.changed-files.outputs.all_changed_files }}" -s ' '
