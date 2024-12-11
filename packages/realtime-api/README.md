@@ -45,6 +45,11 @@ import { RealtimeClient, EventNames, RealtimeUtils } from "@coze/realtime-api";
 const client = new RealtimeClient({
   baseURL: "https://api.coze.cn",
   accessToken: "your_access_token",
+  // or
+  // accessToken: async () => {
+  //   // refresh token if expired
+  //   return 'your_oauth_token';
+  // },
   botId: "your_bot_id",
   voiceId: "your_voice_id",           // Optional: Specify voice ID
   conversationId: "conversation_id",   // Optional: For conversation continuity

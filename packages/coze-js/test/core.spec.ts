@@ -159,4 +159,25 @@ describe('APIClient', () => {
       expect(consoleSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('token as function', () => {
+    beforeEach(() => {
+      client = new APIClient({
+        ...mockConfig,
+        token: () => 'test-token',
+      });
+      vi.spyOn(client as any, 'makeRequest').mockResolvedValue('success');
+    });
+
+    it('should make a GET request', async () => {
+      await client.get('/test', { param: 'value' });
+      expect(client.makeRequest).toHaveBeenCalledWith(
+        '/test?param=value',
+        'GET',
+        undefined,
+        undefined,
+        undefined,
+      );
+    });
+  });
 });

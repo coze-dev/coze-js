@@ -6,6 +6,7 @@
   "author": "",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/postinstall.cjs",
     "lint": "eslint ./ --cache --quiet"
   },
   "dependencies": {

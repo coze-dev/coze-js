@@ -27,6 +27,11 @@ import { CozeAPI, COZE_COM_BASE_URL, ChatStatus, RoleType } from '@coze/api';
 // Initialize client with your Personal Access Token
 const client = new CozeAPI({
   token: 'your_pat_token', // Get your PAT from https://www.coze.com/open/oauth/pats
+  // or
+  // token: async () => {
+  //   // refresh token if expired
+  //   return 'your_oauth_token';
+  // },
   baseURL: COZE_COM_BASE_URL,
 });
 

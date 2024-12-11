@@ -83,7 +83,7 @@ export const getOrRefreshToken = async (localManager: LocalManager) => {
       localManager.get(LocalStorageKey.TOKEN_EXPIRES_AT) || '0',
     );
 
-    if (Date.now() > expiresAt) {
+    if (Date.now() > expiresAt || !accessToken) {
       // refresh token
       const response = await refreshOAuthToken({
         baseURL: baseUrl,

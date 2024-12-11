@@ -1,5 +1,5 @@
 import { type AudioPropertiesConfig } from '@volcengine/rtc';
-import { CozeAPI, type CreateRoomData } from '@coze/api';
+import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
 import { RealtimeEventHandler, EventNames } from './event-handler';
@@ -11,7 +11,7 @@ export interface VideoConfig {
 }
 
 export interface RealtimeClientConfig {
-  accessToken: string /** required, Access Token */;
+  accessToken: GetToken /** required, Access Token */;
   botId: string /** required, Bot Id */;
   voiceId?: string /** optional, Voice Id */;
   conversationId?: string /** optional, Conversation Id */;
