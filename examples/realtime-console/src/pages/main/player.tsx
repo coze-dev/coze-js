@@ -17,16 +17,34 @@ const Player: React.FC<{
 
   return (
     <div className="player-container">
-      <label>
-        <Checkbox
-          defaultChecked={
-            localManager.get(LocalStorageKey.VIDEO_STATE) === 'true'
-          }
-          disabled={!clientRef.current?.isConnected}
-          onChange={handleToggleVideo}
-        />{' '}
-        Video
-      </label>
+      <div
+        style={{
+          marginBottom: '10px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <label>
+          <Checkbox
+            defaultChecked={
+              localManager.get(LocalStorageKey.VIDEO_STATE) === 'true'
+            }
+            disabled={!clientRef.current?.isConnected}
+            onChange={handleToggleVideo}
+          />{' '}
+          Video
+        </label>
+        <a
+          href="https://bytedance.larkoffice.com/docx/BdIxdfjraoarXIx2Pszc7Yx5nre"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: '14px', textDecoration: 'underline' }}
+        >
+          点击抢先体验视频模型
+        </a>
+      </div>
+
       <div
         style={{
           width: '100%',
