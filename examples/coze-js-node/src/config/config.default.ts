@@ -4,6 +4,7 @@ export default {
     COZE_SPACE_ID: '7366123674***',
     COZE_BASE_URL: 'https://api.coze.cn',
     COZE_WORKFLOW_ID: '7394408479***',
+    DATASET_ID: '7430806536349941***',
     auth: {
       pat: {
         COZE_API_KEY: 'pat_4hde3zg5***',
@@ -38,6 +39,7 @@ export default {
     COZE_SPACE_ID: '7366123674***',
     COZE_BASE_URL: 'https://api.coze.com',
     COZE_WORKFLOW_ID: '7387291732***',
+    DATASET_ID: '7430806536349941***',
     auth: {
       pat: {
         COZE_API_KEY: 'pat_4hde3zg5***',

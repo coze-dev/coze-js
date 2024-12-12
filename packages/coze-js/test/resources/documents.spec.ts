@@ -5,7 +5,7 @@ import {
   type UpdateDocumentReq,
   type ListDocumentReq,
   type DeleteDocumentReq,
-} from '../../src/resources/knowledge/documents/documents';
+} from '../../src/resources/datasets/documents/documents';
 import { CozeAPI } from '../../src/index';
 
 describe('Documents', () => {

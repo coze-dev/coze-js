@@ -5,4 +5,5 @@ export * from './files/index.js';
 export * from './workflows/index.js';
 export * from './workspaces/index.js';
 export * from './knowledge/index.js';
+export * from './datasets/index.js';
 export * from './audio/index.js';
