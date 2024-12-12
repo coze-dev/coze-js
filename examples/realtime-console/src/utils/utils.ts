@@ -19,7 +19,12 @@ export const getBaseUrl = (): string => {
 export const getCurrentLocation = () =>
   `${window.location.protocol}//${window.location.host}${window.location.pathname}`;
 
-export const isShowVideo = `${process.env.REACT_APP_ENABLE_VIDEO}` === 'true';
+export const isShowVideo = () => {
+  const enableVideo = localStorage.getItem(LocalStorageKey.ENABLE_VIDEO);
+  return (
+    enableVideo === 'true' && `${process.env.REACT_APP_ENABLE_VIDEO}` === 'true'
+  );
+};
 
 export const redirectToLogin = (
   isTeamWorkspace?: boolean,

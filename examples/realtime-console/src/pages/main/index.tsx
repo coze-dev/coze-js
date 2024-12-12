@@ -94,7 +94,7 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
-      videoConfig: isShowVideo
+      videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
             videoOnDefault:
@@ -280,7 +280,7 @@ const RealtimeConsole: React.FC = () => {
           isMicrophoneOn={isMicrophoneOn}
         />
       </Footer>
-      {isShowVideo && <Player clientRef={clientRef} />}
+      {isShowVideo() && <Player clientRef={clientRef} />}
       <Content style={{ padding: '20px' }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>

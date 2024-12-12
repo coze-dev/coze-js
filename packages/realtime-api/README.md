@@ -63,8 +63,8 @@ const client = new RealtimeClient({
 // Essential Setup
 async function initializeVoiceChat() {
   // 1. Verify device permissions
-  const hasPermission = await RealtimeUtils.checkPermission();
-  if (!hasPermission) {
+  const result = await RealtimeUtils.checkDevicePermission();
+  if (!result.audio) {
     throw new Error("Microphone access required");
   }
 

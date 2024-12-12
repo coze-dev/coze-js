@@ -1,6 +1,11 @@
 import VERTC from '@volcengine/rtc';
 
-import { sleep, checkPermission, getAudioDevices } from '../src/utils';
+import {
+  sleep,
+  checkPermission,
+  getAudioDevices,
+  checkDevicePermission,
+} from '../src/utils';
 
 vi.mock('@volcengine/rtc', () => ({
   default: {
@@ -40,6 +45,21 @@ describe('Utils', () => {
       expect(result).toBe(false);
     });
   });
+
+  describe('checkDevicePermission', () => {
+    it('should return true when audio permission is granted', async () => {
+      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: true });
+      const result = await checkDevicePermission();
+      expect(result.audio).toBe(true);
+    });
+
+    it('should return false when audio permission is denied', async () => {
+      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: false });
+      const result = await checkDevicePermission();
+      expect(result.audio).toBe(false);
+    });
+  });
+
   describe('getAudioDevices', () => {
     it('should return filtered audio input and output devices', async () => {
       const mockDevices = [
