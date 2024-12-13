@@ -27,7 +27,11 @@ export class EventSource extends BaseEventSource {
       this.trigger(EventName.Chunk, msg);
     });
     this.task.onError(e => {
-      this.trigger(EventName.Fail, e);
+      const err = e instanceof Error ? e : new Error(e.errMsg ?? 'fail');
+      if (this.isAborted) {
+        return;
+      }
+      this.trigger(EventName.Fail, err);
     });
     this.task.onClose(() => {
       this.trigger(EventName.Success);
@@ -36,10 +40,10 @@ export class EventSource extends BaseEventSource {
 
   abort() {
     if (!this.isAborted) {
+      this.isAborted = true;
       this.task?.close();
       // fire "fail" manualy
       this.trigger(EventName.Fail, new Error('abort'));
-      this.isAborted = true;
     }
   }
 }

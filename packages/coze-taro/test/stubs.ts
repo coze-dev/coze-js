@@ -83,7 +83,7 @@ export const ttCreateEventSource: TTCreateEVentSource = () => {
     } else if (index === mockWorkflowMessages.length) {
       task.events.trigger('close');
     } else {
-      task.events.trigger('error');
+      task.events.trigger('error', { errMsg: 'err' });
     }
   };
 

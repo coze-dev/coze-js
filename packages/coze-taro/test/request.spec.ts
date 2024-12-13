@@ -53,7 +53,7 @@ describe('SSERequest', () => {
       controller.abort();
     }, 5);
 
-    vi.runAllTimers();
+    vi.runAllTimersAsync();
     await expect(result.deferred?.promise).rejects.toThrowError();
     expect(result.done).toBe(true);
   });

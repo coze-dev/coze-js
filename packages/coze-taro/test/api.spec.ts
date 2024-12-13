@@ -15,7 +15,7 @@ vi.mock('../src/event-source/index', async () => {
   return mod;
 });
 
-describe('CozeAPI', () => {
+describe('CozeAPI - mini', () => {
   it('should call onBeforeAPICall', async () => {
     const mockOnBeforeAPICall = vi.fn();
 

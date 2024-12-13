@@ -53,5 +53,22 @@
      * For example, allow some projects to use an older TypeScript compiler
      * (in addition to whatever "usual" version is being used by other projects in the repo):
      */
+    "@tarojs/components": ["4.0.7", "3.6.35"],
+    "@tarojs/helper": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-framework-react": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-alipay": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-h5": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-harmony-hybrid": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-jd": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-qq": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-swan": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-tt": ["4.0.7", "3.6.35"],
+    "@tarojs/plugin-platform-weapp": ["4.0.7", "3.6.35"],
+    "@tarojs/react": ["4.0.7", "3.6.35"],
+    "@tarojs/runtime": ["4.0.7", "3.6.35"],
+    "@tarojs/shared": ["4.0.7", "3.6.35"],
+    "@tarojs/taro": ["4.0.7", "3.6.35"],
+    "@tarojs/cli": ["4.0.7", "3.6.35"],
+    "babel-preset-taro": ["4.0.7", "3.6.35"]
   }
 }

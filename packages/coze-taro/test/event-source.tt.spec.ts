@@ -41,7 +41,10 @@ describe('TT-EventSource', () => {
     );
     eventSource.start();
 
-    eventSource.abort();
+    setTimeout(() => {
+      eventSource.abort();
+    }, 5);
+
     vi.runAllTimers();
     expect(mockFailFn).toHaveBeenCalledOnce();
   });

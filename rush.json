@@ -433,6 +433,10 @@
     {
       "packageName": "@coze/taro-api-example",
       "projectFolder": "examples/coze-js-taro"
+    },
+    {
+      "packageName": "@coze/taro-api-example3",
+      "projectFolder": "examples/coze-js-taro3"
     }
   ]
 }

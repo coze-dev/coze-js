@@ -1,0 +1,68 @@
+{
+  "name": "@coze/taro-api-example3",
+  "version": "1.0.0",
+  "private": true,
+  "description": "coze js for taro",
+  "author": "",
+  "scripts": {
+    "build:h5": "taro build --type h5",
+    "build:tt": "taro build --type tt",
+    "build:weapp": "taro build --type weapp",
+    "dev:h5": "npm run build:h5 -- --watch",
+    "dev:tt": "npm run build:tt -- --watch",
+    "dev:weapp": "npm run build:weapp -- --watch"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.24.4",
+    "@coze/api": "workspace:*",
+    "@coze/taro-api": "workspace:*",
+    "@tarojs/components": "3.6.35",
+    "@tarojs/helper": "3.6.35",
+    "@tarojs/plugin-framework-vue3": "3.6.35",
+    "@tarojs/plugin-platform-alipay": "3.6.35",
+    "@tarojs/plugin-platform-h5": "3.6.35",
+    "@tarojs/plugin-platform-harmony-hybrid": "3.6.35",
+    "@tarojs/plugin-platform-jd": "3.6.35",
+    "@tarojs/plugin-platform-qq": "3.6.35",
+    "@tarojs/plugin-platform-swan": "3.6.35",
+    "@tarojs/plugin-platform-tt": "3.6.35",
+    "@tarojs/plugin-platform-weapp": "3.6.35",
+    "@tarojs/runtime": "3.6.35",
+    "@tarojs/shared": "3.6.35",
+    "@tarojs/taro": "3.6.35",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@coze-infra/eslint-config": "workspace:*",
+    "@tarojs/cli": "3.6.35",
+    "@tarojs/taro-loader": "3.6.35",
+    "@tarojs/test-utils-vue3": "^0.1.1",
+    "@tarojs/webpack5-runner": "3.6.35",
+    "@types/node": "^20",
+    "@types/webpack-env": "^1.13.6",
+    "@vue/babel-plugin-jsx": "^1.0.6",
+    "@vue/compiler-sfc": "^3.0.0",
+    "babel-preset-taro": "3.6.35",
+    "css-loader": "^6.5.1",
+    "postcss": "^8.4.4",
+    "style-loader": "^3.3.1",
+    "stylelint": "^15.11.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.5.3",
+    "vue-loader": "^17.1.0",
+    "webpack": "^5.64.4"
+  },
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "None",
+    "framework": "Vue3"
+  }
+}
