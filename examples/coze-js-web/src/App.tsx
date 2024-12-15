@@ -7,7 +7,7 @@ import ChatX from './pages/chat-x';
 
 function App() {
   return (
-    <Router basename={`${process.env.PUBLIC_URL}`}>
+    <Router basename={`${process.env.PUBLIC_URL || ''}`}>
       <div className="App">
         <Routes>
           <Route path="/chat" element={<Chat />} />
