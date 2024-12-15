@@ -407,6 +407,10 @@
       "projectFolder": "config/rslib-config"
     },
     {
+      "packageName": "@coze-infra/rsbuild-config",
+      "projectFolder": "config/rsbuild-config"
+    },
+    {
       "packageName": "@coze/api",
       "projectFolder": "packages/coze-js"
     },

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "node scripts/build.js",
+    "build": "rsbuild build",
     "lint": "eslint --cache --quiet",
-    "start": "node scripts/start.js"
+    "start": "rsbuild dev"
   },
   "browserslist": {
     "production": [
@@ -76,6 +76,8 @@
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/rsbuild-config": "workspace:*",
+    "@rsbuild/core": "1.1.10",
     "@types/jest": "^29.2.2",
     "@types/node": "^20",
     "@types/react": "^18.3.11",
