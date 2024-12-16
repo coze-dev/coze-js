@@ -146,12 +146,18 @@ function toSSEEvent(msg: {
   return encoder.encode(output).buffer;
 }
 
-export const ttCreateEventSource: TTCreateEVentSource = () => {
+export const ttCreateEventSource: TTCreateEVentSource = ({ data }) => {
   const task = new TTTask();
 
   let index = 0;
   const mockReceiveMessage = () => {
-    if (index < mockWorkflowMessages.length && !task.closed) {
+    if (data && data.workflow_id && data.workflow_id === 'fail') {
+      setTimeout(() => {
+        task.events.trigger('message', {
+          data: 'invalid json',
+        });
+      }, 10);
+    } else if (index < mockWorkflowMessages.length && !task.closed) {
       setTimeout(() => {
         task.events.trigger('message', {
           data: JSON.stringify(mockWorkflowMessages[index]),

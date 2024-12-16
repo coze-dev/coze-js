@@ -2,7 +2,7 @@ import { Events } from '@tarojs/taro';
 
 type EventListener = () => void;
 
-class AbortSignalPonyfill {
+export class AbortSignalPonyfill {
   private events = new Events();
   aborted = false;
   reason: unknown;
@@ -22,7 +22,7 @@ class AbortSignalPonyfill {
   }
 }
 
-class AbortControllerPonyfill {
+export class AbortControllerPonyfill {
   signal = new AbortSignalPonyfill();
 
   abort(reason?: unknown) {

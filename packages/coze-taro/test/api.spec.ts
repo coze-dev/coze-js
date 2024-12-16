@@ -44,4 +44,46 @@ describe('CozeAPI - mini', () => {
     }
     expect(cozeApi.token).toEqual('newToken');
   });
+
+  it('should not refresh token', async () => {
+    const cozeApi = new CozeAPI({
+      token: '',
+      onBeforeAPICall: () => ({}),
+    });
+    expect(cozeApi.token).toEqual('');
+    const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });
+    const caches = [];
+    for await (const chunk of chunks) {
+      caches.push(chunk);
+    }
+    expect(cozeApi.token).toEqual('');
+  });
+
+  it('should work with chat', async () => {
+    const cozeApi = new CozeAPI({
+      token: '',
+      onBeforeAPICall: () => ({}),
+    });
+    expect(cozeApi.token).toEqual('');
+    const chunks = cozeApi.chat.stream({ bot_id: 'xx' });
+    const caches = [];
+    for await (const chunk of chunks) {
+      caches.push(chunk);
+    }
+  });
+
+  it('should throw error', async () => {
+    const cozeApi = new CozeAPI({
+      token: '',
+      onBeforeAPICall: () => ({ token: 'newToken' }),
+    });
+    expect(cozeApi.token).toEqual('');
+    await expect(async () => {
+      const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'fail' });
+      const caches = [];
+      for await (const chunk of chunks) {
+        caches.push(chunk);
+      }
+    }).rejects.toThrowError();
+  });
 });
