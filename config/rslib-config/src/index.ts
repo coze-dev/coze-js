@@ -1,11 +1,15 @@
 import {
-  defineConfig,
-  LibConfig,
-  RsbuildConfigOutputTarget,
+  defineConfig as _defineConfig,
+  type LibConfig,
+  type RsbuildConfigOutputTarget,
 } from '@rslib/core';
 
 type LibFormat = LibConfig['format'];
 export type BundleType = boolean | 'excludeExternal';
+
+const defineConfig: typeof _defineConfig = _defineConfig;
+
+export { defineConfig };
 
 interface Options {
   format?: LibFormat[];
@@ -21,7 +25,7 @@ const defaultOptions = {
   tsconfigPath: './tsconfig.build.json',
 };
 
-function getRslibConfig(options: Options) {
+export function getRslibConfig(options: Options) {
   const { format, bundle, umdName, tsconfigPath, target } = {
     ...defaultOptions,
     ...options,
@@ -71,4 +75,4 @@ function getLibShared(format: LibFormat, bundleType: BundleType) {
   return shared;
 }
 
-export default getRslibConfig;
+export default defineConfig(getRslibConfig({}));

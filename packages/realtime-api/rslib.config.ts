@@ -1,5 +1,4 @@
-import { defineConfig } from '@rslib/core';
-import getRslibConfig from '@coze-infra/rslib-config';
+import { defineConfig, getRslibConfig } from '@coze-infra/rslib-config';
 export default defineConfig(
   getRslibConfig({
     format: ['esm', 'cjs', 'umd'],
