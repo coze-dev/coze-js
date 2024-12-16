@@ -39,14 +39,14 @@ describe('runCommonCommands', () => {
     runCommonCommands(packages, action);
 
     expect(exec).toHaveBeenCalledWith(
-      'node common/scripts/install-run-rush test:cov --impacted-by package1 --impacted-by package2 -v',
+      'node common/scripts/install-run-rush test:cov --from package1 --from package2 -v',
       {
         cwd: '/path/to/rush',
         fatal: false,
       },
     );
     expect(logger.info).toHaveBeenCalledWith(
-      'Start running: node common/scripts/install-run-rush test:cov --impacted-by package1 --impacted-by package2 -v',
+      'Start running: node common/scripts/install-run-rush test:cov --from package1 --from package2 -v',
     );
     expect(logger.info).toHaveBeenCalledWith(
       'finish exec command with exit code: 0',
@@ -55,7 +55,7 @@ describe('runCommonCommands', () => {
       { code: 0 },
       {
         command:
-          'node common/scripts/install-run-rush test:cov --impacted-by package1 --impacted-by package2 -v',
+          'node common/scripts/install-run-rush test:cov --from package1 --from package2 -v',
         duration: 1000,
         action: 'test:cov',
       },
@@ -71,7 +71,7 @@ describe('runCommonCommands', () => {
     runCommonCommands(packages, action);
 
     expect(exec).toHaveBeenCalledWith(
-      'node common/scripts/install-run-rush lint --impacted-by package1',
+      'node common/scripts/install-run-rush lint --from package1',
       {
         cwd: '/path/to/rush',
         fatal: false,
@@ -106,7 +106,7 @@ describe('runCommonCommands', () => {
 
       runCommonCommands(['package1'], action);
 
-      const expectedCommand = `node common/scripts/install-run-rush ${action} --impacted-by package1${
+      const expectedCommand = `node common/scripts/install-run-rush ${action} --from package1${
         shouldHaveVFlag ? ' -v' : ''
       }`;
       expect(exec).toHaveBeenCalledWith(expectedCommand, {
