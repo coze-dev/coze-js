@@ -56,7 +56,7 @@ async function quickChat() {
 ## Key Features
 
 - 🌐 **Consistent API**: Maintains consistent API with [Coze-JS](../coze-js/README.md)
-- 🔄 **Streaming Support**: Compatible with ByteDance Mini Program/WeChat Mini Program
+- 🔄 **Streaming Support**: Compatible with ByteDance Mini Program/WeChat Mini Program/H5
 
 ## Advanced Usage
 
