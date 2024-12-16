@@ -27,7 +27,7 @@ describe('Weapp-EventSource', () => {
     expect(mockSuccessFn).toHaveBeenCalledOnce();
   });
 
-  it.only('should abort correctly', () => {
+  it('should abort correctly', () => {
     const mockFailFn = vi.fn();
 
     const eventSource = new EventSource({ url: 'xx' }).on(
