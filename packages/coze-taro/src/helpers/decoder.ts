@@ -41,4 +41,5 @@ class TextDecoderPonyfill {
   }
 }
 
-export const TextDecoder = window.TextDecoder ?? TextDecoderPonyfill;
+export const TextDecoder =
+  (globalThis || window).TextDecoder ?? TextDecoderPonyfill;

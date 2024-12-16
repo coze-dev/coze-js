@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 /* eslint-disable security/detect-object-injection -- ignore */
 import Taro from '@tarojs/taro';
 
