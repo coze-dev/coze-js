@@ -33,6 +33,18 @@ jobs:
         with:
           node-version: ${{ matrix.NodeVersion }}
 
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            common/temp/pnpm-local
+            common/temp/pnpm-store
+            common/temp/install-run
+          key: ${{ runner.os }}-rush-store-${{ hashFiles('common/config/subspaces/**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-store-main
+            ${{ runner.os }}-rush-store
+
       - name: Install Dependencies
         run: node common/scripts/install-run-rush.js install
 
