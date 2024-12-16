@@ -1,12 +1,7 @@
 import { EventName } from '../src/event-source/types';
-import { EventSource } from '../src/event-source/index.tt';
-import { ttCreateEventSource } from './stubs';
+import { EventSource } from '../src/event-source/index.weapp';
 
-vi.stubGlobal('tt', {
-  createEventSource: ttCreateEventSource,
-});
-
-describe('TT-EventSource', () => {
+describe('Weapp-EventSource', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

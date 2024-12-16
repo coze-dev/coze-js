@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 /* eslint-disable security/detect-object-injection -- ignore */
 import Taro from '@tarojs/taro';
 
@@ -29,9 +30,14 @@ export class EventSource extends BaseEventSource {
         this.trigger(EventName.Fail, new Error(err.errMsg));
       },
       success: res => {
-        this.trigger(EventName.Success, res);
+        if (res.statusCode !== 200) {
+          this.trigger(EventName.Fail, new Error(res.errMsg));
+        } else {
+          this.trigger(EventName.Success, res);
+        }
       },
     });
+
     this.onHeadersReceived();
     this.onChunkReceived();
   }

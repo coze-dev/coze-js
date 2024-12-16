@@ -6,6 +6,9 @@
     "coze",
     "ai",
     "taro",
+    "taro-api",
+    "coze-taro",
+    "coze-api",
     "sdk",
     "chatbot",
     "typescript"

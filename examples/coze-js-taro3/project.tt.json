@@ -1,0 +1,9 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "coze-js-taro3",
+  "appid": "testAppId",
+  "setting": {
+    "es6": false,
+    "minified": false
+  }
+}

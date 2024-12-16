@@ -1,18 +1,9 @@
-/* eslint-disable @typescript-eslint/no-invalid-void-type -- ignore */
 import Taro from '@tarojs/taro';
-import {
-  CozeAPI as InnerCozeAPI,
-  type ClientOptions as InnerClientOptions,
-} from '@coze/api';
+import { CozeAPI as InnerCozeAPI } from '@coze/api';
 
-import { sharedMixins } from './mixins/shared';
-import { platformMixins } from './mixins/platform';
-
-export interface ClientOptions extends InnerClientOptions {
-  onBeforeAPICall?: (
-    options: unknown,
-  ) => ({ token?: string } | void) | Promise<{ token?: string } | void>;
-}
+import { sharedMixins } from '../mixins/shared';
+import { platformMixins } from '../mixins/platform';
+import { type ClientOptions } from './types';
 
 export class CozeAPI extends InnerCozeAPI {
   constructor(public options: ClientOptions) {
