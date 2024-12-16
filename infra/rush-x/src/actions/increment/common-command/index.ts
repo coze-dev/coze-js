@@ -6,8 +6,7 @@ import { reportRushLog } from './report-to-ci';
 
 export const runCommonCommands = (packages: string[], action: string): void => {
   const rushConfiguration = getRushConfiguration();
-  const prefix = '--impacted-by';
-  // const prefix = '--from';
+  const prefix = '--from';
   const postfix = [];
   if (['test:cov', 'build', 'perf-defender'].includes(action)) {
     postfix.push('-v');
