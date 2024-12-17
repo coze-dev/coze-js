@@ -16,6 +16,14 @@ vi.mock('../src/event-source/index', async () => {
 });
 
 describe('CozeAPI - mini', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('should call onBeforeAPICall', async () => {
     const mockOnBeforeAPICall = vi.fn();
 
@@ -24,6 +32,8 @@ describe('CozeAPI - mini', () => {
       onBeforeAPICall: mockOnBeforeAPICall,
     });
     const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });
+    vi.runAllTimersAsync();
+
     const caches = [];
     for await (const chunk of chunks) {
       caches.push(chunk);
@@ -38,6 +48,8 @@ describe('CozeAPI - mini', () => {
     });
     expect(cozeApi.token).toEqual('');
     const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });
+    vi.runAllTimersAsync();
+
     const caches = [];
     for await (const chunk of chunks) {
       caches.push(chunk);
@@ -52,6 +64,8 @@ describe('CozeAPI - mini', () => {
     });
     expect(cozeApi.token).toEqual('');
     const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });
+    vi.runAllTimersAsync();
+
     const caches = [];
     for await (const chunk of chunks) {
       caches.push(chunk);
@@ -66,10 +80,13 @@ describe('CozeAPI - mini', () => {
     });
     expect(cozeApi.token).toEqual('');
     const chunks = cozeApi.chat.stream({ bot_id: 'xx' });
+    vi.runAllTimersAsync();
+
     const caches = [];
     for await (const chunk of chunks) {
       caches.push(chunk);
     }
+    expect(caches.length).toEqual(4);
   });
 
   it('should work with workflow chat', async () => {
@@ -98,6 +115,30 @@ describe('CozeAPI - mini', () => {
     expect(cozeApi.token).toEqual('');
     await expect(async () => {
       const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'fail' });
+      vi.runAllTimersAsync();
+      const caches = [];
+      for await (const chunk of chunks) {
+        caches.push(chunk);
+      }
+    }).rejects.toThrowError();
+  });
+
+  it('should work with timeout', async () => {
+    const cozeApi = new CozeAPI({
+      token: '',
+      axiosOptions: {
+        timeout: 5,
+      },
+    });
+
+    const unhandle = () => {
+      // donothing
+    };
+    process.on('unhandledRejection', unhandle);
+
+    await expect(async () => {
+      const chunks = cozeApi.workflows.runs.stream({ workflow_id: 'xx' });
+      vi.runAllTimersAsync();
       const caches = [];
       for await (const chunk of chunks) {
         caches.push(chunk);

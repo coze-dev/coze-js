@@ -24,11 +24,11 @@ export abstract class BaseEventSource {
     return this;
   }
 
-  trigger(eventName: EventName, args?: unknown | Error) {
+  trigger(eventName: EventName, args?: unknown) {
     const msg: EventMessage = {
       event: eventName,
       data: eventName !== EventName.Fail ? args : undefined,
-      error: eventName === EventName.Fail ? (args as Error) : undefined,
+      errMsg: eventName === EventName.Fail ? (args as string) : undefined,
     };
     this.events.trigger(eventName, msg);
     return this;

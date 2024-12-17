@@ -74,6 +74,7 @@ const mockWorkflowMessages = [
 class TTTask {
   events = new Events();
   closed = false;
+  reason: string | undefined = '';
 
   onOpen(cb: () => void) {
     this.events.on('open', cb);
@@ -93,8 +94,9 @@ class TTTask {
     this.events.on('close', cb);
   }
 
-  close() {
+  close(reason?: string) {
     this.closed = true;
+    this.reason = reason;
   }
 }
 
@@ -133,7 +135,7 @@ function toSSEEvent(msg: {
   event: string;
   id: number;
   data: Record<string, unknown>;
-}): ArrayBuffer {
+}): { whole: ArrayBuffer; parts: ArrayBuffer[] } {
   let output = '';
   if (msg.event) {
     output += `event: ${msg.event}\n`;
@@ -141,12 +143,19 @@ function toSSEEvent(msg: {
   if (typeof msg.id === 'number') {
     output += `id: ${msg.id}\n`;
   }
+
   output += encodeData(JSON.stringify(msg.data));
+  const split = Math.floor(output.length / 2);
+  const parts = [output.slice(0, split), output.slice(split)];
+
   const encoder = new TextEncoder();
-  return encoder.encode(output).buffer;
+  return {
+    whole: encoder.encode(output).buffer,
+    parts: [encoder.encode(parts[0]).buffer, encoder.encode(parts[1]).buffer],
+  };
 }
 
-export const ttCreateEventSource: TTCreateEVentSource = ({ data }) => {
+export const ttCreateEventSource: TTCreateEVentSource = ({ data, timeout }) => {
   const task = new TTTask();
 
   let index = 0;
@@ -168,13 +177,18 @@ export const ttCreateEventSource: TTCreateEVentSource = ({ data }) => {
     } else if (index === mockWorkflowMessages.length) {
       task.events.trigger('close');
     } else {
-      task.events.trigger('error', { errMsg: 'err' });
+      task.events.trigger('error', { errMsg: task.reason ?? 'err' });
     }
   };
 
   setTimeout(() => {
     task.events.trigger('open');
     mockReceiveMessage();
+    if (timeout) {
+      setTimeout(() => {
+        task.close('timeout');
+      }, timeout);
+    }
   }, 0);
 
   return task;
@@ -193,9 +207,20 @@ export const taroStreamingRequest = ({
   const mockReceiveMessage = () => {
     if (index < mockWorkflowMessages.length && !task.closed) {
       setTimeout(() => {
-        task.events.trigger('chunkReceived', {
-          data: toSSEEvent(mockWorkflowMessages[index]),
-        });
+        if (index === 2) {
+          // mock long message split
+          const { parts } = toSSEEvent(mockWorkflowMessages[index]);
+          parts.forEach(part => {
+            task.events.trigger('chunkReceived', {
+              data: part,
+            });
+          });
+        } else {
+          task.events.trigger('chunkReceived', {
+            data: toSSEEvent(mockWorkflowMessages[index]).whole,
+          });
+        }
+
         index++;
         mockReceiveMessage();
       }, 10);
