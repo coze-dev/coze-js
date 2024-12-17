@@ -17,11 +17,13 @@ export type RequestOptions = Omit<
   'url' | 'method' | 'baseURL' | 'data' | 'responseType'
 > &
   Record<string, unknown>;
+
+export type GetToken = string | (() => Promise<string> | string);
 export interface ClientOptions {
   /** baseURL, default is https://api.coze.com, Use https://api.coze.cn if you use https://coze.cn */
   baseURL?: string;
-  /** Personal Access Token (PAT) or OAuth2.0 token */
-  token: string;
+  /** Personal Access Token (PAT) or OAuth2.0 token, or a function to get token */
+  token: GetToken;
   /** see https://github.com/axios/axios?tab=readme-ov-file#request-config */
   axiosOptions?: RequestOptions;
   /** Custom axios instance */
@@ -37,7 +39,7 @@ export interface ClientOptions {
 export class APIClient {
   protected _config: ClientOptions;
   baseURL: string;
-  token: string;
+  token: GetToken;
   axiosOptions?: RequestOptions;
   axiosInstance?: AxiosInstance | unknown;
   debug: boolean;
@@ -57,6 +59,7 @@ export class APIClient {
 
     if (
       isBrowser() &&
+      typeof this.token !== 'function' &&
       isPersonalAccessToken(this.token) &&
       !this.allowPersonalAccessTokenInBrowser
     ) {
@@ -77,13 +80,21 @@ export class APIClient {
   static TimeoutError = Errors.TimeoutError;
   static UserAbortError = Errors.APIUserAbortError;
 
-  protected buildOptions(
+  protected async getToken(): Promise<string> {
+    if (typeof this.token === 'function') {
+      return await this.token();
+    }
+    return this.token;
+  }
+
+  protected async buildOptions(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     body?: unknown,
     options?: RequestOptions,
-  ): FetchAPIOptions {
+  ): Promise<FetchAPIOptions> {
+    const token = await this.getToken();
     const headers: Record<string, string> = {
-      authorization: `Bearer ${this.token}`,
+      authorization: `Bearer ${token}`,
     };
 
     if (!isBrowser()) {
@@ -99,6 +110,7 @@ export class APIClient {
 
     return config;
   }
+
   public async makeRequest<Req, Rsp>(
     apiUrl: string,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
@@ -108,7 +120,7 @@ export class APIClient {
   ): Promise<Rsp> {
     const fullUrl = `${this.baseURL}${apiUrl}`;
 
-    const fetchOptions = this.buildOptions(method, body, options);
+    const fetchOptions = await this.buildOptions(method, body, options);
     fetchOptions.isStreaming = isStream;
     fetchOptions.axiosInstance = this.axiosInstance;
 

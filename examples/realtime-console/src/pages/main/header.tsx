@@ -15,7 +15,6 @@ import { ChatEventType } from '@coze/api';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
-import { isShowVideo } from '../../utils/utils';
 
 const { Text, Link } = Typography;
 
@@ -59,12 +58,14 @@ const Header: React.FC<HeaderProps> = ({
   const formRef = useRef<MessageFormRef>(null);
 
   const checkMicrophonePermission = () => {
-    RealtimeUtils.checkPermission({
-      audio: true,
-      video: isShowVideo,
-    }).then(isDeviceEnable => {
-      if (isDeviceEnable) {
+    RealtimeUtils.checkDevicePermission(true).then(result => {
+      if (result.audio) {
         setMicrophoneStatus('normal');
+        if (result.video) {
+          localManager.set(LocalStorageKey.ENABLE_VIDEO, 'true');
+        } else {
+          localManager.set(LocalStorageKey.ENABLE_VIDEO, 'false');
+        }
       } else {
         setMicrophoneStatus('error');
       }

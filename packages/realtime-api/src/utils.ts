@@ -13,6 +13,7 @@ export const sleep = (milliseconds: number): Promise<void> => {
   return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
 };
 /**
+ * @deprecated use checkDevicePermission instead
  * Check microphone permission，return boolean
  */
 export const checkPermission = async ({
@@ -30,6 +31,9 @@ export const checkPermission = async ({
     return false;
   }
 };
+
+export const checkDevicePermission = async (checkVideo = false) =>
+  await VERTC.enableDevices({ audio: true, video: checkVideo });
 
 /**
  * Get audio devices

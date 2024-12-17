@@ -11,6 +11,7 @@ export enum LocalStorageKey {
   PKCE_CODE_VERIFIER = 'pkce_code_verifier',
   TOKEN_EXPIRES_AT = 'token_expires_at',
   EVENT_DATA = 'event_data',
+  ENABLE_VIDEO = 'enable_video',
 }
 
 export class LocalManager {

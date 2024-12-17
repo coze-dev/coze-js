@@ -65,6 +65,30 @@ describe('APIClient', () => {
       );
     });
 
+    it('should use dynamic token', async () => {
+      const client2 = new APIClient({
+        ...mockConfig,
+        token: async () => Promise.resolve('test-dynamic-token'),
+      });
+      const mockJson = vi.fn().mockResolvedValue({ code: 0, data: 'success' });
+      (fetchAPI as vi.Mock).mockResolvedValue({
+        response: mockResponse,
+        json: mockJson,
+      });
+
+      const result = await client2.makeRequest('/test', 'GET');
+      expect(result).toEqual({ code: 0, data: 'success' });
+      expect(fetchAPI).toHaveBeenCalledWith(
+        'https://api.example.com/test',
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            authorization: 'Bearer test-dynamic-token',
+          }),
+        }),
+      );
+    });
+
     it('should handle errors', async () => {
       const mockJson = vi
         .fn()

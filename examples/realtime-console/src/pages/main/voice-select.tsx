@@ -267,14 +267,6 @@ const VoiceSelect: React.FC<{
     if (!voice) {
       return;
     }
-    // Check if cloning is allowed
-    if (
-      voice.is_system_voice === false &&
-      voice.available_training_times <= 0
-    ) {
-      message.error('This voice does not support cloning');
-      return;
-    }
     setSelectedVoice(voice);
     setCloneModalVisible(true);
   };
@@ -291,16 +283,14 @@ const VoiceSelect: React.FC<{
 
   return (
     <>
-      {!voices.some(v => !v.is_system_voice) && (
-        <Button
-          type="primary"
-          icon={<CopyOutlined />}
-          onClick={e => handleClone(voices[0], e)}
-          style={{ marginBottom: 16 }}
-        >
-          Clone Voice
-        </Button>
-      )}
+      <Button
+        type="primary"
+        icon={<CopyOutlined />}
+        onClick={e => handleClone(voices[0], e)}
+        style={{ marginBottom: 16 }}
+      >
+        Clone Voice
+      </Button>
       <Select
         value={value}
         onChange={onChange}

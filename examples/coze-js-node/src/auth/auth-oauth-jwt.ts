@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
 /*
  * How to effectuate OpenAPI authorization through the OAuth JWT (JSON Web Token) method.
@@ -21,7 +20,9 @@ import fs from 'fs';
 
 import { CozeAPI, getJWTToken } from '@coze/api';
 
-import config from '../config/config.default.js';
+import { streamingChat } from '../utils.js';
+import config from '../config/config.js';
+import { botId } from '../client.js';
 
 // 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
 const key = (process.env.COZE_ENV || 'en') as keyof typeof config;
@@ -39,7 +40,7 @@ const privateKey = fs
   .readFileSync(join(__dirname, '../../tmp/private_key.pem'))
   .toString();
 
-const result = await getJWTToken({
+let jwtToken = await getJWTToken({
   baseURL,
   appId,
   aud,
@@ -47,10 +48,35 @@ const result = await getJWTToken({
   privateKey,
   sessionName: 'test', // optional Isolate different sub-resources under the same jwt account
 });
-console.log('getJWTToken', result);
+console.log('getJWTToken', jwtToken);
 
 // Initialize a new Coze API client using the obtained access token
-const client = new CozeAPI({ baseURL, token: result.access_token });
+const client = new CozeAPI({
+  baseURL,
+  token: async () => {
+    // refresh token if expired
+    // 5 seconds buffer
+    if (jwtToken.expires_in * 1000 > Date.now() + 5000) {
+      return jwtToken.access_token;
+    }
 
-// Example of how to use the client (commented out)
-// e.g. client.chat.stream(...);
+    console.log('refresh token');
+    jwtToken = await getJWTToken({
+      baseURL,
+      appId,
+      aud,
+      keyid,
+      privateKey,
+      sessionName: 'test',
+    });
+
+    return jwtToken.access_token;
+  },
+});
+
+// Example of how to use the client:
+streamingChat({
+  client,
+  botId,
+  query: 'give me a joke',
+});

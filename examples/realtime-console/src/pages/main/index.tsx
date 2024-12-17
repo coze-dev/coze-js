@@ -17,7 +17,12 @@ import {
 } from '@coze/realtime-api';
 import { type APIError } from '@coze/api';
 
-import { getBaseUrl, isShowVideo, redirectToLogin } from '../../utils/utils';
+import {
+  getBaseUrl,
+  isShowVideo,
+  isTeamWorkspace,
+  redirectToLogin,
+} from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import logo from '../../logo.svg';
 import { useAccessToken } from '../../hooks/use-access-token';
@@ -46,7 +51,7 @@ const RealtimeConsole: React.FC = () => {
   const serverEventsEndRef = useRef<HTMLDivElement>(null);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(true);
   const localManager = new LocalManager();
-  const { accessToken, removeAccessToken, isTeamWorkspace, initAccessToken } =
+  const { getAccessToken, removeAccessToken, initLocalManager } =
     useAccessToken();
 
   const handleSaveSettings = async () => {
@@ -54,7 +59,7 @@ const RealtimeConsole: React.FC = () => {
       clientRef.current.disconnect();
       clientRef.current = null;
     }
-    await initAccessToken();
+    await initLocalManager();
     setTimeout(() => {
       handleInitClient();
     });
@@ -78,7 +83,7 @@ const RealtimeConsole: React.FC = () => {
     }
 
     const client = new RealtimeClient({
-      accessToken: accessToken ?? '',
+      accessToken: getAccessToken,
       botId: botId.trim(),
       voiceId: voiceId.trim(),
       // conversationId: '1234567890', // Optional
@@ -89,7 +94,7 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
-      videoConfig: isShowVideo
+      videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
             videoOnDefault:
@@ -223,15 +228,15 @@ const RealtimeConsole: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (!accessToken) {
-      return;
-    }
-    handleInitClient();
-    return () => {
-      handleDisconnect();
-    };
-  }, [accessToken]);
+  // useEffect(() => {
+  //   if (!accessToken) {
+  //     return;
+  //   }
+  //   handleInitClient();
+  //   return () => {
+  //     handleDisconnect();
+  //   };
+  // }, [accessToken]);
 
   const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -275,7 +280,7 @@ const RealtimeConsole: React.FC = () => {
           isMicrophoneOn={isMicrophoneOn}
         />
       </Footer>
-      {isShowVideo && <Player clientRef={clientRef} />}
+      {isShowVideo() && <Player clientRef={clientRef} />}
       <Content style={{ padding: '20px' }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>

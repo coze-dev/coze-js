@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
  * How to effectuate OpenAPI authorization through the OAuth PKCE (Proof Key for Code Exchange) method.
  *
@@ -21,7 +20,7 @@ import {
   refreshOAuthToken,
 } from '@coze/api';
 
-import config from '../config/config.default.js';
+import config from '../config/config.js';
 
 // 'en' for https://api.coze.com, 'zh' for https://api.coze.cn
 const key = (process.env.COZE_ENV || 'en') as keyof typeof config;
@@ -44,6 +43,9 @@ console.log(
 
 import readline from 'readline';
 
+import { streamingChat } from '../utils.js';
+import { botId } from '../client.js';
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -63,7 +65,7 @@ const code = await getCodeFromUser();
 console.log('Received code:', code);
 
 // Exchange the authorization code for an OAuth token using PKCE
-const oauthToken = await getPKCEOAuthToken({
+let oauthToken = await getPKCEOAuthToken({
   clientId,
   redirectUrl,
   baseURL,
@@ -77,17 +79,26 @@ console.log('getPKCEOAuthToken', oauthToken);
 
 const client = new CozeAPI({
   baseURL,
-  token: oauthToken.access_token,
+  token: async () => {
+    // Refresh the OAuth token using the refresh token obtained earlier
+    if (oauthToken.expires_in * 1000 > Date.now() + 5000) {
+      return oauthToken.access_token;
+    }
+    console.log('refresh token');
+    const refreshTokenResult = await refreshOAuthToken({
+      clientId,
+      refreshToken: oauthToken.refresh_token,
+      baseURL,
+    });
+    oauthToken = refreshTokenResult;
+    return oauthToken.access_token;
+  },
 });
 
-// Example of how to use the client (commented out)
+// Example of how to use the client
 // e.g. client.chat.stream(...);
-
-// Refresh the OAuth token using the refresh token obtained earlier
-const refreshedOAuthToken = await refreshOAuthToken({
-  clientId,
-  refreshToken: oauthToken.refresh_token,
-  baseURL,
+streamingChat({
+  client,
+  botId,
+  query: 'give me a joke',
 });
-
-console.log('refreshOAuthToken', refreshedOAuthToken);
