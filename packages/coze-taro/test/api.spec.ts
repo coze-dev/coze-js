@@ -72,6 +72,24 @@ describe('CozeAPI - mini', () => {
     }
   });
 
+  it('should work with workflow chat', async () => {
+    const cozeApi = new CozeAPI({
+      token: '',
+      onBeforeAPICall: () => ({}),
+    });
+    expect(cozeApi.token).toEqual('');
+    const chunks = cozeApi.workflows.chat.stream({
+      bot_id: 'xx',
+      workflow_id: 'xx',
+      additional_messages: [],
+      parameters: {},
+    });
+    const caches = [];
+    for await (const chunk of chunks) {
+      caches.push(chunk);
+    }
+  });
+
   it('should throw error', async () => {
     const cozeApi = new CozeAPI({
       token: '',

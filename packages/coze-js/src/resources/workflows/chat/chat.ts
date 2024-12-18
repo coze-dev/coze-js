@@ -8,7 +8,7 @@ import {
 import { CozeError } from '../../../error.js';
 import { type RequestOptions } from '../../../core.js';
 
-export class Chat extends APIResource {
+export class WorkflowChat extends APIResource {
   /**
    * Execute a chat workflow. | 执行对话流
    * @docs en: https://www.coze.cn/docs/developer_guides/workflow_chat?_lang=en
@@ -22,7 +22,10 @@ export class Chat extends APIResource {
    * @param params.ext - Optional Additional information for the chat. | 可选 对话的附加信息。
    * @returns AsyncGenerator<StreamChatData> | 对话数据流
    */
-  async *stream(params: ChatWorkflowReq, options?: RequestOptions) {
+  async *stream(
+    params: ChatWorkflowReq,
+    options?: RequestOptions,
+  ): AsyncIterable<StreamChatData> {
     const apiUrl = '/v1/workflows/chat';
     const payload = {
       ...params,
