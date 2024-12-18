@@ -7,7 +7,9 @@
     "module": "ES2022",
     "lib": ["es2015", "dom"],
     "types": ["node"],
-    "target": "es2022"
+    "target": "es2022",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "references": [
     { "path": "./tsconfig.build.json" },

@@ -1,8 +1,11 @@
-import { Documents } from './documents/index.js';
+import { OldDocuments } from './documents/index.js';
 import { APIResource } from '../resource.js';
 
 export class Knowledge extends APIResource {
-  documents: Documents = new Documents(this._client);
+  /**
+   * @deprecated
+   */
+  documents: OldDocuments = new OldDocuments(this._client);
 }
 
 export * from './documents/index.js';

@@ -10,6 +10,7 @@ import {
   type StreamChatReq,
   type StreamChatData,
   type CreateFileReq,
+  type ChatWorkflowReq,
   type FileObject,
 } from '@coze/api';
 
@@ -133,34 +134,46 @@ export function getChatStreamMixin(api: CozeAPI) {
       result,
     );
 
-    try {
-      while (true) {
-        if (result.done) {
-          break;
-        }
-        if (!result.messages.length) {
-          await result.deferred?.promise;
-        }
-        let message = result.messages.shift();
-        while (message) {
-          if (message.event === ChatEventType.DONE) {
-            yield {
-              event: message.event,
-              data: '[DONE]',
-            };
-          } else {
-            yield {
-              event: message.event,
-              data: JSON.parse(message.data),
-            };
-          }
-          message = result.messages.shift();
-        }
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : e;
-      throw new CozeError(`Could not handle message: ${msg}`);
-    }
+    yield* handleStreamMessages(result);
+  };
+}
+
+// workflows.chat.stream
+export function getWorkflowChatStreamMixin(api: CozeAPI) {
+  return async function* stream(
+    params: ChatWorkflowReq,
+    options?: RequestOptions,
+  ): AsyncIterable<StreamChatData> {
+    await refreshToken(api, params, options);
+
+    const result: {
+      messages: Array<ChatMessage>;
+      done: boolean;
+      deferred: Deferred | null;
+    } = {
+      messages: [],
+      done: false,
+      deferred: null,
+    };
+
+    sendRequest(
+      {
+        url: `${api.options.baseURL ?? ''}/v1/workflows/chat`,
+        method: 'POST',
+        data: params,
+        headers: Object.assign(
+          {
+            Authorization: `Bearer ${api.options.token}`,
+          },
+          api.options.headers,
+          options?.headers,
+        ),
+        signal: options?.signal,
+      },
+      result,
+    );
+
+    yield* handleStreamMessages(result);
   };
 }
 
@@ -217,5 +230,40 @@ async function refreshToken(
       api.options.token = config.token;
       api.token = config.token;
     }
+  }
+}
+
+async function* handleStreamMessages(result: {
+  messages: Array<ChatMessage>;
+  done: boolean;
+  deferred: Deferred | null;
+}): AsyncGenerator<StreamChatData> {
+  try {
+    while (true) {
+      if (result.done) {
+        break;
+      }
+      if (!result.messages.length) {
+        await result.deferred?.promise;
+      }
+      let message = result.messages.shift();
+      while (message) {
+        if (message.event === ChatEventType.DONE) {
+          yield {
+            event: message.event,
+            data: '[DONE]',
+          };
+        } else {
+          yield {
+            event: message.event,
+            data: JSON.parse(message.data),
+          };
+        }
+        message = result.messages.shift();
+      }
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : e;
+    throw new CozeError(`Could not handle message: ${msg}`);
   }
 }

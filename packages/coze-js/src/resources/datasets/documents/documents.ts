@@ -6,8 +6,6 @@ import { type RequestOptions } from '../../../core.js';
 const headers = { 'agw-js-conv': 'str' };
 export class Documents extends APIResource {
   /**
-   * @deprecated  The method is deprecated and will be removed in a future version. Please use 'client.datasets.documents.list' instead.
-   *
    * View the file list of a specified knowledge base, which includes lists of documents, spreadsheets, or images.
    * | 调用接口查看指定知识库的内容列表，即文件、表格或图像列表。
    * @docs en: https://www.coze.com/docs/developer_guides/list_knowledge_files?_lang=en
@@ -29,8 +27,6 @@ export class Documents extends APIResource {
   }
 
   /**
-   * @deprecated  The method is deprecated and will be removed in a future version. Please use 'client.datasets.documents.create' instead.
-   *
    * Upload files to the specific knowledge. | 调用此接口向指定知识库中上传文件。
    * @docs en: https://www.coze.com/docs/developer_guides/create_knowledge_files?_lang=en
    * @docs zh: https://www.coze.cn/docs/developer_guides/create_knowledge_files?_lang=zh
@@ -50,8 +46,6 @@ export class Documents extends APIResource {
   }
 
   /**
-   * @deprecated  The method is deprecated and will be removed in a future version. Please use 'client.datasets.documents.delete' instead.
-   *
    * Delete text, images, sheets, and other files in the knowledge base, supporting batch deletion.
    * | 删除知识库中的文本、图像、表格等文件，支持批量删除。
    * @docs en: https://www.coze.com/docs/developer_guides/delete_knowledge_files?_lang=en
@@ -70,8 +64,6 @@ export class Documents extends APIResource {
   }
 
   /**
-   * @deprecated  The method is deprecated and will be removed in a future version. Please use 'client.datasets.documents.update' instead.
-   *
    * Modify the knowledge base file name and update strategy. | 调用接口修改知识库文件名称和更新策略。
    * @docs en: https://www.coze.com/docs/developer_guides/modify_knowledge_files?_lang=en
    * @docs zh: https://www.coze.cn/docs/developer_guides/modify_knowledge_files?_lang=zh

@@ -13,6 +13,7 @@ const botId = process.env.COZE_BOT_ID || config[key].COZE_BOT_ID;
 const spaceId = process.env.COZE_SPACE_ID || config[key].COZE_SPACE_ID;
 const workflowId = process.env.COZE_WORKFLOW_ID || config[key].COZE_WORKFLOW_ID;
 const baseURL = process.env.COZE_BASE_URL || config[key].COZE_BASE_URL;
+const datasetId = process.env.DATASET_ID || config[key].DATASET_ID;
 
 const client = new CozeAPI({
   baseURL,
@@ -25,4 +26,13 @@ async function sleep(ms: number) {
   });
 }
 
-export { client, botId, spaceId, workflowId, sleep, baseURL, apiKey };
+export {
+  client,
+  botId,
+  spaceId,
+  workflowId,
+  sleep,
+  baseURL,
+  apiKey,
+  datasetId,
+};

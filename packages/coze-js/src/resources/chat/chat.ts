@@ -6,7 +6,9 @@ import { Messages } from './messages/index.js';
 
 const uuid = () => (Math.random() * new Date().getTime()).toString();
 
-const handleAdditionalMessages = (additional_messages?: EnterMessage[]) =>
+export const handleAdditionalMessages = (
+  additional_messages?: EnterMessage[],
+) =>
   additional_messages?.map(i => ({
     ...i,
     content:

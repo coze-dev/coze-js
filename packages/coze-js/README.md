@@ -110,7 +110,7 @@ async function streamChat() {
 |---------|-------------|----------|
 | Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
 | Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
-| Knowledge | Document management | [knowledge.ts](../../examples/coze-js-node/src/knowledge.ts) |
+| Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 
