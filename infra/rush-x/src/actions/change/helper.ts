@@ -1,8 +1,10 @@
 import path from 'path';
 
-import type { RushConfigurationProject } from '@rushstack/rush-sdk/lib/api/RushConfigurationProject';
-import type { RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
 import { ChangeFile } from '@rushstack/rush-sdk/lib/api/ChangeFile';
+import {
+  type RushConfigurationProject,
+  type RushConfiguration,
+} from '@rushstack/rush-sdk';
 import { logger } from '@coze-infra/rush-logger';
 import type { Commit, Parser, ParserOptions } from '@commitlint/types';
 
