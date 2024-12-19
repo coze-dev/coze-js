@@ -1,3 +1,5 @@
+import { type RushConfigurationProject } from '@rushstack/rush-sdk';
+
 export enum BumpType {
   ALPHA = 'alpha',
   BETA = 'beta',
@@ -15,3 +17,13 @@ export interface PublishOptions {
   bumpType?: BumpType; // 版本升级类型
   skipCommit?: boolean; // 是否跳过提交
 }
+
+export interface PublishManifest {
+  project: RushConfigurationProject;
+  currentVersion: string;
+  newVersion: string;
+}
+
+export type ApplyPublishManifest = (
+  manifests: PublishManifest[],
+) => Promise<string[]>;

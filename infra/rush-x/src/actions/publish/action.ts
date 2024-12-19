@@ -8,6 +8,7 @@ import { type PublishOptions } from './types';
 import { validateAndGetPackages } from './packages';
 import { commitChanges } from './git';
 import { confirmForPublish } from './confirm';
+import { generateChangelog } from './changelog';
 import { applyPublishManifest } from './apply-new-version';
 
 export const publish = async (options: PublishOptions) => {
@@ -21,10 +22,8 @@ export const publish = async (options: PublishOptions) => {
   );
 
   // 2. 生成发布清单
-  const publishManifest = await generatePublishManifest(
-    packagesToPublish,
-    options,
-  );
+  const { manifests: publishManifest, isBetaPublish } =
+    await generatePublishManifest(packagesToPublish, options);
 
   const continuePublish = await confirmForPublish(
     publishManifest,
@@ -35,8 +34,14 @@ export const publish = async (options: PublishOptions) => {
     return;
   }
 
-  // 3. 应用更新
-  const changedFiles = await applyPublishManifest(publishManifest);
+  // 3. 应用更新，注意这里会修改文件，产生 sideEffect
+  const postHandles = [applyPublishManifest];
+  if (isBetaPublish === false) {
+    postHandles.push(generateChangelog);
+  }
+  const changedFiles = (
+    await Promise.all(postHandles.map(handle => handle(publishManifest)))
+  ).flat();
 
   // 4. 创建并推送发布分支
   if (!options.skipCommit) {

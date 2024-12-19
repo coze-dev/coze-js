@@ -3,6 +3,7 @@ import { type RushConfigurationProject } from '@rushstack/rush-sdk';
 
 import { randomHash } from '../../utils/random';
 import { BumpType } from './types';
+import { type PublishManifest } from './types';
 import { requstBumpType } from './request-bump-type';
 
 interface VersionOptions {
@@ -94,20 +95,14 @@ const generateNewVersionForPackage = (
   return newVersion;
 };
 
-export interface PublishManifest {
-  project: RushConfigurationProject;
-  currentVersion: string;
-  newVersion: string;
-}
-
 /**
  * 生成发布清单
  */
 export const generatePublishManifest = async (
   packages: Set<RushConfigurationProject>,
   options: VersionOptions,
-): Promise<PublishManifest[]> => {
-  const manifest: PublishManifest[] = [];
+): Promise<{ manifests: PublishManifest[]; isBetaPublish: boolean }> => {
+  const manifests: PublishManifest[] = [];
   const { version, bumpType } = options;
   if (version && !semver.valid(version)) {
     throw new Error(`Invalid version specified: ${version}`);
@@ -122,11 +117,14 @@ export const generatePublishManifest = async (
   for (const pkg of packages) {
     const currentVersion = pkg.packageJson.version;
     const newVersion = await generateNewVersionForPackage(pkg, options);
-    manifest.push({
+    manifests.push({
       project: pkg,
       newVersion,
       currentVersion,
     });
   }
-  return manifest;
+  return {
+    manifests,
+    isBetaPublish: [BumpType.BETA, BumpType.ALPHA].includes(options.bumpType),
+  };
 };
