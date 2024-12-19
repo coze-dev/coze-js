@@ -1,4 +1,4 @@
-import type { RushConfigurationProject } from '@rushstack/rush-sdk/lib/api/RushConfigurationProject';
+import type { RushConfigurationProject } from '@rushstack/rush-sdk';
 
 import { readConfig } from './utils/read-config';
 import { type RuleReport } from './types';
