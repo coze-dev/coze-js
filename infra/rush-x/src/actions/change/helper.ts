@@ -1,8 +1,11 @@
 import path from 'path';
 
-import type { RushConfigurationProject } from '@rushstack/rush-sdk/lib/api/RushConfigurationProject';
-import type { RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
+import { type RushConfiguration as RushConfigurationType } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
 import { ChangeFile } from '@rushstack/rush-sdk/lib/api/ChangeFile';
+import {
+  type RushConfigurationProject,
+  type RushConfiguration,
+} from '@rushstack/rush-sdk';
 import { logger } from '@coze-infra/rush-logger';
 import type { Commit, Parser, ParserOptions } from '@commitlint/types';
 
@@ -149,7 +152,7 @@ export async function generateAllChangesFile(
     // TODO: ChangeFile 需要的 IChangeInfo 类型和当前规范存在属性差异，暂时先忽略 email
     const changeFile = new ChangeFile(
       { changes: [], packageName, email },
-      rushConfiguration,
+      rushConfiguration as unknown as RushConfigurationType,
     );
     changeFile.addChange({ packageName, comment, type: patchType });
     changeFile.writeSync();
