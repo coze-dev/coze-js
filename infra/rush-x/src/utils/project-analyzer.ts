@@ -1,5 +1,7 @@
-import { type RushConfigurationProject } from '@rushstack/rush-sdk/lib/api/RushConfigurationProject';
-import { RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
+import {
+  type RushConfigurationProject,
+  RushConfiguration,
+} from '@rushstack/rush-sdk';
 import { logger } from '@coze-infra/rush-logger';
 
 import { setOutput } from './ci-interactor';
