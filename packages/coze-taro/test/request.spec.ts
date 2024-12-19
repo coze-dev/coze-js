@@ -26,6 +26,7 @@ describe('SSERequest', () => {
       messages: [],
       done: false,
       deferred: null,
+      error: null,
     };
     sendRequest({ url: 'xx' }, result);
     expect(result.done).toBe(false);
@@ -41,10 +42,12 @@ describe('SSERequest', () => {
       messages: Array<unknown>;
       done: boolean;
       deferred: Deferred | null;
+      error: Error | null;
     } = {
       messages: [],
       done: false,
       deferred: null,
+      error: null,
     };
     const controller = new AbortController();
     sendRequest({ url: 'xx', signal: controller.signal }, result);

@@ -13,12 +13,13 @@ export class EventSource extends BaseEventSource {
   }
 
   start() {
-    const { url, method, headers, data } = this.options;
+    const { url, method, headers, data, timeout } = this.options;
     this.task = tt.createEventSource({
       url,
       method,
       header: headers,
       data,
+      timeout,
     });
     this.task.onOpen(() => {
       this.trigger(EventName.Open);
@@ -27,11 +28,12 @@ export class EventSource extends BaseEventSource {
       this.trigger(EventName.Chunk, msg);
     });
     this.task.onError(e => {
-      const err = e instanceof Error ? e : new Error(e.errMsg ?? 'fail');
+      const errMsg =
+        e instanceof Error ? e.message : ((e && e.errMsg) ?? 'fail');
       if (this.isAborted) {
         return;
       }
-      this.trigger(EventName.Fail, err);
+      this.trigger(EventName.Fail, errMsg);
     });
     this.task.onClose(() => {
       this.trigger(EventName.Success);
@@ -43,7 +45,7 @@ export class EventSource extends BaseEventSource {
       this.isAborted = true;
       this.task?.close();
       // fire "fail" manualy
-      this.trigger(EventName.Fail, new Error('abort'));
+      this.trigger(EventName.Fail, 'abort');
     }
   }
 }

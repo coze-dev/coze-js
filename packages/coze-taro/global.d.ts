@@ -3,6 +3,7 @@ type TTCreateEVentSource = (args: {
   header?: unknown;
   method?: string;
   data?: Record<string, string>;
+  timeout?: number;
 }) => {
   close(): void;
   onMessage(

@@ -12,13 +12,14 @@ import { BaseEventSource } from './base';
 export class EventSource extends BaseEventSource {
   private task?: Taro.RequestTask<unknown>;
   private isAborted = false;
+  private cacheChunk = '';
 
   constructor(private options: RequestConfig) {
     super();
   }
 
   start() {
-    const { url, method, headers, data } = this.options;
+    const { url, method, headers, data, timeout } = this.options;
     this.task = Taro.request({
       url,
       method,
@@ -26,12 +27,13 @@ export class EventSource extends BaseEventSource {
       data,
       enableChunked: true,
       enableCookie: true,
+      timeout,
       fail: err => {
-        this.trigger(EventName.Fail, new Error(err.errMsg));
+        this.trigger(EventName.Fail, err.errMsg);
       },
       success: res => {
         if (res.statusCode !== 200) {
-          this.trigger(EventName.Fail, new Error(res.errMsg));
+          this.trigger(EventName.Fail, res.errMsg);
         } else {
           this.trigger(EventName.Success, res);
         }
@@ -60,28 +62,33 @@ export class EventSource extends BaseEventSource {
       const octets = new Uint8Array(res.data);
       const decoder = new TextDecoder();
       const chunk = decoder.decode(octets);
+      this.cacheChunk += chunk;
 
-      const messages: Array<Record<string, string>> = [];
-      let message: Record<string, string> = {};
-      const lines = chunk.split('\n');
-      for (let i = 0; i < lines.length - 1; i++) {
-        const line = lines[i];
+      if (this.cacheChunk.endsWith('\n\n')) {
+        const chunkStr = this.cacheChunk;
+        this.cacheChunk = '';
+        const messages: Array<Record<string, string>> = [];
+        let message: Record<string, string> = {};
+        const lines = chunkStr.split('\n');
+        for (let i = 0; i < lines.length - 1; i++) {
+          const line = lines[i];
 
-        const index = line.indexOf(':');
-        if (index !== -1) {
-          const field = line.substring(0, index).trim();
-          const content = line.substring(index + 1).trim();
-          message[field] = content;
-          if (field === 'data') {
-            messages.push(message);
-            message = {};
+          const index = line.indexOf(':');
+          if (index !== -1) {
+            const field = line.substring(0, index).trim();
+            const content = line.substring(index + 1).trim();
+            message[field] = content;
+            if (field === 'data') {
+              messages.push(message);
+              message = {};
+            }
           }
         }
-      }
 
-      messages.map(msg => {
-        this.trigger(EventName.Chunk, msg);
-      });
+        messages.map(msg => {
+          this.trigger(EventName.Chunk, msg);
+        });
+      }
     });
   }
 }
