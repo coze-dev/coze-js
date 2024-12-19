@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { confirm } from '@inquirer/prompts';
 
-import { type PublishManifest } from './version';
+import { type PublishManifest } from './types';
 
 export const confirmForPublish = async (
   publishManifest: PublishManifest[],
