@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 
-import { type RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
+import { type RushConfiguration } from '@rushstack/rush-sdk';
 import { logger } from '@coze-infra/rush-logger';
 
 import { getRushConfiguration } from '../../utils/project-analyzer';
