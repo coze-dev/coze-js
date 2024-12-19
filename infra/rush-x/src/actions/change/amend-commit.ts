@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { type RushConfiguration } from '@rushstack/rush-sdk/lib/api/RushConfiguration';
+import { type RushConfiguration } from '@rushstack/rush-sdk';
 
 import { getRushConfiguration } from '../../utils/project-analyzer';
 import { getChangedFilesFromCached } from '../../utils/git-command';
