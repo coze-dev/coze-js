@@ -101,6 +101,7 @@ describe('CozeAPI - mini', () => {
       additional_messages: [],
       parameters: {},
     });
+    vi.runAllTimersAsync();
     const caches = [];
     for await (const chunk of chunks) {
       caches.push(chunk);
