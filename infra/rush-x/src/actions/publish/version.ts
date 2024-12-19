@@ -3,6 +3,7 @@ import { type RushConfigurationProject } from '@rushstack/rush-sdk';
 
 import { randomHash } from '../../utils/random';
 import { BumpType } from './types';
+import { type PublishManifest } from './types';
 import { requstBumpType } from './request-bump-type';
 
 interface VersionOptions {
@@ -94,11 +95,13 @@ const generateNewVersionForPackage = (
   return newVersion;
 };
 
-export interface PublishManifest {
-  project: RushConfigurationProject;
-  currentVersion: string;
-  newVersion: string;
-}
+const calBumpPolicy = (options: VersionOptions) => {
+  const { version, bumpType } = options;
+  if (version) {
+    return version;
+  }
+  return bumpType;
+};
 
 /**
  * 生成发布清单
@@ -106,13 +109,16 @@ export interface PublishManifest {
 export const generatePublishManifest = async (
   packages: Set<RushConfigurationProject>,
   options: VersionOptions,
-): Promise<PublishManifest[]> => {
-  const manifest: PublishManifest[] = [];
+): Promise<{
+  manifests: PublishManifest[];
+  isBetaPublish: boolean;
+  bumpPolicy: BumpType | string;
+}> => {
+  const manifests: PublishManifest[] = [];
   const { version, bumpType } = options;
   if (version && !semver.valid(version)) {
     throw new Error(`Invalid version specified: ${version}`);
-  }
-  if (!version && !bumpType) {
+  } else if (!bumpType) {
     const newBumpType = await requstBumpType();
     if (!newBumpType) {
       throw new Error('Version selection was cancelled!');
@@ -122,11 +128,16 @@ export const generatePublishManifest = async (
   for (const pkg of packages) {
     const currentVersion = pkg.packageJson.version;
     const newVersion = await generateNewVersionForPackage(pkg, options);
-    manifest.push({
+    manifests.push({
       project: pkg,
       newVersion,
       currentVersion,
     });
   }
-  return manifest;
+  const bumpPolicy = calBumpPolicy(options);
+  return {
+    manifests,
+    isBetaPublish: [BumpType.BETA, BumpType.ALPHA].includes(options.bumpType),
+    bumpPolicy,
+  };
 };
