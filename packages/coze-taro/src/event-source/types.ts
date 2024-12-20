@@ -10,7 +10,7 @@ export enum EventName {
 export interface EventMessage<T = unknown> {
   event: EventName;
   data?: T;
-  error?: Error;
+  errMsg?: string;
 }
 
 export type EventHandler = (msg: EventMessage) => void;
@@ -20,4 +20,5 @@ export interface RequestConfig
   url: string;
   method?: 'GET' | 'POST';
   signal?: GenericAbortSignal;
+  timeout?: number;
 }

@@ -8,6 +8,7 @@ export function sendRequest<Message>(
     messages: Array<Message>;
     done: boolean;
     deferred: Deferred | null;
+    error: Error | null;
   },
 ) {
   result.deferred = new Deferred();
@@ -24,8 +25,10 @@ export function sendRequest<Message>(
       result.deferred?.resolve(msg);
     })
     .on(EventName.Fail, msg => {
+      const error = new Error(msg.errMsg);
       result.done = true;
-      result.deferred?.reject(msg.error as Error);
+      result.error = error;
+      result.deferred?.reject(error);
     });
 
   if (config.signal) {

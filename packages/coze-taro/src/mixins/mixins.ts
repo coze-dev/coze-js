@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- ignore */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 import Taro from '@tarojs/taro';
 import {
@@ -41,10 +42,12 @@ export function getWorkflowStreamMixin(api: CozeAPI) {
       messages: Array<WorkflowMessage>;
       done: boolean;
       deferred: Deferred | null;
+      error: Error | null;
     } = {
       messages: [],
       done: false,
       deferred: null,
+      error: null,
     };
 
     sendRequest(
@@ -60,6 +63,7 @@ export function getWorkflowStreamMixin(api: CozeAPI) {
           options?.headers,
         ),
         signal: options?.signal,
+        timeout: options?.timeout ?? api.axiosOptions?.timeout,
       },
       result,
     );
@@ -71,6 +75,9 @@ export function getWorkflowStreamMixin(api: CozeAPI) {
         }
         if (!result.messages.length) {
           await result.deferred?.promise;
+          if (result.error) {
+            throw result.error;
+          }
         }
         let message = result.messages.shift();
         while (message) {
@@ -105,10 +112,12 @@ export function getChatStreamMixin(api: CozeAPI) {
       messages: Array<ChatMessage>;
       done: boolean;
       deferred: Deferred | null;
+      error: Error | null;
     } = {
       messages: [],
       done: false,
       deferred: null,
+      error: null,
     };
 
     const { conversation_id, ...rest } = params;
@@ -130,6 +139,7 @@ export function getChatStreamMixin(api: CozeAPI) {
           options?.headers,
         ),
         signal: options?.signal,
+        timeout: options?.timeout ?? api.axiosOptions?.timeout,
       },
       result,
     );
@@ -150,10 +160,12 @@ export function getWorkflowChatStreamMixin(api: CozeAPI) {
       messages: Array<ChatMessage>;
       done: boolean;
       deferred: Deferred | null;
+      error: Error | null;
     } = {
       messages: [],
       done: false,
       deferred: null,
+      error: null,
     };
 
     sendRequest(
@@ -169,6 +181,7 @@ export function getWorkflowChatStreamMixin(api: CozeAPI) {
           options?.headers,
         ),
         signal: options?.signal,
+        timeout: options?.timeout ?? api.axiosOptions?.timeout,
       },
       result,
     );
@@ -194,6 +207,7 @@ export function getUploadFileMixin(api: CozeAPI) {
         ),
         filePath: params.file.filePath,
         name: 'file',
+        timeout: options?.timeout ?? api.axiosOptions?.timeout,
         success(res) {
           if (res.statusCode !== 200) {
             reject(new Error(res.data));
@@ -237,6 +251,7 @@ async function* handleStreamMessages(result: {
   messages: Array<ChatMessage>;
   done: boolean;
   deferred: Deferred | null;
+  error: Error | null;
 }): AsyncGenerator<StreamChatData> {
   try {
     while (true) {
@@ -245,6 +260,9 @@ async function* handleStreamMessages(result: {
       }
       if (!result.messages.length) {
         await result.deferred?.promise;
+        if (result.error) {
+          throw result.error;
+        }
       }
       let message = result.messages.shift();
       while (message) {

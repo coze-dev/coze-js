@@ -10,6 +10,7 @@ export class CozeAPI extends InnerCozeAPI {
     super({
       ...options,
       axiosOptions: {
+        ...(options.axiosOptions ?? {}),
         header: {
           ...options.headers,
           Authorization: `Bearer ${options.token}`,
