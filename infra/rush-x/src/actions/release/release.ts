@@ -43,11 +43,7 @@ const releasePackage = async (
 ) => {
   const prepareReleaseTasks: ((
     project: RushConfigurationProject,
-  ) => Promise<void>)[] = [
-    buildProject,
-    updateDependencyVersions,
-    applyCozePublishConfig,
-  ];
+  ) => Promise<void>)[] = [updateDependencyVersions, applyCozePublishConfig];
   const { project } = releaseManifest;
   const { packageName } = project;
   logger.info(`Preparing release for package: ${packageName}`);
@@ -61,6 +57,11 @@ export const releasePackages = async (
   releaseManifests: ReleaseManifest[],
   releaseOptions: ReleaseOptions,
 ) => {
+  await Promise.all(
+    releaseManifests.map(async manifest => {
+      await buildProject(manifest.project);
+    }),
+  );
   await Promise.all(
     releaseManifests.map(async manifest => {
       await releasePackage(manifest, releaseOptions);
