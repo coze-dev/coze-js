@@ -1,5 +1,6 @@
 import { logger } from '@coze-infra/rush-logger';
 
+import { exec } from '../../utils/exec';
 import { type ReleaseOptions } from './types';
 import { releasePackages } from './release';
 import { buildReleaseManifest } from './manifest';
@@ -11,6 +12,8 @@ export async function release(options: ReleaseOptions): Promise<void> {
     dryRun = false,
     registry = 'https://registry.npmjs.org',
   } = options;
+
+  await exec(`git checkout ${commit}`);
 
   // 1. 获取需要发布的包列表
   const packagesToPublish = await getPackagesToPublish(commit);
