@@ -1,6 +1,6 @@
 {
   "name": "@coze/taro-api",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.a5f070",
   "description": "Official Coze Taro SDK for seamless AI integration into your applications | 扣子官方 Taro SDK，助您轻松集成 AI 能力到应用中",
   "keywords": [
     "coze",
