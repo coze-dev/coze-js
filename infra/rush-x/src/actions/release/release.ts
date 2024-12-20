@@ -44,9 +44,9 @@ const releasePackage = async (
   const prepareReleaseTasks: ((
     project: RushConfigurationProject,
   ) => Promise<void>)[] = [
+    buildProject,
     updateDependencyVersions,
     applyCozePublishConfig,
-    buildProject,
   ];
   const { project } = releaseManifest;
   const { packageName } = project;
