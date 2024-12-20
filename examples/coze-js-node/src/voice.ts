@@ -64,6 +64,17 @@ async function listAllVoices() {
   return allVoices;
 }
 
+async function voiceTranslation() {
+  // const filePath = join(__dirname, '../tmp/voice.mp3');
+  // const fileBuffer = await fs.createReadStream(filePath);
+
+  const voiceObj = await client.audio.translations.create({
+    file: fileBuffer as any,
+  });
+  console.log('client.audio.translations.create', voiceObj);
+}
+
 await voiceClone().catch(console.error);
 await createSpeech().catch(console.error);
 await listAllVoices().catch(console.error);
+await voiceTranslation().catch(console.error);
