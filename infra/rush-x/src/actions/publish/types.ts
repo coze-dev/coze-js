@@ -16,6 +16,7 @@ export interface PublishOptions {
   only?: string[]; // 仅发布指定包
   bumpType?: BumpType; // 版本升级类型
   skipCommit?: boolean; // 是否跳过提交
+  skipPush?: boolean; // 是否跳过推送
 }
 
 export interface PublishManifest {

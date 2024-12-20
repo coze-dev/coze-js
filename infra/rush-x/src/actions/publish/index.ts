@@ -15,6 +15,7 @@ export const installAction: InstallAction = (program: Command) => {
     .option('-f, --from <packages...>', '发布指定包及其上下游依赖')
     .option('-o, --only <packages...>', '仅发布指定包')
     .option('-s, --skip-commit', '是否跳过提交', false)
+    .option('-p, --skip-push', '是否跳过推送', false)
     .option(
       '-b, --bump-type <type>',
       '版本升级类型 (alpha/beta/patch/minor/major)',

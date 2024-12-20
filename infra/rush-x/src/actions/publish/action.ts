@@ -5,7 +5,7 @@ import { getRushConfiguration } from '../../utils/project-analyzer';
 import { generatePublishManifest } from './version';
 import { type PublishOptions } from './types';
 import { validateAndGetPackages } from './packages';
-import { commitChanges } from './git';
+import { commitChanges, pushToRemote } from './git';
 import { confirmForPublish } from './confirm';
 import { generateChangelog } from './changelog';
 import { applyPublishManifest } from './apply-new-version';
@@ -45,11 +45,15 @@ export const publish = async (options: PublishOptions) => {
 
   // 4. 创建并推送发布分支
   if (!options.skipCommit) {
-    await commitChanges({
+    const effects = await commitChanges({
       sessionId,
       files: changedFiles,
       cwd: rushFolder,
       publishManifests,
     });
+    if (!options.skipPush) {
+      await pushToRemote(effects, rushFolder);
+    }
   }
+  logger.success('Publish success.');
 };
