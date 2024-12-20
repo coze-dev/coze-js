@@ -1,0 +1,54 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v/*/*' # 匹配 v/{packagename}/{version} 格式的标签
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        include:
+          - NodeVersion: 20.9.x
+            NodeVersionDisplayName: 20
+            OS: ubuntu-latest
+    name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
+    runs-on: ${{ matrix.OS }}
+    if: github.repository == 'coze-dev/coze-js'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Config Git User
+        # should be turn to ci user
+        run: |
+          git config --local user.name "tecvan"
+          git config --local user.email "fanwenjie.fe@bytedance.com"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.NodeVersion }}
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            common/temp/pnpm-local
+            common/temp/pnpm-store
+            common/temp/install-run
+          key: ${{ runner.os }}-rush-store-${{ hashFiles('common/config/subspaces/**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-store-main
+            ${{ runner.os }}-rush-store
+
+      - name: Install Dependencies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Run Rlease
+        run: node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}

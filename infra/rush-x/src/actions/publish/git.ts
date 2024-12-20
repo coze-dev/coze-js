@@ -34,7 +34,7 @@ export async function commitChanges({
   files,
   cwd,
   publishManifests,
-}: CommitChangesOptions): Promise<void> {
+}: CommitChangesOptions): Promise<{ effects: string[]; branchName: string }> {
   const date = dayjs().format('YYYYMMDD');
   const branchName = `release/${date}-${sessionId}`;
 
@@ -49,16 +49,14 @@ export async function commitChanges({
     tags.map(tag => `git tag -a ${tag} -m "Bump type ${tag}"`).join(' && '),
     { cwd },
   );
-  // Must force push to main repo to trigger CI publish
-  // But main repo requires permissions, auto-publish will only be available within whitelist in the future
-  await exec(`git push ${MAIN_REPO_URL} ${branchName} --no-verify`, {
-    cwd,
-  });
-  await exec(`git push ${MAIN_REPO_URL} ${tags.join(' ')} --no-verify`, {
-    cwd,
-  });
+  return { effects: [...tags, branchName], branchName };
+}
 
-  logger.success(
-    'Version bump pushed to remote, now you need to create a pull request manually.',
-  );
+export async function pushToRemote(
+  effects: string[],
+  cwd: string,
+): Promise<void> {
+  await exec(`git push ${MAIN_REPO_URL} ${effects.join(' ')} --no-verify`, {
+    cwd,
+  });
 }
