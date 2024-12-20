@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { logger } from '@coze-infra/rush-logger';
 
 import { randomHash } from '../../utils/random';
@@ -12,6 +11,7 @@ import { generateChangelog } from './changelog';
 import { applyPublishManifest } from './apply-new-version';
 
 export const publish = async (options: PublishOptions) => {
+  const sessionId = randomHash(6);
   const rushConfiguration = getRushConfiguration();
   const rushFolder = rushConfiguration.rushJsonFolder;
 
@@ -22,11 +22,11 @@ export const publish = async (options: PublishOptions) => {
   );
 
   // 2. 生成发布清单
-  const { manifests: publishManifest, isBetaPublish } =
+  const { manifests: publishManifests, isBetaPublish } =
     await generatePublishManifest(packagesToPublish, options);
 
   const continuePublish = await confirmForPublish(
-    publishManifest,
+    publishManifests,
     options.dryRun,
   );
 
@@ -40,20 +40,16 @@ export const publish = async (options: PublishOptions) => {
     postHandles.push(generateChangelog);
   }
   const changedFiles = (
-    await Promise.all(postHandles.map(handle => handle(publishManifest)))
+    await Promise.all(postHandles.map(handle => handle(publishManifests)))
   ).flat();
 
   // 4. 创建并推送发布分支
   if (!options.skipCommit) {
-    const date = dayjs().format('YYYYMMDD');
-    const branchName = `release/${date}-${randomHash(6)}`;
-    await commitChanges(branchName, changedFiles, rushFolder);
-    logger.success(`Successfully created and pushed branch: ${branchName}`);
-    logger.success(
-      'Now you need to push the branch to remote repository manually, and then create a pull request.',
-    );
-    logger.success(
-      'the ci system will automatically publish according to the pull request.',
-    );
+    await commitChanges({
+      sessionId,
+      files: changedFiles,
+      cwd: rushFolder,
+      publishManifests,
+    });
   }
 };

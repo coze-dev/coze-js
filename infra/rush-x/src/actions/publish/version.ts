@@ -95,19 +95,30 @@ const generateNewVersionForPackage = (
   return newVersion;
 };
 
+const calBumpPolicy = (options: VersionOptions) => {
+  const { version, bumpType } = options;
+  if (version) {
+    return version;
+  }
+  return bumpType;
+};
+
 /**
  * 生成发布清单
  */
 export const generatePublishManifest = async (
   packages: Set<RushConfigurationProject>,
   options: VersionOptions,
-): Promise<{ manifests: PublishManifest[]; isBetaPublish: boolean }> => {
+): Promise<{
+  manifests: PublishManifest[];
+  isBetaPublish: boolean;
+  bumpPolicy: BumpType | string;
+}> => {
   const manifests: PublishManifest[] = [];
   const { version, bumpType } = options;
   if (version && !semver.valid(version)) {
     throw new Error(`Invalid version specified: ${version}`);
-  }
-  if (!version && !bumpType) {
+  } else if (!bumpType) {
     const newBumpType = await requstBumpType();
     if (!newBumpType) {
       throw new Error('Version selection was cancelled!');
@@ -123,8 +134,10 @@ export const generatePublishManifest = async (
       currentVersion,
     });
   }
+  const bumpPolicy = calBumpPolicy(options);
   return {
     manifests,
     isBetaPublish: [BumpType.BETA, BumpType.ALPHA].includes(options.bumpType),
+    bumpPolicy,
   };
 };
