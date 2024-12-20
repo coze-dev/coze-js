@@ -25,9 +25,8 @@
   "license": "MIT",
   "author": "yjfengwen <yjfengwen@gmail.com>",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "files": [
     "dist",
     "LICENSE",
@@ -56,5 +55,10 @@
   "peerDependencies": {
     "@tarojs/taro": ">=3",
     "axios": "^1.7.1"
+  },
+  "cozePublishConfig": {
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts"
   }
 }
