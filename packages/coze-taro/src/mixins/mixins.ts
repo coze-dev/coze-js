@@ -181,6 +181,7 @@ export function getWorkflowChatStreamMixin(api: CozeAPI) {
           options?.headers,
         ),
         signal: options?.signal,
+        timeout: options?.timeout ?? api.axiosOptions?.timeout,
       },
       result,
     );

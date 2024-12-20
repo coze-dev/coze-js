@@ -238,3 +238,15 @@ export const taroStreamingRequest = ({
 
   return task;
 };
+
+export const taroUploadFile = ({
+  success,
+}: {
+  fail: (err: { errMsg: string }) => void;
+  success: (res: { statusCode: number; data: string }) => void;
+}) => {
+  success({
+    statusCode: 200,
+    data: JSON.stringify({ data: { mock: 'xx' } }),
+  });
+};
