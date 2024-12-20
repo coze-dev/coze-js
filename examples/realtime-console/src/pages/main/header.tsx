@@ -8,14 +8,15 @@ import {
 } from '@coze/realtime-api';
 import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 
-import MessageForm, { type MessageFormRef } from './message-form';
-
 import '../../App.css';
 import { ChatEventType } from '@coze/api';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
 import { isShowVideo } from '../../utils/utils';
+import useCozeAPI from '../../hooks/use-coze-api';
+import MessageForm, { type MessageFormRef } from './message-form';
+import ComfortStrategyForm from './comfort-strategy-form';
 
 const { Text, Link } = Typography;
 
@@ -64,6 +65,8 @@ const Header: React.FC<HeaderProps> = ({
   >([]);
 
   const formRef = useRef<MessageFormRef>(null);
+  const [comfortStrategyVisible, setComfortStrategyVisible] = useState(false);
+  const { uploadFile } = useCozeAPI();
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkDevicePermission(true).then(result => {
@@ -293,6 +296,44 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handleComfortStrategySubmit = async (
+    values: any,
+    callback?: (values: any) => void,
+  ) => {
+    let fileId;
+    if (values.comfortStrategy === 'audio') {
+      try {
+        const res = await uploadFile(values.audioFile.file);
+        fileId = res?.id;
+        console.log('File uploaded successfully:', res);
+      } catch (error) {
+        message.error('Failed to upload file');
+      }
+    }
+
+    const eventData = {
+      id: 'event_1',
+      event_type: 'session.pre_answer.updated',
+      data: {
+        pre_answer: {
+          type: values.comfortStrategy,
+          file_id: fileId,
+          pre_answer_list: values.fixedText?.split('\n').filter(Boolean),
+          bot_id: values.botId,
+        },
+        trigger: {
+          type: values.triggerStrategy,
+          time_after: values.triggerInterval,
+        },
+      },
+    };
+    if (callback) {
+      callback(eventData);
+    } else {
+      handleSendMessage({ eventData: JSON.stringify(eventData) });
+    }
+  };
+
   if (microphoneStatus === 'error') {
     return (
       <>
@@ -348,6 +389,13 @@ const Header: React.FC<HeaderProps> = ({
         >
           {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
         </Button>
+        <Button
+          type="primary"
+          style={{ marginRight: '10px' }}
+          onClick={() => setComfortStrategyVisible(true)}
+        >
+          Comfort Strategy
+        </Button>
         <div
           style={{
             marginTop: '10px',
@@ -386,6 +434,11 @@ const Header: React.FC<HeaderProps> = ({
             </span>
           )}
         </div>
+        <ComfortStrategyForm
+          visible={comfortStrategyVisible}
+          onClose={() => setComfortStrategyVisible(false)}
+          onSubmit={handleComfortStrategySubmit}
+        />
       </>
     );
   }

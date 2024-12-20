@@ -172,14 +172,14 @@ describe('APIClient', () => {
   describe('debugLog', () => {
     it('should log when debug is true', () => {
       const consoleSpy = vi.spyOn(console, 'debug').mockImplementation();
-      client.debugLog('test message');
+      client.debugLog(false, 'test message');
       expect(consoleSpy).toHaveBeenCalledWith('test message');
     });
 
     it('should not log when debug is false', () => {
       client.debug = false;
       const consoleSpy = vi.spyOn(console, 'debug').mockImplementation();
-      client.debugLog('test message');
+      client.debugLog(false, 'test message');
       expect(consoleSpy).not.toHaveBeenCalled();
     });
   });

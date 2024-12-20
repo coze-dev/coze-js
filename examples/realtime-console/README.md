@@ -9,7 +9,10 @@
 ```bash
 rush update
 rush build
-npm run start
+npm run start # disable video by default
+# or set enable video to true
+REACT_APP_ENABLE_VIDEO=true npm run start
+
 ```
 
 ![realtime-console](./assets/realtime-console.png)
