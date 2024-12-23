@@ -111,7 +111,6 @@ export const generatePublishManifest = async (
   options: VersionOptions,
 ): Promise<{
   manifests: PublishManifest[];
-  isBetaPublish: boolean;
   bumpPolicy: BumpType | string;
 }> => {
   const manifests: PublishManifest[] = [];
@@ -137,7 +136,6 @@ export const generatePublishManifest = async (
   const bumpPolicy = calBumpPolicy(options);
   return {
     manifests,
-    isBetaPublish: [BumpType.BETA, BumpType.ALPHA].includes(options.bumpType),
     bumpPolicy,
   };
 };

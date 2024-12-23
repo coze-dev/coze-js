@@ -29,3 +29,19 @@ export const getCurrentBranchName = async () => {
   const { stdout } = await exec('git rev-parse --abbrev-ref HEAD');
   return stdout.trim();
 };
+
+/**
+ * 确保没有未提交的变更
+ */
+export const ensureNotUncommittedChanges = async () => {
+  const res = await exec('git status');
+  if (res.code !== 0) {
+    throw new Error('Failed to check git status');
+  }
+  if (res.stdout?.includes('nothing to commit, working tree clean')) {
+    return true;
+  }
+  throw new Error(
+    'There are uncommitted changes in the working tree, please commit them first.',
+  );
+};
