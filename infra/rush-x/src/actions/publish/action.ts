@@ -92,4 +92,9 @@ export const publish = async (options: PublishOptions) => {
     }
   }
   logger.success('Publish success.');
+  if (isBetaPublish) {
+    logger.success(
+      'Please refer to https://github.com/coze-dev/coze-js/actions/workflows/release.yml for the release progress.',
+    );
+  }
 };
