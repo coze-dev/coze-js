@@ -25,5 +25,10 @@
     //    */
     //   "autoinstallerName": "rush-plugins"
     // }
+    {
+      "packageName": "@coze-infra/rush-x",
+      "pluginName": "@coze-infra/rush-x",
+      "autoinstallerName": "plugins"
+    }
   ]
 }

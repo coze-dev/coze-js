@@ -10,6 +10,7 @@ import { commitChanges, pushToRemote } from './git';
 import { confirmForPublish } from './confirm';
 import { generateChangelog } from './changelog';
 import { applyPublishManifest } from './apply-new-version';
+
 export const publish = async (options: PublishOptions) => {
   const sessionId = randomHash(6);
   const rushConfiguration = getRushConfiguration();
@@ -17,6 +18,10 @@ export const publish = async (options: PublishOptions) => {
 
   // 1. 验证并获取需要发布的包列表
   const packagesToPublish = validateAndGetPackages(options);
+  if (packagesToPublish.size === 0) {
+    logger.error('No packages to publish.');
+    return;
+  }
   logger.debug(
     `Will publish the following packages:\n ${[...packagesToPublish].map(pkg => pkg.packageName).join('\n')}`,
   );
