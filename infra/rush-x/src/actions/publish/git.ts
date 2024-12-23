@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { logger } from '@coze-infra/rush-logger';
 
+import { getCurrentBranchName } from '../../utils/git-command';
 import { exec } from '../../utils/exec';
-import { type PublishManifest } from './types';
+import { BumpType, type PublishManifest } from './types';
 
 const MAIN_REPO_URL = 'git@github.com:coze-dev/coze-js.git';
 
@@ -28,17 +29,23 @@ interface CommitChangesOptions {
   files: string[];
   cwd: string;
   publishManifests: PublishManifest[];
+  bumpPolicy: BumpType | string;
 }
 export async function commitChanges({
   sessionId,
   files,
   cwd,
   publishManifests,
+  bumpPolicy,
 }: CommitChangesOptions): Promise<{ effects: string[]; branchName: string }> {
-  const date = dayjs().format('YYYYMMDD');
-  const branchName = `release/${date}-${sessionId}`;
-
-  await exec(`git checkout -b ${branchName}`, { cwd });
+  let branchName = '';
+  // 测试版本直接在源分支发布，非测试版本创建新分支
+  if (bumpPolicy !== BumpType.BETA) {
+    const date = dayjs().format('YYYYMMDD');
+    branchName = `release/${date}-${sessionId}`;
+    await exec(`git checkout -b ${branchName}`, { cwd });
+  }
+  branchName = await getCurrentBranchName();
   await exec(`git add ${files.join(' ')}`, { cwd });
   await exec(`git commit -m "chore: Publish ${branchName}" -n`, { cwd });
 
