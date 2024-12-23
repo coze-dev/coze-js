@@ -53,4 +53,4 @@ jobs:
 
       - name: Run Rlease
         run: |
-          node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+          NODE_AUTH_TOKEN=${{ secrets.NODE_AUTH_TOKEN }} node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
