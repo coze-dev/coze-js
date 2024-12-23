@@ -23,13 +23,7 @@ export default defineConfig(async merge => {
       options: {},
     },
     framework: 'vue3',
-    compiler: {
-      type: 'webpack5',
-      prebundle: {
-        // 1. Don‘t prebundle '@coze/taro-api'
-        exclude: ['@coze/taro-api'],
-      },
-    },
+    compiler: 'webpack5',
     cache: {
       enable: false,
     },
@@ -54,11 +48,6 @@ export default defineConfig(async merge => {
         },
       },
       webpackChain(chain) {
-        // 2. Enable multi-platform support for '@coze/taro-api'
-        chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
-          args[2]['include'] = ['@coze/taro-api'];
-          return args;
-        });
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
       },
     },
@@ -91,11 +80,6 @@ export default defineConfig(async merge => {
         },
       },
       webpackChain(chain) {
-        // 2. Enable multi-platform support for '@coze/taro-api'
-        chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
-          args[2]['include'] = ['@coze/taro-api'];
-          return args;
-        });
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
       },
     },
