@@ -20,5 +20,6 @@ See [README.md](../../README.md) for details.
 
 1. Clone the repository
 2. Install dependencies: `rush update`
-3. Start the development server: `npm start`
-4. Open the browser and navigate to `http://localhost:3000`
+3. Build the project: `rush build`
+4. Start the development server: `npm start`
+5. Open the browser and navigate to `http://localhost:3000`

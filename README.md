@@ -57,6 +57,12 @@ npm i -g pnpm@9.12.0 @microsoft/rush@5.140.0
 rush update
 ```
 
+5. **Build the project**
+
+``` bash
+rush build
+```
+
 After that, you can start to develop projects inside this repository.
 
 Enjoy it!

@@ -21,12 +21,12 @@ export default {
       oauth_jwt: {
         COZE_APP_ID: '1132697914***',
         COZE_KEY_ID: 'YeZD3wilJnsEUuYMb5Zl6-oGtmxJKlqFMq27StqXB6E***',
-        COZE_AUD: 'api.coze.com',
+        COZE_AUD: 'api.coze.cn',
       },
       auth_jwt_channel: {
         COZE_APP_ID: '1207101228***',
         COZE_KEY_ID: 'tKoUIXgHCOJZcdk6k_jrfoEawOplkdVd6P3***',
-        COZE_AUD: 'api.coze.com',
+        COZE_AUD: 'api.coze.cn',
       },
       oauth_device: {
         COZE_CLIENT_ID: '12074396512971595586715564048503***',

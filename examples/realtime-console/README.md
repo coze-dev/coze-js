@@ -8,6 +8,7 @@
 
 ```bash
 rush update
+rush build
 npm run start
 ```
 
