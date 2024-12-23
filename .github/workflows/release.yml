@@ -1,0 +1,52 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v/*/*' # 匹配 v/{packagename}/{version} 格式的标签
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - NodeVersion: 20.9.x
+            NodeVersionDisplayName: 20
+            OS: ubuntu-latest
+    name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
+    runs-on: ${{ matrix.OS }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Config Git User
+        # should be turn to ci user
+        run: |
+          git config --local user.name "tecvan"
+          git config --local user.email "fanwenjie.fe@bytedance.com"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.NodeVersion }}
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            common/temp/pnpm-local
+            common/temp/pnpm-store
+            common/temp/install-run
+          key: ${{ runner.os }}-rush-store-${{ hashFiles('common/config/subspaces/**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-store-main
+            ${{ runner.os }}-rush-store
+
+      - name: Install Dependencies
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Run Rlease
+        run: |
+          NODE_AUTH_TOKEN=${{ secrets.NODE_AUTH_TOKEN }} node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}

@@ -11,7 +11,11 @@ export const installAction: InstallAction = (program: Command) => {
     .description('Release packages based on git tags.')
     .requiredOption('--commit <string>', '需要执行发布的 commit id')
     .option('--dry-run', '是否只执行不真实发布', false)
-    .option('-r, --registry <string>', '发布到的 registry')
+    .option(
+      '-r, --registry <string>',
+      '发布到的 registry',
+      'https://registry.npmjs.org',
+    )
     .action(async (options: ReleaseOptions) => {
       try {
         if (!options.commit) {
