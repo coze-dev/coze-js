@@ -59,7 +59,7 @@ const retrivePackages = (
 
 export const validateAndGetPackages = (options: PublishOptions) => {
   const retrivePatterns = Object.values(RetrivePattern);
-  if (retrivePatterns.every(pattern => options[pattern]?.length <= 0)) {
+  if (retrivePatterns.every(pattern => (options[pattern]?.length || 0) <= 0)) {
     throw new Error('No packages to publish');
   }
   return retrivePatterns.reduce((acc, pattern) => {

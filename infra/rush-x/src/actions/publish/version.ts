@@ -39,21 +39,14 @@ const calculateNewVersion = (
     case BumpType.BETA: {
       // 如果当前已经是 beta 版本，增加 beta 版本号
       if (prerelease[0] === 'beta') {
-        return (
-          semver.inc(currentVersion, 'prerelease', 'beta') || currentVersion
-        );
+        const nextVersion = semver.inc(currentVersion, 'prerelease', 'beta');
+        return nextVersion || currentVersion;
       }
       // 否则基于当前版本创建新的 beta 版本
       const baseVersion = `${major}.${minor}.${patch}`;
       return `${baseVersion}-beta.1`;
     }
     case BumpType.ALPHA: {
-      // 如果当前已经是 alpha 版本，增加 alpha 版本号
-      if (prerelease[0] === 'alpha') {
-        return (
-          semver.inc(currentVersion, 'prerelease', 'alpha') || currentVersion
-        );
-      }
       // 否则基于当前版本创建新的 alpha 版本
       const baseVersion = `${major}.${minor}.${patch}`;
       // 生成随机哈希值

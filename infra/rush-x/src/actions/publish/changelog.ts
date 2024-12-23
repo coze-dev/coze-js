@@ -37,9 +37,10 @@ const readChangeFiles = async (changedFolderOfPkg: string) => {
 const readChanges = async (changeFiles: string[]) => {
   const changes = (
     await Promise.all(
-      changeFiles.map(r => {
+      changeFiles.map(async r => {
         try {
-          return readJsonFile<ChangeFile>(r);
+          const res = await readJsonFile<ChangeFile>(r);
+          return res;
         } catch (e) {
           return null;
         }
@@ -53,11 +54,19 @@ const readPreviousChangelog = async (
   changelogJsonPath: string,
   packageName: string,
 ) => {
+  const defaultValue = {
+    name: packageName,
+    entries: [] as ChangeLog['entries'],
+  };
   if (!(await isFileExists(changelogJsonPath))) {
-    return { name: packageName, entries: [] as ChangeLog['entries'] };
+    return defaultValue;
   }
-  const changelog = await readJsonFile<ChangeLog>(changelogJsonPath);
-  return changelog;
+  try {
+    const changelog = await readJsonFile<ChangeLog>(changelogJsonPath);
+    return changelog;
+  } catch (e) {
+    return defaultValue;
+  }
 };
 
 const generateChangelogForProject = async (manifest: PublishManifest) => {

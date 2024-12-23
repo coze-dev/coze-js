@@ -19,10 +19,12 @@ const updateDependencyVersions: PrehandleJob = async (
 ) => {
   const rushConfiguration = getRushConfiguration();
   const { dependencies } = packageJson;
-  for (const [dep, ver] of Object.entries(dependencies)) {
-    const project = rushConfiguration.getProjectByName(dep);
-    if (/^workspace:/.test(ver) && project) {
-      dependencies[dep] = project.packageJson.version;
+  if (dependencies) {
+    for (const [dep, ver] of Object.entries(dependencies)) {
+      const project = rushConfiguration.getProjectByName(dep);
+      if (/^workspace:/.test(ver) && project) {
+        dependencies[dep] = project.packageJson.version;
+      }
     }
   }
   return Promise.resolve(packageJson);
