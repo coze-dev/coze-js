@@ -19,7 +19,9 @@ export const publish = async (options: PublishOptions) => {
   // 1. 验证并获取需要发布的包列表
   const packagesToPublish = validateAndGetPackages(options);
   if (packagesToPublish.size === 0) {
-    logger.error('No packages to publish.');
+    logger.error(
+      'No packages to publish, should specify some package by `--to` or `--from` or `--only`',
+    );
     return;
   }
   logger.debug(
