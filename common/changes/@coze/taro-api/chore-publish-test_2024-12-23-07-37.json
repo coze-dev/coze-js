@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "bump version for test",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "fanwenjie.fe@bytedance.com"
+}

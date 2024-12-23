@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "bump version for test",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "fanwenjie.fe@bytedance.com"
+}
