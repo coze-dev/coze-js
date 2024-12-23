@@ -6,7 +6,7 @@ on:
       - 'v/*/*' # 匹配 v/{packagename}/{version} 格式的标签
 
 jobs:
-  build:
+  publish:
     strategy:
       matrix:
         include:
@@ -15,10 +15,11 @@ jobs:
             OS: ubuntu-latest
     name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
     runs-on: ${{ matrix.OS }}
+    if: github.repository == 'coze-dev/coze-js'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Config Git User
         # should be turn to ci user
@@ -29,6 +30,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.NodeVersion }}
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '~/.nvmrc'
+          cache: 'npm'
 
       - name: Cache
         uses: actions/cache@v4
