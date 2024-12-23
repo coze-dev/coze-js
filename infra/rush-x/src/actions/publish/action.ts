@@ -2,12 +2,15 @@ import { logger } from '@coze-infra/rush-logger';
 
 import { randomHash } from '../../utils/random';
 import { getRushConfiguration } from '../../utils/project-analyzer';
-import { ensureNotUncommittedChanges } from '../../utils/git-command';
+import {
+  ensureNotUncommittedChanges,
+  isMainBranch,
+} from '../../utils/git-command';
 import { generatePublishManifest } from './version';
 import { type PublishOptions } from './types';
 import { BumpType } from './types';
+import { pushToRemote } from './push-to-remote';
 import { validateAndGetPackages } from './packages';
-import { commitChanges, pushToRemote } from './git';
 import { confirmForPublish } from './confirm';
 import { generateChangelog } from './changelog';
 import { applyPublishManifest } from './apply-new-version';
@@ -40,6 +43,16 @@ export const publish = async (options: PublishOptions) => {
   // 2. 生成发布清单
   const { manifests: publishManifests, bumpPolicy } =
     await generatePublishManifest(packagesToPublish, options);
+  const isBetaPublish = [BumpType.BETA, BumpType.ALPHA].includes(
+    bumpPolicy as BumpType,
+  );
+  if (isBetaPublish === false && (await isMainBranch()) === false) {
+    // 只允许在主分支发布
+    logger.error(
+      'You are not in main branch, please switch to main branch and try again.',
+    );
+    return;
+  }
 
   const continuePublish = await confirmForPublish(
     publishManifests,
@@ -52,9 +65,6 @@ export const publish = async (options: PublishOptions) => {
 
   // 3. 应用更新，注意这里会修改文件，产生 sideEffect
   const postHandles = [applyPublishManifest];
-  const isBetaPublish = [BumpType.BETA, BumpType.ALPHA].includes(
-    bumpPolicy as BumpType,
-  );
   if (isBetaPublish === false) {
     postHandles.push(generateChangelog);
   }
@@ -63,38 +73,14 @@ export const publish = async (options: PublishOptions) => {
   ).flat();
 
   // 4. 创建并推送发布分支
-  if (!options.skipCommit) {
-    const { effects, branchName } = await commitChanges({
-      sessionId,
-      files: changedFiles,
-      cwd: rushFolder,
-      publishManifests,
-    });
-    if (!options.skipPush) {
-      await pushToRemote(effects, rushFolder);
-      // 这里还需要进一步优化：
-      // 1. 如果是 alpha 版本，直接推送，出发 CI，执行发布
-      // 2. beta: 发起MR，MR 合入任意分支后，触发发布
-      // 3. 正式版本：发起MR，MR 合入 main 后，触发发布
-      if (bumpPolicy !== BumpType.ALPHA) {
-        const prUrl = `https://github.com/coze-dev/coze-js/compare/${branchName}?expand=1`;
-        const log = [
-          '************************************************',
-          '*',
-          `* Please create PR: ${prUrl}`,
-          '*',
-          '************************************************',
-        ];
-        logger.success(log.join('\n'));
-        const open = await import('open');
-        await open(prUrl);
-      }
-    }
-  }
+  await pushToRemote({
+    publishManifests,
+    bumpPolicy,
+    sessionId,
+    changedFiles,
+    cwd: rushFolder,
+    skipCommit: options.skipCommit,
+    skipPush: options.skipPush,
+  });
   logger.success('Publish success.');
-  if (isBetaPublish) {
-    logger.success(
-      'Please refer to https://github.com/coze-dev/coze-js/actions/workflows/release.yml for the release progress.',
-    );
-  }
 };

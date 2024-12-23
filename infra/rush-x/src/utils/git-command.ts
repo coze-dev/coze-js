@@ -30,6 +30,11 @@ export const getCurrentBranchName = async () => {
   return stdout.trim();
 };
 
+export const isMainBranch = async () => {
+  const currentBranchName = await getCurrentBranchName();
+  return currentBranchName === 'main';
+};
+
 /**
  * 确保没有未提交的变更
  */
