@@ -28,3 +28,8 @@ export const getPackagesToPublish = async (
 
   return packages;
 };
+
+export const getCurrentBranchName = async () => {
+  const { stdout } = await exec('git rev-parse --abbrev-ref HEAD');
+  return stdout.trim();
+};

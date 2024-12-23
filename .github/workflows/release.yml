@@ -2,8 +2,6 @@ name: Release Pipeline
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v/*/*' # 匹配 v/{packagename}/{version} 格式的标签
 
@@ -47,10 +45,7 @@ jobs:
       - name: Install Dependencies
         run: node common/scripts/install-run-rush.js install
 
-      - name: Setup npm auth
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Run Rlease
-        run: |
-          NODE_AUTH_TOKEN=${{ secrets.NODE_AUTH_TOKEN }} node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+        run: node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}

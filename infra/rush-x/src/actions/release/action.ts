@@ -3,15 +3,11 @@ import { logger } from '@coze-infra/rush-logger';
 import { exec } from '../../utils/exec';
 import { type ReleaseOptions } from './types';
 import { releasePackages } from './release';
+import { checkReleasePlan } from './plan';
 import { buildReleaseManifest } from './manifest';
-import { getPackagesToPublish } from './git';
-
+import { getCurrentBranchName, getPackagesToPublish } from './git';
 export async function release(options: ReleaseOptions): Promise<void> {
-  const {
-    commit,
-    dryRun = false,
-    registry = 'https://registry.npmjs.org',
-  } = options;
+  const { commit, dryRun = false, registry } = options;
 
   await exec(`git checkout ${commit}`);
 
@@ -31,6 +27,8 @@ export async function release(options: ReleaseOptions): Promise<void> {
       .join(', '),
     false,
   );
+  const branchName = await getCurrentBranchName();
+  checkReleasePlan(releaseManifests, branchName);
 
   await releasePackages(releaseManifests, { commit, dryRun, registry });
   logger.success('All packages published successfully!');

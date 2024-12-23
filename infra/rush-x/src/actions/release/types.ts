@@ -3,7 +3,7 @@ import { type RushConfigurationProject } from '@rushstack/rush-sdk';
 export interface ReleaseOptions {
   commit: string;
   dryRun?: boolean;
-  registry?: string;
+  registry: string;
 }
 
 export interface PackageToPublish {
