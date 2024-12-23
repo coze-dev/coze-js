@@ -94,6 +94,8 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
+      userId: localManager.get(LocalStorageKey.USER_ID),
+      conversationId: localManager.get(LocalStorageKey.CONVERSATION_ID),
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',

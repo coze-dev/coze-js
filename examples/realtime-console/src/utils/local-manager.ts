@@ -12,6 +12,8 @@ export enum LocalStorageKey {
   TOKEN_EXPIRES_AT = 'token_expires_at',
   EVENT_DATA = 'event_data',
   ENABLE_VIDEO = 'enable_video',
+  USER_ID = 'user_id',
+  CONVERSATION_ID = 'conversation_id',
 }
 
 export class LocalManager {
@@ -25,8 +27,8 @@ export class LocalManager {
     return `${this.prefix}${key}`;
   }
 
-  get(key: string): string {
-    return localStorage.getItem(this.getKey(key)) ?? '';
+  get(key: string, defaultValue = ''): string {
+    return localStorage.getItem(this.getKey(key)) ?? defaultValue;
   }
 
   set(key: string, value: string): void {
