@@ -1,11 +1,13 @@
 import { logger } from '@coze-infra/rush-logger';
 
+import { getCurrentBranchName } from '../../utils/git-command';
 import { exec } from '../../utils/exec';
 import { type ReleaseOptions } from './types';
 import { releasePackages } from './release';
 import { checkReleasePlan } from './plan';
 import { buildReleaseManifest } from './manifest';
-import { getCurrentBranchName, getPackagesToPublish } from './git';
+import { getPackagesToPublish } from './git';
+
 export async function release(options: ReleaseOptions): Promise<void> {
   const { commit, dryRun = false, registry } = options;
 

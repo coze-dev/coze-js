@@ -3,7 +3,7 @@ import { logger } from '@coze-infra/rush-logger';
 
 import { exec } from '../../utils/exec';
 import { type ReleaseOptions, type ReleaseManifest } from './types';
-import { updateDependencyVersions, applyCozePublishConfig } from './package';
+import { applyPublishConfig } from './package';
 
 /**
  * 发布包
@@ -46,15 +46,10 @@ const releasePackage = async (
   releaseManifest: ReleaseManifest,
   releaseOptions: ReleaseOptions,
 ) => {
-  const prepareReleaseTasks: ((
-    project: RushConfigurationProject,
-  ) => Promise<void>)[] = [updateDependencyVersions, applyCozePublishConfig];
   const { project } = releaseManifest;
   const { packageName } = project;
   logger.info(`Preparing release for package: ${packageName}`);
-  for (const task of prepareReleaseTasks) {
-    await task(project);
-  }
+  await applyPublishConfig(project);
   await publishPackage(project, releaseOptions);
 };
 

@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { logger } from '@coze-infra/rush-logger';
 
 import { exec } from '../../utils/exec';
@@ -28,17 +27,15 @@ interface CommitChangesOptions {
   files: string[];
   cwd: string;
   publishManifests: PublishManifest[];
+  branchName: string;
 }
 export async function commitChanges({
   sessionId,
   files,
   cwd,
   publishManifests,
+  branchName,
 }: CommitChangesOptions): Promise<{ effects: string[]; branchName: string }> {
-  const date = dayjs().format('YYYYMMDD');
-  const branchName = `release/${date}-${sessionId}`;
-
-  await exec(`git checkout -b ${branchName}`, { cwd });
   await exec(`git add ${files.join(' ')}`, { cwd });
   await exec(`git commit -m "chore: Publish ${branchName}" -n`, { cwd });
 
@@ -52,11 +49,8 @@ export async function commitChanges({
   return { effects: [...tags, branchName], branchName };
 }
 
-export async function pushToRemote(
-  effects: string[],
-  cwd: string,
-): Promise<void> {
-  await exec(`git push ${MAIN_REPO_URL} ${effects.join(' ')} --no-verify`, {
+export async function push(refs: string[], cwd: string): Promise<void> {
+  await exec(`git push ${MAIN_REPO_URL} ${refs.join(' ')} --no-verify`, {
     cwd,
   });
 }
