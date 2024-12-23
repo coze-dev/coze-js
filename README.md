@@ -9,6 +9,7 @@ This monorepo contains the following packages:
 |---------|------------|---------|
 | [@coze/api](./packages/coze-js) | Coze API | [![npm](https://img.shields.io/npm/v/@coze/api.svg)](https://www.npmjs.com/package/@coze/api) |
 | [@coze/realtime-api](./packages/realtime-api) | Realtime API | [![npm](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api) |
+| [@coze/taro-api](./packages/coze-taro) | Taro API | [![npm](https://img.shields.io/npm/v/@coze/taro-api.svg)](https://www.npmjs.com/package/@coze/taro-api) |
 
 
 ## 🎮 Examples
@@ -19,6 +20,8 @@ Find usage examples for each package in the [examples](./examples) directory:
 - [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/coze-js
 - [realtime-console](./examples/realtime-console) - Full Console Demo for @coze/realtime-api
 - [realtime-call-up](./examples/realtime-call-up) - Sample Call Up Demo for @coze/realtime-api
+- [coze-js-taro](./examples/coze-js-taro) - Sample Call Up Demo for @coze/taro-api
+- [coze-js-taro3](./examples/coze-js-taro3) - Sample Call Up Demo for @coze/taro-api
 
 
 ## 🚀 Getting Started

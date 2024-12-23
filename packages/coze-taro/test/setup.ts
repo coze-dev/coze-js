@@ -7,4 +7,5 @@ vi.doMock('@tarojs/taro', () => ({
     uploadFile: taroUploadFile,
   },
   Events,
+  getEnv: () => 'TT',
 }));
