@@ -68,7 +68,7 @@ export const pushToRemote = async (options: PushToRemoteOptions) => {
       '*',
       '************************************************',
     ];
-    logger.success(log.join('\n'));
+    logger.success(log.join('\n'), false);
     const open = await import('open');
     await open.default(prUrl);
   }
