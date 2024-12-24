@@ -86,6 +86,7 @@ npm run start
 ## 📖 Documentation
 
 - [Contributing Guidelines](./CONTRIBUTING.md)
+- [How to publish](./docs/publish.md)
 
 ## 📄 License
 

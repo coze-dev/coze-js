@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush-plugin-manifest.schema.json",
+  "plugins": [
+    {
+      "pluginName": "@coze-infra/rush-x",
+      "description": "Rush plugin for publish packages in monorepo",
+      "commandLineJsonFilePath": "./command-line.json"
+    }
+  ]
+}

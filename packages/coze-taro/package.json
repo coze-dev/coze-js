@@ -1,6 +1,6 @@
 {
   "name": "@coze/taro-api",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Official Coze Taro SDK for seamless AI integration into your applications | 扣子官方 Taro SDK，助您轻松集成 AI 能力到应用中",
   "keywords": [
     "coze",
@@ -37,7 +37,6 @@
     "build": "rm -rf dist && tsc -b tsconfig.build.json -f",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
-    "prepublishOnly": "npm run build",
     "test": "vitest --run",
     "test:cov": "vitest --coverage --run"
   },
@@ -56,5 +55,6 @@
   "peerDependencies": {
     "@tarojs/taro": ">=3",
     "axios": "^1.7.1"
-  }
+  },
+  "cozePublishConfig": {}
 }

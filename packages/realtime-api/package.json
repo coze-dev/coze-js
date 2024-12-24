@@ -1,6 +1,6 @@
 {
   "name": "@coze/realtime-api",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A powerful real-time communication SDK for voice interactions with Coze AI bots | 扣子官方实时通信 SDK，用于与 Coze AI bots 进行语音交互",
   "keywords": [
     "coze",
@@ -31,6 +31,7 @@
   },
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
+  "types": "./src/index.ts",
   "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
@@ -43,7 +44,6 @@
     "demo": "npm run start & cd ../../examples/realtime-console && npm run start",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
-    "prepublishOnly": "npm run build",
     "start": "rm -rf dist && rslib build -w",
     "test": "vitest",
     "test:cov": "vitest --coverage --run"
