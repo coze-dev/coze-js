@@ -166,6 +166,7 @@ const RealtimeConsole: React.FC = () => {
       (data?.data?.role === 'user' ||
         data?.data?.role === 'assistant' ||
         data?.event_type === 'conversation.created' ||
+        data?.event_type === 'conversation.audio_transcript.delta' ||
         data?.event_type === 'error')
     ) {
       setServerEvents(prevEvents => {
@@ -205,6 +206,13 @@ const RealtimeConsole: React.FC = () => {
           },
         },
       };
+    }
+
+    if (
+      lastEvent.event === 'conversation.audio_transcript.delta' &&
+      event.event === 'conversation.audio_transcript.delta'
+    ) {
+      return event;
     }
     return null;
   };
