@@ -113,7 +113,7 @@ async function streamChat() {
 | Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
-
+| Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
 [View all examples →](../../examples/coze-js-node/src/)
 
 ## Development
