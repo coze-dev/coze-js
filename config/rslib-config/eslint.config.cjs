@@ -1,6 +1,7 @@
 const { defineConfig } = require('@coze-infra/eslint-config');
 
 module.exports = defineConfig({
-  packageRoot: __dirname,
   preset: 'node',
+  packageRoot: __dirname,
+  ignores: ['lib-ts'],
 });

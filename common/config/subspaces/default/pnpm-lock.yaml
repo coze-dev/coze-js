@@ -191,24 +191,12 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.16.15
-      '@vitejs/plugin-react':
-        specifier: ~4.3.3
-        version: 4.3.3(vite@5.4.10(@types/node@20.16.15)(sass@1.82.0)(terser@5.36.0))
-      '@vitest/coverage-v8':
-        specifier: ~2.1.4
-        version: 2.1.4(vitest@2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(sass@1.82.0)(terser@5.36.0))
-      happy-dom:
-        specifier: ~15.11.0
-        version: 15.11.0
       sucrase:
         specifier: ^3.32.0
         version: 3.35.0
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
-      vitest:
-        specifier: ~2.1.4
-        version: 2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(sass@1.82.0)(terser@5.36.0)
 
   ../../../config/rslib-config:
     dependencies:
@@ -225,24 +213,12 @@ importers:
       '@types/node':
         specifier: ^20
         version: 20.16.15
-      '@vitejs/plugin-react':
-        specifier: ~4.3.3
-        version: 4.3.3(vite@5.4.10(@types/node@20.16.15)(sass@1.82.0)(terser@5.36.0))
-      '@vitest/coverage-v8':
-        specifier: ~2.1.4
-        version: 2.1.4(vitest@2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(sass@1.82.0)(terser@5.36.0))
-      happy-dom:
-        specifier: ~15.11.0
-        version: 15.11.0
       sucrase:
         specifier: ^3.32.0
         version: 3.35.0
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
-      vitest:
-        specifier: ~2.1.4
-        version: 2.1.4(@types/node@20.16.15)(happy-dom@15.11.0)(sass@1.82.0)(terser@5.36.0)
 
   ../../../config/ts-config:
     devDependencies:

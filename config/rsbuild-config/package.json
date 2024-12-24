@@ -6,10 +6,8 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "build": "exit",
-    "lint": "exit",
-    "test": "exit",
-    "test:cov": "exit 0"
+    "build": "npx tsc -b tsconfig.build.json",
+    "lint": "eslint ./ --cache --quiet"
   },
   "dependencies": {
     "@rsbuild/core": "1.1.10",
@@ -20,11 +18,7 @@
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@types/node": "^20",
-    "@vitejs/plugin-react": "~4.3.3",
-    "@vitest/coverage-v8": "~2.1.4",
-    "happy-dom": "~15.11.0",
     "sucrase": "^3.32.0",
-    "typescript": "^5.5.3",
-    "vitest": "~2.1.4"
+    "typescript": "^5.5.3"
   }
 }
