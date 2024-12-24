@@ -9,6 +9,7 @@ import { requstBumpType } from './request-bump-type';
 interface VersionOptions {
   version?: string;
   bumpType?: BumpType;
+  sessionId: string;
 }
 
 /**
@@ -17,6 +18,7 @@ interface VersionOptions {
 const calculateNewVersion = (
   currentVersion: string,
   bumpType: BumpType,
+  sessionId?: string,
 ): string => {
   // 解析当前版本
   const parsed = semver.parse(currentVersion);
@@ -50,8 +52,7 @@ const calculateNewVersion = (
       // 否则基于当前版本创建新的 alpha 版本
       const baseVersion = `${major}.${minor}.${patch}`;
       // 生成随机哈希值
-      const hash = randomHash(6);
-      return `${baseVersion}-alpha.${hash}`;
+      return `${baseVersion}-alpha.${sessionId || randomHash(6)}`;
     }
     default: {
       throw new Error(
@@ -83,7 +84,11 @@ const generateNewVersionForPackage = (
   if (!bumpType) {
     throw new Error('Version selection was cancelled');
   }
-  const newVersion = calculateNewVersion(currentVersion, bumpType);
+  const newVersion = calculateNewVersion(
+    currentVersion,
+    bumpType,
+    options.sessionId,
+  );
 
   return newVersion;
 };

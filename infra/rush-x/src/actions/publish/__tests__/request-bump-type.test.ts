@@ -28,7 +28,7 @@ describe('request-bump-type', () => {
         message: 'Select version bump type:',
         choices: [
           {
-            name: 'ALPHA: Alpha pre-release version, for example: 1.1.1-alpha.1',
+            name: 'ALPHA: Alpha pre-release version, for example: 1.1.1-alpha.2597f3',
             value: BumpType.ALPHA,
           },
           {

@@ -22,13 +22,21 @@
   "license": "MIT",
   "author": "Leeight <leeight@gmail.com>",
   "type": "module",
-  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.cjs",
+      "import": "./dist/esm/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
   "browser": {
     "crypto": false,
     "os": false,
     "jsonwebtoken": false
   },
-  "types": "src/index.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
@@ -62,17 +70,5 @@
   },
   "peerDependencies": {
     "axios": "^1.7.1"
-  },
-  "cozePublishConfig": {
-    "exports": {
-      ".": {
-        "require": "./dist/cjs/index.cjs",
-        "import": "./dist/esm/index.js",
-        "types": "./dist/types/index.d.ts"
-      }
-    },
-    "main": "dist/cjs/index.cjs",
-    "module": "dist/esm/index.js",
-    "types": "dist/types/index.d.ts"
   }
 }

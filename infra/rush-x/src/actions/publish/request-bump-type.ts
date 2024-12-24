@@ -17,7 +17,7 @@ const getTypeDescription = (type: BumpType): string => {
     case BumpType.BETA:
       return `Beta pre-release version, for example: ${chalk.green('1.1.1-beta.1')}`;
     case BumpType.ALPHA:
-      return `Alpha pre-release version, for example: ${chalk.green('1.1.1-alpha.1')}`;
+      return `Alpha pre-release version, for example: ${chalk.green('1.1.1-alpha.2597f3')}`;
     default:
       return '';
   }

@@ -42,7 +42,10 @@ export const publish = async (options: PublishOptions) => {
 
   // 2. 生成发布清单
   const { manifests: publishManifests, bumpPolicy } =
-    await generatePublishManifest(packagesToPublish, options);
+    await generatePublishManifest(packagesToPublish, {
+      ...options,
+      sessionId,
+    });
   const isBetaPublish = [BumpType.BETA, BumpType.ALPHA].includes(
     bumpPolicy as BumpType,
   );

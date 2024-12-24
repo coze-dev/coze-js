@@ -90,12 +90,9 @@ describe('release', () => {
       await releasePackages(releaseManifests, options);
 
       // 验证构建过程
-      expect(exec).toHaveBeenCalledWith('npm run build', {
-        cwd: mockProject1.projectFolder,
-      });
-      expect(exec).toHaveBeenCalledWith('npm run build', {
-        cwd: mockProject2.projectFolder,
-      });
+      expect(exec).toHaveBeenCalledWith(
+        'rush build --to package-1 --to package-2',
+      );
 
       // 验证发布过程
       expect(applyPublishConfig).toHaveBeenCalledWith(mockProject1);
@@ -279,11 +276,12 @@ describe('release', () => {
         registry: mockRegistry,
       });
 
+      expect(exec).toHaveBeenCalledWith(
+        `rush build ${projects.map(project => `--to ${project.packageName}`).join(' ')}`,
+      );
+
       // 验证所有包都被构建和发布
       projects.forEach(project => {
-        expect(exec).toHaveBeenCalledWith('npm run build', {
-          cwd: project.projectFolder,
-        });
         expect(exec).toHaveBeenCalledWith(
           `NODE_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
           {

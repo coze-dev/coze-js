@@ -115,7 +115,10 @@ describe('publish action', () => {
 
     // 验证流程
     expect(validateAndGetPackages).toHaveBeenCalledWith(options);
-    expect(generatePublishManifest).toHaveBeenCalledWith(mockPackages, options);
+    expect(generatePublishManifest).toHaveBeenCalledWith(mockPackages, {
+      ...options,
+      sessionId: mockSessionId,
+    });
     expect(confirmForPublish).toHaveBeenCalledWith(
       mockPublishManifests,
       undefined,
