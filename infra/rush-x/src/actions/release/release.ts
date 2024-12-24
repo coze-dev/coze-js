@@ -35,13 +35,6 @@ const publishPackage = async (
   logger.success(`- Published ${project.packageName}@${version}`);
 };
 
-const buildProject = async (project: RushConfigurationProject) => {
-  const { projectFolder } = project;
-  await exec('npm run build', {
-    cwd: projectFolder,
-  });
-};
-
 const releasePackage = async (
   releaseManifest: ReleaseManifest,
   releaseOptions: ReleaseOptions,
@@ -53,15 +46,19 @@ const releasePackage = async (
   await publishPackage(project, releaseOptions);
 };
 
+const buildProjects = async (releaseManifests: ReleaseManifest[]) => {
+  const packageNames = releaseManifests.map(
+    manifest => manifest.project.packageName,
+  );
+  const buildCommands = `rush build ${packageNames.map(name => `--to ${name}`).join(' ')}`;
+  await exec(buildCommands);
+};
+
 export const releasePackages = async (
   releaseManifests: ReleaseManifest[],
   releaseOptions: ReleaseOptions,
 ) => {
-  await Promise.all(
-    releaseManifests.map(async manifest => {
-      await buildProject(manifest.project);
-    }),
-  );
+  await buildProjects(releaseManifests);
   await Promise.all(
     releaseManifests.map(async manifest => {
       await releasePackage(manifest, releaseOptions);
