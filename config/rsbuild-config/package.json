@@ -5,6 +5,10 @@
   "maintainers": [],
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "bin": {
+    "rersbuild": "./bin/index.sh",
+    "rsbuild": "./bin/index.sh"
+  },
   "scripts": {
     "build": "npx tsc -b tsconfig.build.json",
     "lint": "eslint ./ --cache --quiet"

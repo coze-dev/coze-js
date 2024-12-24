@@ -1,5 +1,5 @@
-import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
+import { defineConfig } from '@rsbuild/core';
 
 const baseRsbuildConfig = defineConfig({
   plugins: [pluginReact()],
@@ -13,4 +13,5 @@ const baseRsbuildConfig = defineConfig({
     },
   },
 });
+export { defineConfig, baseRsbuildConfig };
 export default baseRsbuildConfig;
