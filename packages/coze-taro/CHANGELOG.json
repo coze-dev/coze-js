@@ -1,0 +1,37 @@
+{
+  "name": "@coze/taro-api",
+  "entries": [
+    {
+      "version": "0.0.7",
+      "tag": "HEAD",
+      "date": "2024-12-24T02:33:11.789Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "add chat workflow support"
+          },
+          {
+            "comment": "add timeout"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "update to dist dep"
+          },
+          {
+            "comment": "setup correct versions"
+          },
+          {
+            "comment": "update version"
+          },
+          {
+            "comment": "fix worksflow unit test"
+          },
+          {
+            "comment": "add unit test"
+          }
+        ]
+      }
+    }
+  ]
+}

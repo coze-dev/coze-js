@@ -1,0 +1,25 @@
+{
+  "name": "@coze/api",
+  "entries": [
+    {
+      "version": "1.0.16",
+      "tag": "HEAD",
+      "date": "2024-12-24T02:33:11.789Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "add chat workflow support"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "update to dist dep"
+          },
+          {
+            "comment": "setup correct versions"
+          }
+        ]
+      }
+    }
+  ]
+}
