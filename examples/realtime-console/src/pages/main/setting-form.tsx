@@ -15,7 +15,12 @@ import {
   Input,
 } from 'antd';
 import { AuthenticationError } from '@coze/api';
-import { RobotOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  RobotOutlined,
+  InfoCircleOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from '@ant-design/icons';
 
 import { isTeamWorkspace, redirectToLogin } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
@@ -104,6 +109,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
   const [loadingWorkspaces, setLoadingWorkspaces] = useState(false);
   const [loadingVoices, setLoadingVoices] = useState(false);
   const [loadingBots, setLoadingBots] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces, cloneVoice } =
     useCozeAPI();
@@ -210,7 +216,6 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
           workspaceId,
         );
       }
-
       form.setFieldsValue({
         [LocalStorageKey.WORKSPACE_ID]: localManager.get(
           LocalStorageKey.WORKSPACE_ID,
@@ -220,6 +225,10 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.WORKSPACE_ACCESS_TOKEN]: localManager.get(
           LocalStorageKey.WORKSPACE_ACCESS_TOKEN,
         ),
+        [LocalStorageKey.USER_ID]: localManager.get(LocalStorageKey.USER_ID),
+        [LocalStorageKey.CONVERSATION_ID]: localManager.get(
+          LocalStorageKey.CONVERSATION_ID,
+        ),
       });
     })().catch(err => {
       console.error(err);
@@ -227,10 +236,13 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
   }, [form, api]);
 
   const saveSettings = () => {
-    const { workspace_id, bot_id, voice_id } = form.getFieldsValue();
+    const { workspace_id, bot_id, voice_id, user_id, conversation_id } =
+      form.getFieldsValue();
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
     localManager.set(LocalStorageKey.VOICE_ID, voice_id);
+    localManager.set(LocalStorageKey.USER_ID, user_id);
+    localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
   };
 
   const handleOk = () => {
@@ -411,6 +423,34 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             fetchAllVoices={fetchAllVoices}
           />
         </Form.Item>
+        <Form.Item style={{ marginLeft: 0 }}>
+          <Button
+            type="link"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            icon={showAdvanced ? <CaretUpOutlined /> : <CaretDownOutlined />}
+            style={{ paddingLeft: 0 }}
+          >
+            Advanced Settings
+          </Button>
+        </Form.Item>
+
+        <div style={{ display: showAdvanced ? 'block' : 'none' }}>
+          <Form.Item
+            name={LocalStorageKey.CONVERSATION_ID}
+            label="Conversation ID"
+            tooltip="Optional: Specify a custom conversation ID"
+          >
+            <Input placeholder="Enter conversation ID" />
+          </Form.Item>
+          <Form.Item
+            name={LocalStorageKey.USER_ID}
+            label="User ID"
+            tooltip="Optional: Specify a custom user ID"
+          >
+            <Input placeholder="Enter user ID" />
+          </Form.Item>
+        </div>
+
         <Form.Item>
           <Row justify="end">
             <Space>

@@ -113,7 +113,22 @@ const MessageForm = forwardRef<MessageFormRef, MessageFormProps>(
                 {
                   validator: (_, value) => {
                     try {
-                      JSON.parse(value);
+                      const parsedValue = JSON.parse(value);
+
+                      // check tool_outputs.output data event_type
+                      if (
+                        parsedValue.event_type ===
+                        'conversation.chat.submit_tool_outputs'
+                      ) {
+                        if (!parsedValue.data?.tool_outputs?.[0]?.output) {
+                          return Promise.reject(
+                            new Error(
+                              'data.tool_outputs.output cannot be empty for submit_tool_outputs event',
+                            ),
+                          );
+                        }
+                      }
+
                       return Promise.resolve();
                     } catch (error) {
                       return Promise.reject(
