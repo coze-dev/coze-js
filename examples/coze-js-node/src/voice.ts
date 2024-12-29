@@ -22,6 +22,8 @@ async function voiceClone() {
     preview_text:
       '今天天气真是太好了，阳光灿烂，心情超级棒，但是朋友最近的感情问题也让我心痛不已，好像世界末日一样，真的好为他难过。',
     voice_id: '742894224871836***',
+    space_id: '742403634451716***',
+    description: '',
   });
   console.log('client.audio.voices.clone', voiceObj);
 }
