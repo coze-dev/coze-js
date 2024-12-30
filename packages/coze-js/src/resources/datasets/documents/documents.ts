@@ -15,9 +15,12 @@ export class Documents extends APIResource {
    * @param params.page_size - Optional The size of pagination. Default is 10. | 可选 分页大小。默认为 10。
    * @returns ListDocumentData | 知识库文件列表
    */
-  list(params: ListDocumentReq, options?: RequestOptions) {
+  async list(
+    params: ListDocumentReq,
+    options?: RequestOptions,
+  ): Promise<ListDocumentData> {
     const apiUrl = '/open_api/knowledge/document/list';
-    const response = this._client.get<ListDocumentReq, ListDocumentData>(
+    const response = await this._client.get<ListDocumentReq, ListDocumentData>(
       apiUrl,
       params,
       false,
@@ -36,7 +39,10 @@ export class Documents extends APIResource {
    * | 向新知识库首次上传文件时必选 分段规则。
    * @returns DocumentInfo[] | 已上传文件的基本信息
    */
-  async create(params: CreateDocumentReq, options?: RequestOptions) {
+  async create(
+    params: CreateDocumentReq,
+    options?: RequestOptions,
+  ): Promise<DocumentInfo[]> {
     const apiUrl = '/open_api/knowledge/document/create';
     const response = await this._client.post<
       CreateDocumentReq,
@@ -53,7 +59,10 @@ export class Documents extends APIResource {
    * @param params.document_ids - Required The list of knowledge base files to be deleted. | 必选 待删除的文件 ID。
    * @returns void | 无返回
    */
-  async delete(params: DeleteDocumentReq, options?: RequestOptions) {
+  async delete(
+    params: DeleteDocumentReq,
+    options?: RequestOptions,
+  ): Promise<void> {
     const apiUrl = '/open_api/knowledge/document/delete';
     await this._client.post<DeleteDocumentReq, undefined>(
       apiUrl,
@@ -72,7 +81,10 @@ export class Documents extends APIResource {
    * @param params.update_rule - Optional The update strategy for online web pages. | 可选 在线网页更新策略。
    * @returns void | 无返回
    */
-  async update(params: UpdateDocumentReq, options?: RequestOptions) {
+  async update(
+    params: UpdateDocumentReq,
+    options?: RequestOptions,
+  ): Promise<void> {
     const apiUrl = '/open_api/knowledge/document/update';
     await this._client.post<UpdateDocumentReq, undefined>(
       apiUrl,
@@ -98,6 +110,7 @@ export interface CreateDocumentReq {
   dataset_id: string;
   document_bases: DocumentBase[];
   chunk_strategy?: ChunkStrategy;
+  format_type?: number;
 }
 
 export interface DeleteDocumentReq {
@@ -125,6 +138,7 @@ export interface DocumentInfo {
   update_interval: number;
   update_time: number;
   update_type: number;
+  tos_uri: string;
 }
 
 export interface ChunkStrategy {
@@ -133,6 +147,7 @@ export interface ChunkStrategy {
   max_tokens?: number;
   remove_extra_spaces?: boolean;
   remove_urls_emails?: boolean;
+  caption_type?: number;
 }
 
 export interface DocumentBase {
@@ -146,6 +161,7 @@ export interface SourceInfo {
   file_type?: string;
   web_url?: string;
   document_source?: number;
+  source_file_id?: string;
 }
 
 export interface UpdateRule {
