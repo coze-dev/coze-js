@@ -8,4 +8,7 @@ vi.doMock('@tarojs/taro', () => ({
   },
   Events,
   getEnv: () => 'TT',
+  ENV_TYPE: {
+    WEB: 'WEB',
+  },
 }));
