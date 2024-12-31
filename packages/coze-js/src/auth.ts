@@ -15,12 +15,15 @@ const getCrypto = () => {
   if (isBrowser()) {
     return window.crypto;
   }
-  return nodeCrypto;
+  return {
+    getRandomValues: (array: Uint8Array) => nodeCrypto.randomFillSync(array),
+    subtle: nodeCrypto.subtle,
+  };
 };
+
 const generateRandomString = () => {
   const array = new Uint8Array(32);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (getCrypto() as any).getRandomValues(array);
+  getCrypto().getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 };
 
