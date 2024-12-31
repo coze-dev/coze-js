@@ -194,18 +194,30 @@ export const ttCreateEventSource: TTCreateEVentSource = ({ data, timeout }) => {
   return task;
 };
 
-export const taroStreamingRequest = ({
+export const taroRequest = ({
+  data,
+  timeout,
   fail,
   success,
 }: {
+  data?: Record<string, unknown>;
+  timeout?: number;
   fail: (err: { errMsg: string }) => void;
   success: (res: { statusCode: number; errMsg?: string }) => void;
 }) => {
+  if (data?.workflow_id === 'nonStreaming') {
+    return Promise.resolve();
+  }
+
   const task = new TaroStreamingTask();
 
   let index = 0;
   const mockReceiveMessage = () => {
-    if (index < mockWorkflowMessages.length && !task.closed) {
+    if (data && data.workflow_id && data.workflow_id === 'fail') {
+      setTimeout(() => {
+        fail({ errMsg: 'fail' });
+      }, 10);
+    } else if (index < mockWorkflowMessages.length && !task.closed) {
       setTimeout(() => {
         if (index === 2) {
           // mock long message split
@@ -234,6 +246,11 @@ export const taroStreamingRequest = ({
   setTimeout(() => {
     task.events.trigger('headersReceived');
     mockReceiveMessage();
+    if (timeout) {
+      setTimeout(() => {
+        task.abort();
+      }, timeout);
+    }
   }, 0);
 
   return task;
