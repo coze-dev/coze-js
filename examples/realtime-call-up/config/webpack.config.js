@@ -608,6 +608,7 @@ module.exports = function (webpackEnv) {
         shouldUseReactRefresh &&
         new ReactRefreshWebpackPlugin({
           overlay: false,
+          exclude: [/packages\/realtime-api/],
         }),
       // Watcher doesn't work well if you mistype casing in a path so we use
       // a plugin that prints an error when you attempt to do this.
