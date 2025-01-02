@@ -1,4 +1,4 @@
-import { type AudioPropertiesConfig } from '@volcengine/rtc';
+import { type ScreenConfig, type AudioPropertiesConfig } from '@volcengine/rtc';
 import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -8,6 +8,8 @@ import { EngineClient } from './client';
 export interface VideoConfig {
   videoOnDefault?: boolean /** optional, Whether to turn on video by default, defaults to true */;
   renderDom?: string /** optional, The DOM element to render the video stream to */;
+  videoInputDeviceId?: string /** optional, The device ID of the video input device to use */;
+  screenConfig?: ScreenConfig; // optional, Screen share configuration if videoInputDeviceId is 'screenShare' see https://www.volcengine.com/docs/6348/104481#screenconfig for more details
 }
 
 export interface RealtimeClientConfig {
@@ -67,6 +69,16 @@ class RealtimeClient extends RealtimeEventHandler {
    * @param config.suppressNonStationaryNoise - Optional, suppress non-stationary noise, defaults to false. |
    *                                         可选，默认是否抑制非静态噪声，默认值为 false。
    * @param config.isAutoSubscribeAudio - Optional, whether to automatically subscribe to bot reply audio streams, defaults to true. |
+   * @param config.videoConfig - Optional, Video configuration. |
+   *                            可选，视频配置。
+   * @param config.videoConfig.videoOnDefault - Optional, Whether to turn on video by default, defaults to true. |
+   *                                            可选，默认是否开启视频，默认值为 true。
+   * @param config.videoConfig.renderDom - Optional, The DOM element to render the video stream to. |
+   *                                       可选，渲染视频流的 DOM 元素。
+   * @param config.videoConfig.videoInputDeviceId - Optional, The device ID of the video input device to use. |
+   *                                               可选，视频输入设备的设备 ID。
+   * @param config.videoConfig.screenConfig - Optional, Screen share configuration if videoInputDeviceId is 'screenShare' see https://www.volcengine.com/docs/6348/104481#screenconfig for more details. |
+   *                                         可选，屏幕共享配置，如果 videoInputDeviceId 是 'screenShare'，请参考 https://www.volcengine.com/docs/6348/104481#screenconfig 了解更多详情。
    */
   constructor(config: RealtimeClientConfig) {
     super(config.debug);
@@ -117,6 +129,7 @@ class RealtimeClient extends RealtimeEventHandler {
       this._config.debug,
       this._isTestEnv,
       this._isSupportVideo,
+      this._config.videoConfig,
     );
 
     // Step3 bind engine events
@@ -286,6 +299,11 @@ class RealtimeClient extends RealtimeEventHandler {
   async setAudioOutputDevice(deviceId: string) {
     await this._client?.setAudioOutputDevice(deviceId);
     this.dispatch(EventNames.AUDIO_OUTPUT_DEVICE_CHANGED, { deviceId });
+  }
+
+  async setVideoInputDevice(deviceId: string) {
+    await this._client?.setVideoInputDevice(deviceId);
+    this.dispatch(EventNames.VIDEO_INPUT_DEVICE_CHANGED, { deviceId });
   }
 }
 
