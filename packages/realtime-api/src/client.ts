@@ -9,7 +9,7 @@ import VERTC, {
   type UserMessageEvent,
 } from '@volcengine/rtc';
 
-import { getAudioDevices } from './utils';
+import { getAudioDevices, isScreenShareDevice } from './utils';
 import { EventNames, RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { type VideoConfig } from '.';
@@ -19,6 +19,9 @@ export class EngineClient extends RealtimeEventHandler {
   private joinUserId = '';
   private _AIAnsExtension: RTCAIAnsExtension | null = null;
   private _isSupportVideo = false;
+  private _videoConfig?: VideoConfig;
+  private _streamIndex?: StreamIndex;
+  private _roomUserId?: string;
 
   // eslint-disable-next-line max-params
   constructor(
@@ -26,6 +29,7 @@ export class EngineClient extends RealtimeEventHandler {
     debug = false,
     isTestEnv = false,
     isSupportVideo = false,
+    videoConfig?: VideoConfig,
   ) {
     super(debug);
 
@@ -48,6 +52,7 @@ export class EngineClient extends RealtimeEventHandler {
       this.handleRemoteAudioPropertiesReport.bind(this);
 
     this._isSupportVideo = isSupportVideo;
+    this._videoConfig = videoConfig;
   }
 
   bindEngineEvents() {
@@ -205,7 +210,43 @@ export class EngineClient extends RealtimeEventHandler {
     await this.engine.setAudioPlaybackDevice(deviceId);
   }
 
+  async setVideoInputDevice(deviceId: string, isAutoCapture = true) {
+    const devices = await getAudioDevices({ video: true });
+    if (devices.videoInputs.findIndex(i => i.deviceId === deviceId) === -1) {
+      throw new RealtimeAPIError(
+        RealtimeError.DEVICE_ACCESS_ERROR,
+        `Video input device not found: ${deviceId}`,
+      );
+    }
+
+    await this.changeVideoState(false);
+    if (isScreenShareDevice(deviceId)) {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+        this.engine.setLocalVideoPlayer(StreamIndex.STREAM_INDEX_MAIN);
+      }
+      if (isAutoCapture) {
+        await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+      }
+      this._streamIndex = StreamIndex.STREAM_INDEX_SCREEN;
+    } else {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_SCREEN) {
+        this.engine.setLocalVideoPlayer(StreamIndex.STREAM_INDEX_SCREEN);
+      }
+
+      if (isAutoCapture) {
+        await this.engine.startVideoCapture(deviceId);
+      }
+      this._streamIndex = StreamIndex.STREAM_INDEX_MAIN;
+    }
+
+    this.engine.setLocalVideoPlayer(this._streamIndex, {
+      renderDom: this._videoConfig?.renderDom || 'local-player',
+      userId: this._roomUserId,
+    });
+  }
+
   async createLocalStream(userId?: string, videoConfig?: VideoConfig) {
+    this._roomUserId = userId;
     const devices = await getAudioDevices({ video: this._isSupportVideo });
     if (!devices.audioInputs.length) {
       throw new RealtimeAPIError(
@@ -213,7 +254,8 @@ export class EngineClient extends RealtimeEventHandler {
         'Failed to get audio devices',
       );
     }
-    if (this._isSupportVideo && !devices.videoInputs.length) {
+
+    if (!devices.videoInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
         'Failed to get video devices',
@@ -222,24 +264,20 @@ export class EngineClient extends RealtimeEventHandler {
 
     await this.engine.startAudioCapture(devices.audioInputs[0].deviceId);
 
-    if (this._isSupportVideo && videoConfig?.videoOnDefault) {
-      await this.engine.startVideoCapture(devices.videoInputs[0].deviceId);
-    }
-
     if (this._isSupportVideo) {
-      this.engine.setLocalVideoPlayer(StreamIndex.STREAM_INDEX_MAIN, {
-        renderDom: videoConfig?.renderDom || 'local-player',
-        userId,
-      });
+      this.setVideoInputDevice(
+        videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
+        videoConfig?.videoOnDefault,
+      );
     }
   }
 
   async disconnect() {
     try {
       if (this._isSupportVideo) {
-        await this.engine.stopVideoCapture();
+        await this.changeVideoState(false);
       }
-      await this.engine.stopAudioCapture();
+      await this.changeAudioState(false);
       await this.engine.unpublishStream(MediaType.AUDIO);
       await this.engine.leaveRoom();
       this.removeEventListener();
@@ -265,9 +303,17 @@ export class EngineClient extends RealtimeEventHandler {
   async changeVideoState(isVideoOn: boolean) {
     try {
       if (isVideoOn) {
-        await this.engine.startVideoCapture();
+        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+          await this.engine.startVideoCapture();
+        } else {
+          await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+        }
       } else {
-        await this.engine.stopVideoCapture();
+        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+          await this.engine.stopVideoCapture();
+        } else {
+          await this.engine.stopScreenCapture();
+        }
       }
     } catch (e) {
       this.dispatch(EventNames.ERROR, e);
