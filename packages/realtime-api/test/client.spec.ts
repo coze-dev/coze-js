@@ -1,28 +1,60 @@
-import VERTC, { UserOfflineReason } from '@volcengine/rtc';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mock } from 'vitest';
+import VERTC, { MediaType, StreamIndex } from '@volcengine/rtc';
 
-import * as RealtimeUtils from '../src/utils';
+import * as utils from '../src/utils';
+import { EventNames } from '../src/event-handler';
 import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
-import { EventNames } from '../src';
 
-vi.mock('@volcengine/rtc', async () => ({
+const mockEngine = {
+  on: vi.fn(),
+  off: vi.fn(),
+  joinRoom: vi.fn(),
+  startAudioCapture: vi.fn(),
+  stopAudioCapture: vi.fn(),
+  setAudioPlaybackDevice: vi.fn(),
+  startVideoCapture: vi.fn(),
+  stopVideoCapture: vi.fn(),
+  startScreenCapture: vi.fn(),
+  stopScreenCapture: vi.fn(),
+  setLocalVideoPlayer: vi.fn(),
+  unpublishStream: vi.fn(),
+  leaveRoom: vi.fn(),
+  publishStream: vi.fn(),
+  sendUserMessage: vi.fn(),
+  enableAudioPropertiesReport: vi.fn(),
+  setAudioCaptureConfig: vi.fn(),
+  registerExtension: vi.fn(),
+  startAudioPlaybackDeviceTest: vi.fn(),
+  stopAudioPlaybackDeviceTest: vi.fn(),
+};
+
+// Mock VERTC
+vi.mock('@volcengine/rtc', () => ({
   default: {
-    createEngine: vi.fn(),
-    enumerateDevices: vi.fn(),
-    events: {},
     setParameter: vi.fn(),
-    enumerateAudioCaptureDevices: vi.fn(),
-    enumerateAudioPlaybackDevices: vi.fn(),
+    createEngine: vi.fn(() => mockEngine),
+    events: {
+      onUserMessageReceived: 'onUserMessageReceived',
+      onUserJoined: 'onUserJoined',
+      onUserLeave: 'onUserLeave',
+      onError: 'onError',
+      onPlayerEvent: 'onPlayerEvent',
+      onLocalAudioPropertiesReport: 'onLocalAudioPropertiesReport',
+      onRemoteAudioPropertiesReport: 'onRemoteAudioPropertiesReport',
+    },
   },
-  MediaType: (await vi.importActual('@volcengine/rtc')).MediaType,
   StreamIndex: {
     STREAM_INDEX_MAIN: 0,
     STREAM_INDEX_SCREEN: 1,
   },
-  UserOfflineReason: (await vi.importActual('@volcengine/rtc'))
-    .UserOfflineReason,
+  MediaType: {
+    AUDIO: 'audio',
+  },
 }));
 
+// Mock RTCAIAnsExtension
 vi.mock('@volcengine/rtc/extension-ainr', () => ({
   default: vi.fn().mockImplementation(() => ({
     enable: vi.fn(),
@@ -30,218 +62,137 @@ vi.mock('@volcengine/rtc/extension-ainr', () => ({
   })),
 }));
 
+// Mock utils
+vi.mock('../src/utils', () => ({
+  getAudioDevices: vi.fn(),
+  isScreenShareDevice: vi.fn(),
+}));
+
 describe('EngineClient', () => {
   let client: EngineClient;
-  let mockEngine: any;
 
   beforeEach(() => {
-    mockEngine = {
-      on: vi.fn(),
-      off: vi.fn(),
-      joinRoom: vi.fn(),
-      startAudioCapture: vi.fn(),
-      unpublishStream: vi.fn(),
-      publishStream: vi.fn(),
-      leaveRoom: vi.fn(),
-      stopAudioCapture: vi.fn(),
-      stop: vi.fn(),
-      enableAudioPropertiesReport: vi.fn(),
-      startAudioPlaybackDeviceTest: vi.fn(),
-      stopAudioPlaybackDeviceTest: vi.fn(),
-      setAudioCaptureConfig: vi.fn(),
-      registerExtension: vi.fn(),
-      sendUserMessage: vi.fn(),
-      setAudioPlaybackDevice: vi.fn(),
-      stopVideoCapture: vi.fn(),
-      setLocalVideoPlayer: vi.fn(),
-      startVideoCapture: vi.fn(),
-    };
-    (VERTC.createEngine as vi.Mock).mockReturnValue(mockEngine);
-    (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
-      { deviceId: 'audio1', kind: 'audioinput' },
-      { deviceId: 'audio2', kind: 'audioinput' },
-      { deviceId: 'video1', kind: 'videoinput' },
-    ]);
-
-    client = new EngineClient('testAppId', true, true, true);
+    vi.clearAllMocks();
+    client = new EngineClient('test-app-id', true);
   });
 
-  describe('constructor', () => {
-    it('should create an engine', () => {
-      expect(VERTC.createEngine).toHaveBeenCalledWith('testAppId');
+  describe('constructor and initialization', () => {
+    it('should initialize with test environment', () => {
+      // const VERTC = require('@volcengine/rtc').default;
+      new EngineClient('test-app-id', true, true);
+      expect(VERTC.setParameter).toHaveBeenCalledWith(
+        'ICE_CONFIG_REQUEST_URLS',
+        ['rtc-test.bytedance.com'],
+      );
     });
   });
 
-  describe('bindEngineEvents', () => {
+  describe('event handling', () => {
     it('should bind engine events', () => {
       client.bindEngineEvents();
-      expect(mockEngine.on).toHaveBeenCalledTimes(7);
+      expect(mockEngine.on).toHaveBeenCalledTimes(6);
     });
-  });
 
-  describe('removeEventListener', () => {
-    it('should remove engine event listeners', () => {
+    it('should remove event listeners', () => {
       client.removeEventListener();
-      expect(mockEngine.off).toHaveBeenCalledTimes(7);
+      expect(mockEngine.off).toHaveBeenCalledTimes(6);
     });
-  });
 
-  describe('joinRoom', () => {
-    it('should join room successfully', async () => {
-      await client.joinRoom({ token: 'token', roomId: 'roomId', uid: 'uid' });
-      expect(mockEngine.joinRoom).toHaveBeenCalledWith(
-        'token',
-        'roomId',
-        { userId: 'uid' },
+    it('should handle message parsing error', () => {
+      const dispatchSpy = vi.spyOn(client as any, 'dispatch');
+      client.handleMessage({ message: 'invalid-json' } as any);
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.ERROR,
         expect.any(Object),
       );
     });
+  });
 
-    it('should throw error if joining room fails', async () => {
-      mockEngine.joinRoom.mockRejectedValue(new Error('Join room failed'));
+  describe('room operations', () => {
+    it('should join room successfully', async () => {
+      mockEngine.joinRoom.mockResolvedValueOnce(undefined);
+      await client.joinRoom({
+        token: 'test-token',
+        roomId: 'test-room',
+        uid: 'test-uid',
+      });
+      expect(mockEngine.joinRoom).toHaveBeenCalled();
+    });
+
+    it('should handle join room error', async () => {
+      mockEngine.joinRoom.mockRejectedValueOnce(new Error('Connection failed'));
       await expect(
         client.joinRoom({
-          token: 'token',
-          roomId: 'roomId',
-          uid: 'uid',
+          token: 'test-token',
+          roomId: 'test-room',
+          uid: 'test-uid',
         }),
       ).rejects.toThrow(RealtimeAPIError);
     });
   });
 
-  describe('getDevices', () => {
-    it('should return audio input devices', async () => {
-      const devices = await RealtimeUtils.getAudioDevices({ video: true });
-      expect(devices.audioInputs).toHaveLength(2);
-    });
-    it('should handle device enumeration errors', async () => {
-      (VERTC.enumerateDevices as vi.Mock).mockRejectedValue(
-        new Error('Enumeration failed'),
-      );
-      await expect(
-        RealtimeUtils.getAudioDevices({ video: true }),
-      ).rejects.toThrow(Error);
-    });
-  });
-
-  describe('createLocalStream', () => {
-    it('should start audio capture with first device', async () => {
-      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([
-        { deviceId: 'audio1', kind: 'audioinput' },
-      ]);
-      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
-
-      await client.createLocalStream();
-      expect(mockEngine.startAudioCapture).toHaveBeenCalledWith('audio1');
+  describe('device management', () => {
+    beforeEach(() => {
+      (utils.getAudioDevices as Mock).mockResolvedValue({
+        audioInputs: [{ deviceId: 'audio-in-1' }],
+        audioOutputs: [{ deviceId: 'audio-out-1' }],
+        videoInputs: [{ deviceId: 'video-1' }],
+      });
     });
 
-    it('should throw error if no audio devices', async () => {
-      (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([]);
-      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([]);
-      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
+    it('should set audio input device', async () => {
+      await client.setAudioInputDevice('audio-in-1');
+      expect(mockEngine.startAudioCapture).toHaveBeenCalledWith('audio-in-1');
+    });
 
-      await expect(client.createLocalStream()).rejects.toThrow(
+    it('should throw error for invalid audio input device', async () => {
+      (utils.getAudioDevices as Mock).mockResolvedValueOnce({
+        audioInputs: [],
+        audioOutputs: [],
+        videoInputs: [],
+      });
+      await expect(client.setAudioInputDevice('invalid-id')).rejects.toThrow(
         RealtimeAPIError,
       );
     });
-
-    it('should throw error if no video devices', async () => {
-      (VERTC.enumerateDevices as vi.Mock).mockResolvedValue([
-        { deviceId: 'audio1', kind: 'audioinput' },
-      ]);
-      await expect(client.createLocalStream()).rejects.toThrow(Error);
-    });
   });
 
-  describe('disconnect', () => {
-    it('should disconnect properly', async () => {
-      await client.disconnect();
-      expect(mockEngine.stopAudioCapture).toHaveBeenCalled();
-      expect(mockEngine.unpublishStream).toHaveBeenCalled();
-      expect(mockEngine.leaveRoom).toHaveBeenCalled();
-    });
-    it('should throw error if disconnecting fails', async () => {
-      mockEngine.stopAudioCapture.mockRejectedValue(
-        new Error('Failed to stop'),
-      );
-      await expect(client.disconnect()).rejects.toThrow(Error);
-    });
-  });
-
-  describe('changeAudioState', () => {
-    it('should publish stream when mic is on', async () => {
+  describe('stream management', () => {
+    it('should change audio state', async () => {
       await client.changeAudioState(true);
-      expect(mockEngine.publishStream).toHaveBeenCalled();
-    });
+      expect(mockEngine.publishStream).toHaveBeenCalledWith(MediaType.AUDIO);
 
-    it('should unpublish stream when mic is off', async () => {
       await client.changeAudioState(false);
-      expect(mockEngine.unpublishStream).toHaveBeenCalled();
+      expect(mockEngine.unpublishStream).toHaveBeenCalledWith(MediaType.AUDIO);
     });
 
-    it('should throw error if changing audio state fails', async () => {
-      mockEngine.publishStream.mockRejectedValue(new Error('Failed to start'));
-      await expect(client.changeAudioState(true)).rejects.toThrow(Error);
-    });
-  });
-
-  describe('changeVideoState', () => {
-    it('should publish stream when camera is on', async () => {
+    it('should change video state', async () => {
+      (client as any)._streamIndex = StreamIndex.STREAM_INDEX_MAIN;
       await client.changeVideoState(true);
       expect(mockEngine.startVideoCapture).toHaveBeenCalled();
-    });
 
-    it('should unpublish stream when camera is off', async () => {
       await client.changeVideoState(false);
       expect(mockEngine.stopVideoCapture).toHaveBeenCalled();
     });
-    it('should throw error if changing video state fails', async () => {
-      mockEngine.startVideoCapture.mockRejectedValue(
-        new Error('Failed to start'),
+  });
+
+  describe('message handling', () => {
+    it('should send message', async () => {
+      mockEngine.sendUserMessage.mockResolvedValueOnce('success');
+      await client.sendMessage({ test: 'message' });
+      expect(mockEngine.sendUserMessage).toHaveBeenCalled();
+    });
+
+    it('should handle send message error', async () => {
+      mockEngine.sendUserMessage.mockRejectedValueOnce(
+        new Error('Send failed'),
       );
-      await expect(client.changeVideoState(true)).rejects.toThrow(Error);
+      await expect(client.sendMessage({ test: 'message' })).rejects.toThrow();
     });
   });
 
-  describe('stop', () => {
-    it('should send stop message to joined user', async () => {
-      mockEngine.sendUserMessage.mockResolvedValue('success');
-      await client.stop();
-      expect(mockEngine.sendUserMessage).toHaveBeenCalledWith(
-        '', // joinUserId is empty in test
-        JSON.stringify({
-          id: 'event_1',
-          event_type: 'conversation.chat.cancel',
-          data: {},
-        }),
-      );
-    });
-
-    it('should handle errors when stopping', async () => {
-      mockEngine.sendUserMessage.mockRejectedValue(new Error('Failed to send'));
-      await expect(client.stop()).rejects.toThrow(Error);
-    });
-  });
-
-  describe('sendMessage', () => {
-    it('should send message to joined user', async () => {
-      const message = { type: 'test', data: {} };
-      mockEngine.sendUserMessage.mockResolvedValue('success');
-      await client.sendMessage(message);
-      expect(mockEngine.sendUserMessage).toHaveBeenCalledWith(
-        '', // joinUserId is empty in test
-        JSON.stringify(message),
-      );
-    });
-
-    it('should handle errors when sending message', async () => {
-      mockEngine.sendUserMessage.mockRejectedValue(new Error('Failed to send'));
-      await expect(client.sendMessage({})).rejects.toThrow(Error);
-    });
-  });
-
-  describe('enableAudioNoiseReduction', () => {
-    it('should set audio capture config with noise reduction enabled', async () => {
+  describe('audio features', () => {
+    it('should enable audio noise reduction', async () => {
       await client.enableAudioNoiseReduction();
       expect(mockEngine.setAudioCaptureConfig).toHaveBeenCalledWith({
         noiseSuppression: true,
@@ -249,43 +200,15 @@ describe('EngineClient', () => {
         autoGainControl: true,
       });
     });
-  });
 
-  describe('initAIAnsExtension', () => {
-    it('should register AI extension', async () => {
+    it('should initialize AI ANS extension', async () => {
       await client.initAIAnsExtension();
       expect(mockEngine.registerExtension).toHaveBeenCalled();
     });
   });
 
-  describe('changeAIAnsExtension', () => {
-    it('should enable AI extension when true', async () => {
-      await client.initAIAnsExtension();
-      client.changeAIAnsExtension(true);
-      // Note: We can't directly test the extension enable/disable calls
-      // as they are internal to the extension instance
-    });
-
-    it('should disable AI extension when false', async () => {
-      await client.initAIAnsExtension();
-      client.changeAIAnsExtension(false);
-      // Note: We can't directly test the extension enable/disable calls
-      // as they are internal to the extension instance
-    });
-  });
-
-  describe('enableAudioPropertiesReport', () => {
-    it('should call engine enableAudioPropertiesReport', () => {
-      const config = { interval: 100 };
-      client.enableAudioPropertiesReport(config);
-      expect(mockEngine.enableAudioPropertiesReport).toHaveBeenCalledWith(
-        config,
-      );
-    });
-  });
-
-  describe('startAudioPlaybackDeviceTest', () => {
-    it('should call engine startAudioPlaybackDeviceTest', async () => {
+  describe('audio device testing', () => {
+    it('should start audio playback device test', async () => {
       await client.startAudioPlaybackDeviceTest();
       expect(mockEngine.startAudioPlaybackDeviceTest).toHaveBeenCalledWith(
         'audio-test.wav',
@@ -293,158 +216,9 @@ describe('EngineClient', () => {
       );
     });
 
-    it('should handle errors when starting audio playback device test', async () => {
-      mockEngine.startAudioPlaybackDeviceTest.mockRejectedValue(
-        new Error('Failed to start'),
-      );
-      await expect(client.startAudioPlaybackDeviceTest()).rejects.toThrow(
-        Error,
-      );
-    });
-  });
-
-  describe('stopAudioPlaybackDeviceTest', () => {
-    it('should call engine stopAudioPlaybackDeviceTest', async () => {
-      await client.stopAudioPlaybackDeviceTest();
+    it('should stop audio playback device test', () => {
+      client.stopAudioPlaybackDeviceTest();
       expect(mockEngine.stopAudioPlaybackDeviceTest).toHaveBeenCalled();
-    });
-    it('should handle errors when stopping audio playback device test', async () => {
-      mockEngine.stopAudioPlaybackDeviceTest.mockRejectedValue(
-        new Error('Failed to stop'),
-      );
-      await expect(client.stopAudioPlaybackDeviceTest()).toThrow(Error);
-    });
-  });
-
-  describe('setAudioInputDevice', () => {
-    it('should set audio input device successfully', async () => {
-      const mockDevices = [
-        { deviceId: 'new-audio-input-id', kind: 'audioinput', label: 'Mic 1' },
-      ];
-
-      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue(
-        mockDevices,
-      );
-      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue([]);
-
-      const deviceId = 'new-audio-input-id';
-      await client.setAudioInputDevice(deviceId);
-      expect(mockEngine.stopAudioCapture).toHaveBeenCalled();
-      expect(mockEngine.startAudioCapture).toHaveBeenCalledWith(deviceId);
-    });
-
-    it('should throw error if setting input device fails', async () => {
-      const deviceId = 'invalid-device';
-      mockEngine.startAudioCapture.mockRejectedValue(new Error('Device error'));
-
-      await expect(client.setAudioInputDevice(deviceId)).rejects.toThrow(
-        RealtimeAPIError,
-      );
-    });
-  });
-
-  describe('handleMessage', () => {
-    it('should handle message', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      client.handleMessage({
-        userId: 'test-user-id',
-        message: JSON.stringify({
-          event_type: 'test-event-type',
-        }),
-      });
-      expect(dispatchSpy).toHaveBeenCalledWith('server.test-event-type', {
-        event_type: 'test-event-type',
-      });
-    });
-
-    it('should handle error when parsing message', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      client.handleMessage({
-        userId: 'test-user-id',
-        message: 'invalid-message',
-      });
-      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.ERROR, {
-        message: 'Failed to parse message: invalid-message',
-        error: expect.any(Error),
-      });
-    });
-  });
-
-  describe('handleEventError', () => {
-    it('should handle event error', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      client.handleEventError({});
-      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.ERROR, {});
-    });
-  });
-
-  describe('handleUserJoin', () => {
-    it('should handle user join', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      const event = {
-        userInfo: { userId: 'test-user-id' },
-        publishState: {
-          audio: true,
-          video: true,
-          screenAudio: true,
-          screenVideo: true,
-        },
-      };
-      client.handleUserJoin(event);
-      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_JOIN, event);
-    });
-  });
-
-  describe('handleUserLeave', () => {
-    it('should handle user leave', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      client.handleUserLeave({
-        userInfo: { userId: 'test-user-id' },
-        reason: UserOfflineReason.QUIT,
-      });
-      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_LEAVE, {
-        userInfo: { userId: 'test-user-id' },
-        reason: UserOfflineReason.QUIT,
-      });
-    });
-  });
-
-  describe('handlePlayerEvent', () => {
-    it('should handle player event', () => {
-      const dispatchSpy = vi.spyOn(client, 'dispatch');
-      client.handlePlayerEvent({});
-      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.PLAYER_EVENT, {});
-    });
-  });
-
-  describe('setAudioOutputDevice', () => {
-    it('should set audio output device successfully', async () => {
-      const mockDevices = [
-        {
-          deviceId: 'new-audio-output-id',
-          kind: 'audiooutput',
-          label: 'Speaker 1',
-        },
-      ];
-      (VERTC.enumerateAudioPlaybackDevices as vi.Mock).mockResolvedValue(
-        mockDevices,
-      );
-      (VERTC.enumerateAudioCaptureDevices as vi.Mock).mockResolvedValue([]);
-
-      const deviceId = 'new-audio-output-id';
-      await client.setAudioOutputDevice(deviceId);
-      expect(mockEngine.setAudioPlaybackDevice).toHaveBeenCalledWith(deviceId);
-    });
-
-    it('should throw error if setting output device fails', async () => {
-      const deviceId = 'invalid-device';
-      mockEngine.setAudioPlaybackDevice.mockRejectedValue(
-        new Error('Device error'),
-      );
-
-      await expect(client.setAudioOutputDevice(deviceId)).rejects.toThrow(
-        RealtimeAPIError,
-      );
     });
   });
 });

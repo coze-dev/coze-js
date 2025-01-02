@@ -1,3 +1,5 @@
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
+import type { Mock } from 'vitest';
 import VERTC from '@volcengine/rtc';
 
 import {
@@ -5,6 +7,7 @@ import {
   checkPermission,
   getAudioDevices,
   checkDevicePermission,
+  isScreenShareSupported,
 } from '../src/utils';
 
 vi.mock('@volcengine/rtc', () => ({
@@ -15,6 +18,24 @@ vi.mock('@volcengine/rtc', () => ({
     enumerateAudioPlaybackDevices: vi.fn(),
   },
 }));
+
+// Mock navigator.mediaDevices
+const mockNavigator = {
+  mediaDevices: {
+    getDisplayMedia: () => Promise.resolve({}),
+  },
+};
+
+// Add this before the tests
+beforeAll(() => {
+  // @ts-expect-error - mock global navigator
+  global.navigator = mockNavigator;
+});
+
+afterAll(() => {
+  // @ts-expect-error - cleanup
+  delete global.navigator;
+});
 
 describe('Utils', () => {
   describe('sleep', () => {
@@ -29,18 +50,18 @@ describe('Utils', () => {
 
   describe('checkPermission', () => {
     it('should return true when audio permission is granted', async () => {
-      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: true });
+      (VERTC.enableDevices as Mock).mockResolvedValue({ audio: true });
       const result = await checkPermission();
       expect(result).toBe(true);
     });
 
     it('should return false when audio permission is denied', async () => {
-      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: false });
+      (VERTC.enableDevices as Mock).mockResolvedValue({ audio: false });
       const result = await checkPermission();
       expect(result).toBe(false);
     });
     it('should throw error when enableDevices failed', async () => {
-      (VERTC.enableDevices as vi.Mock).mockRejectedValue(new Error('test'));
+      (VERTC.enableDevices as Mock).mockRejectedValue(new Error('test'));
       const result = await checkPermission();
       expect(result).toBe(false);
     });
@@ -48,13 +69,13 @@ describe('Utils', () => {
 
   describe('checkDevicePermission', () => {
     it('should return true when audio permission is granted', async () => {
-      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: true });
+      (VERTC.enableDevices as Mock).mockResolvedValue({ audio: true });
       const result = await checkDevicePermission();
       expect(result.audio).toBe(true);
     });
 
     it('should return false when audio permission is denied', async () => {
-      (VERTC.enableDevices as vi.Mock).mockResolvedValue({ audio: false });
+      (VERTC.enableDevices as Mock).mockResolvedValue({ audio: false });
       const result = await checkDevicePermission();
       expect(result.audio).toBe(false);
     });
@@ -68,7 +89,11 @@ describe('Utils', () => {
         { deviceId: '3', kind: 'videoinput', label: 'Camera 1' },
       ];
 
-      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue(mockDevices);
+      (VERTC.enumerateDevices as Mock).mockResolvedValue(mockDevices);
+
+      const originalNavigator = global.navigator;
+      // @ts-expect-error - mock navigator without getDisplayMedia
+      global.navigator = { mediaDevices: {} };
 
       const result = await getAudioDevices({ video: true });
 
@@ -81,10 +106,17 @@ describe('Utils', () => {
       });
 
       expect(VERTC.enumerateDevices).toHaveBeenCalled();
+
+      // @ts-expect-error - restore navigator
+      global.navigator = originalNavigator;
     });
 
     it('should return empty arrays when no devices are found', async () => {
-      (VERTC.enumerateDevices as jest.Mock).mockResolvedValue([]);
+      (VERTC.enumerateDevices as Mock).mockResolvedValue([]);
+
+      const originalNavigator = global.navigator;
+      // @ts-expect-error - mock navigator without getDisplayMedia
+      global.navigator = { mediaDevices: {} };
 
       const result = await getAudioDevices({ video: true });
 
@@ -93,6 +125,24 @@ describe('Utils', () => {
         audioOutputs: [],
         videoInputs: [],
       });
+
+      // @ts-expect-error - restore navigator
+      global.navigator = originalNavigator;
+    });
+  });
+
+  describe('isScreenShareSupported', () => {
+    it('should return true when getDisplayMedia is available', () => {
+      expect(isScreenShareSupported()).toBe(true);
+    });
+
+    it('should return false when getDisplayMedia is not available', () => {
+      const originalNavigator = global.navigator;
+      // @ts-expect-error - mock navigator without getDisplayMedia
+      global.navigator = { mediaDevices: {} };
+      expect(isScreenShareSupported()).toBe(false);
+      // @ts-expect-error - restore navigator
+      global.navigator = originalNavigator;
     });
   });
 });

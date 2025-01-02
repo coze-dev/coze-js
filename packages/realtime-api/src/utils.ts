@@ -32,6 +32,11 @@ export const checkPermission = async ({
   }
 };
 
+/**
+ * Checks device permissions for audio and video
+ * @param checkVideo Whether to check video permissions (default: false)
+ * @returns Promise that resolves with the device permission status
+ */
 export const checkDevicePermission = async (checkVideo = false) =>
   await VERTC.enableDevices({ audio: true, video: checkVideo });
 
@@ -47,6 +52,20 @@ export const getAudioDevices = async ({
   let devices: MediaDeviceInfo[] = [];
   if (video) {
     devices = await VERTC.enumerateDevices();
+    if (isScreenShareSupported()) {
+      devices.push({
+        deviceId: 'screenShare',
+        kind: 'videoinput',
+        label: 'Screen Share',
+        groupId: 'screenShare',
+        toJSON: () => ({
+          deviceId: 'screenShare',
+          kind: 'videoinput',
+          label: 'Screen Share',
+          groupId: 'screenShare',
+        }),
+      });
+    }
   } else {
     devices = await [
       ...(await VERTC.enumerateAudioCaptureDevices()),
@@ -66,3 +85,14 @@ export const getAudioDevices = async ({
     videoInputs: devices.filter(i => i.deviceId && i.kind === 'videoinput'),
   };
 };
+
+export const isScreenShareDevice = (deviceId?: string) =>
+  deviceId === 'screenShare';
+
+/**
+ * Check if browser supports screen sharing
+ * 检查浏览器是否支持屏幕共享
+ */
+export function isScreenShareSupported(): boolean {
+  return !!navigator?.mediaDevices?.getDisplayMedia;
+}
