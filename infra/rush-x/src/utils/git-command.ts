@@ -43,10 +43,10 @@ export const ensureNotUncommittedChanges = async () => {
   if (res.code !== 0) {
     throw new Error('Failed to check git status');
   }
-  if (res.stdout?.includes('nothing to commit, working tree clean')) {
-    return true;
+  if (res.stdout?.includes('git restore')) {
+    throw new Error(
+      'There are uncommitted changes in the working tree, please commit them first.',
+    );
   }
-  throw new Error(
-    'There are uncommitted changes in the working tree, please commit them first.',
-  );
+  return true;
 };
