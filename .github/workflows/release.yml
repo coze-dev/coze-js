@@ -61,7 +61,9 @@ jobs:
 
       - name: Install Dependencies
         if: steps.check_tag.outputs.has_valid_tag == 'true'
-        run: node common/scripts/install-run-rush.js install
+        run: |
+          npm i -g @microsoft/rush@5.140.0
+          node common/scripts/install-run-rush.js install
 
       - name: Run Release
         if: steps.check_tag.outputs.has_valid_tag == 'true'

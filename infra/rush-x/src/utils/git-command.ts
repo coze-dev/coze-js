@@ -21,6 +21,11 @@ export const getChangedFilesFromCached = async (): Promise<string[]> => {
   return serializeFilesName(output.stdout);
 };
 
+export const getChangedFiles = async (): Promise<string[]> => {
+  const output = await exec('git diff --name-only --diff-filter=ACMR');
+  return serializeFilesName(output.stdout);
+};
+
 /**
  * 获取当前分支名称
  * @returns string
@@ -39,14 +44,13 @@ export const isMainBranch = async () => {
  * 确保没有未提交的变更
  */
 export const ensureNotUncommittedChanges = async () => {
-  const res = await exec('git status');
-  if (res.code !== 0) {
-    throw new Error('Failed to check git status');
+  const changedFiles = (
+    await Promise.all([getChangedFilesFromCached(), getChangedFiles()])
+  ).flat();
+  if (changedFiles.length > 0) {
+    throw new Error(
+      'There are uncommitted changes in the working tree, please commit them first.',
+    );
   }
-  if (res.stdout?.includes('nothing to commit, working tree clean')) {
-    return true;
-  }
-  throw new Error(
-    'There are uncommitted changes in the working tree, please commit them first.',
-  );
+  return true;
 };
