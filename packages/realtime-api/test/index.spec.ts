@@ -205,6 +205,26 @@ describe('RealtimeClient', () => {
     });
   });
 
+  describe('setVideoInputDevice', () => {
+    it('should set video input device', async () => {
+      const mockSetVideoInputDevice = vi.fn();
+      (client as any)._client = {
+        setVideoInputDevice: mockSetVideoInputDevice,
+      };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setVideoInputDevice('test-device');
+
+      expect(mockSetVideoInputDevice).toHaveBeenCalledWith('test-device');
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        EventNames.VIDEO_INPUT_DEVICE_CHANGED,
+        {
+          deviceId: 'test-device',
+        },
+      );
+    });
+  });
+
   describe('setAudioOutputDevice', () => {
     it('should set audio output device', async () => {
       const mockSetAudioOutputDevice = vi.fn();

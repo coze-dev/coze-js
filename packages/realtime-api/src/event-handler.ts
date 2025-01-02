@@ -82,6 +82,11 @@ export enum EventNames {
    */
   AUDIO_OUTPUT_DEVICE_CHANGED = 'client.output.device.changed',
   /**
+   * en: Video input device changed
+   * zh: 视频输入设备改变
+   */
+  VIDEO_INPUT_DEVICE_CHANGED = 'client.video.input.device.changed',
+  /**
    * en: Bot joined
    * zh: Bot 加入
    */
