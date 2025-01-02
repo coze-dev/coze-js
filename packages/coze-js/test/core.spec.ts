@@ -5,6 +5,13 @@ import { APIClient } from '../src/core';
 
 vi.mock('../src/fetcher');
 
+vi.mock('../src/version.js', () => ({
+  ...vi.importActual('../src/version.js'),
+  getBrowserClientUserAgent: vi
+    .fn()
+    .mockReturnValue('mocked-browser-user-agent'),
+}));
+
 describe('APIClient', () => {
   const mockConfig = {
     baseURL: 'https://api.example.com',

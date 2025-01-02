@@ -20,6 +20,7 @@ describe('Voices', () => {
         voice_id: 'test-voice-id',
         response_format: 'mp3' as const,
         speed: 1.0,
+        sample_rate: 16000,
       };
 
       const result = await audio.speech.create(params);

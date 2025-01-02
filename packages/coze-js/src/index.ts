@@ -14,6 +14,7 @@ export class CozeAPI extends APIClient {
   workflows: API.Workflows = new API.Workflows(this);
   workspaces: API.WorkSpaces = new API.WorkSpaces(this);
   audio: API.Audio = new API.Audio(this);
+  templates: API.Templates = new API.Templates(this);
 }
 export {
   type ClientOptions,

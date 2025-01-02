@@ -18,7 +18,10 @@ export class Speech extends APIResource {
     const apiUrl = '/v1/audio/speech';
     const response = await this._client.post<CreateSpeechReq, ArrayBuffer>(
       apiUrl,
-      params,
+      {
+        ...params,
+        sample_rate: params.sample_rate || 24000,
+      },
       false,
       mergeConfig(options, { responseType: 'arraybuffer' }),
     );
@@ -37,4 +40,7 @@ export interface CreateSpeechReq {
   /** Speech speed, range [0.2,3], default is 1, usually one decimal place is sufficient
    * | 语速，[0.2,3]，默认为1，通常保留一位小数即可 */
   speed?: number;
+  /** Sample rate, default is 24000, supports 8000, 16000, 24000, 32000, 44100, 48000
+   * | 采样率，默认是24000，支持8000, 16000, 24000, 32000, 44100, 48000 */
+  sample_rate?: number;
 }

@@ -7,3 +7,4 @@ export * from './workspaces/index.js';
 export * from './knowledge/index.js';
 export * from './datasets/index.js';
 export * from './audio/index.js';
+export * from './templates/index.js';
