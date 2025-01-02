@@ -15,6 +15,7 @@ import { ChatEventType } from '@coze/api';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
+import { isShowVideo } from '../../utils/utils';
 
 const { Text, Link } = Typography;
 
@@ -49,12 +50,19 @@ const Header: React.FC<HeaderProps> = ({
   const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
   const [audioCapture, setAudioCapture] = useState<string>('default');
   const [audioPlayback, setAudioPlayback] = useState<string>('default');
+  const [videoInputDeviceId, setVideoInputDeviceId] =
+    useState<string>('default');
+
   const [inputDeviceOptions, setInputDeviceOptions] = useState<
     { label: string; value: string }[]
   >([]);
   const [outputDeviceOptions, setOutputDeviceOptions] = useState<
     { label: string; value: string }[]
   >([]);
+  const [videoInputDeviceOptions, setVideoInputDeviceOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+
   const formRef = useRef<MessageFormRef>(null);
 
   const checkMicrophonePermission = () => {
@@ -93,7 +101,7 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     async function getDevices() {
       try {
-        const devices = await RealtimeUtils.getAudioDevices();
+        const devices = await RealtimeUtils.getAudioDevices({ video: true });
         const inputDevices = devices.audioInputs.map(device => ({
           label: device.label || `Microphone ${device.deviceId}`,
           value: device.deviceId,
@@ -102,9 +110,14 @@ const Header: React.FC<HeaderProps> = ({
           label: device.label || `Speaker ${device.deviceId}`,
           value: device.deviceId,
         }));
+        const videoInputDevices = devices.videoInputs.map(device => ({
+          label: device.label || `Video Input ${device.deviceId}`,
+          value: device.deviceId,
+        }));
 
         setInputDeviceOptions(inputDevices);
         setOutputDeviceOptions(outputDevices);
+        setVideoInputDeviceOptions(videoInputDevices);
       } catch (err) {
         console.error('Failed to get devices:', err);
         message.error('Failed to get devices');
@@ -270,6 +283,11 @@ const Header: React.FC<HeaderProps> = ({
     clientRef.current?.setAudioOutputDevice(value);
   };
 
+  const handleVideoInputDeviceChange = (value: string) => {
+    setVideoInputDeviceId(value);
+    clientRef.current?.setVideoInputDevice(value);
+  };
+
   if (microphoneStatus === 'error') {
     return (
       <>
@@ -351,6 +369,17 @@ const Header: React.FC<HeaderProps> = ({
               options={outputDeviceOptions}
             />
           </span>
+          {isShowVideo() && (
+            <span>
+              <Text style={{ marginRight: 8 }}>Video Device:</Text>
+              <Select
+                style={{ width: 200 }}
+                value={videoInputDeviceId}
+                onChange={handleVideoInputDeviceChange}
+                options={videoInputDeviceOptions}
+              />
+            </span>
+          )}
         </div>
       </>
     );
