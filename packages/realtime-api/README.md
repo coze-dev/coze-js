@@ -6,6 +6,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/coze-dev/coze-js/pulls)
 
+English | [简体中文](./README.zh-CN.md)
+
 A powerful real-time communication SDK for voice interactions with Coze AI bots.
 
 ## Features

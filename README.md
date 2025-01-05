@@ -1,22 +1,27 @@
 # Monorepo of Coze Orz
 [![codecov](https://codecov.io/gh/coze-dev/coze-js/graph/badge.svg?token=W5EBMZ0NUE)](https://codecov.io/gh/coze-dev/coze-js) ![ci](https://github.com/coze-dev/coze-js/actions/workflows/ci@main.yml/badge.svg)
 
+English | [简体中文](./README.zh-CN.md)
+
 ## 📦 Packages
 
 This monorepo contains the following packages:
 
 | Package | Description | Version |
 |---------|------------|---------|
-| [@coze/api](./packages/coze-js) | Coze API | [![npm](https://img.shields.io/npm/v/@coze/api.svg)](https://www.npmjs.com/package/@coze/api) |
-| [@coze/realtime-api](./packages/realtime-api) | Realtime API | [![npm](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api) |
+| [@coze/api](./packages/coze-js) | Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/api.svg)](https://www.npmjs.com/package/@coze/api) |
+| [@coze/realtime-api](./packages/realtime-api) | Realtime API SDK | [![npm](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api) |
+| [@coze/taro-api](./packages/coze-taro) | Taro Mini Program Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/taro-api.svg)](https://www.npmjs.com/package/@coze/taro-api) |
 
 
 ## 🎮 Examples
 
 Find usage examples for each package in the [examples](./examples) directory:
 
-- [coze-js-node](./examples/coze-js-node) - Node.js Demo for @coze/coze-js
-- [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/coze-js
+- [coze-js-node](./examples/coze-js-node) - Node.js Demo for @coze/api
+- [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/api
+- [coze-js-taro](./examples/coze-js-taro) - Taro4 Mini Program Demo for @coze/taro-api
+- [coze-js-taro3](./examples/coze-js-taro3) - Taro3 Mini Program Demo for @coze/taro-api
 - [realtime-console](./examples/realtime-console) - Full Console Demo for @coze/realtime-api
 - [realtime-call-up](./examples/realtime-call-up) - Sample Call Up Demo for @coze/realtime-api
 
@@ -85,6 +90,7 @@ npm run start
 
 ## 📖 Documentation
 
+- [Official Documentation](https://www.coze.com/docs/developer_guides/nodejs_overview)
 - [Contributing Guidelines](./CONTRIBUTING.md)
 - [How to publish](./docs/publish.md)
 

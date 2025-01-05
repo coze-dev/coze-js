@@ -1,5 +1,7 @@
 # Coze Node.js Example
 
+English | [简体中文](./README.zh-CN.md)
+
 This guide will help you quickly set up and run the Coze Node.js example.
 
 ## Quick Start
@@ -8,10 +10,10 @@ This guide will help you quickly set up and run the Coze Node.js example.
 Please refer to the root [README.md](../../README.md) for dependency installation instructions.
 
 ### 2. Configure Environment
-1. Create your configuration file:
+1. Modify your configuration file:
 
 ```bash
-cp src/config/config.default.ts src/config/config.ts
+cd src/config/config.ts
 ```
 
 2. Update the following values in `config.ts`:
@@ -20,7 +22,7 @@ cp src/config/config.default.ts src/config/config.ts
 - `auth.pat.COZE_API_KEY`: Your Coze API key
 
 ### 3. Run the Example
-Choose one of the following commands based on your endpoint:
+Choose one of the following commands based on your Base URL:
 
 ```bash
 # For China region (api.coze.cn)
