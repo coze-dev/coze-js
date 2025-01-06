@@ -28,7 +28,13 @@ comment:
 # reference doc: https://docs.codecov.com/docs/components
 component_management:
   default_rules: # default rules that will be inherited by all components
-    flag_coverage_not_uploaded_behavior: exclude # don't send status checks that don't have flag coverage uploaded
+    statuses:
+      - type: project
+        target: 90%
+        threshold: 1%
+      - type: patch
+        target: 90%
+        threshold: 10%
 
   individual_components:
     - component_id: coze-js # this is an identifier that should not be changed
