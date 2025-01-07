@@ -5,6 +5,8 @@
 [![bundle size](https://img.shields.io/bundlephobia/min/%40coze%2Fapi)](https://bundlephobia.com/package/@coze/api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+English | [简体中文](./README.zh-CN.md)
+
 Official Node.js and Browser SDK for [Coze](https://www.coze.com)（or [扣子](https://www.coze.cn)） API platform.
 
 ## Quick Start
@@ -131,14 +133,15 @@ npm run test
 ### Node.js
 ```bash
 cd examples/coze-js-node
-cp config.default.js config.js  # Edit config.js with your credentials
-npm start src/chat.ts
+rush build
+npx tsx ./src/chat.ts
 ```
 
 ### Browser
 ```bash
 cd examples/coze-js-web
-npm run start
+rush build
+npx tsx ./src/chat.ts
 ```
 
 ## Documentation

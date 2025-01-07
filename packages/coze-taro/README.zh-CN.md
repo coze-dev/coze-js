@@ -1,34 +1,34 @@
 # Taro Coze API SDK
 
-English | [简体中文](./README.zh-CN.md)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Official [Taro](https://docs.taro.zone/docs/) SDK for [Coze](https://www.coze.com)（or [扣子](https://www.coze.cn)） API platform.
+[English](./README.md) | 简体中文
 
-## Quick Start
+[Coze](https://www.coze.com)（或[扣子](https://www.coze.cn)）API 平台的官方 [Taro](https://docs.taro.zone/docs/) SDK。
 
-### 1. Installation
+## 快速开始
+
+### 1. 安装
 
 ```sh
 npm install @coze/taro-api @coze/api
-# or
+# 或
 pnpm install @coze/taro-api @coze/api
 ```
 
-### 2. Basic Usage
+### 2. 基本用法
 
 ```javascript
 import { COZE_COM_BASE_URL, RoleType, ChatStatus } from '@coze/api';
 import { CozeAPI } from '@coze/taro-api';
 
-// Initialize client with your Personal Access Token
+// 使用个人访问令牌初始化客户端
 const client = new CozeAPI({
-  token: 'your_pat_token', // Get your PAT from https://www.coze.com/open/oauth/pats
+  token: 'your_pat_token', // 从 https://www.coze.com/open/oauth/pats 获取你的 PAT
   baseURL: COZE_COM_BASE_URL,
 });
 
-// Simple chat example
+// 简单对话示例
 async function quickChat() {
   try {
     const v = await client.chat.createAndPoll({
@@ -49,20 +49,20 @@ async function quickChat() {
       console.log('usage', v.chat.usage);
     }
   } catch (error) {
-    console.error('Chat error:', error);
+    console.error('对话错误:', error);
     throw error;
   }
 }
 ```
 
-## Key Features
+## 主要特性
 
-- 🌐 **Consistent API**: Maintains consistent API with [Coze-JS](../coze-js/README.md)
-- 🔄 **Streaming Support**: Compatible with ByteDance Mini Program/WeChat Mini Program/H5
+- 🌐 **一致的 API**：与 [Coze-JS](../coze-js/README.md) 保持一致的 API
+- 🔄 **流式响应支持**：兼容字节小程序/微信小程序/H5
 
-## Advanced Usage
+## 高级用法
 
-### Streaming Chat
+### 流式对话
 
 ```javascript
 import { ChatEventType } from '@coze/api';
@@ -82,13 +82,13 @@ async function streamChat() {
 
   for await (const part of stream) {
     if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-      console.log(part.data.content); // Real-time response
+      console.log(part.data.content); // 实时响应
     }
   }
 }
 ```
 
-### Refresh token
+### 刷新令牌
 
 ```javascript
 import { COZE_COM_BASE_URL } from '@coze/api';
@@ -103,7 +103,7 @@ const client = new CozeAPI({
 });
 ```
 
-### Abort streaming chat
+### 中断流式对话
 
 ```javascript
 import { ChatEventType } from '@coze/api';
@@ -130,37 +130,37 @@ async function streamChat() {
 
   for await (const part of stream) {
     if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-      console.log(part.data.content); // Real-time response
+      console.log(part.data.content); // 实时响应
     }
   }
 }
 ```
 
-## Try Examples
+## 尝试示例
 
 ```bash
 cd examples/coze-js-taro
-cp .env.development .env.local # Edit .env.local with your credentials
+cp .env.development .env.local # 编辑 .env.local 填入你的凭证
 npm run dev:weapp
 ```
 
-## Notes
+## 注意事项
 ### Taro@3 + React
-The following configuration is required:
+需要以下配置：
 
 ```javascript
 export default defineConfig(() => {
   compiler: {
     type: 'webpack5',
     prebundle: {
-      // 1. Don‘t prebundle '@coze/taro-api'
+      // 1. 不要预打包 '@coze/taro-api'
       exclude: ['@coze/taro-api'],
     },
   },
 
   mini: {
     webpackChain(chain) {
-      // 2. Enable multi-platform support for '@coze/taro-api'
+      // 2. 为 '@coze/taro-api' 启用多平台支持
       chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
         args[2]['include'] = ['@coze/taro-api'];
         return args;
@@ -170,7 +170,7 @@ export default defineConfig(() => {
 
   h5: {
     webpackChain(chain) {
-      // 2. Enable multi-platform support for '@coze/taro-api'
+      // 2. 为 '@coze/taro-api' 启用多平台支持
       chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
         args[2]['include'] = ['@coze/taro-api'];
         return args;
@@ -180,9 +180,9 @@ export default defineConfig(() => {
 });
 ```
 
-## Documentation
+## 文档
 
-For detailed API documentation and guides, visit:
+详细的 API 文档和指南，请访问：
 
-- [API Overview](https://www.coze.com/docs/developer_guides/api_overview)
-- [Authentication Guide](https://www.coze.com/docs/developer_guides/authentication)
+- [API 概览](https://www.coze.com/docs/developer_guides/api_overview)
+- [认证指南](https://www.coze.com/docs/developer_guides/authentication)
