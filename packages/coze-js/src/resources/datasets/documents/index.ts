@@ -1,1 +1,1 @@
-export * from './documents.js';
+export * from './documents';

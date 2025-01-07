@@ -1,6 +1,6 @@
-import { APIResource } from '../../resource.js';
-import { mergeConfig } from '../../../utils.js';
-import { type RequestOptions } from '../../../core.js';
+import { APIResource } from '../../resource';
+import { mergeConfig } from '../../../utils';
+import { type RequestOptions } from '../../../core';
 
 export class Speech extends APIResource {
   /**

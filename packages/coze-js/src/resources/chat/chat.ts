@@ -1,8 +1,8 @@
-import { APIResource, type ErrorData } from '../resource.js';
-import { sleep } from '../../utils.js';
-import { CozeError } from '../../error.js';
-import { type RequestOptions } from '../../core.js';
-import { Messages } from './messages/index.js';
+import { APIResource, type ErrorData } from '../resource';
+import { sleep } from '../../utils';
+import { CozeError } from '../../error';
+import { type RequestOptions } from '../../core';
+import { Messages } from './messages/index';
 
 const uuid = () => (Math.random() * new Date().getTime()).toString();
 

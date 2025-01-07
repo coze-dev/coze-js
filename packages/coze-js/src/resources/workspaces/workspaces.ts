@@ -1,6 +1,6 @@
-import { APIResource } from '../resource.js';
-import { safeJsonParse } from '../../utils.js';
-import { type RequestOptions } from '../../core.js';
+import { APIResource } from '../resource';
+import { safeJsonParse } from '../../utils';
+import { type RequestOptions } from '../../core';
 
 export class WorkSpaces extends APIResource {
   /**
