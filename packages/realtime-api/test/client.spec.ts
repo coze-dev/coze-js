@@ -28,6 +28,9 @@ const mockEngine = {
   registerExtension: vi.fn(),
   startAudioPlaybackDeviceTest: vi.fn(),
   stopAudioPlaybackDeviceTest: vi.fn(),
+  unpublishScreen: vi.fn(),
+  publishScreen: vi.fn(),
+  setVideoSourceType: vi.fn(),
 };
 
 // Mock VERTC
@@ -51,6 +54,9 @@ vi.mock('@volcengine/rtc', () => ({
   },
   MediaType: {
     AUDIO: 'audio',
+  },
+  VideoSourceType: {
+    VIDEO_SOURCE_TYPE_INTERNAL: 'internal',
   },
 }));
 

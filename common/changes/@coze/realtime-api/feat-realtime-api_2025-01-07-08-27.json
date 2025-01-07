@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "screen sharing bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
