@@ -9,12 +9,12 @@ import {
   getBrowserClientUserAgent,
   getNodeClientUserAgent,
   getUserAgent,
-} from './version.js';
-import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
-import { type FetchAPIOptions, fetchAPI } from './fetcher.js';
-import { APIError, type ErrorRes } from './error.js';
-import * as Errors from './error.js';
-import { COZE_COM_BASE_URL } from './constant.js';
+} from './version';
+import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils';
+import { type FetchAPIOptions, fetchAPI } from './fetcher';
+import { APIError, type ErrorRes } from './error';
+import * as Errors from './error';
+import { COZE_COM_BASE_URL } from './constant';
 
 export type RequestOptions = Omit<
   AxiosRequestConfig,

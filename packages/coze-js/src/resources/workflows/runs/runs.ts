@@ -1,6 +1,6 @@
-import { APIResource } from '../../resource.js';
-import { CozeError } from '../../../error.js';
-import { type RequestOptions } from '../../../core.js';
+import { APIResource } from '../../resource';
+import { CozeError } from '../../../error';
+import { type RequestOptions } from '../../../core';
 
 export class Runs extends APIResource {
   /**

@@ -1,7 +1,7 @@
-import { type ChunkStrategy, Documents } from './documents/index.js';
-import { APIResource } from '../resource.js';
-import { type RequestOptions } from '../../core.js';
-import { Images } from './images/index.js';
+import { type ChunkStrategy, Documents } from './documents/index';
+import { APIResource } from '../resource';
+import { type RequestOptions } from '../../core';
+import { Images } from './images/index';
 
 export class Datasets extends APIResource {
   documents: Documents = new Documents(this._client);
@@ -298,5 +298,5 @@ export interface DocumentProgress {
   update_interval: number;
 }
 
-export * from './documents/index.js';
-export * from './images/index.js';
+export * from './documents/index';
+export * from './images/index';

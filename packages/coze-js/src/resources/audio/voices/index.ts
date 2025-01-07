@@ -1,1 +1,1 @@
-export * from './voices.js';
+export * from './voices';

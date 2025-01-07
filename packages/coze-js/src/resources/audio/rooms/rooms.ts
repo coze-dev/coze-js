@@ -1,5 +1,5 @@
-import { APIResource } from '../../resource.js';
-import { type RequestOptions } from '../../../core.js';
+import { APIResource } from '../../resource';
+import { type RequestOptions } from '../../../core';
 
 export class Rooms extends APIResource {
   async create(params: CreateRoomReq, options?: RequestOptions) {
