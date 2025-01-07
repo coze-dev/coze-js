@@ -58,6 +58,10 @@ const client = new RealtimeClient({
   audioMutedDefault: false,           // Optional: Initial audio state (default: false)
   suppressStationaryNoise: false,     // Optional: Enable stationary noise suppression(default: false)
   suppressNonStationaryNoise: false,  // Optional: Enable non-stationary noise suppression(default: false)
+  videoConfig: { // Optional: Video configuration
+    videoOnDefault: true, // Optional: Whether to turn on video by default, defaults to true
+    renderDom: 'local-player' // Optional: The DOM element to render the video stream to
+  },
 });
 
 // Essential Setup
