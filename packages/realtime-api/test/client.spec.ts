@@ -317,6 +317,7 @@ describe('EngineClient', () => {
     });
 
     it('should throw error when no video devices available', async () => {
+      (client as any)._isSupportVideo = true;
       (utils.getAudioDevices as Mock).mockResolvedValueOnce({
         audioInputs: [{ deviceId: 'audio-in-1' }],
         audioOutputs: [],
