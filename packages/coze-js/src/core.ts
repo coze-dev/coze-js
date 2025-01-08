@@ -5,7 +5,11 @@ import {
   type AxiosInstance,
 } from 'axios';
 
-import { getNodeClientUserAgent, getUserAgent } from './version.js';
+import {
+  getBrowserClientUserAgent,
+  getNodeClientUserAgent,
+  getUserAgent,
+} from './version.js';
 import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils.js';
 import { type FetchAPIOptions, fetchAPI } from './fetcher.js';
 import { APIError, type ErrorRes } from './error.js';
@@ -101,7 +105,7 @@ export class APIClient {
       headers['User-Agent'] = getUserAgent();
       headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
     } else {
-      // headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
+      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     }
 
     const config = mergeConfig(this.axiosOptions, options, { headers });

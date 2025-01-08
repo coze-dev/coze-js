@@ -126,10 +126,12 @@ export class Messages extends APIResource {
     options?: RequestOptions,
   ) {
     const apiUrl = `/v1/conversation/message/delete?conversation_id=${conversation_id}&message_id=${message_id}`;
-    const response = await this._client.post<
-      unknown,
-      { data: ChatV3Message[] }
-    >(apiUrl, undefined, false, options);
+    const response = await this._client.post<unknown, { data: ChatV3Message }>(
+      apiUrl,
+      undefined,
+      false,
+      options,
+    );
     return response.data;
   }
 }
