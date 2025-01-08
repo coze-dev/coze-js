@@ -7,6 +7,7 @@ import VERTC, {
   type onUserLeaveEvent,
   StreamIndex,
   type UserMessageEvent,
+  VideoSourceType,
 } from '@volcengine/rtc';
 
 import { getAudioDevices, isScreenShareDevice } from './utils';
@@ -225,7 +226,12 @@ export class EngineClient extends RealtimeEventHandler {
         this.engine.setLocalVideoPlayer(StreamIndex.STREAM_INDEX_MAIN);
       }
       if (isAutoCapture) {
+        this.engine.setVideoSourceType(
+          StreamIndex.STREAM_INDEX_SCREEN,
+          VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
+        );
         await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+        await this.engine.publishScreen(MediaType.VIDEO);
       }
       this._streamIndex = StreamIndex.STREAM_INDEX_SCREEN;
     } else {
@@ -255,7 +261,7 @@ export class EngineClient extends RealtimeEventHandler {
       );
     }
 
-    if (!devices.videoInputs.length) {
+    if (this._isSupportVideo && !devices.videoInputs.length) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
         'Failed to get video devices',
@@ -306,13 +312,19 @@ export class EngineClient extends RealtimeEventHandler {
         if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
           await this.engine.startVideoCapture();
         } else {
+          this.engine.setVideoSourceType(
+            StreamIndex.STREAM_INDEX_SCREEN,
+            VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
+          );
           await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+          await this.engine.publishScreen(MediaType.VIDEO);
         }
       } else {
         if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
           await this.engine.stopVideoCapture();
         } else {
           await this.engine.stopScreenCapture();
+          await this.engine.unpublishScreen(MediaType.VIDEO);
         }
       }
     } catch (e) {

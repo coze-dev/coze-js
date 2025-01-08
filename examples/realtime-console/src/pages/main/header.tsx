@@ -283,9 +283,14 @@ const Header: React.FC<HeaderProps> = ({
     clientRef.current?.setAudioOutputDevice(value);
   };
 
-  const handleVideoInputDeviceChange = (value: string) => {
-    setVideoInputDeviceId(value);
-    clientRef.current?.setVideoInputDevice(value);
+  const handleVideoInputDeviceChange = async (value: string) => {
+    try {
+      setVideoInputDeviceId(value);
+      await clientRef.current?.setVideoInputDevice(value);
+    } catch (error) {
+      message.error(`Failed to set video input device: ${error}`);
+      console.error(error);
+    }
   };
 
   if (microphoneStatus === 'error') {
