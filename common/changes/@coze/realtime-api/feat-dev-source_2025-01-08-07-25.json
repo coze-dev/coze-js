@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "realtime-api 源码引入到 examples",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "wangfocheng@bytedance.com"
+}
