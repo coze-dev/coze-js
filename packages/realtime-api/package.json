@@ -28,7 +28,6 @@
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
   "types": "./src/index.ts",
-  "typings": "src/index.d.ts",
   "files": [
     "dist",
     "LICENSE",

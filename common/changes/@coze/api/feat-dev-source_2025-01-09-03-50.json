@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "rebase 0109",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "wangfocheng@bytedance.com"
+}
