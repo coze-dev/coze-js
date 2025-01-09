@@ -7,7 +7,6 @@
     "allowJs": true,
     "strict": true,
     "outDir": "dist",
-    "skipLibCheck": true,
     "resolveJsonModule": true
   },
   "include": ["src/**/*"],
