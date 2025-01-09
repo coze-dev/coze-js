@@ -68,7 +68,7 @@
   "peerDependencies": {
     "axios": "^1.7.1"
   },
-  "botPublishConfig": {
+  "cozePublishConfig": {
     "exports": {
       ".": {
         "require": "./dist/cjs/index.cjs",
