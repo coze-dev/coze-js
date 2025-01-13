@@ -62,7 +62,7 @@
     "typescript": "^5.5.3",
     "vitest": "~2.1.4"
   },
-  "botPublishConfig": {
+  "cozePublishConfig": {
     "exports": {
       ".": {
         "require": "./dist/cjs/index.cjs",

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "cozePub",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "wangfocheng@bytedance.com"
+}
