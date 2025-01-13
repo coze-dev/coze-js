@@ -1,1 +1,1 @@
-export * from './transcriptions.js';
+export * from './transcriptions';
