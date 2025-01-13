@@ -17,6 +17,7 @@ export interface RealtimeClientConfig {
   botId: string /** required, Bot Id */;
   voiceId?: string /** optional, Voice Id */;
   conversationId?: string /** optional, Conversation Id */;
+  userId?: string /** optional, User Id */;
   baseURL?: string /** optional, defaults to "https://api.coze.cn" */;
   debug?: boolean /** optional, defaults to false */;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
@@ -53,6 +54,8 @@ class RealtimeClient extends RealtimeEventHandler {
    *                         可选，音色Id。
    * @param config.conversationId - Optional, Conversation Id. |
    *                               可选，会话Id。
+   * @param config.userId - Optional, User Id. |
+   *                        可选，用户Id。
    * @param config.baseURL - Optional, defaults to "https://api.coze.cn". |
    *                        可选，默认值为 "https://api.coze.cn"。
    * @param config.debug - Optional, defaults to false.
@@ -110,9 +113,10 @@ class RealtimeClient extends RealtimeEventHandler {
       // Step1 get token
       roomInfo = await this._api.audio.rooms.create({
         bot_id: botId,
-        conversation_id: conversationId,
+        conversation_id: conversationId || undefined,
         voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
         connector_id: this._config.connectorId,
+        uid: this._config.userId || undefined,
       });
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);

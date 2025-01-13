@@ -20,6 +20,8 @@ export class Voices extends APIResource {
    * | 如果传入会基于该文本生成预览音频，否则使用默认的文本
    * @param params.text - Optional. Users can read this text, service will compare audio with text. Returns error if difference is too large
    * | 可以让用户按照该文本念诵，服务会对比音频与该文本的差异。若差异过大会返回错误
+   * @param params.space_id - Optional.  The space id of the voice. | 空间ID
+   * @param params.description- Optional. The description of the voice. | 音色描述
    * @param options - Request options
    * @returns Clone voice data
    */
@@ -71,6 +73,10 @@ export interface CloneVoiceReq {
   /** Users can read this text, service will compare audio with text. Returns error if difference is too large
    * | 可以让用户按照该文本念诵，服务会对比音频与该文本的差异。若差异过大会返回错误 */
   text?: string;
+  /** The space id of the voice. */
+  space_id?: string;
+  /** The description of the voice. */
+  description?: string;
 }
 
 export interface CloneVoiceData {

@@ -94,6 +94,8 @@ const RealtimeConsole: React.FC = () => {
       suppressStationaryNoise: noiseSuppression.includes('stationary'),
       suppressNonStationaryNoise: noiseSuppression.includes('non-stationary'),
       connectorId: '1024',
+      userId: localManager.get(LocalStorageKey.USER_ID),
+      conversationId: localManager.get(LocalStorageKey.CONVERSATION_ID),
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
@@ -164,6 +166,7 @@ const RealtimeConsole: React.FC = () => {
       (data?.data?.role === 'user' ||
         data?.data?.role === 'assistant' ||
         data?.event_type === 'conversation.created' ||
+        data?.event_type === 'conversation.audio_transcript.delta' ||
         data?.event_type === 'error')
     ) {
       setServerEvents(prevEvents => {
@@ -203,6 +206,13 @@ const RealtimeConsole: React.FC = () => {
           },
         },
       };
+    }
+
+    if (
+      lastEvent.event === 'conversation.audio_transcript.delta' &&
+      event.event === 'conversation.audio_transcript.delta'
+    ) {
+      return event;
     }
     return null;
   };

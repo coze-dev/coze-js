@@ -19,8 +19,10 @@ import { COZE_COM_BASE_URL } from './constant.js';
 export type RequestOptions = Omit<
   AxiosRequestConfig,
   'url' | 'method' | 'baseURL' | 'data' | 'responseType'
-> &
-  Record<string, unknown>;
+> & {
+  /** Whether to enable debug mode in current request */
+  debug?: boolean;
+} & Record<string, unknown>;
 
 export type GetToken = string | (() => Promise<string> | string);
 export interface ClientOptions {
@@ -108,7 +110,12 @@ export class APIClient {
       headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     }
 
-    const config = mergeConfig(this.axiosOptions, options, { headers });
+    const config = mergeConfig(
+      this.axiosOptions,
+      options,
+      { headers },
+      { headers: this.headers || {} },
+    );
     config.method = method;
     config.data = body;
 
@@ -128,13 +135,13 @@ export class APIClient {
     fetchOptions.isStreaming = isStream;
     fetchOptions.axiosInstance = this.axiosInstance;
 
-    this.debugLog(`--- request url: ${fullUrl}`);
-    this.debugLog('--- request options:', fetchOptions);
+    this.debugLog(options?.debug, `--- request url: ${fullUrl}`);
+    this.debugLog(options?.debug, '--- request options:', fetchOptions);
 
     const { response, stream, json } = await fetchAPI(fullUrl, fetchOptions);
 
-    this.debugLog(`--- response status: ${response.status}`);
-    this.debugLog('--- response headers: ', response.headers);
+    this.debugLog(options?.debug, `--- response status: ${response.status}`);
+    this.debugLog(options?.debug, '--- response headers: ', response.headers);
 
     // Taro use `header`
     const contentType = (response.headers ??
@@ -238,8 +245,8 @@ export class APIClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public debugLog(...msgs: any[]) {
-    if (this.debug) {
+  public debugLog(forceDebug = false, ...msgs: any[]) {
+    if (this.debug || forceDebug) {
       console.debug(...msgs);
     }
   }

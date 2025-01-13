@@ -210,12 +210,23 @@ const useCozeAPI = () => {
     }
   };
 
+  const uploadFile = async (file: File) => {
+    try {
+      const response = await api?.files.upload({ file });
+      return response;
+    } catch (error) {
+      console.error('upload file error:', error);
+      throw error;
+    }
+  };
+
   return {
     api,
     fetchAllVoices,
     fetchAllBots,
     fetchAllWorkspaces,
     cloneVoice,
+    uploadFile,
   };
 };
 
