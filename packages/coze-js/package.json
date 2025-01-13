@@ -58,7 +58,7 @@
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",
-    "@rslib/core": "0.0.18",
+    "@rslib/core": "0.3.0",
     "@swc/core": "^1.3.14",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/node": "^20",
