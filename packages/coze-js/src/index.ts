@@ -1,5 +1,5 @@
-import * as API from './resources/index.js';
-import { APIClient } from './core.js';
+import * as API from './resources/index';
+import { APIClient } from './core';
 
 export class CozeAPI extends APIClient {
   bots: API.Bots = new API.Bots(this);
@@ -16,13 +16,9 @@ export class CozeAPI extends APIClient {
   audio: API.Audio = new API.Audio(this);
   templates: API.Templates = new API.Templates(this);
 }
-export {
-  type ClientOptions,
-  type RequestOptions,
-  type GetToken,
-} from './core.js';
-export * from './auth.js';
-export * from './resources/index.js';
-export * from './fetcher.js';
-export * from './error.js';
-export * from './constant.js';
+export { type ClientOptions, type RequestOptions, type GetToken } from './core';
+export * from './auth';
+export * from './resources/index';
+export * from './fetcher';
+export * from './error';
+export * from './constant';

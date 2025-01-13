@@ -1,12 +1,12 @@
-import { APIResource } from '../../resource.js';
+import { APIResource } from '../../resource';
 import {
   type ContentType,
   type ChatV3Message,
   type MetaDataType,
   type RoleType,
   type ObjectStringItem,
-} from '../../index.js';
-import { type RequestOptions } from '../../../core.js';
+} from '../../index';
+import { type RequestOptions } from '../../../core';
 
 export class Messages extends APIResource {
   /**

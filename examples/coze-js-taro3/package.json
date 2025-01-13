@@ -48,6 +48,7 @@
     "@types/webpack-env": "^1.13.6",
     "@vue/babel-plugin-jsx": "^1.0.6",
     "@vue/compiler-sfc": "^3.0.0",
+    "babel-loader": "^8.2.3",
     "babel-preset-taro": "3.6.35",
     "css-loader": "^6.5.1",
     "postcss": "^8.4.4",

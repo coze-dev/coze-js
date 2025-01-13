@@ -2,7 +2,9 @@ import { defineConfig, type UserConfigExport } from '@tarojs/cli';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 import devConfig from './dev';
 import prodConfig from './prod';
+import path from 'path';
 
+const packagesDir = path.resolve(__dirname, '../../../../');
 export default defineConfig(async merge => {
   const baseConfig: UserConfigExport = {
     projectName: 'coze-js-taro3',
@@ -60,6 +62,13 @@ export default defineConfig(async merge => {
           return args;
         });
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
+        chain.module
+          .rule('taroApiBabel')
+          .test(/\.ts$/)
+          .use('babel-loader')
+          .loader('babel-loader')
+          .end()
+          .include.add(packagesDir);
       },
     },
     h5: {
@@ -97,6 +106,13 @@ export default defineConfig(async merge => {
           return args;
         });
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
+        chain.module
+          .rule('taroApiBabel')
+          .test(/\.ts$/)
+          .use('babel-loader')
+          .loader('babel-loader')
+          .end()
+          .include.add(packagesDir);
       },
     },
     rn: {

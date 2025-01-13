@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-import { APIResource } from '../resource.js';
-import { type RequestOptions } from '../../core.js';
+import { APIResource } from '../resource';
+import { type RequestOptions } from '../../core';
 
 export class Bots extends APIResource {
   /**

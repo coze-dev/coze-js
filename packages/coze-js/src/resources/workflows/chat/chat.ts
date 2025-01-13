@@ -1,12 +1,12 @@
-import { APIResource } from '../../resource.js';
+import { APIResource } from '../../resource';
 import {
   ChatEventType,
   type EnterMessage,
   handleAdditionalMessages,
   type StreamChatData,
-} from '../../chat/chat.js';
-import { CozeError } from '../../../error.js';
-import { type RequestOptions } from '../../../core.js';
+} from '../../chat/chat';
+import { CozeError } from '../../../error';
+import { type RequestOptions } from '../../../core';
 
 export class WorkflowChat extends APIResource {
   /**

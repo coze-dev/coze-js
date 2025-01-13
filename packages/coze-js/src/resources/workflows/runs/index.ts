@@ -1,1 +1,1 @@
-export * from './runs.js';
+export * from './runs';

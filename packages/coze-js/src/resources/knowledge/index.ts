@@ -1,5 +1,5 @@
-import { OldDocuments } from './documents/index.js';
-import { APIResource } from '../resource.js';
+import { OldDocuments } from './documents/index';
+import { APIResource } from '../resource';
 
 export class Knowledge extends APIResource {
   /**
@@ -8,4 +8,4 @@ export class Knowledge extends APIResource {
   documents: OldDocuments = new OldDocuments(this._client);
 }
 
-export * from './documents/index.js';
+export * from './documents/index';

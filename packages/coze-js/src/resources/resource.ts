@@ -1,4 +1,4 @@
-import { type APIClient } from '../core.js';
+import { type APIClient } from '../core';
 
 export class APIResource {
   protected _client: APIClient;

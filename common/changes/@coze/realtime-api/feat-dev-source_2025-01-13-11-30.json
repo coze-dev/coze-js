@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "cozePublishConfig",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "wangfocheng@bytedance.com"
+}

@@ -23,16 +23,11 @@
   "author": "jackshen <jackshen310@gmail.com>",
   "type": "module",
   "exports": {
-    ".": {
-      "require": "./dist/cjs/index.cjs",
-      "import": "./dist/esm/index.js",
-      "types": "./dist/types/index.d.ts"
-    }
+    ".": "./src/index.ts"
   },
-  "main": "dist/cjs/index.cjs",
-  "module": "dist/esm/index.js",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
   "types": "./src/index.ts",
-  "typings": "dist/types/index.d.ts",
   "files": [
     "dist",
     "LICENSE",
@@ -66,5 +61,17 @@
     "axios": "^1.7.7",
     "typescript": "^5.5.3",
     "vitest": "~2.1.4"
+  },
+  "cozePublishConfig": {
+    "exports": {
+      ".": {
+        "require": "./dist/cjs/index.cjs",
+        "import": "./dist/esm/index.js",
+        "types": "./dist/types/index.d.ts"
+      }
+    },
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/esm/index.js",
+    "typings": "dist/types/index.d.ts"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "taro dev source",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "wangfocheng@bytedance.com"
+}

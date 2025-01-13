@@ -14,7 +14,7 @@ import {
   type ErrorRes,
   CozeError,
   APIUserAbortError,
-} from './error.js';
+} from './error';
 
 export interface FetchAPIOptions extends AxiosRequestConfig {
   // Custom axios instance

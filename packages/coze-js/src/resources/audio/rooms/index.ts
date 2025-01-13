@@ -1,1 +1,1 @@
-export * from './rooms.js';
+export * from './rooms';
