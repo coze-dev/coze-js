@@ -1,1 +1,1 @@
-export { Documents as OldDocuments } from './documents.js';
+export { Documents as OldDocuments } from './documents';

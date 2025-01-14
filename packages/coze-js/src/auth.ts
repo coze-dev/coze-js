@@ -2,14 +2,14 @@ import * as nodeCrypto from 'crypto';
 
 import jwt from 'jsonwebtoken';
 
-import { isBrowser, sleep } from './utils.js';
-import { APIError } from './error.js';
-import { APIClient, type RequestOptions } from './core.js';
+import { isBrowser, sleep } from './utils';
+import { APIError } from './error';
+import { APIClient, type RequestOptions } from './core';
 import {
   COZE_COM_BASE_URL,
   MAX_POLL_INTERVAL,
   POLL_INTERVAL,
-} from './constant.js';
+} from './constant';
 
 const getCrypto = () => {
   if (isBrowser()) {

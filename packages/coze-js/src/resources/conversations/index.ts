@@ -1,7 +1,7 @@
-import { APIResource } from '../resource.js';
-import { type EnterMessage, type MetaDataType } from '../index.js';
-import { type RequestOptions } from '../../core.js';
-import { Messages } from './messages/index.js';
+import { APIResource } from '../resource';
+import { type EnterMessage, type MetaDataType } from '../index';
+import { type RequestOptions } from '../../core';
+import { Messages } from './messages/index';
 
 export class Conversations extends APIResource {
   /**
@@ -123,4 +123,4 @@ export interface ConversationSession {
   conversation_id: string;
 }
 
-export * from './messages/index.js';
+export * from './messages/index';
