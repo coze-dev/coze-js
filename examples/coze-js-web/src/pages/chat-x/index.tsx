@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
-import { Badge, Button, type GetProp, message, Space } from 'antd';
-import { type CreateChatData } from '@coze/api';
+import { Badge, Button, type GetProp, message, Space, Tooltip } from 'antd';
+import { WebsocketsEventType, type CreateChatData } from '@coze/api';
 import { type MessageInfo } from '@ant-design/x/es/useXChat';
 import {
   Attachments,
@@ -15,9 +15,12 @@ import {
 import {
   CloudUploadOutlined,
   PaperClipOutlined,
+  PhoneOutlined,
+  PhoneTwoTone,
   PlusOutlined,
 } from '@ant-design/icons';
 
+import useWsAPI from './use-ws-api';
 import useStyles from './use-style';
 import useCozeAPI from './use-coze-api';
 import Settings from './settings';
@@ -67,6 +70,9 @@ const ChatX: React.FC = () => {
     new Map(),
   );
   const isTypingRef = React.useRef(false);
+  const [speech, setSpeech] = React.useState(false);
+  const [chat, setChat] = React.useState(false);
+  const lastContentRef = React.useRef('');
 
   const {
     initClient,
@@ -75,7 +81,18 @@ const ChatX: React.FC = () => {
     getBotInfo,
     uploadFile,
     uploading,
+    clientRef,
   } = useCozeAPI();
+  const { startChat, stopChat, startSpeech, stopSpeech } = useWsAPI(
+    clientRef,
+    data => {
+      if (
+        data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE
+      ) {
+        setContent(lastContentRef.current + data.data.content);
+      }
+    },
+  );
 
   // ==================== Runtime ====================
   const [agent] = useXAgent({
@@ -223,13 +240,32 @@ const ChatX: React.FC = () => {
   );
 
   const attachmentsNode = (
-    <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-      <Button
-        type="text"
-        icon={<PaperClipOutlined />}
-        onClick={() => setHeaderOpen(!headerOpen)}
-      />
-    </Badge>
+    <>
+      <Badge dot={attachedFiles.length > 0 && !headerOpen}>
+        <Button
+          type="text"
+          icon={<PaperClipOutlined />}
+          onClick={() => setHeaderOpen(!headerOpen)}
+        />
+      </Badge>
+      <Tooltip title="语音对话">
+        <Button
+          type="text"
+          icon={chat ? <PhoneTwoTone /> : <PhoneOutlined />}
+          onClick={() => {
+            const nextChat = !chat;
+            setChat(nextChat);
+            if (nextChat) {
+              startChat();
+              message.info('开始语音对话');
+            } else {
+              stopChat();
+              message.info('停止语音对话');
+            }
+          }}
+        />
+      </Tooltip>
+    </>
   );
 
   const senderHeader = (
@@ -309,6 +345,21 @@ const ChatX: React.FC = () => {
           prefix={attachmentsNode}
           loading={agent.isRequesting() || uploading}
           className={styles.sender}
+          allowSpeech={{
+            // When setting `recording`, the built-in speech recognition feature will be disabled
+            recording: speech,
+            onRecordingChange: nextSpeech => {
+              setSpeech(nextSpeech);
+              if (nextSpeech) {
+                lastContentRef.current = content;
+                message.info('开始语音转文字');
+                startSpeech();
+              } else {
+                message.info('停止语音转文字');
+                stopSpeech();
+              }
+            },
+          }}
         />
       </div>
     </div>

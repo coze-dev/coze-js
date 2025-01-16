@@ -50,7 +50,9 @@
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.2",
-    "node-fetch": "^2.x"
+    "node-fetch": "^2.x",
+    "reconnecting-websocket": "^4.4.0",
+    "ws": "^8.11.0"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
@@ -63,6 +65,7 @@
     "@types/node-fetch": "^2.x",
     "@types/uuid": "^9.0.1",
     "@types/whatwg-fetch": "^0.0.33",
+    "@types/ws": "^8.5.1",
     "@vitest/coverage-v8": "~2.1.4",
     "axios": "^1.7.7",
     "typescript": "^5.5.3",

@@ -13,11 +13,14 @@ const botId = process.env.COZE_BOT_ID || config[key].COZE_BOT_ID;
 const spaceId = process.env.COZE_SPACE_ID || config[key].COZE_SPACE_ID;
 const workflowId = process.env.COZE_WORKFLOW_ID || config[key].COZE_WORKFLOW_ID;
 const baseURL = process.env.COZE_BASE_URL || config[key].COZE_BASE_URL;
+const baseWsURL = process.env.COZE_BASE_WS_URL || config[key].COZE_BASE_WS_URL;
 const datasetId = process.env.DATASET_ID || config[key].DATASET_ID;
 
 const client = new CozeAPI({
   baseURL,
   token: apiKey,
+  baseWsURL,
+  debug: false,
 });
 
 async function sleep(ms: number) {
