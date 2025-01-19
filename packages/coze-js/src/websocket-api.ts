@@ -4,15 +4,15 @@ import {
   type Event,
   type CloseEvent,
   type ErrorEvent,
-} from 'reconnecting-websocket/dist/events.js';
+} from 'reconnecting-websocket/dist/events';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import { isBrowser } from './utils.js';
+import { isBrowser } from './utils';
 import {
   type CommonErrorEvent,
   WebsocketsEventType,
-} from './resources/websockets/types.js';
-import { type WebsocketOptions } from './core.js';
+} from './resources/websockets/types';
+import { type WebsocketOptions } from './core';
 
 export class WebSocketAPI<Req, Rsp> {
   private rws: ReconnectingWebSocket;

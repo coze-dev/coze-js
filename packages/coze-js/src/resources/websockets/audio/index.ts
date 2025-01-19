@@ -1,9 +1,9 @@
-import { APIResource } from '../../resource.js';
-import { Transcriptions } from './transcriptions/index.js';
-import { Speech } from './speech/index.js';
+import { APIResource } from '../../resource';
+import { Transcriptions } from './transcriptions/index';
+import { Speech } from './speech/index';
 
-export * from './speech/index.js';
-export * from './transcriptions/index.js';
+export * from './speech/index';
+export * from './transcriptions/index';
 
 export class Audio extends APIResource {
   speech: Speech = new Speech(this._client);

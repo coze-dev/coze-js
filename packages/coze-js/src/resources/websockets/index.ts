@@ -1,20 +1,20 @@
-import { Chat } from './chat/index.js';
-import { Audio } from './audio/index.js';
-import { APIResource } from '../resource.js';
+import { Chat } from './chat/index';
+import { Audio } from './audio/index';
+import { APIResource } from '../resource';
 
 export class Websockets extends APIResource {
   audio: Audio = new Audio(this._client);
   chat: Chat = new Chat(this._client);
 }
 
-export { type CreateChatWsReq, type CreateChatWsRes } from './chat/index.js';
+export { type CreateChatWsReq, type CreateChatWsRes } from './chat/index';
 export {
   type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
-} from './audio/transcriptions/index.js';
+} from './audio/transcriptions/index';
 export {
   type CreateSpeechWsReq,
   type CreateSpeechWsRes,
-} from './audio/speech/index.js';
+} from './audio/speech/index';
 
-export * from './types.js';
+export * from './types';

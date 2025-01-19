@@ -8,9 +8,9 @@ import {
   type SpeechCreatedEvent,
   type SpeechUpdatedEvent,
   type SpeechUpdateEvent,
-} from '../../types.js';
-import { APIResource } from '../../../resource.js';
-import { type WebsocketOptions } from '../../../../core.js';
+} from '../../types';
+import { APIResource } from '../../../resource';
+import { type WebsocketOptions } from '../../../../core';
 
 export class Speech extends APIResource {
   async create(options?: WebsocketOptions) {

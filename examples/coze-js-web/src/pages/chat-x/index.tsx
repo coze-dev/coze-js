@@ -76,30 +76,29 @@ const ChatX: React.FC = () => {
 
   const {
     initClient,
-    streamingChat,
+    // streamingChat,
     botInfo,
     getBotInfo,
     uploadFile,
     uploading,
     clientRef,
   } = useCozeAPI();
-  const { startChat, stopChat, startSpeech, stopSpeech } = useWsAPI(
-    clientRef,
-    data => {
+  const { startChat, stopChat, startSpeech, stopSpeech, sendWsMessage } =
+    useWsAPI(clientRef, data => {
       if (
         data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE
       ) {
         setContent(lastContentRef.current + data.data.content);
       }
-    },
-  );
+    });
 
   // ==================== Runtime ====================
   const [agent] = useXAgent({
     request: ({ message: query }, { onUpdate, onSuccess }) => {
       const conversationId = activeKeyRef.current || '0';
       isTypingRef.current = true;
-      streamingChat({
+
+      sendWsMessage({
         query: query ?? '',
         conversationId: conversationId === '0' ? undefined : conversationId,
         onUpdate,
@@ -138,6 +137,46 @@ const ChatX: React.FC = () => {
           });
         },
       });
+
+      // streamingChat({
+      //   query: query ?? '',
+      //   conversationId: conversationId === '0' ? undefined : conversationId,
+      //   onUpdate,
+      //   onSuccess: (delta: string) => {
+      //     onSuccess(delta);
+      //     isTypingRef.current = false;
+      //   },
+      //   onCreated: (data: CreateChatData) => {
+      //     setConversationsItems(prev => {
+      //       const exist = prev.find(
+      //         item => item.key === data.conversation_id || item.key === '0',
+      //       );
+      //       activeKeyRef.current = data.conversation_id;
+
+      //       if (!exist) {
+      //         return [
+      //           ...prev,
+      //           {
+      //             key: data.conversation_id,
+      //             label: query ?? '',
+      //           },
+      //         ];
+      //       } else {
+      //         if (exist.key === '0') {
+      //           const newConversationsItems = prev.map(item => {
+      //             if (item.key === '0') {
+      //               return { key: data.conversation_id, label: query ?? '' };
+      //             }
+      //             return item;
+      //           });
+
+      //           return newConversationsItems;
+      //         }
+      //         return prev;
+      //       }
+      //     });
+      //   },
+      // });
     },
   });
 
@@ -252,16 +291,16 @@ const ChatX: React.FC = () => {
         <Button
           type="text"
           icon={chat ? <PhoneTwoTone /> : <PhoneOutlined />}
-          onClick={() => {
+          onClick={async () => {
             const nextChat = !chat;
-            setChat(nextChat);
             if (nextChat) {
-              startChat();
+              await startChat();
               message.info('开始语音对话');
             } else {
-              stopChat();
+              await stopChat();
               message.info('停止语音对话');
             }
+            setChat(nextChat);
           }}
         />
       </Tooltip>
@@ -348,16 +387,16 @@ const ChatX: React.FC = () => {
           allowSpeech={{
             // When setting `recording`, the built-in speech recognition feature will be disabled
             recording: speech,
-            onRecordingChange: nextSpeech => {
-              setSpeech(nextSpeech);
+            onRecordingChange: async nextSpeech => {
               if (nextSpeech) {
                 lastContentRef.current = content;
                 message.info('开始语音转文字');
-                startSpeech();
+                await startSpeech();
               } else {
                 message.info('停止语音转文字');
-                stopSpeech();
+                await stopSpeech();
               }
+              setSpeech(nextSpeech);
             },
           }}
         />

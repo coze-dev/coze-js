@@ -20,9 +20,9 @@ import {
   type InputAudioBufferClearEvent,
   type InputAudioBufferCompletedEvent,
   type InputAudioBufferCompleteEvent,
-} from '../types.js';
-import { APIResource } from '../../resource.js';
-import { type WebsocketOptions } from '../../../core.js';
+} from '../types';
+import { APIResource } from '../../resource';
+import { type WebsocketOptions } from '../../../core';
 
 export class Chat extends APIResource {
   async create(botId: string, options?: WebsocketOptions) {

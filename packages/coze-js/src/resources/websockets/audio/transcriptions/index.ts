@@ -10,9 +10,9 @@ import {
   type TranscriptionsMessageUpdateEvent,
   type TranscriptionsMessageCompletedEvent,
   type CommonErrorEvent,
-} from '../../types.js';
-import { APIResource } from '../../../resource.js';
-import { type WebsocketOptions } from '../../../../core.js';
+} from '../../types';
+import { APIResource } from '../../../resource';
+import { type WebsocketOptions } from '../../../../core';
 
 export class Transcriptions extends APIResource {
   async create(options?: WebsocketOptions) {

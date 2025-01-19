@@ -1,8 +1,9 @@
-import { type MutableRefObject, useCallback, useRef } from 'react';
+import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 import {
   type ConversationAudioDeltaEvent,
   type CozeAPI,
+  type CreateChatData,
   type CreateChatWsReq,
   type CreateChatWsRes,
   type CreateTranscriptionsWsReq,
@@ -30,6 +31,17 @@ const useWsAPI = (
   > | null>(null);
   const isConnected = useRef(false);
   const trackId = useRef('my-track');
+  const deviceListRef = useRef<MediaDeviceInfo[]>([]);
+  const eventSetRef = useRef<Set<string>>();
+
+  useEffect(() => {
+    // Listen for device change; e.g. if somebody disconnects a microphone
+    // deviceList is array of MediaDeviceInfo[] + `default` property
+    wavRecorder.listenForDeviceChange((deviceList: MediaDeviceInfo[]) => {
+      console.log('deviceList', deviceList);
+      deviceListRef.current = deviceList;
+    });
+  }, []);
 
   const initTranscriptionsWs = useCallback(async () => {
     closeTranscriptionsWs();
@@ -63,6 +75,13 @@ const useWsAPI = (
 
       ws.onmessage = (data, event) => {
         console.log('[transcriptions] ws message', data);
+        if (
+          data.event_type ===
+          WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_COMPLETED
+        ) {
+          console.log('[transcriptions] ws transcriptions completed', data);
+          closeTranscriptionsWs();
+        }
         onTranscription(data);
       };
 
@@ -95,89 +114,105 @@ const useWsAPI = (
     }
   };
 
-  const initWs = useCallback(async () => {
-    closeWs();
+  const initWs = useCallback(
+    async ({
+      conversationId,
+      onMessage,
+    }: {
+      conversationId?: string;
+      onMessage?: (data: CreateChatWsRes) => void;
+    }) => {
+      closeWs();
 
-    if (!isConnected.current) {
-      await wavStreamPlayer.connect();
-      console.log('wavStreamPlayer.connect');
-      isConnected.current = true;
-    }
-    if (!clientRef.current) {
-      return;
-    }
-    const ws = await clientRef.current.websockets.chat.create(
-      config.getBotId(),
-    );
-    return new Promise<WebSocketAPI<CreateChatWsReq, CreateChatWsRes>>(
-      (resolve, reject) => {
-        ws.onopen = () => {
-          console.log('[chat] ws open');
+      if (!isConnected.current) {
+        await wavStreamPlayer.connect();
+        console.log('wavStreamPlayer.connect');
+        isConnected.current = true;
+      }
+      if (!clientRef.current) {
+        return;
+      }
+      const ws = await clientRef.current.websockets.chat.create(
+        config.getBotId(),
+      );
+      return new Promise<WebSocketAPI<CreateChatWsReq, CreateChatWsRes>>(
+        (resolve, reject) => {
+          ws.onopen = () => {
+            console.log('[chat] ws open');
 
-          ws.send({
-            id: '1',
-            event_type: WebsocketsEventType.CHAT_UPDATE,
-            data: {
-              input_audio: {
-                format: 'pcm',
-                codec: 'pcm',
-                sample_rate: 24000,
-                channel: 1,
-                bit_depth: 16,
+            ws.send({
+              id: '1',
+              event_type: WebsocketsEventType.CHAT_UPDATE,
+              data: {
+                chat_config: {
+                  conversation_id: conversationId,
+                },
+                input_audio: {
+                  format: 'pcm',
+                  codec: 'pcm',
+                  sample_rate: 24000,
+                  channel: 1,
+                  bit_depth: 16,
+                },
               },
-            },
-          });
+            });
 
-          resolve(ws);
-        };
+            resolve(ws);
+          };
 
-        ws.onmessage = (data, event) => {
-          console.log('[chat] ws message', data);
-          if (
-            data.event_type === WebsocketsEventType.CONVERSATION_CHAT_FAILED
-          ) {
-            console.error('[chat] ws error', data);
-            // ws.close();
-            return;
-          }
-          if (
-            data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_DELTA
-          ) {
-            handleAudioMessage(data);
-          } else if (
-            [
-              WebsocketsEventType.CONVERSATION_CHAT_COMPLETED,
-              WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_COMPLETED,
-              WebsocketsEventType.SPEECH_AUDIO_COMPLETED,
-            ].includes(data.event_type)
-          ) {
-            // closeWs();
-          }
-        };
+          ws.onmessage = (data, event) => {
+            onMessage?.(data);
+            console.log('[chat] ws message', data);
+            eventSetRef.current?.add(data.event_type);
 
-        ws.onerror = (error, event) => {
-          console.error('[chat] ws error', error, event);
-          if (error.data.code === 401) {
-            console.error('[chat] Unauthorized Error', error);
-          } else if (error.data.code === 403) {
-            console.error('[chat] Forbidden Error', error);
-          } else {
-            console.error('[chat] WebSocket error', error);
-          }
+            if (
+              data.event_type === WebsocketsEventType.CONVERSATION_CHAT_FAILED
+            ) {
+              console.error('[chat] ws error', data);
+              // ws.close();
+              return;
+            }
+            if (
+              data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_DELTA
+            ) {
+              handleAudioMessage(data);
+            } else if (
+              [
+                WebsocketsEventType.CONVERSATION_CHAT_COMPLETED,
+                WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_COMPLETED,
+                WebsocketsEventType.SPEECH_AUDIO_COMPLETED,
+              ].includes(data.event_type)
+            ) {
+              closeWs();
+              console.log('allEvent', eventSetRef.current);
+            }
+          };
 
-          ws.close();
+          ws.onerror = (error, event) => {
+            console.error('[chat] ws error', error, event);
+            if (error.data.code === 401) {
+              console.error('[chat] Unauthorized Error', error);
+            } else if (error.data.code === 403) {
+              console.error('[chat] Forbidden Error', error);
+            } else {
+              console.error('[chat] WebSocket error', error);
+            }
 
-          reject(error);
-        };
+            ws.close();
 
-        ws.onclose = () => {
-          console.log('[chat] ws close');
-        };
+            reject(error);
+          };
 
-        wsRef.current = ws;
-      },
-    );
-  }, []);
+          ws.onclose = () => {
+            console.log('[chat] ws close');
+          };
+
+          wsRef.current = ws;
+        },
+      );
+    },
+    [],
+  );
 
   const closeWs = () => {
     if (wsRef.current) {
@@ -201,8 +236,8 @@ const useWsAPI = (
   );
 
   const startChat = useCallback(async () => {
-    await initWs();
-    await wavRecorder.begin();
+    await initWs({});
+    await wavRecorder.begin(deviceListRef.current[0].deviceId);
     interruptAudio();
     trackId.current = `my-track-${new Date().getTime()}`;
 
@@ -231,7 +266,8 @@ const useWsAPI = (
 
   const stopChat = useCallback(async () => {
     await wavRecorder.pause();
-    await wavRecorder.end();
+    const finalAudio = await wavRecorder.end();
+    console.log('[chat] finalAudio:', finalAudio);
 
     wsRef.current?.send({
       id: '1',
@@ -242,7 +278,7 @@ const useWsAPI = (
 
   const startSpeech = useCallback(async () => {
     await initTranscriptionsWs();
-    await wavRecorder.begin();
+    await wavRecorder.begin(deviceListRef.current[0].deviceId);
 
     // await wavRecorder.clear();
     await wavRecorder.record(data => {
@@ -281,15 +317,66 @@ const useWsAPI = (
     console.log('[transcriptions] send input_audio_buffer_complete');
 
     await wavRecorder.pause();
-    await wavRecorder.end();
+    const finalAudio = await wavRecorder.end();
+    console.log('[transcriptions] finalAudio:', finalAudio);
 
-    closeTranscriptionsWs();
+    // closeTranscriptionsWs();
   }, []);
 
   const interruptAudio = useCallback(() => {
     // wavRecorder.clear();
     wavStreamPlayer.interrupt();
   }, []);
+
+  const sendWsMessage = useCallback(
+    async ({
+      query,
+      conversationId,
+      onUpdate,
+      onSuccess,
+      onCreated,
+    }: {
+      query: string;
+      conversationId?: string;
+      onUpdate: (delta: string) => void;
+      onSuccess: (delta: string) => void;
+      onCreated: (data: CreateChatData) => void;
+    }) => {
+      let message = '';
+      await initWs({
+        onMessage: data => {
+          if (
+            data.event_type === WebsocketsEventType.CONVERSATION_CHAT_CREATED
+          ) {
+            onCreated?.(data.data as CreateChatData);
+          } else if (
+            data.event_type === WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
+          ) {
+            message += data.data.content;
+            onUpdate?.(message);
+          } else if (
+            data.event_type ===
+            WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED
+          ) {
+            message += data.data.content;
+            onSuccess?.(message);
+          }
+        },
+        conversationId,
+      });
+
+      wsRef.current?.send({
+        id: 'event_id',
+        event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+        data: {
+          role: 'user', // user/assistant
+          content_type: 'object_string', // text/object_string
+          content: `[{"type":"text","text":"${query}"}]`,
+        },
+      });
+    },
+    [],
+  );
 
   return {
     initWs,
@@ -298,6 +385,7 @@ const useWsAPI = (
     interruptAudio,
     startSpeech,
     stopSpeech,
+    sendWsMessage,
   };
 };
 
