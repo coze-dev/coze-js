@@ -83,7 +83,9 @@ const operations = {
   disconnect: () => client.disconnect(),
   interrupt: () => client.interrupt(),
   toggleMicrophone: (enabled: boolean) => client.setAudioEnable(enabled),
-  checkConnection: () => client.isConnected
+  checkConnection: () => client.isConnected,
+  // get rtc engine instance, for detail visit https://www.volcengine.com/docs/6348/104478#rtcengine
+  getRtcEngine: () => client.getRtcEngine(),
 };
 
 // Event Handling

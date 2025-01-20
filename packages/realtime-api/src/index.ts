@@ -1,4 +1,8 @@
-import { type ScreenConfig, type AudioPropertiesConfig } from '@volcengine/rtc';
+import {
+  type ScreenConfig,
+  type AudioPropertiesConfig,
+  type IRTCEngine,
+} from '@volcengine/rtc';
 import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -308,6 +312,15 @@ class RealtimeClient extends RealtimeEventHandler {
   async setVideoInputDevice(deviceId: string) {
     await this._client?.setVideoInputDevice(deviceId);
     this.dispatch(EventNames.VIDEO_INPUT_DEVICE_CHANGED, { deviceId });
+  }
+
+  /**
+   * en: Get the RTC engine instance, for detail visit https://www.volcengine.com/docs/6348/104481
+   *
+   * zh: 获取 RTC 引擎实例，详情请访问 https://www.volcengine.com/docs/6348/104481
+   */
+  getRtcEngine(): IRTCEngine | undefined {
+    return this._client?.getRtcEngine();
   }
 }
 

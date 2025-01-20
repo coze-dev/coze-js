@@ -79,7 +79,9 @@ const operations = {
   disconnect: () => client.disconnect(),
   interrupt: () => client.interrupt(),
   toggleMicrophone: (enabled: boolean) => client.setAudioEnable(enabled),
-  checkConnection: () => client.isConnected
+  checkConnection: () => client.isConnected,
+  // 获取 RTC 引擎实例，详情请访问  https://www.volcengine.com/docs/6348/104478#rtcengine
+  getRtcEngine: () => client.getRtcEngine(),
 };
 
 // 事件处理
