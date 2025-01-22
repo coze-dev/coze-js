@@ -25,7 +25,7 @@ export class EventSource extends BaseEventSource {
       this.trigger(EventName.Open);
     });
     this.task.onMessage(msg => {
-      this.trigger(EventName.Chunk, msg);
+      this.trigger(EventName.Chunk, { data: msg });
     });
     this.task.onError(e => {
       const errMsg =
@@ -33,7 +33,7 @@ export class EventSource extends BaseEventSource {
       if (this.isAborted) {
         return;
       }
-      this.trigger(EventName.Fail, errMsg);
+      this.trigger(EventName.Fail, { errMsg });
     });
     this.task.onClose(() => {
       this.trigger(EventName.Success);
@@ -45,7 +45,7 @@ export class EventSource extends BaseEventSource {
       this.isAborted = true;
       this.task?.close();
       // fire "fail" manualy
-      this.trigger(EventName.Fail, 'abort');
+      this.trigger(EventName.Fail, { errMsg: 'abort' });
     }
   }
 }

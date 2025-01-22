@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 /* eslint-disable @typescript-eslint/no-invalid-void-type -- ignore */
 import axios, {
   type AxiosAdapter,
   type AxiosInstance,
   type InternalAxiosRequestConfig,
+  type AxiosResponseHeaders,
 } from 'axios';
 import { request, getEnv, ENV_TYPE } from '@tarojs/taro';
 import {
   CozeAPI as InnerCozeAPI,
   type ClientOptions as InnerClientOptions,
+  APIError,
 } from '@coze/api';
 
 import { sharedMixins } from './mixins/shared';
@@ -59,13 +62,31 @@ export class CozeAPI extends InnerCozeAPI {
           data,
           header,
           success: res => {
-            resolve({
-              data: res.data,
-              status: res.statusCode,
-              statusText: res.errMsg,
-              headers: res.header,
-              config,
-            });
+            // Request failed
+            if (res.statusCode !== 200 || res.data.code) {
+              const resData = res.data || {};
+              resData.error = resData.error || resData.detail || {};
+              const resHeader = res.header || {};
+              resHeader['x-tt-logid'] =
+                resHeader['X-Tt-Logid'] ||
+                resHeader['x-tt-logid'] ||
+                resData.error.logid;
+              const error = APIError.generate(
+                res.statusCode,
+                resData,
+                res.errMsg,
+                resHeader as AxiosResponseHeaders,
+              );
+              reject(error);
+            } else {
+              resolve({
+                data: res.data,
+                status: res.statusCode,
+                statusText: res.errMsg,
+                headers: res.header,
+                config,
+              });
+            }
           },
           fail: err => {
             reject(err);
