@@ -96,6 +96,7 @@ const RealtimeConsole: React.FC = () => {
       connectorId: '1024',
       userId: localManager.get(LocalStorageKey.USER_ID),
       conversationId: localManager.get(LocalStorageKey.CONVERSATION_ID),
+      workflowId: localManager.get(LocalStorageKey.WORKFLOW_ID),
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',

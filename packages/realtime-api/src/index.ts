@@ -18,6 +18,7 @@ export interface RealtimeClientConfig {
   voiceId?: string /** optional, Voice Id */;
   conversationId?: string /** optional, Conversation Id */;
   userId?: string /** optional, User Id */;
+  workflowId?: string /** optional, Workflow Id */;
   baseURL?: string /** optional, defaults to "https://api.coze.cn" */;
   debug?: boolean /** optional, defaults to false */;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
@@ -117,6 +118,7 @@ class RealtimeClient extends RealtimeEventHandler {
         voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
         connector_id: this._config.connectorId,
         uid: this._config.userId || undefined,
+        workflow_id: this._config.workflowId || undefined,
       });
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);
