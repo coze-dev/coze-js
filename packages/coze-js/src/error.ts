@@ -11,7 +11,6 @@ export class APIError extends CozeError {
   readonly code: number | null | undefined;
   readonly msg: string | null | undefined;
   readonly detail: string | null | undefined;
-  readonly help_doc: string | null | undefined;
   readonly logid: string | null | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly rawError: any;
@@ -25,13 +24,12 @@ export class APIError extends CozeError {
     super(`${APIError.makeMessage(status, error, message, headers)}`);
     this.status = status;
     this.headers = headers;
-    this.logid = headers?.['x-tt-logid'];
+    this.logid = error?.detail?.logid || headers?.['x-tt-logid'];
 
     // this.error = error;
     this.code = error?.code;
     this.msg = error?.msg;
     this.detail = error?.error?.detail;
-    this.help_doc = error?.error?.help_doc;
     this.rawError = error;
   }
 
@@ -59,11 +57,6 @@ export class APIError extends CozeError {
       const logId = error?.logid || headers?.['x-tt-logid'];
       if (logId) {
         list.push(`logid: ${logId}`);
-      }
-
-      const help_doc = error?.help_doc;
-      if (help_doc) {
-        list.push(`help doc: ${help_doc}`);
       }
 
       return list.join(', ');
@@ -199,6 +192,10 @@ export const castToError = (err: unknown): Error => {
 export interface ErrorRes {
   code: number;
   msg?: string;
+  detail?: {
+    logid?: string;
+  };
+  /** @deprecated use detail instead */
   error?: {
     logid?: string;
     detail?: string;
