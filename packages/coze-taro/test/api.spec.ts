@@ -1,15 +1,5 @@
 import { CozeAPI } from '../src/api';
 
-vi.mock('../src/mixins/platform', async () => {
-  const mod = await vi.importActual('../src/mixins/platform.weapp');
-  return mod;
-});
-
-vi.mock('../src/event-source/index', async () => {
-  const mod = await vi.importActual('../src/event-source/index.weapp');
-  return mod;
-});
-
 describe('CozeAPI - mini', () => {
   beforeEach(() => {
     vi.useFakeTimers();

@@ -24,7 +24,6 @@
   },
   "license": "MIT",
   "author": "yjfengwen <yjfengwen@gmail.com>",
-  "type": "module",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "types": "src/index.ts",

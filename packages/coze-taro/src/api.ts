@@ -63,7 +63,7 @@ export class CozeAPI extends InnerCozeAPI {
           header,
           success: res => {
             // Request failed
-            if (res.statusCode !== 200 || res.data.code) {
+            if (res.statusCode !== 200 || res.data?.code) {
               const resData = res.data || {};
               resData.error = resData.error || resData.detail || {};
               const resHeader = res.header || {};

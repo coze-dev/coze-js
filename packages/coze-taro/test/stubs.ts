@@ -206,7 +206,7 @@ export const taroRequest = ({
   success: (res: { statusCode: number; errMsg?: string }) => void;
 }) => {
   if (data?.workflow_id === 'nonStreaming') {
-    return Promise.resolve();
+    return Promise.resolve({ statusCode: 200 });
   }
 
   const task = new TaroStreamingTask();
