@@ -398,4 +398,11 @@ describe('EngineClient', () => {
       );
     });
   });
+
+  describe('getRtcEngine', () => {
+    it('should get rtc engine', () => {
+      const engine = client.getRtcEngine();
+      expect(engine).toBeDefined();
+    });
+  });
 });
