@@ -2,6 +2,53 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.0.18",
+      "tag": "HEAD",
+      "date": "2025-02-06T10:36:15.097Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "update error handling and remove help_doc field"
+          },
+          {
+            "comment": "voice ASR bug"
+          },
+          {
+            "comment": "fix version"
+          },
+          {
+            "comment": "add test code"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "add translation api"
+          },
+          {
+            "comment": "Add description and space_id parameters to voices.clone api"
+          },
+          {
+            "comment": "coze-js remove import .js"
+          },
+          {
+            "comment": "@coze/api 源码引入到coze-js-web、coze-js-node"
+          },
+          {
+            "comment": "rebase 0109"
+          },
+          {
+            "comment": "cozePublishConfig"
+          },
+          {
+            "comment": "rebase 0113"
+          },
+          {
+            "comment": "add node-fetch for streaming support in older Node.js  versions"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.16",
       "tag": "HEAD",
       "date": "2025-01-09T02:43:30.468Z",
