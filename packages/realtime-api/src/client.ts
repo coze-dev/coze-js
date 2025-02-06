@@ -421,4 +421,8 @@ export class EngineClient extends RealtimeEventHandler {
       throw e;
     }
   }
+
+  getRtcEngine() {
+    return this.engine;
+  }
 }

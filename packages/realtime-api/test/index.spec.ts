@@ -52,6 +52,7 @@ describe('RealtimeClient', () => {
       initAIAnsExtension: vi.fn(),
       changeAIAnsExtension: vi.fn(),
       sendMessage: vi.fn(),
+      getRtcEngine: vi.fn(),
       dispatch: vi.fn(),
     } as any;
     (EngineClient as vi.Mock).mockImplementation(() => mockEngineClient);
@@ -330,6 +331,14 @@ describe('RealtimeClient', () => {
       expect(mockEngineClient.sendMessage).toHaveBeenCalledWith({
         message: 'test',
       });
+    });
+  });
+
+  describe('getRtcEngine', () => {
+    it('should return rtc engine instance', async () => {
+      await client.connect();
+      client.getRtcEngine();
+      expect(mockEngineClient.getRtcEngine).toHaveBeenCalled();
     });
   });
 });
