@@ -26,6 +26,7 @@ import useCozeAPI from './use-coze-api';
 import Settings from './settings';
 import logo from './logo.svg';
 import { config } from './config';
+import VoiceChatModal from './components/voice-chat-modal';
 
 interface Conversation {
   key: string;
@@ -73,16 +74,10 @@ const ChatX: React.FC = () => {
   const [speech, setSpeech] = React.useState(false);
   const [chat, setChat] = React.useState(false);
   const lastContentRef = React.useRef('');
+  const [voiceChatModalOpen, setVoiceChatModalOpen] = React.useState(false);
 
-  const {
-    initClient,
-    // streamingChat,
-    botInfo,
-    getBotInfo,
-    uploadFile,
-    uploading,
-    clientRef,
-  } = useCozeAPI();
+  const { initClient, botInfo, getBotInfo, uploadFile, uploading, clientRef } =
+    useCozeAPI();
   const { startChat, stopChat, startSpeech, stopSpeech, sendWsMessage } =
     useWsAPI(clientRef, data => {
       if (
@@ -137,46 +132,6 @@ const ChatX: React.FC = () => {
           });
         },
       });
-
-      // streamingChat({
-      //   query: query ?? '',
-      //   conversationId: conversationId === '0' ? undefined : conversationId,
-      //   onUpdate,
-      //   onSuccess: (delta: string) => {
-      //     onSuccess(delta);
-      //     isTypingRef.current = false;
-      //   },
-      //   onCreated: (data: CreateChatData) => {
-      //     setConversationsItems(prev => {
-      //       const exist = prev.find(
-      //         item => item.key === data.conversation_id || item.key === '0',
-      //       );
-      //       activeKeyRef.current = data.conversation_id;
-
-      //       if (!exist) {
-      //         return [
-      //           ...prev,
-      //           {
-      //             key: data.conversation_id,
-      //             label: query ?? '',
-      //           },
-      //         ];
-      //       } else {
-      //         if (exist.key === '0') {
-      //           const newConversationsItems = prev.map(item => {
-      //             if (item.key === '0') {
-      //               return { key: data.conversation_id, label: query ?? '' };
-      //             }
-      //             return item;
-      //           });
-
-      //           return newConversationsItems;
-      //         }
-      //         return prev;
-      //       }
-      //     });
-      //   },
-      // });
     },
   });
 
@@ -287,21 +242,11 @@ const ChatX: React.FC = () => {
           onClick={() => setHeaderOpen(!headerOpen)}
         />
       </Badge>
-      <Tooltip title="语音对话">
+      <Tooltip title="Voice Chat">
         <Button
           type="text"
           icon={chat ? <PhoneTwoTone /> : <PhoneOutlined />}
-          onClick={async () => {
-            const nextChat = !chat;
-            if (nextChat) {
-              await startChat();
-              message.info('开始语音对话');
-            } else {
-              await stopChat();
-              message.info('停止语音对话');
-            }
-            setChat(nextChat);
-          }}
+          onClick={() => setVoiceChatModalOpen(true)}
         />
       </Tooltip>
     </>
@@ -340,6 +285,32 @@ const ChatX: React.FC = () => {
       <img src={logo} draggable={false} alt="logo" />
       <span>Chat</span>
     </div>
+  );
+
+  const voiceChatModalNode = (
+    <VoiceChatModal
+      open={voiceChatModalOpen}
+      onClose={() => {
+        setVoiceChatModalOpen(false);
+        if (chat) {
+          stopChat().then(() => {
+            setChat(false);
+            message.info('Stop Voice Chat');
+          });
+        }
+      }}
+      recording={chat}
+      onRecordingChange={async nextChat => {
+        if (nextChat) {
+          await startChat();
+          message.info('Start Voice Chat');
+        } else {
+          await stopChat();
+          message.info('Stop Voice Chat');
+        }
+        setChat(nextChat);
+      }}
+    />
   );
 
   // ==================== Render =================
@@ -390,10 +361,10 @@ const ChatX: React.FC = () => {
             onRecordingChange: async nextSpeech => {
               if (nextSpeech) {
                 lastContentRef.current = content;
-                message.info('开始语音转文字');
+                message.info('Start Voice to Text');
                 await startSpeech();
               } else {
-                message.info('停止语音转文字');
+                message.info('Stop Voice to Text');
                 await stopSpeech();
               }
               setSpeech(nextSpeech);
@@ -401,6 +372,7 @@ const ChatX: React.FC = () => {
           }}
         />
       </div>
+      {voiceChatModalNode}
     </div>
   );
 };

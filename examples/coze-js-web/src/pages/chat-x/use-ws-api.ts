@@ -74,6 +74,17 @@ const useWsAPI = (
       };
 
       ws.onmessage = (data, event) => {
+        if (data.event_type === WebsocketsEventType.ERROR) {
+          if (data.data.code === 4100) {
+            console.error('Unauthorized Error', data);
+          } else if (data.data.code === 4101) {
+            console.error('Forbidden Error', data);
+          } else {
+            console.error('WebSocket error', data);
+          }
+          ws.close();
+          return;
+        }
         console.log('[transcriptions] ws message', data);
         if (
           data.event_type ===
@@ -86,13 +97,7 @@ const useWsAPI = (
       };
 
       ws.onerror = (error, event) => {
-        if (error.data.code === 401) {
-          console.error('[transcriptions] Unauthorized Error', error, event);
-        } else if (error.data.code === 403) {
-          console.error('[transcriptions] Forbidden Error', error, event);
-        } else {
-          console.error('[transcriptions] WebSocket error', error, event);
-        }
+        console.error('[transcriptions] WebSocket error', error, event);
 
         ws.close();
 
@@ -161,6 +166,18 @@ const useWsAPI = (
           };
 
           ws.onmessage = (data, event) => {
+            if (data.event_type === WebsocketsEventType.ERROR) {
+              if (data.data.code === 4100) {
+                console.error('[chat] Unauthorized Error', data);
+              } else if (data.data.code === 4101) {
+                console.error('[chat] Forbidden Error', data);
+              } else {
+                console.error('[chat] WebSocket error', data);
+              }
+              ws.close();
+              return;
+            }
+
             onMessage?.(data);
             console.log('[chat] ws message', data);
             eventSetRef.current?.add(data.event_type);
@@ -189,15 +206,7 @@ const useWsAPI = (
           };
 
           ws.onerror = (error, event) => {
-            console.error('[chat] ws error', error, event);
-            if (error.data.code === 401) {
-              console.error('[chat] Unauthorized Error', error);
-            } else if (error.data.code === 403) {
-              console.error('[chat] Forbidden Error', error);
-            } else {
-              console.error('[chat] WebSocket error', error);
-            }
-
+            console.error('[chat] WebSocket error', error);
             ws.close();
 
             reject(error);
@@ -222,7 +231,7 @@ const useWsAPI = (
   };
 
   const handleAudioMessage = useCallback(
-    (data: ConversationAudioDeltaEvent) => {
+    async (data: ConversationAudioDeltaEvent) => {
       const decodedContent = atob(data.data.content);
       const arrayBuffer = new ArrayBuffer(decodedContent.length);
       const view = new Uint8Array(arrayBuffer);
@@ -230,16 +239,19 @@ const useWsAPI = (
         view[i] = decodedContent.charCodeAt(i);
       }
 
-      wavStreamPlayer.add16BitPCM(arrayBuffer, trackId.current);
+      await wavStreamPlayer.add16BitPCM(arrayBuffer, trackId.current);
     },
     [],
   );
 
   const startChat = useCallback(async () => {
+    interruptAudio();
+
     await initWs({});
     await wavRecorder.begin(deviceListRef.current[0].deviceId);
-    interruptAudio();
-    trackId.current = `my-track-${new Date().getTime()}`;
+
+    // init stream player
+    await wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), trackId.current);
 
     // await wavRecorder.clear();
     await wavRecorder.record(data => {
@@ -277,6 +289,7 @@ const useWsAPI = (
   }, []);
 
   const startSpeech = useCallback(async () => {
+    interruptAudio();
     await initTranscriptionsWs();
     await wavRecorder.begin(deviceListRef.current[0].deviceId);
 
@@ -324,8 +337,8 @@ const useWsAPI = (
   }, []);
 
   const interruptAudio = useCallback(() => {
-    // wavRecorder.clear();
     wavStreamPlayer.interrupt();
+    trackId.current = `my-track-${new Date().getTime()}`;
   }, []);
 
   const sendWsMessage = useCallback(
@@ -342,6 +355,8 @@ const useWsAPI = (
       onSuccess: (delta: string) => void;
       onCreated: (data: CreateChatData) => void;
     }) => {
+      interruptAudio();
+
       let message = '';
       await initWs({
         onMessage: data => {

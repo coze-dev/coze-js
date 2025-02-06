@@ -10,17 +10,12 @@ import { client } from '../client.js';
 const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');
 
-if (!fs.existsSync(filePath)) {
+if (fs.existsSync(filePath)) {
   fs.writeFileSync(filePath, '');
 }
 
 async function main() {
-  const ws = await client.websockets.audio.speech.create({
-    headers: {
-      'x-tt-env': 'ppe_stream_audio',
-      'x-use-ppe': '1',
-    },
-  });
+  const ws = await client.websockets.audio.speech.create();
 
   // Create speaker instance
   const speaker = new Speaker({
@@ -70,7 +65,20 @@ async function main() {
   };
 
   ws.onmessage = (data, event) => {
+    if (data.event_type === WebsocketsEventType.ERROR) {
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
+    }
+
     console.log('on message', data);
+
     if (data.event_type === WebsocketsEventType.SPEECH_AUDIO_UPDATE) {
       const audio = data.data.delta;
 
@@ -88,16 +96,7 @@ async function main() {
   };
 
   ws.onerror = (error, event) => {
-    console.log('on error', event);
-
-    if (error.data.code === 401) {
-      console.error('Unauthorized Error', error);
-    } else if (error.data.code === 403) {
-      console.error('Forbidden Error', error);
-    } else {
-      console.error('WebSocket error', error);
-    }
-
+    console.error('WebSocket error', error);
     ws.close();
   };
 

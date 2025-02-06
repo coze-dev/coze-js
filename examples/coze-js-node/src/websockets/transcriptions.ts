@@ -58,6 +58,18 @@ async function main() {
   };
 
   ws.onmessage = (data, event) => {
+    if (data.event_type === WebsocketsEventType.ERROR) {
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
+    }
+
     console.log('on message');
     if (data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE) {
       console.log('content', data.data.content);
@@ -65,13 +77,7 @@ async function main() {
   };
 
   ws.onerror = (error, event) => {
-    if (error.data.code === 401) {
-      console.error('Unauthorized Error', error);
-    } else if (error.data.code === 403) {
-      console.error('Forbidden Error', error);
-    } else {
-      console.error('WebSocket error', error);
-    }
+    console.error('WebSocket error', error);
     ws.close();
   };
 

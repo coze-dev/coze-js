@@ -22,7 +22,7 @@ async function main() {
     sampleRate: 24000, // sample rate
   });
 
-  ws.onopen = async () => {
+  ws.onopen = () => {
     console.log('on open');
 
     ws.send({
@@ -79,7 +79,7 @@ async function main() {
 
     // Stream upload audio fields
     for (const line of audioLines) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // await new Promise(resolve => setTimeout(resolve, 100));
       ws.send({
         id: 'event_id',
         event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
@@ -106,7 +106,15 @@ async function main() {
 
   ws.onmessage = (data, event) => {
     if (data.event_type === WebsocketsEventType.ERROR) {
-      console.error('error', data);
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
     }
 
     eventSet.add(data.event_type);
@@ -122,13 +130,7 @@ async function main() {
   };
 
   ws.onerror = error => {
-    if (error.data.code === 401) {
-      console.error('Unauthorized Error', error);
-    } else if (error.data.code === 403) {
-      console.error('Forbidden Error', error);
-    } else {
-      console.error('WebSocket error', error);
-    }
+    console.error('WebSocket error', error);
     ws.close();
   };
 
