@@ -144,42 +144,6 @@ cp .env.development .env.local # Edit .env.local with your credentials
 npm run dev:weapp
 ```
 
-## Notes
-### Taro@3 + React
-The following configuration is required:
-
-```javascript
-export default defineConfig(() => {
-  compiler: {
-    type: 'webpack5',
-    prebundle: {
-      // 1. Don‘t prebundle '@coze/taro-api'
-      exclude: ['@coze/taro-api'],
-    },
-  },
-
-  mini: {
-    webpackChain(chain) {
-      // 2. Enable multi-platform support for '@coze/taro-api'
-      chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
-        args[2]['include'] = ['@coze/taro-api'];
-        return args;
-      });
-    },
-  },
-
-  h5: {
-    webpackChain(chain) {
-      // 2. Enable multi-platform support for '@coze/taro-api'
-      chain.resolve.plugin('MultiPlatformPlugin').tap(args => {
-        args[2]['include'] = ['@coze/taro-api'];
-        return args;
-      });
-    },
-  }
-});
-```
-
 ## Documentation
 
 For detailed API documentation and guides, visit:

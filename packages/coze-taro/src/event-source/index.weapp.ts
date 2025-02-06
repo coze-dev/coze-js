@@ -29,13 +29,13 @@ export class EventSource extends BaseEventSource {
       enableCookie: true,
       timeout,
       fail: err => {
-        this.trigger(EventName.Fail, err.errMsg);
+        this.trigger(EventName.Fail, { errMsg: err.errMsg });
       },
       success: res => {
         if (res.statusCode !== 200) {
-          this.trigger(EventName.Fail, res.errMsg);
+          this.trigger(EventName.Fail, { errMsg: res.errMsg, data: res });
         } else {
-          this.trigger(EventName.Success, res);
+          this.trigger(EventName.Success, { data: res });
         }
       },
     });
@@ -53,7 +53,7 @@ export class EventSource extends BaseEventSource {
 
   private onHeadersReceived() {
     this.task?.onHeadersReceived(res => {
-      this.trigger(EventName.Open, res);
+      this.trigger(EventName.Open, { data: res });
     });
   }
 
@@ -62,6 +62,21 @@ export class EventSource extends BaseEventSource {
       const octets = new Uint8Array(res.data);
       const decoder = new TextDecoder();
       const chunk = decoder.decode(octets);
+
+      // The request may be failed, so we need to check the chunk
+      if (!this.cacheChunk) {
+        const chunkJson = this.safeParseJSON(chunk);
+        if (chunkJson && chunkJson.code) {
+          this.trigger(EventName.Fail, {
+            errMsg: chunkJson.msg,
+            data: chunkJson,
+          });
+          // Abort the request
+          this.abort();
+          return;
+        }
+      }
+
       this.cacheChunk += chunk;
 
       if (this.cacheChunk.endsWith('\n\n')) {
@@ -86,9 +101,17 @@ export class EventSource extends BaseEventSource {
         }
 
         messages.map(msg => {
-          this.trigger(EventName.Chunk, msg);
+          this.trigger(EventName.Chunk, { data: msg });
         });
       }
     });
+  }
+
+  private safeParseJSON(str: string) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
   }
 }

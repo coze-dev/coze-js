@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "update version",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "yjfengwen@foxmail.com"
+}

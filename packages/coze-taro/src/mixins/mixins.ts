@@ -1,4 +1,3 @@
-/* eslint-disable complexity -- ignore */
 /* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 import Taro from '@tarojs/taro';
 import {
@@ -7,7 +6,6 @@ import {
   WorkflowEventType,
   WorkflowEvent,
   ChatEventType,
-  CozeError,
   type StreamChatReq,
   type StreamChatData,
   type CreateFileReq,
@@ -68,34 +66,29 @@ export function getWorkflowStreamMixin(api: CozeAPI) {
       result,
     );
 
-    try {
-      while (true) {
-        if (result.done) {
-          break;
-        }
-        if (!result.messages.length) {
-          await result.deferred?.promise;
-          if (result.error) {
-            throw result.error;
-          }
-        }
-        let message = result.messages.shift();
-        while (message) {
-          if (message.event === WorkflowEventType.DONE) {
-            yield new WorkflowEvent(Number(message.id), WorkflowEventType.DONE);
-          } else {
-            yield new WorkflowEvent(
-              Number(message.id),
-              message.event,
-              JSON.parse(message.data),
-            );
-          }
-          message = result.messages.shift();
+    while (true) {
+      if (result.done) {
+        break;
+      }
+      if (!result.messages.length) {
+        await result.deferred?.promise;
+        if (result.error) {
+          throw result.error;
         }
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : e;
-      throw new CozeError(`Could not handle message: ${msg}`);
+      let message = result.messages.shift();
+      while (message) {
+        if (message.event === WorkflowEventType.DONE) {
+          yield new WorkflowEvent(Number(message.id), WorkflowEventType.DONE);
+        } else {
+          yield new WorkflowEvent(
+            Number(message.id),
+            message.event,
+            JSON.parse(message.data),
+          );
+        }
+        message = result.messages.shift();
+      }
     }
   };
 }
@@ -253,35 +246,30 @@ async function* handleStreamMessages(result: {
   deferred: Deferred | null;
   error: Error | null;
 }): AsyncGenerator<StreamChatData> {
-  try {
-    while (true) {
-      if (result.done) {
-        break;
-      }
-      if (!result.messages.length) {
-        await result.deferred?.promise;
-        if (result.error) {
-          throw result.error;
-        }
-      }
-      let message = result.messages.shift();
-      while (message) {
-        if (message.event === ChatEventType.DONE) {
-          yield {
-            event: message.event,
-            data: '[DONE]',
-          };
-        } else {
-          yield {
-            event: message.event,
-            data: JSON.parse(message.data),
-          };
-        }
-        message = result.messages.shift();
+  while (true) {
+    if (result.done) {
+      break;
+    }
+    if (!result.messages.length) {
+      await result.deferred?.promise;
+      if (result.error) {
+        throw result.error;
       }
     }
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : e;
-    throw new CozeError(`Could not handle message: ${msg}`);
+    let message = result.messages.shift();
+    while (message) {
+      if (message.event === ChatEventType.DONE) {
+        yield {
+          event: message.event,
+          data: '[DONE]',
+        };
+      } else {
+        yield {
+          event: message.event,
+          data: JSON.parse(message.data),
+        };
+      }
+      message = result.messages.shift();
+    }
   }
 }

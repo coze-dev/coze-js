@@ -1,19 +1,4 @@
 import { CozeAPI } from '../src/api';
-import { ttCreateEventSource } from './stubs';
-
-vi.stubGlobal('tt', {
-  createEventSource: ttCreateEventSource,
-});
-
-vi.mock('../src/mixins/platform', async () => {
-  const mod = await vi.importActual('../src/mixins/platform.tt');
-  return mod;
-});
-
-vi.mock('../src/event-source/index', async () => {
-  const mod = await vi.importActual('../src/event-source/index.tt');
-  return mod;
-});
 
 describe('CozeAPI - mini', () => {
   beforeEach(() => {
@@ -40,6 +25,11 @@ describe('CozeAPI - mini', () => {
         caches.push(chunk);
       }
       expect(mockOnBeforeAPICall).toHaveBeenCalledOnce();
+
+      await cozeApi.workflows.runs.create({
+        workflow_id: 'nonStreaming',
+      });
+      expect(mockOnBeforeAPICall).toHaveBeenCalledTimes(2);
     });
 
     it('should refresh token', async () => {

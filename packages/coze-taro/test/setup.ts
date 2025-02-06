@@ -1,10 +1,15 @@
-import { Events, taroStreamingRequest, taroUploadFile } from './stubs';
+import { Events, taroRequest, taroUploadFile } from './stubs';
 
 vi.doMock('@tarojs/taro', () => ({
   default: {
     Events,
-    request: taroStreamingRequest,
+    request: taroRequest,
     uploadFile: taroUploadFile,
   },
   Events,
+  request: taroRequest,
+  getEnv: () => 'WEAPP',
+  ENV_TYPE: {
+    WEB: 'WEB',
+  },
 }));
