@@ -11,8 +11,6 @@ import { getPackagesToPublish } from './git';
 export async function release(options: ReleaseOptions): Promise<void> {
   const { commit, dryRun = false, registry } = options;
 
-  await exec(`git checkout ${commit}`);
-
   // 1. 获取需要发布的包列表
   const packagesToPublish = await getPackagesToPublish(commit);
   if (packagesToPublish.length === 0) {
@@ -31,6 +29,7 @@ export async function release(options: ReleaseOptions): Promise<void> {
   );
   const branchName = await getCurrentBranchName();
   checkReleasePlan(releaseManifests, branchName);
+  await exec(`git checkout ${commit}`);
 
   await releasePackages(releaseManifests, { commit, dryRun, registry });
   logger.success('All packages published successfully!');
