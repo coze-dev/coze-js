@@ -1,11 +1,14 @@
+import nodeFetch from 'node-fetch';
 import axios from 'axios';
 
-import { fetchAPI } from '../src/fetcher';
+import { fetchAPI, adapterFetch } from '../src/fetcher';
 import { TimeoutError, APIUserAbortError, CozeError } from '../src/error';
 
 vi.mock('axios');
+vi.mock('node-fetch');
 
 const mockedAxios = vi.mocked(axios);
+const mockedFetch = vi.mocked(nodeFetch);
 
 describe('fetchAPI', () => {
   afterEach(() => {
@@ -136,6 +139,78 @@ describe('fetchAPI', () => {
     Object.defineProperty(axios, 'VERSION', {
       value: originalVersion,
       configurable: true,
+    });
+  });
+
+  it('should use adapterFetch for streaming requests', async () => {
+    const mockStream = {
+      [Symbol.asyncIterator]: vi.fn().mockImplementation(function* () {
+        yield new TextEncoder().encode('data: {"chunk": 1}\n\n');
+      }),
+    };
+    mockedAxios.mockResolvedValue({ data: mockStream });
+
+    Object.defineProperty(process, 'version', { value: 'v16.0.0' });
+
+    const result = await fetchAPI('https://api.example.com/stream', {
+      isStreaming: true,
+    });
+    const streamResult = result.stream();
+
+    const chunks: { data: string }[] = [];
+    for await (const chunk of streamResult) {
+      chunks.push(chunk as { data: string });
+    }
+
+    expect(axios).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://api.example.com/stream',
+        responseType: 'stream',
+        isStreaming: true,
+        adapter: expect.any(Function),
+      }),
+    );
+    expect(chunks).toEqual([{ data: '{"chunk": 1}' }]);
+  });
+});
+
+describe('adapterFetch', () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  it('should properly adapt node-fetch response', async () => {
+    const mockBody = { test: 'data' };
+    const mockResponse = {
+      body: mockBody,
+      status: 200,
+      headers: new Map(),
+      ok: true,
+      json: () => Promise.resolve(mockBody),
+    };
+
+    mockedFetch.mockResolvedValue(mockResponse as any);
+
+    const options = {
+      url: 'https://api.example.com',
+      data: JSON.stringify({ foo: 'bar' }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    };
+
+    const result = await adapterFetch(options);
+
+    expect(mockedFetch).toHaveBeenCalledWith(options.url, {
+      data: options.data,
+      body: options.data,
+      method: options.method,
+      headers: options.headers,
+      url: options.url,
+    });
+
+    expect(result).toEqual({
+      data: mockBody,
+      ...mockResponse,
     });
   });
 });

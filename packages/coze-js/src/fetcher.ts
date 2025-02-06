@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import fetch from 'node-fetch';
 import axios, {
   type AxiosResponseHeaders,
   type AxiosRequestConfig,
@@ -8,6 +9,7 @@ import axios, {
   type AxiosStatic,
 } from 'axios';
 
+import { isBrowser } from './utils';
 import {
   APIError,
   TimeoutError,
@@ -50,6 +52,27 @@ const handleError = (error: any) => {
   }
 };
 
+// node-fetch is used for streaming requests
+export const adapterFetch = async (options: any): Promise<any> => {
+  const response = await fetch(options.url, {
+    body: options.data,
+    ...options,
+  });
+  return {
+    data: response.body,
+    ...response,
+  };
+};
+
+const isSupportNativeFetch = () => {
+  if (isBrowser()) {
+    return true;
+  }
+  // native fetch is supported in node 18.0.0 or higher
+  const version = process.version.slice(1);
+  return compareVersions(version, '18.0.0') >= 0;
+};
+
 export async function fetchAPI<ResultType>(
   url: string,
   options: FetchAPIOptions = {},
@@ -69,7 +92,11 @@ export async function fetchAPI<ResultType>(
   const response: AxiosResponse = await (axiosInstance as AxiosInstance)({
     url,
     responseType: options.isStreaming ? 'stream' : 'json',
-    adapter: options.isStreaming ? 'fetch' : undefined,
+    adapter: options.isStreaming
+      ? isSupportNativeFetch()
+        ? 'fetch'
+        : adapterFetch
+      : undefined,
     ...options,
   }).catch(error => {
     throw handleError(error);
