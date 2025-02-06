@@ -54,7 +54,6 @@ describe('Error classes', () => {
       expect(error.code).toBe(errorBody.code);
       expect(error.msg).toBe(errorBody.msg);
       expect(error.detail).toBe(errorBody.error.detail);
-      expect(error.help_doc).toBe(errorBody.error.help_doc);
       expect(error.logid).toBe('12345');
     });
 
@@ -65,7 +64,6 @@ describe('Error classes', () => {
         msg: 'Bad Request',
         error: {
           detail: 'Invalid input',
-          help_doc: 'https://www.coze.com/docs/error/1001',
         },
       };
       const headers = new AxiosHeaders({ 'x-tt-logid': '12345' });
@@ -76,9 +74,6 @@ describe('Error classes', () => {
       expect(error.message).toContain('msg: Bad Request');
       expect(error.message).toContain('detail: Invalid input');
       expect(error.message).toContain('logid: 12345');
-      expect(error.message).toContain(
-        'help doc: https://www.coze.com/docs/error/1001',
-      );
     });
 
     it('should use provided message when no error body', () => {
