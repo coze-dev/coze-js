@@ -53,7 +53,7 @@ const handleError = (error: any) => {
 };
 
 // node-fetch is used for streaming requests
-const adapterFetch = async (options: any): Promise<any> => {
+export const adapterFetch = async (options: any): Promise<any> => {
   const response = await fetch(options.url, {
     body: options.data,
     ...options,
