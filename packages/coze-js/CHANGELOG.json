@@ -2,6 +2,21 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.0.19",
+      "tag": "HEAD",
+      "date": "2025-02-07T03:06:20.888Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "downgrade node-fetch from ^3.3.2 to ^2.7.0"
+          },
+          {
+            "comment": "downgrade node-fetch from ^3.3.2 to ^2.x"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.18",
       "tag": "HEAD",
       "date": "2025-02-06T10:36:15.097Z",
