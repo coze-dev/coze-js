@@ -56,8 +56,8 @@ export class WebSocketAPI<Req, Rsp> {
     });
 
     this.rws.addEventListener('error', (event: ErrorEvent) => {
-      const statusCode = event.target._req?.res?.statusCode;
-      const rawHeaders = event.target._req?.res?.rawHeaders || [];
+      const statusCode = event.target?._req?.res?.statusCode;
+      const rawHeaders = event.target?._req?.res?.rawHeaders || [];
       const logidIndex = rawHeaders.findIndex(
         (header: string) => header === 'X-Tt-Logid',
       );

@@ -1,3 +1,4 @@
+import { WebSocketAPI } from '../src/websocket-api';
 import * as utils from '../src/utils.js';
 import { fetchAPI } from '../src/fetcher';
 import { APIError } from '../src/error';
@@ -5,8 +6,15 @@ import { APIClient } from '../src/core';
 
 vi.mock('../src/fetcher');
 
-vi.mock('../src/version.js', () => ({
-  ...vi.importActual('../src/version.js'),
+// Add WebSocket mock
+vi.mock('../src/websocket-api', () => ({
+  WebSocketAPI: vi.fn().mockImplementation(() => ({
+    connect: vi.fn().mockResolvedValue(true),
+  })),
+}));
+
+vi.mock('../src/version', () => ({
+  ...vi.importActual('../src/version'),
   getBrowserClientUserAgent: vi
     .fn()
     .mockReturnValue('mocked-browser-user-agent'),
@@ -188,6 +196,68 @@ describe('APIClient', () => {
       const consoleSpy = vi.spyOn(console, 'debug').mockImplementation();
       client.debugLog(false, 'test message');
       expect(consoleSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('makeWebsocket', () => {
+    it('should make a websocket connection with correct configuration', async () => {
+      const mockToken = 'test-token';
+      const expectedUrl = 'wss://ws.coze.com/test';
+      client.baseWsURL = 'wss://ws.coze.com';
+
+      const websocket = await client.makeWebsocket('/test');
+
+      expect(websocket).toBeDefined();
+      expect(WebSocketAPI).toHaveBeenCalledWith(
+        expectedUrl,
+        expect.objectContaining({
+          debug: true,
+          headers: {
+            'X-Coze-Client-User-Agent': 'mocked-browser-user-agent',
+            authorization: `Bearer ${mockToken}`,
+          },
+        }),
+      );
+    });
+
+    it('should merge custom websocket options', async () => {
+      const customOptions = {
+        maxReconnectionDelay: 5000,
+        minReconnectionDelay: 1000,
+        debug: false,
+      };
+
+      const websocket = await client.makeWebsocket('/test', customOptions);
+
+      expect(WebSocketAPI).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining(customOptions),
+      );
+
+      expect(websocket).toBeDefined();
+    });
+
+    it('should use dynamic token for websocket connection', async () => {
+      const dynamicToken = 'dynamic-test-token';
+      const client2 = new APIClient({
+        ...mockConfig,
+        token: async () => Promise.resolve(dynamicToken),
+      });
+
+      const websocket = await client2.makeWebsocket('/test');
+
+      expect(websocket).toBeDefined();
+
+      expect(WebSocketAPI).toHaveBeenCalledWith(
+        'wss://ws.coze.com/test',
+        expect.objectContaining({
+          debug: true,
+          headers: {
+            'X-Coze-Client-User-Agent': 'mocked-browser-user-agent',
+            authorization: `Bearer ${dynamicToken}`,
+          },
+        }),
+      );
     });
   });
 });

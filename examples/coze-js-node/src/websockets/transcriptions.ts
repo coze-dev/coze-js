@@ -1,8 +1,13 @@
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import fs from 'fs';
 
 import { WebsocketsEventType } from '@coze/api';
 
-import { client } from '../client.js';
+import { client } from '../client';
+
+const filename = fileURLToPath(import.meta.url);
+const filePath = join(dirname(filename), '../../tmp/pcm.txt');
 
 async function main() {
   const ws = await client.websockets.audio.transcriptions.create({
@@ -27,7 +32,7 @@ async function main() {
     });
 
     // Read audio_data.txt file
-    const audioData = fs.readFileSync('audio_data.txt', 'utf-8');
+    const audioData = fs.readFileSync(filePath, 'utf-8');
     // Split audio data by lines
     const audioLines = audioData.split('\n');
 

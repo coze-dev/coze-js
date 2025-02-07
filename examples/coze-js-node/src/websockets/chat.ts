@@ -5,7 +5,7 @@ import fs from 'fs';
 import Speaker from 'speaker';
 import { WebsocketsEventType } from '@coze/api';
 
-import { client, botId } from '../client.js';
+import { client, botId } from '../client';
 
 const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');

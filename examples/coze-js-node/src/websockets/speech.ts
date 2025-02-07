@@ -5,7 +5,7 @@ import fs from 'fs';
 import Speaker from 'speaker';
 import { WebsocketsEventType } from '@coze/api';
 
-import { client } from '../client.js';
+import { client } from '../client';
 
 const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');
@@ -44,24 +44,19 @@ async function main() {
       },
     });
 
-    setTimeout(() => {
-      ws.send({
-        id: 'event_id',
-        event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_APPEND,
-        data: {
-          delta:
-            '本文档介绍如何通过 WebSocket 协议实时访问扣子的流式大模型语音识别、大模型语音合成、多模态流式大模型 chat。',
-        },
-      });
-    }, 1000);
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_APPEND,
+      data: {
+        delta:
+          '本文档介绍如何通过 WebSocket 协议实时访问扣子的流式大模型语音识别、大模型语音合成、多模态流式大模型 chat。',
+      },
+    });
 
-    setTimeout(() => {
-      // ws.send({
-      //   id: 'event_id',
-      //   event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_COMPLETE,
-      //   data: {},
-      // });
-    }, 5000);
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_COMPLETE,
+    });
   };
 
   ws.onmessage = (data, event) => {
