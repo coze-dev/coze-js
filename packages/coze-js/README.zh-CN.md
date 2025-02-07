@@ -59,6 +59,7 @@ async function quickChat() {
 - 🌐 **完整 API 支持**：覆盖所有 [Coze 开放平台 API](https://www.coze.cn/docs/developer_guides/api_overview)
 - 🔐 **多种认证方式**：PAT、OAuth、JWT、OAuth PKCE
 - 🔄 **流式响应支持**：聊天和工作流的实时响应
+- 🔄 **Websocket 支持**：聊天、语音转文本、文本转语音的实时响应
 - 🌍 **跨平台**：支持 Node.js（≥14）和现代浏览器
 - ⚙️ **可配置**：超时、请求头、信号、调试选项
 
@@ -104,6 +105,68 @@ async function streamChat() {
 }
 ```
 
+### 流式对话（Websocket）
+```javascript
+import { CozeAPI, RoleType, WebsocketsEventType } from '@coze/api';
+
+async function wsChat() {
+  const ws = await client.websockets.chat.create('your_bot_id');
+
+  ws.onopen = () => {
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CHAT_UPDATE,
+      data: {
+        chat_config: {
+          auto_save_history: true,
+          user_id: 'uuid',
+          meta_data: {},
+          custom_variables: {},
+          extra_params: {},
+        },
+      },
+    });
+
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+      data: {
+        role: RoleType.User,
+        content: 'tell me a joke',
+        content_type: 'text',
+      },
+    });
+  };
+
+  ws.onmessage = (data, event) => {
+    if (data.event_type === WebsocketsEventType.ERROR) {
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
+    }
+
+    if (data.event_type === WebsocketsEventType.CONVERSATION_MESSAGE_DELTA) {
+      console.log('on message delta', data.data);
+    } else if (
+      data.event_type === WebsocketsEventType.CONVERSATION_CHAT_COMPLETED
+    ) {
+      console.log('on chat completed', data.data);
+    }
+  };
+
+  ws.onerror = error => {
+    console.error('WebSocket error', error);
+    ws.close();
+  };
+}
+```
+
 ## 更多示例
 
 | 功能 | 描述 | 示例 |
@@ -113,8 +176,11 @@ async function streamChat() {
 | 数据集 | 文档管理 | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | 工作流 | 执行工作流 | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
 | 语音 | 语音合成 | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
-
+| 流式对话（websocket） | 文本、语音对话 | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
+| 语音合成（websocket） | 文本转语音 | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
+| 语音识别（websocket） | 语音转文本 | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
 [查看所有示例 →](../../examples/coze-js-node/src/)
+[Websocket 事件 →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
 
 ## 开发
 
@@ -132,7 +198,7 @@ npm run test
 ```bash
 cd examples/coze-js-node
 rush build
-npx tsx ./src/chat.ts
+COZE_ENV=zh npx tsx ./src/chat.ts
 ```
 
 ### 浏览器

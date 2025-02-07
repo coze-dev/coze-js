@@ -61,6 +61,7 @@ async function quickChat() {
 - 🌐 **Full API Support**: Covers all [Coze Open Platform APIs](https://www.coze.com/docs/developer_guides/api_overview)
 - 🔐 **Multiple Auth Methods**: PAT, OAuth, JWT, OAuth PKCE
 - 🔄 **Streaming Support**: Real-time responses for chat and workflow
+- 🔄 **Websocket Support**: Real-time responses for chat, speech, and transcriptions
 - 🌍 **Cross-Platform**: Works in Node.js (≥14) and modern browsers
 - ⚙️ **Configurable**: Timeout, headers, signal, debug options
 
@@ -106,6 +107,68 @@ async function streamChat() {
 }
 ```
 
+### Websocket Chat
+```javascript
+import { CozeAPI, RoleType, WebsocketsEventType } from '@coze/api';
+
+async function wsChat() {
+  const ws = await client.websockets.chat.create('your_bot_id');
+
+  ws.onopen = () => {
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CHAT_UPDATE,
+      data: {
+        chat_config: {
+          auto_save_history: true,
+          user_id: 'uuid',
+          meta_data: {},
+          custom_variables: {},
+          extra_params: {},
+        },
+      },
+    });
+
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+      data: {
+        role: RoleType.User,
+        content: 'tell me a joke',
+        content_type: 'text',
+      },
+    });
+  };
+
+  ws.onmessage = (data, event) => {
+    if (data.event_type === WebsocketsEventType.ERROR) {
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
+    }
+
+    if (data.event_type === WebsocketsEventType.CONVERSATION_MESSAGE_DELTA) {
+      console.log('on message delta', data.data);
+    } else if (
+      data.event_type === WebsocketsEventType.CONVERSATION_CHAT_COMPLETED
+    ) {
+      console.log('on chat completed', data.data);
+    }
+  };
+
+  ws.onerror = error => {
+    console.error('WebSocket error', error);
+    ws.close();
+  };
+}
+```
+
 ## More Examples
 
 | Feature | Description | Example |
@@ -116,7 +179,11 @@ async function streamChat() {
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 | Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
+| Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
+| Speech（websocket） | Text to speech | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
+| Transcriptions（websocket） | Speech to text | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
 [View all examples →](../../examples/coze-js-node/src/)
+[Websocket Events →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
 
 ## Development
 
@@ -135,13 +202,15 @@ npm run test
 cd examples/coze-js-node
 rush build
 npx tsx ./src/chat.ts
+# or using .cn domain
+COZE_ENV=zh npx tsx ./src/chat.ts
 ```
 
 ### Browser
 ```bash
 cd examples/coze-js-web
 rush build
-npx tsx ./src/chat.ts
+npm start
 ```
 
 ## Documentation

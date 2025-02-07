@@ -3,14 +3,71 @@ import { dirname, join } from 'path';
 import fs from 'fs';
 
 import Speaker from 'speaker';
-import { WebsocketsEventType } from '@coze/api';
+import { RoleType, WebsocketsEventType } from '@coze/api';
 
 import { client, botId } from '../client';
 
 const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');
 
-async function main() {
+async function textChat() {
+  const ws = await client.websockets.chat.create(botId);
+
+  ws.onopen = () => {
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CHAT_UPDATE,
+      data: {
+        chat_config: {
+          auto_save_history: true,
+          user_id: 'uuid',
+          meta_data: {},
+          custom_variables: {},
+          extra_params: {},
+        },
+      },
+    });
+
+    ws.send({
+      id: 'event_id',
+      event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+      data: {
+        role: RoleType.User,
+        content: 'tell me a joke',
+        content_type: 'text',
+      },
+    });
+  };
+
+  ws.onmessage = (data, event) => {
+    if (data.event_type === WebsocketsEventType.ERROR) {
+      if (data.data.code === 4100) {
+        console.error('Unauthorized Error', data);
+      } else if (data.data.code === 4101) {
+        console.error('Forbidden Error', data);
+      } else {
+        console.error('WebSocket error', data);
+      }
+      ws.close();
+      return;
+    }
+
+    if (data.event_type === WebsocketsEventType.CONVERSATION_MESSAGE_DELTA) {
+      console.log('on message delta', data.data);
+    } else if (
+      data.event_type === WebsocketsEventType.CONVERSATION_CHAT_COMPLETED
+    ) {
+      console.log('on chat completed', data.data);
+    }
+  };
+
+  ws.onerror = error => {
+    console.error('WebSocket error', error);
+    ws.close();
+  };
+}
+
+async function voiceChat() {
   const ws = await client.websockets.chat.create(botId, {
     headers: {},
   });
@@ -138,4 +195,5 @@ async function main() {
   // ws.onclose = () => {};
 }
 
-main();
+textChat();
+voiceChat();
