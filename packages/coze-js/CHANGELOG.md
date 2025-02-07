@@ -1,5 +1,13 @@
 # @coze/api
 
+## 1.0.19 - 2025-02-07
+
+### Bug Fixes
+
+- downgrade node-fetch from ^3.3.2 to ^2.7.0
+- downgrade node-fetch from ^3.3.2 to ^2.x
+
+
 ## 1.0.18 - 2025-02-06
 
 ### New Features
