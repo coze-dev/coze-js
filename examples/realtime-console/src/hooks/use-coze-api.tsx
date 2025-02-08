@@ -46,6 +46,7 @@ const useCozeAPI = () => {
           new CozeAPI({
             token: accessToken,
             baseURL,
+            allowPersonalAccessTokenInBrowser: true,
           }),
         );
       } else {
