@@ -22,7 +22,7 @@ export const getCurrentLocation = () =>
 export const isShowVideo = () => {
   const enableVideo = localStorage.getItem(LocalStorageKey.ENABLE_VIDEO);
   return (
-    enableVideo === 'true' && `${process.env.REACT_APP_ENABLE_VIDEO}` === 'true'
+    enableVideo === 'true'
   );
 };
 

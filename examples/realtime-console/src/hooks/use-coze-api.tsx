@@ -46,6 +46,7 @@ const useCozeAPI = () => {
           new CozeAPI({
             token: accessToken,
             baseURL,
+            allowPersonalAccessTokenInBrowser: true,
           }),
         );
       } else {
@@ -83,6 +84,7 @@ const useCozeAPI = () => {
         const response = await new CozeAPI({
           token,
           baseURL: getBaseUrl(),
+          allowPersonalAccessTokenInBrowser: true,
         }).bots.list({
           space_id: pureWorkspaceId,
           page_size: pageSize,

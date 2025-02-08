@@ -225,12 +225,17 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.WORKSPACE_ACCESS_TOKEN]: localManager.get(
           LocalStorageKey.WORKSPACE_ACCESS_TOKEN,
         ),
-        [LocalStorageKey.USER_ID]: localManager.get(LocalStorageKey.USER_ID),
+        [LocalStorageKey.USER_ID]: localManager.get(
+          LocalStorageKey.USER_ID,
+          '',
+        ),
         [LocalStorageKey.CONVERSATION_ID]: localManager.get(
           LocalStorageKey.CONVERSATION_ID,
+          '',
         ),
         [LocalStorageKey.WORKFLOW_ID]: localManager.get(
           LocalStorageKey.WORKFLOW_ID,
+          '',
         ),
       });
     })().catch(err => {
@@ -250,9 +255,9 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
     localManager.set(LocalStorageKey.VOICE_ID, voice_id);
-    localManager.set(LocalStorageKey.USER_ID, user_id);
-    localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
-    localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
+    localManager.set(LocalStorageKey.USER_ID, user_id || '');
+    localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id || '');
+    localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id || '');
   };
 
   const handleOk = () => {
