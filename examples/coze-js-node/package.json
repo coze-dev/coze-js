@@ -12,7 +12,8 @@
   "dependencies": {
     "@coze/api": "workspace:*",
     "axios": "^1.7.7",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "speaker": "^0.5.5"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",

@@ -63,6 +63,8 @@ jobs:
         if: steps.check_tag.outputs.has_valid_tag == 'true'
         run: |
           npm i -g @microsoft/rush@5.140.0
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
           node common/scripts/install-run-rush.js install
 
       - name: Run Release

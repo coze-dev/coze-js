@@ -15,10 +15,16 @@ export class CozeAPI extends APIClient {
   workspaces: API.WorkSpaces = new API.WorkSpaces(this);
   audio: API.Audio = new API.Audio(this);
   templates: API.Templates = new API.Templates(this);
+  websockets: API.Websockets = new API.Websockets(this);
 }
-export { type ClientOptions, type RequestOptions, type GetToken } from './core';
+export {
+  type ClientOptions,
+  type RequestOptions,
+  type GetToken,
+} from './core.js';
 export * from './auth';
 export * from './resources/index';
 export * from './fetcher';
 export * from './error';
 export * from './constant';
+export { WebSocketAPI } from './websocket-api';

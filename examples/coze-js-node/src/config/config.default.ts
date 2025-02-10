@@ -3,6 +3,7 @@ export default {
     COZE_BOT_ID: '7395773137***',
     COZE_SPACE_ID: '7366123674***',
     COZE_BASE_URL: 'https://api.coze.cn',
+    COZE_BASE_WS_URL: 'wss://ws.coze.cn',
     COZE_WORKFLOW_ID: '7394408479***',
     DATASET_ID: '7430806536349941***',
     auth: {
@@ -38,6 +39,7 @@ export default {
     COZE_BOT_ID: '7372391044***',
     COZE_SPACE_ID: '7366123674***',
     COZE_BASE_URL: 'https://api.coze.com',
+    COZE_BASE_WS_URL: 'wss://ws.coze.com',
     COZE_WORKFLOW_ID: '7387291732***',
     DATASET_ID: '7430806536349941***',
     auth: {

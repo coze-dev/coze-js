@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
-import { Badge, Button, type GetProp, message, Space } from 'antd';
-import { type CreateChatData } from '@coze/api';
+import { Badge, Button, type GetProp, message, Space, Tooltip } from 'antd';
+import { WebsocketsEventType, type CreateChatData } from '@coze/api';
 import { type MessageInfo } from '@ant-design/x/es/useXChat';
 import {
   Attachments,
@@ -15,14 +15,18 @@ import {
 import {
   CloudUploadOutlined,
   PaperClipOutlined,
+  PhoneOutlined,
+  PhoneTwoTone,
   PlusOutlined,
 } from '@ant-design/icons';
 
+import useWsAPI from './use-ws-api';
 import useStyles from './use-style';
 import useCozeAPI from './use-coze-api';
 import Settings from './settings';
 import logo from './logo.svg';
 import { config } from './config';
+import VoiceChatModal from './components/voice-chat-modal';
 
 interface Conversation {
   key: string;
@@ -67,22 +71,29 @@ const ChatX: React.FC = () => {
     new Map(),
   );
   const isTypingRef = React.useRef(false);
+  const [speech, setSpeech] = React.useState(false);
+  const [chat, setChat] = React.useState(false);
+  const lastContentRef = React.useRef('');
+  const [voiceChatModalOpen, setVoiceChatModalOpen] = React.useState(false);
 
-  const {
-    initClient,
-    streamingChat,
-    botInfo,
-    getBotInfo,
-    uploadFile,
-    uploading,
-  } = useCozeAPI();
+  const { initClient, botInfo, getBotInfo, uploadFile, uploading, clientRef } =
+    useCozeAPI();
+  const { startChat, stopChat, startSpeech, stopSpeech, sendWsMessage } =
+    useWsAPI(clientRef, data => {
+      if (
+        data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE
+      ) {
+        setContent(lastContentRef.current + data.data.content);
+      }
+    });
 
   // ==================== Runtime ====================
   const [agent] = useXAgent({
     request: ({ message: query }, { onUpdate, onSuccess }) => {
       const conversationId = activeKeyRef.current || '0';
       isTypingRef.current = true;
-      streamingChat({
+
+      sendWsMessage({
         query: query ?? '',
         conversationId: conversationId === '0' ? undefined : conversationId,
         onUpdate,
@@ -223,13 +234,22 @@ const ChatX: React.FC = () => {
   );
 
   const attachmentsNode = (
-    <Badge dot={attachedFiles.length > 0 && !headerOpen}>
-      <Button
-        type="text"
-        icon={<PaperClipOutlined />}
-        onClick={() => setHeaderOpen(!headerOpen)}
-      />
-    </Badge>
+    <>
+      <Badge dot={attachedFiles.length > 0 && !headerOpen}>
+        <Button
+          type="text"
+          icon={<PaperClipOutlined />}
+          onClick={() => setHeaderOpen(!headerOpen)}
+        />
+      </Badge>
+      <Tooltip title="Voice Chat">
+        <Button
+          type="text"
+          icon={chat ? <PhoneTwoTone /> : <PhoneOutlined />}
+          onClick={() => setVoiceChatModalOpen(true)}
+        />
+      </Tooltip>
+    </>
   );
 
   const senderHeader = (
@@ -265,6 +285,32 @@ const ChatX: React.FC = () => {
       <img src={logo} draggable={false} alt="logo" />
       <span>Chat</span>
     </div>
+  );
+
+  const voiceChatModalNode = (
+    <VoiceChatModal
+      open={voiceChatModalOpen}
+      onClose={() => {
+        setVoiceChatModalOpen(false);
+        if (chat) {
+          stopChat().then(() => {
+            setChat(false);
+            message.info('Stop Voice Chat');
+          });
+        }
+      }}
+      recording={chat}
+      onRecordingChange={async nextChat => {
+        if (nextChat) {
+          await startChat();
+          message.info('Start Voice Chat');
+        } else {
+          await stopChat();
+          message.info('Stop Voice Chat');
+        }
+        setChat(nextChat);
+      }}
+    />
   );
 
   // ==================== Render =================
@@ -309,8 +355,24 @@ const ChatX: React.FC = () => {
           prefix={attachmentsNode}
           loading={agent.isRequesting() || uploading}
           className={styles.sender}
+          allowSpeech={{
+            // When setting `recording`, the built-in speech recognition feature will be disabled
+            recording: speech,
+            onRecordingChange: async nextSpeech => {
+              if (nextSpeech) {
+                lastContentRef.current = content;
+                message.info('Start Voice to Text');
+                await startSpeech();
+              } else {
+                message.info('Stop Voice to Text');
+                await stopSpeech();
+              }
+              setSpeech(nextSpeech);
+            },
+          }}
         />
       </div>
+      {voiceChatModalNode}
     </div>
   );
 };

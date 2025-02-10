@@ -43,7 +43,10 @@ jobs:
             ${{ runner.os }}-rush-store
 
       - name: Install Dependencies
-        run: node common/scripts/install-run-rush.js install
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
+          node common/scripts/install-run-rush.js install
 
       - name: Build all
         run: node common/scripts/install-run-rush.js build --verbose

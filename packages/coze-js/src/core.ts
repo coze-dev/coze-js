@@ -5,6 +5,7 @@ import {
   type AxiosInstance,
 } from 'axios';
 
+import { WebSocketAPI } from './websocket-api';
 import {
   getBrowserClientUserAgent,
   getNodeClientUserAgent,
@@ -14,7 +15,7 @@ import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils';
 import { type FetchAPIOptions, fetchAPI } from './fetcher';
 import { APIError, type ErrorRes } from './error';
 import * as Errors from './error';
-import { COZE_COM_BASE_URL } from './constant';
+import { COZE_COM_BASE_URL, COZE_COM_BASE_WS_URL } from './constant';
 
 export type RequestOptions = Omit<
   AxiosRequestConfig,
@@ -23,6 +24,21 @@ export type RequestOptions = Omit<
   /** Whether to enable debug mode in current request */
   debug?: boolean;
 } & Record<string, unknown>;
+
+export interface WebsocketOptions {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  WebSocket?: any; // WebSocket constructor, if none provided, defaults to global WebSocket
+  maxReconnectionDelay?: number; // max delay in ms between reconnections
+  minReconnectionDelay?: number; // min delay in ms between reconnections
+  reconnectionDelayGrowFactor?: number; // how fast the reconnection delay grows
+  minUptime?: number; // min time in ms to consider connection as stable
+  connectionTimeout?: number; // retry connect if not connected after this time, in ms
+  maxRetries?: number; // maximum number of retries
+  maxEnqueuedMessages?: number; // maximum number of messages to buffer until reconnection
+  startClosed?: boolean; // start websocket in CLOSED state, call `.reconnect()` to connect
+  debug?: boolean; // enables debug output
+  headers?: Record<string, string>; // custom headers
+}
 
 export type GetToken = string | (() => Promise<string> | string);
 export interface ClientOptions {
@@ -40,6 +56,10 @@ export interface ClientOptions {
   headers?: Headers | Record<string, unknown>;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
   allowPersonalAccessTokenInBrowser?: boolean;
+  /** base websocket URL, default is wss://ws.coze.cn */
+  baseWsURL?: string;
+  /** websocket options */
+  websocketOptions?: WebsocketOptions;
 }
 
 export class APIClient {
@@ -51,10 +71,11 @@ export class APIClient {
   debug: boolean;
   allowPersonalAccessTokenInBrowser: boolean;
   headers?: Headers | Record<string, unknown>;
-
+  baseWsURL: string;
   constructor(config: ClientOptions) {
     this._config = config;
     this.baseURL = config.baseURL || COZE_COM_BASE_URL;
+    this.baseWsURL = config.baseWsURL || COZE_COM_BASE_WS_URL;
     this.token = config.token;
     this.axiosOptions = config.axiosOptions || {};
     this.axiosInstance = config.axiosInstance;
@@ -118,6 +139,34 @@ export class APIClient {
     );
     config.method = method;
     config.data = body;
+
+    return config;
+  }
+
+  protected async buildWebsocketOptions(
+    options?: WebsocketOptions,
+  ): Promise<WebsocketOptions> {
+    const token = await this.getToken();
+    const headers: Record<string, string> = {
+      authorization: `Bearer ${token}`,
+    };
+
+    if (!isBrowser()) {
+      headers['User-Agent'] = getUserAgent();
+      headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
+    } else {
+      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
+    }
+
+    const config = mergeConfig(
+      {
+        debug: this._config.debug ?? false,
+      },
+      this._config.websocketOptions,
+      options,
+      { headers },
+      { headers: this.headers || {} },
+    );
 
     return config;
   }
@@ -238,6 +287,22 @@ export class APIClient {
       isStream,
       options,
     );
+  }
+
+  public async makeWebsocket<Req, Rsp>(
+    apiUrl: string,
+    options?: WebsocketOptions,
+  ) {
+    const fullUrl = `${this.baseWsURL}${apiUrl}`;
+
+    const websocketOptions = await this.buildWebsocketOptions(options);
+
+    this.debugLog(options?.debug, `--- websocket url: ${fullUrl}`);
+    this.debugLog(options?.debug, '--- websocket options:', websocketOptions);
+
+    const ws = new WebSocketAPI<Req, Rsp>(fullUrl, websocketOptions);
+
+    return ws;
   }
 
   public getConfig() {
