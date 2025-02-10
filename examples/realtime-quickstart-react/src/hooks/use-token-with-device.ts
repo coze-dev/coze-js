@@ -1,7 +1,7 @@
 import { type DeviceCodeData, type OAuthToken } from '@coze/api';
 
 const baseServerURL = 'http://localhost:3002';
-const workspaceId = '7457832409259147264'; // 如果是协作处授权（OBO），需要设置 workspaceId
+const workspaceId = '745783240925914***'; // 如果是协作处授权（OBO），需要设置 workspaceId
 
 const useTokenWithDevice = () => {
   const getDeviceCode = async () => {
@@ -24,7 +24,7 @@ const useTokenWithDevice = () => {
   };
 
   const getDeviceToken = async (deviceCode: DeviceCodeData) => {
-    const res = await fetch(`${baseServerURL}/get_devcie_token`, {
+    const res = await fetch(`${baseServerURL}/get_device_token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -79,10 +79,15 @@ const useTokenWithDevice = () => {
       const deviceCode = await getDeviceCode();
 
       // 2. open device code verification uri
-      window.open(
+      const popup = window.open(
         `${deviceCode.verification_uri}?user_code=${deviceCode.user_code}`,
         '_blank',
       );
+      if (!popup) {
+        throw new Error(
+          'Popup was blocked. Please disable popup blocker and try again.',
+        );
+      }
 
       // 3. poll and get device token
       const deviceToken = await getDeviceToken(deviceCode);

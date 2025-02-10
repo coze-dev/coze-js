@@ -77,7 +77,7 @@ import {
   useTokenWithPKCE,
 } from './hooks/index';
 
-const botId = '7428177321599221810';
+const botId = '7428177321599***';
 
 const client = ref<RealtimeClient | null>(null);
 const messageList = ref<string[]>([]);
