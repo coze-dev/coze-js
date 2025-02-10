@@ -35,12 +35,12 @@
     "README.zh-CN.md"
   ],
   "scripts": {
-    "build": "rm -rf ./dist && rslib build",
+    "build": "rslib build",
     "buildAll": "npm run build && cd ../../examples/realtime-console && npm run build",
     "demo": "npm run start & cd ../../examples/realtime-console && npm run start",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
-    "start": "rm -rf dist && rslib build -w",
+    "start": "rslib build -w",
     "test": "vitest",
     "test:cov": "vitest --coverage --run"
   },

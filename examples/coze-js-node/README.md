@@ -26,8 +26,10 @@ Choose one of the following commands based on your Base URL:
 
 ```bash
 # For China region (api.coze.cn)
-COZE_ENV=zh npx tsx ./src/chat.ts
+COZE_ENV=zh npx tsx ./src/chat.ts            # macOS/Linux
+set "COZE_ENV=zh" && npx tsx ./src/chat.ts   # Windows CMD
+$env:COZE_ENV="zh"; npx tsx ./src/chat.ts    # Windows PowerShell
 
 # For Global region (api.coze.com)
-npx  tsx ./src/chat.ts
+npx tsx ./src/chat.ts
 ```

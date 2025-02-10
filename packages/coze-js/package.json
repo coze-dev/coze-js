@@ -41,10 +41,10 @@
     "README.zh-CN.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && rslib build",
+    "build": "rslib build",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
-    "start": "rm -rf dist && rslib build -w",
+    "start": "rslib build -w",
     "test": "vitest",
     "test:cov": "vitest --coverage --run"
   },

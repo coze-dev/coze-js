@@ -10,8 +10,12 @@
 rush update
 rush build
 npm run start # disable video by default
+
 # or set enable video to true
-REACT_APP_ENABLE_VIDEO=true npm run start
+REACT_APP_ENABLE_VIDEO=true npm run start  # for macos/linux
+# Windows users should use either:
+set "REACT_APP_ENABLE_VIDEO=true" && npm run start  # for windows cmd
+$env:REACT_APP_ENABLE_VIDEO="true"; npm run start   # for windows powershell
 
 ```
 
