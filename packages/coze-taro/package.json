@@ -34,7 +34,7 @@
     "README.zh-CN.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -b tsconfig.build.json -f",
+    "build": "tsc -b tsconfig.build.json -f",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
     "test": "vitest --run",

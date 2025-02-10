@@ -25,9 +25,11 @@ cd src/config/config.ts
 根据你的 Base URL 选择以下命令之一：
 
 ```bash
-# 中国区域 (api.coze.cn)
-COZE_ENV=zh npx tsx ./src/chat.ts
+# 国内 (api.coze.cn)
+COZE_ENV=zh npx tsx ./src/chat.ts            # macOS/Linux
+set "COZE_ENV=zh" && npx tsx ./src/chat.ts   # Windows CMD
+$env:COZE_ENV="zh"; npx tsx ./src/chat.ts    # Windows PowerShell
 
-# 全球区域 (api.coze.com)
+# 海外 (api.coze.com)
 npx tsx ./src/chat.ts
 ```

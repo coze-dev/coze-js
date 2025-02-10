@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "Add Windows-specific environment variable commands for CMD and PowerShell",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
