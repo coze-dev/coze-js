@@ -1,14 +1,13 @@
 # Quick Start
 
 ## Prerequisites
-1. Set up your development environment following the [coze-js](../../README.md#development-guide) guide
-2. Ensure you have Node.js (v18+) installed
+1. Ensure you have Node.js (v18+) installed
 
 ## Running the Demo
 
 ```bash
-rush update
-rush build
+npm run run-preinstall
+npm install
 npm run start # disable video by default
 # or set enable video to true
 REACT_APP_ENABLE_VIDEO=true npm run start

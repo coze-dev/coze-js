@@ -22,7 +22,8 @@
 2. 安装依赖：
 
 ```bash
-rush update
+npm run run-preinstall
+npm install
 ```
 
 3. 配置 OAuth 凭证：

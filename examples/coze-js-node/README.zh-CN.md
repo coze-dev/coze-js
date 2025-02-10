@@ -7,7 +7,10 @@
 ## 快速开始
 
 ### 1. 安装依赖
-请参考根目录的 [README.md](../../README.md) 了解依赖安装说明。
+```bash
+npm run run-preinstall
+npm install
+```
 
 ### 2. 配置环境
 1. 修改你的配置文件：

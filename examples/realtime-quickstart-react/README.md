@@ -23,7 +23,8 @@ This is a real-time voice conversation application example built using React and
 
 1. Install dependencies:
 ```bash
-rush update
+npm run run-preinstall
+npm install
 ```
 
 2. Start the development server:
@@ -46,6 +47,16 @@ const { getToken } = useTokenWithPat();
 // const { getToken } = useTokenWithPKCE();
 // const { getToken } = useTokenWithWeb();
 ```
+
+- Modify `src/hooks/use-token-with-pat.ts` to return your access token
+```typescript
+const useTokenWithPat = () => {
+  const getToken = () =>
+    'Your access token';
+  return {
+    getToken,
+  };
+};
 
 ## quickstart-oauth-server
 

@@ -7,7 +7,10 @@ This guide will help you quickly set up and run the Coze Node.js example.
 ## Quick Start
 
 ### 1. Install Dependencies
-Please refer to the root [README.md](../../README.md) for dependency installation instructions.
+```bash
+npm run run-preinstall
+npm install
+```
 
 ### 2. Configure Environment
 1. Modify your configuration file:

@@ -23,7 +23,8 @@ This is a sample OAuth server implementation demonstrating different OAuth authe
 2. Install dependencies:
 
 ```bash
-rush update
+npm run run-preinstall
+npm install
 ```
 
 3. Configure OAuth credentials:

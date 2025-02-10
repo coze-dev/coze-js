@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint ./ --cache --quiet",
+    "run-preinstall": "node scripts/preinstall.js",
     "start-device": "tsx src/device-oauth/index.ts",
     "start-jwt": "tsx src/jwt-oauth/index.ts",
     "start-pkce": "tsx src/pkce-oauth/index.ts",

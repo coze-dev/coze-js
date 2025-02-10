@@ -23,7 +23,8 @@
 
 1. 安装依赖:
 ```bash
-rush update
+npm run run-preinstall
+npm install
 ```
 
 2. 启动开发服务器:
@@ -45,6 +46,17 @@ const { getToken } = useTokenWithPat();
 // const { getToken } = useTokenWithJWT();
 // const { getToken } = useTokenWithPKCE();
 // const { getToken } = useTokenWithWeb();
+```
+- 修改 `src/hooks/use-token-with-pat.ts` ，返回 access token
+```
+const useTokenWithPat = () => {
+  const getToken = () =>
+    'Your access token';
+  return {
+    getToken,
+  };
+};
+
 ```
 
 ## quickstart-oauth-server

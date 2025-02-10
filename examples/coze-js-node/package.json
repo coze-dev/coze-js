@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "postinstall": "node scripts/postinstall.cjs",
-    "lint": "eslint ./ --cache --quiet"
+    "lint": "eslint ./ --cache --quiet",
+    "run-preinstall": "node scripts/preinstall.js"
   },
   "dependencies": {
     "@coze/api": "workspace:*",
