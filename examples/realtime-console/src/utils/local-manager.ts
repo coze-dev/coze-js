@@ -14,6 +14,7 @@ export enum LocalStorageKey {
   ENABLE_VIDEO = 'enable_video',
   USER_ID = 'user_id',
   CONVERSATION_ID = 'conversation_id',
+  WORKFLOW_ID = 'workflow_id',
 }
 
 export class LocalManager {

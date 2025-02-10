@@ -17,6 +17,7 @@ export interface CreateRoomReq {
   voice_id?: string;
   connector_id: string;
   uid?: string;
+  workflow_id?: string;
 }
 
 export interface CreateRoomData {

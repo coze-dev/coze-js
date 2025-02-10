@@ -229,6 +229,9 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.CONVERSATION_ID]: localManager.get(
           LocalStorageKey.CONVERSATION_ID,
         ),
+        [LocalStorageKey.WORKFLOW_ID]: localManager.get(
+          LocalStorageKey.WORKFLOW_ID,
+        ),
       });
     })().catch(err => {
       console.error(err);
@@ -236,13 +239,20 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
   }, [form, api]);
 
   const saveSettings = () => {
-    const { workspace_id, bot_id, voice_id, user_id, conversation_id } =
-      form.getFieldsValue();
+    const {
+      workspace_id,
+      bot_id,
+      voice_id,
+      user_id,
+      conversation_id,
+      workflow_id,
+    } = form.getFieldsValue();
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
     localManager.set(LocalStorageKey.VOICE_ID, voice_id);
     localManager.set(LocalStorageKey.USER_ID, user_id);
     localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
+    localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
   };
 
   const handleOk = () => {
@@ -448,6 +458,13 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             tooltip="Optional: Specify a custom user ID"
           >
             <Input placeholder="Enter user ID" />
+          </Form.Item>
+          <Form.Item
+            name={LocalStorageKey.WORKFLOW_ID}
+            label="Workflow ID"
+            tooltip="Optional: Specify a custom workflow ID"
+          >
+            <Input placeholder="Enter workflow ID" />
           </Form.Item>
         </div>
 
