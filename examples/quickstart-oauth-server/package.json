@@ -1,0 +1,35 @@
+{
+  "name": "@coze/quickstart-oauth-server",
+  "version": "1.0.0",
+  "description": "coze-api & realtime-api quickstart oauth server",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ./ --cache --quiet",
+    "start-device": "tsx src/device-oauth/index.ts",
+    "start-jwt": "tsx src/jwt-oauth/index.ts",
+    "start-pkce": "tsx src/pkce-oauth/index.ts",
+    "start-web": "tsx src/web-oauth/index.ts"
+  },
+  "dependencies": {
+    "@coze/api": "workspace:*",
+    "@koa/cors": "^3.2.0",
+    "axios": "^1.7.7",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^13.0.1",
+    "koa-session": "^7.0.2"
+  },
+  "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@types/koa": "^2.15.0",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.8",
+    "@types/koa-session": "^6.4.5",
+    "@types/koa__cors": "^5.0.0",
+    "@types/node": "^20",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.3"
+  }
+}
