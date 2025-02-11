@@ -244,6 +244,16 @@ describe('Auth functions', () => {
         'https://www.coze.com/api/permission/oauth2/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state',
       );
     });
+
+    it('should return the correct authentication URL with workspaceId', () => {
+      const url = getWebAuthenticationUrl({
+        ...mockConfig,
+        workspaceId: '123',
+      });
+      expect(url).toBe(
+        'https://www.coze.com/api/permission/oauth2/workspace_id/123/authorize?response_type=code&client_id=test-client-id&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&state=test-state',
+      );
+    });
   });
 
   describe('getPKCEAuthenticationUrl', () => {

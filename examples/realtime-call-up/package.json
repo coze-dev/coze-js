@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node scripts/build.js",
     "lint": "eslint --cache --quiet",
+    "run-preinstall": "node scripts/preinstall.js",
     "start": "node scripts/start.js",
     "test": "exit 0"
   },

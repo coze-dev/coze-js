@@ -18,11 +18,14 @@
 在 [examples](./examples) 目录中查找每个包的使用示例：
 
 - [coze-js-node](./examples/coze-js-node) - @coze/api 的 Node.js 使用示例
-- [coze-js-web](./examples/coze-js-web) - @coze/api 的 React Web 使用示例
+- [coze-js-web](./examples/coze-js-web) - @coze/api 的 React Web 使用示例，[预览](https://coze-js-web-example.surge.sh/)
 - [coze-js-taro](./examples/coze-js-taro) - @coze/taro-api Taro4 小程序示例
 - [coze-js-taro3](./examples/coze-js-taro3) - @coze/taro-api Taro3 小程序示例
-- [realtime-console](./examples/realtime-console) - @coze/realtime-api 完整版实时语音示例
+- [realtime-console](./examples/realtime-console) - @coze/realtime-api 完整版实时语音示例，[预览](https://coze.cn/open-platform/realtime/playground)
 - [realtime-call-up](./examples/realtime-call-up) - @coze/realtime-api 简化版实时语音示例
+- [realtime-quickstart-react](./examples/realtime-quickstart-react) - @coze/realtime-api 快速入门 React 示例
+- [realtime-quickstart-vue](./examples/realtime-quickstart-vue) - @coze/realtime-api 快速入门 Vue 示例
+- [quickstart-oauth-server](./examples/quickstart-oauth-server) - Coze SDK OAuth 示例
 
 ## 🚀 快速开始
 
