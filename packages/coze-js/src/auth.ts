@@ -38,6 +38,9 @@ export const getWebAuthenticationUrl = (config: WebAuthenticationConfig) => {
     redirect_uri: config.redirectUrl,
     state: config.state ?? '',
   });
+  if (config.workspaceId) {
+    return `${baseUrl}/api/permission/oauth2/workspace_id/${config.workspaceId}/authorize?${params.toString()}`;
+  }
   return `${baseUrl}/api/permission/oauth2/authorize?${params.toString()}`;
 };
 
@@ -382,6 +385,7 @@ export interface WebAuthenticationConfig {
   clientId: string;
   redirectUrl: string;
   state?: string;
+  workspaceId?: string;
 }
 
 export interface PKCEAuthenticationConfig extends WebAuthenticationConfig {
