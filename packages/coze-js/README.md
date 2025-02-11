@@ -169,6 +169,15 @@ async function wsChat() {
 }
 ```
 
+### Proxy Example
+```ts
+const client = new CozeAPI({
+  token: '', // use proxy token in server
+  baseURL: 'http://localhost:8080/api',
+});
+```
+[View proxy example →](../../examples/coze-js-node/src/proxy/)
+
 ## More Examples
 
 | Feature | Description | Example |
@@ -200,10 +209,14 @@ npm run test
 ### Node.js
 ```bash
 cd examples/coze-js-node
-rush build
+npm run run-preinstall
+npm install
 npx tsx ./src/chat.ts
-# or using .cn domain
-COZE_ENV=zh npx tsx ./src/chat.ts
+
+# For China region (api.coze.cn)
+COZE_ENV=zh npx tsx ./src/chat.ts            # macOS/Linux
+set "COZE_ENV=zh" && npx tsx ./src/chat.ts   # Windows CMD
+$env:COZE_ENV="zh"; npx tsx ./src/chat.ts    # Windows PowerShell
 ```
 
 ### Browser
