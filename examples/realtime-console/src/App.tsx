@@ -10,7 +10,6 @@ const App: React.FC = () => {
     localStorage.setItem(key, config[key as keyof typeof config]);
   }
   localStorage.setItem('token_expires_at', '2739005652000');
-  localStorage.setItem('workspace_id', 'personal_xxx');
 
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL}>

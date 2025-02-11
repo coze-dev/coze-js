@@ -9,6 +9,7 @@ import {
   redirectToLogin,
 } from '../utils/utils';
 import { LocalManager, LocalStorageKey } from '../utils/local-manager';
+import { useTokenWithJWT } from './use-token-with-jwt';
 
 export interface VoiceOption {
   label: React.ReactNode;
@@ -35,16 +36,15 @@ export interface WorkspaceOption {
 
 const useCozeAPI = () => {
   const [api, setApi] = useState<CozeAPI | null>(null);
-  const localManager = new LocalManager();
+  const { getToken } = useTokenWithJWT();
 
   useEffect(() => {
     const init = async () => {
-      const accessToken = await getOrRefreshToken(localManager);
       const baseURL = getBaseUrl();
-      if (accessToken && baseURL) {
+      if (baseURL) {
         setApi(
           new CozeAPI({
-            token: accessToken,
+            token: getToken,
             baseURL,
             allowPersonalAccessTokenInBrowser: true,
           }),

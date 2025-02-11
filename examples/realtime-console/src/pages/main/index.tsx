@@ -25,6 +25,7 @@ import {
 } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import logo from '../../logo.svg';
+import { useTokenWithJWT } from '../../hooks/use-token-with-jwt';
 import { useAccessToken } from '../../hooks/use-access-token';
 import Settings from './settings';
 import Player from './player';
@@ -51,8 +52,8 @@ const RealtimeConsole: React.FC = () => {
   const serverEventsEndRef = useRef<HTMLDivElement>(null);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(true);
   const localManager = new LocalManager();
-  const { getAccessToken, removeAccessToken, initLocalManager } =
-    useAccessToken();
+  const { removeAccessToken, initLocalManager } = useAccessToken();
+  const { getToken } = useTokenWithJWT();
 
   const handleSaveSettings = async () => {
     if (clientRef.current) {
@@ -83,7 +84,7 @@ const RealtimeConsole: React.FC = () => {
     }
 
     const client = new RealtimeClient({
-      accessToken: getAccessToken,
+      accessToken: getToken,
       botId: botId.trim(),
       voiceId: voiceId.trim(),
       // conversationId: '1234567890', // Optional

@@ -19,9 +19,7 @@ npm install
 modify the `config.json` file with your own config
 ```bash
 {
-  "access_token": "pat_KWQlw2nvTlLTMISAzsRu7rV8DRXEJoKLRUgcLP6DL8xPlFFPZ**",
-  "bot_id": "742817732159***",
-  "voice_id": "742894224871***"
+  "base_server_url": "http://localhost:8080"
 }
 
 ```
