@@ -1,5 +1,7 @@
 # Quick Start
 
+Preview: [https://coze.cn/open-platform/realtime/playground](https://coze.cn/open-platform/realtime/playground)
+
 ## Prerequisites
 1. Ensure you have Node.js (v18+) installed
 

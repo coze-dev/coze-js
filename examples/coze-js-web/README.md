@@ -4,6 +4,8 @@ English | [简体中文](./README.zh-CN.md)
 
 A React-based web demo showcasing the capabilities of the Coze API, including chat and voice interactions.
 
+Preview: [https://coze-js-web-example.surge.sh/](https://coze-js-web-example.surge.sh/)
+
 ## Features
 
 - Chat interface with streaming responses

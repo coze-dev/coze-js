@@ -19,11 +19,14 @@ This monorepo contains the following packages:
 Find usage examples for each package in the [examples](./examples) directory:
 
 - [coze-js-node](./examples/coze-js-node) - Node.js Demo for @coze/api
-- [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/api
+- [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/api, [Preview](https://coze-js-web-example.surge.sh/)
 - [coze-js-taro](./examples/coze-js-taro) - Taro4 Mini Program Demo for @coze/taro-api
 - [coze-js-taro3](./examples/coze-js-taro3) - Taro3 Mini Program Demo for @coze/taro-api
-- [realtime-console](./examples/realtime-console) - Full Console Demo for @coze/realtime-api
+- [realtime-console](./examples/realtime-console) - Full Console Demo for @coze/realtime-api, [Preview](https://coze.cn/open-platform/realtime/playground)
 - [realtime-call-up](./examples/realtime-call-up) - Sample Call Up Demo for @coze/realtime-api
+- [realtime-quickstart-react](./examples/realtime-quickstart-react) - Quickstart React Demo for @coze/realtime-api
+- [realtime-quickstart-vue](./examples/realtime-quickstart-vue) - Quickstart Vue Demo for @coze/realtime-api
+- [quickstart-oauth-server](./examples/quickstart-oauth-server) - Quickstart OAuth Server Demo for Coze SDK
 
 
 ## 🚀 Getting Started

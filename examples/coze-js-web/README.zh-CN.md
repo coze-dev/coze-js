@@ -4,6 +4,8 @@
 
 一个基于 React 的 Web 示例，展示了 Coze API 的功能，包括聊天和语音交互。
 
+预览: [https://coze-js-web-example.surge.sh/](https://coze-js-web-example.surge.sh/)
+
 ## 功能特性
 
 - 支持流式响应的聊天界面
