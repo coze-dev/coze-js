@@ -2,6 +2,44 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.0.20",
+      "tag": "HEAD",
+      "date": "2025-02-12T08:07:08.384Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add Websocket Support"
+          },
+          {
+            "comment": "add realtime-quickstart-react & quickstart-oauth-server demo"
+          },
+          {
+            "comment": "add WebSocket chat examples and documentation"
+          },
+          {
+            "comment": "add workflow ID support to realtime console"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Fix  chat-x websocket  bug"
+          },
+          {
+            "comment": "Add workspaceId to getWebAuthenticationUrl"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "Add error handling for JWT token exchange"
+          },
+          {
+            "comment": "Add Windows-specific environment variable commands for CMD and PowerShell"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.19",
       "tag": "HEAD",
       "date": "2025-02-07T03:06:20.888Z",
