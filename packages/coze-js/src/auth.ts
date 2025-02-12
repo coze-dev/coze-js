@@ -329,14 +329,18 @@ export const getJWTToken = async (
           return;
         }
         // Exchange the JWT for an OAuth token
-        const result = await _getJWTToken(
-          {
-            ...config,
-            token,
-          },
-          options,
-        );
-        resolve(result);
+        try {
+          const result = await _getJWTToken(
+            {
+              ...config,
+              token,
+            },
+            options,
+          );
+          resolve(result);
+        } catch (err2) {
+          reject(err2);
+        }
       },
     );
   });
