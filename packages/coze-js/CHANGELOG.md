@@ -1,5 +1,23 @@
 # @coze/api
 
+## 1.0.20 - 2025-02-12
+
+### New Features
+
+- Add Websocket Support
+- add realtime-quickstart-react & quickstart-oauth-server demo
+- add WebSocket chat examples and documentation
+- add workflow ID support to realtime console
+
+### Bug Fixes
+
+- Fix  chat-x websocket  bug
+- Add workspaceId to getWebAuthenticationUrl
+- add unit test
+- Add error handling for JWT token exchange
+- Add Windows-specific environment variable commands for CMD and PowerShell
+
+
 ## 1.0.19 - 2025-02-07
 
 ### Bug Fixes

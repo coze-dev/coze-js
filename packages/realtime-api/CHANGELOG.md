@@ -1,5 +1,23 @@
 # @coze/realtime-api
 
+## 1.0.5 - 2025-02-12
+
+### New Features
+
+- add custom user ID and conversation ID support
+- realtime-api 源码引入到 examples
+- rebase 0109
+- cozePublishConfig
+- taro dev source
+- feat: add getRtcEngine method to expose RTC engine instance
+- add workflow ID support to realtime console
+
+### Bug Fixes
+
+- add test code
+- Add Windows-specific environment variable commands for CMD and PowerShell
+
+
 ## 1.0.4 - 2025-01-09
 
 ### New Features
