@@ -1,18 +1,19 @@
 import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 import {
-  type ConversationAudioDeltaEvent,
   type CozeAPI,
   type CreateChatData,
   type CreateChatWsReq,
   type CreateChatWsRes,
+  type CreateSpeechWsReq,
+  type CreateSpeechWsRes,
   type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
   type WebSocketAPI,
   WebsocketsEventType,
 } from '@coze/api';
 
-import { WavRecorder } from '../../lib/wavtools';
+import { WavRecorder, WavStreamPlayer } from '../../lib/wavtools';
 import { config } from './config';
 
 const wavRecorder = new WavRecorder({ sampleRate: 24000 });
@@ -28,6 +29,10 @@ const useWsAPI = (
   const transcriptionsRef = useRef<WebSocketAPI<
     CreateTranscriptionsWsReq,
     CreateTranscriptionsWsRes
+  > | null>(null);
+  const speechRef = useRef<WebSocketAPI<
+    CreateSpeechWsReq,
+    CreateSpeechWsRes
   > | null>(null);
   const isConnected = useRef(false);
   const trackId = useRef('my-track');
@@ -113,7 +118,10 @@ const useWsAPI = (
   }, []);
 
   const closeTranscriptionsWs = () => {
-    if (transcriptionsRef.current) {
+    if (
+      transcriptionsRef.current &&
+      transcriptionsRef.current.readyState === WebSocket.OPEN
+    ) {
       transcriptionsRef.current.close(1000, 'close');
       transcriptionsRef.current = null;
     }
@@ -192,7 +200,7 @@ const useWsAPI = (
             if (
               data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_DELTA
             ) {
-              handleAudioMessage(data);
+              handleAudioMessage(data.data.content);
             } else if (
               [
                 WebsocketsEventType.CONVERSATION_CHAT_COMPLETED,
@@ -224,25 +232,81 @@ const useWsAPI = (
   );
 
   const closeWs = () => {
-    if (wsRef.current) {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.close();
       wsRef.current = null;
     }
   };
 
-  const handleAudioMessage = useCallback(
-    async (data: ConversationAudioDeltaEvent) => {
-      const decodedContent = atob(data.data.content);
-      const arrayBuffer = new ArrayBuffer(decodedContent.length);
-      const view = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < decodedContent.length; i++) {
-        view[i] = decodedContent.charCodeAt(i);
+  const initSpeechWs = useCallback(
+    async (onMessage?: (data: CreateSpeechWsRes) => void) => {
+      closeSpeechWs();
+      if (!clientRef.current) {
+        return;
       }
+      const ws = await clientRef.current.websockets.audio.speech.create();
 
-      await wavStreamPlayer.add16BitPCM(arrayBuffer, trackId.current);
+      return new Promise<WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes>>(
+        (resolve, reject) => {
+          ws.onopen = () => {
+            console.log('[speech] ws open');
+
+            resolve(ws);
+          };
+
+          ws.onmessage = (data, event) => {
+            if (data.event_type === WebsocketsEventType.ERROR) {
+              if (data.data.code === 4100) {
+                console.error('Unauthorized Error', data);
+              } else if (data.data.code === 4101) {
+                console.error('Forbidden Error', data);
+              } else {
+                console.error('WebSocket error', data);
+              }
+              ws.close();
+              return;
+            }
+            console.log('[transcriptions] ws message', data);
+
+            onMessage?.(data);
+          };
+
+          ws.onerror = (error, event) => {
+            console.error('[speech] WebSocket error', error, event);
+
+            ws.close();
+
+            reject(error);
+          };
+
+          ws.onclose = () => {
+            console.log('[speech] ws close');
+          };
+
+          speechRef.current = ws;
+        },
+      );
     },
     [],
   );
+
+  const closeSpeechWs = () => {
+    if (speechRef.current && speechRef.current.readyState === WebSocket.OPEN) {
+      speechRef.current.close();
+    }
+    speechRef.current = null;
+  };
+
+  const handleAudioMessage = useCallback(async (message: string) => {
+    const decodedContent = atob(message);
+    const arrayBuffer = new ArrayBuffer(decodedContent.length);
+    const view = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < decodedContent.length; i++) {
+      view[i] = decodedContent.charCodeAt(i);
+    }
+
+    await wavStreamPlayer.add16BitPCM(arrayBuffer, trackId.current);
+  }, []);
 
   const startChat = useCallback(async () => {
     interruptAudio();
@@ -288,7 +352,7 @@ const useWsAPI = (
     console.log('[chat] send input_audio_buffer_complete');
   }, []);
 
-  const startSpeech = useCallback(async () => {
+  const startTranscriptions = useCallback(async () => {
     interruptAudio();
     await initTranscriptionsWs();
     await wavRecorder.begin(deviceListRef.current[0].deviceId);
@@ -318,7 +382,7 @@ const useWsAPI = (
     });
   }, []);
 
-  const stopSpeech = useCallback(async () => {
+  const stopTranscriptions = useCallback(async () => {
     if (!transcriptionsRef.current) {
       return;
     }
@@ -371,7 +435,8 @@ const useWsAPI = (
             onUpdate?.(message);
           } else if (
             data.event_type ===
-            WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED
+              WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED &&
+            data.data.type === 'answer'
           ) {
             message += data.data.content;
             onSuccess?.(message);
@@ -393,14 +458,63 @@ const useWsAPI = (
     [],
   );
 
+  const startSpeech = useCallback(async (message: string) => {
+    // interrupt audio if it's playing
+    interruptAudio();
+
+    await initSpeechWs(data => {
+      if (data.event_type === WebsocketsEventType.SPEECH_AUDIO_COMPLETED) {
+        console.log('[speech] ws transcriptions completed', data);
+        closeSpeechWs();
+      }
+      if (data.event_type === WebsocketsEventType.SPEECH_AUDIO_UPDATE) {
+        handleAudioMessage(data.data.delta);
+      }
+    });
+
+    // See https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc#HrVcdpW4Oo3A25xCQIDcGBlknOc
+    speechRef.current?.send({
+      id: '1',
+      event_type: WebsocketsEventType.SPEECH_UPDATE,
+      data: {
+        output_audio: {
+          codec: 'pcm',
+          // voice_id: 'xxx',
+        },
+      },
+    });
+
+    speechRef.current?.send({
+      id: '1',
+      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_APPEND,
+      data: {
+        delta: message,
+      },
+    });
+    speechRef.current?.send({
+      id: '1',
+      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_COMPLETE,
+    });
+  }, []);
+
+  const stopSpeech = useCallback(() => {
+    interruptAudio();
+    closeSpeechWs();
+  }, []);
+
+  const getIsSpeech = useCallback(() => wavStreamPlayer.stream !== null, []);
+
   return {
     initWs,
     startChat,
     stopChat,
     interruptAudio,
+    startTranscriptions,
+    stopTranscriptions,
+    sendWsMessage,
     startSpeech,
     stopSpeech,
-    sendWsMessage,
+    getIsSpeech,
   };
 };
 
