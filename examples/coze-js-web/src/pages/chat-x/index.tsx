@@ -1,6 +1,14 @@
 import React, { useEffect } from 'react';
 
-import { Badge, Button, type GetProp, message, Space, Tooltip } from 'antd';
+import {
+  Badge,
+  Button,
+  Flex,
+  type GetProp,
+  message,
+  Space,
+  Tooltip,
+} from 'antd';
 import { WebsocketsEventType, type CreateChatData } from '@coze/api';
 import { type MessageInfo } from '@ant-design/x/es/useXChat';
 import {
@@ -78,14 +86,20 @@ const ChatX: React.FC = () => {
 
   const { initClient, botInfo, getBotInfo, uploadFile, uploading, clientRef } =
     useCozeAPI();
-  const { startChat, stopChat, startSpeech, stopSpeech, sendWsMessage } =
-    useWsAPI(clientRef, data => {
-      if (
-        data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE
-      ) {
-        setContent(lastContentRef.current + data.data.content);
-      }
-    });
+  const {
+    startChat,
+    stopChat,
+    startTranscriptions,
+    stopTranscriptions,
+    sendWsMessage,
+    startSpeech,
+    stopSpeech,
+    getIsSpeech,
+  } = useWsAPI(clientRef, data => {
+    if (data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE) {
+      setContent(lastContentRef.current + data.data.content);
+    }
+  });
 
   // ==================== Runtime ====================
   const [agent] = useXAgent({
@@ -230,6 +244,23 @@ const ChatX: React.FC = () => {
       key: id,
       role: status === 'local' ? 'local' : 'ai',
       content: msg,
+      footer: (
+        <Flex>
+          <Button
+            size="small"
+            type="text"
+            icon={<PhoneOutlined />}
+            style={{ marginInlineEnd: 'auto' }}
+            onClick={() => {
+              if (getIsSpeech()) {
+                stopSpeech();
+              } else {
+                startSpeech(msg);
+              }
+            }}
+          />
+        </Flex>
+      ),
     }),
   );
 
@@ -362,10 +393,10 @@ const ChatX: React.FC = () => {
               if (nextSpeech) {
                 lastContentRef.current = content;
                 message.info('Start Voice to Text');
-                await startSpeech();
+                await startTranscriptions();
               } else {
                 message.info('Stop Voice to Text');
-                await stopSpeech();
+                await stopTranscriptions();
               }
               setSpeech(nextSpeech);
             },
