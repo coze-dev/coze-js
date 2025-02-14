@@ -167,6 +167,16 @@ async function wsChat() {
 }
 ```
 
+### Proxy 示例
+```ts
+const client = new CozeAPI({
+  token: '', // use proxy token in server
+  baseURL: 'http://localhost:8080/api',
+});
+```
+
+[查看代理示例 →](../../examples/coze-js-node/src/proxy/)
+
 ## 更多示例
 
 | 功能 | 描述 | 示例 |
