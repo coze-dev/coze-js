@@ -10,6 +10,7 @@ import { isScreenShareDevice } from './utils';
 import { RealtimeEventHandler, EventNames } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { EngineClient } from './client';
+
 export interface VideoConfig {
   videoOnDefault?: boolean /** optional, Whether to turn on video by default, defaults to true */;
   renderDom?: string /** optional, The DOM element to render the video stream to */;
@@ -26,6 +27,7 @@ export interface RealtimeClientConfig {
   workflowId?: string /** optional, Workflow Id */;
   baseURL?: string /** optional, defaults to "https://api.coze.cn" */;
   debug?: boolean /** optional, defaults to false */;
+  getRoomInfo?: () => Promise<CreateRoomData> /** optional, Customize get room info */;
   /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
   allowPersonalAccessTokenInBrowser?: boolean;
   /** Whether to mute by default, defaults to false
@@ -112,36 +114,40 @@ class RealtimeClient extends RealtimeEventHandler {
    * zh: 建立与 Coze API 的连接并加入房间
    */
   async connect() {
-    const { botId, conversationId, voiceId } = this._config;
+    const { botId, conversationId, voiceId, getRoomInfo } = this._config;
 
     let roomInfo: CreateRoomData;
     try {
       // Step1 get token
-      let config = undefined;
-      if (this._config.videoConfig) {
-        if (isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)) {
-          config = {
-            video_config: {
-              stream_video_type: 'screen' as const,
-            },
-          };
-        } else {
-          config = {
-            video_config: {
-              stream_video_type: 'main' as const,
-            },
-          };
+      if (getRoomInfo) {
+        roomInfo = await getRoomInfo();
+      } else {
+        let config = undefined;
+        if (this._config.videoConfig) {
+          if (isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)) {
+            config = {
+              video_config: {
+                stream_video_type: 'screen' as const,
+              },
+            };
+          } else {
+            config = {
+              video_config: {
+                stream_video_type: 'main' as const,
+              },
+            };
+          }
         }
+        roomInfo = await this._api.audio.rooms.create({
+          bot_id: botId,
+          conversation_id: conversationId || undefined,
+          voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
+          connector_id: this._config.connectorId,
+          uid: this._config.userId || undefined,
+          workflow_id: this._config.workflowId || undefined,
+          config,
+        });
       }
-      roomInfo = await this._api.audio.rooms.create({
-        bot_id: botId,
-        conversation_id: conversationId || undefined,
-        voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
-        connector_id: this._config.connectorId,
-        uid: this._config.userId || undefined,
-        workflow_id: this._config.workflowId || undefined,
-        config,
-      });
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);
       throw new RealtimeAPIError(
