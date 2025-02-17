@@ -167,3 +167,4 @@ examples/coze-js-node/tmp/
 examples/coze-js-node/src/config/config.ts
 
 !examples/coze-js-web/src/lib/wavtools/dist
+!packages/coze-js/src/ws-tools/lib/wavtools/dist

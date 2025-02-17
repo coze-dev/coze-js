@@ -177,6 +177,63 @@ const client = new CozeAPI({
 
 [查看代理示例 →](../../examples/coze-js-node/src/proxy/)
 
+### 语音合成
+```javascript
+import { WsSpeechClient, WebsocketsEventType } from '@coze/api/ws-tools';
+
+// 初始化
+const client = new WsSpeechClient({
+  token: 'your_pat_token',
+  baseWsURL: COZE_CN_BASE_WS_URL,
+  allowPersonalAccessTokenInBrowser: true, // optional
+});
+
+// 监听所有下行事件(包括error）
+client.on('data', data => {
+  console.log('[speech] ws data', data);
+});
+
+// 或者，监听单个事件
+client.on(WebsocketsEventType.ERROR, data => {
+  console.error('[speech] ws error', data);
+});
+
+// 连接
+try {
+  await client.connect({voiceId: 'your_voice_id'});
+  console.log('[speech] ws connect success');
+} catch (error) {
+  console.error('[speech] ws connect error', error);
+  return;
+}
+
+// 发送消息并播放
+client.appendAndComplete(message);
+
+// 打断
+client.interrupt();
+
+// 断开连接，销毁实例
+client.disconnect();
+
+// 暂停语音播放
+client.pause();
+
+// 恢复语音播放
+client.resume();
+
+// 切换语音播放
+client.togglePlay();
+
+// 语音是否播放中
+client.isPlaying();
+
+// 发送文本片段
+client.append(message);
+// 结束发送文本
+client.complete();
+```
+
 ## 更多示例
 
 | 功能 | 描述 | 示例 |

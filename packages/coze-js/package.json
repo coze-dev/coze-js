@@ -23,7 +23,8 @@
   "author": "Leeight <leeight@gmail.com>",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./ws-tools": "./src/ws-tools/index.ts"
   },
   "main": "src/index.ts",
   "module": "src/index.ts",
@@ -52,6 +53,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.x",
     "reconnecting-websocket": "^4.4.0",
+    "uuid": "^10.0.0",
     "ws": "^8.11.0"
   },
   "devDependencies": {
@@ -80,6 +82,11 @@
         "require": "./dist/cjs/index.cjs",
         "import": "./dist/esm/index.js",
         "types": "./dist/types/index.d.ts"
+      },
+      "./ws-tools": {
+        "require": "./dist/cjs/ws-tools/index.cjs",
+        "import": "./dist/esm/ws-tools/index.js",
+        "types": "./dist/types/ws-tools/index.d.ts"
       }
     },
     "main": "dist/cjs/index.cjs",
