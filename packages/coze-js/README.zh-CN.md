@@ -179,7 +179,8 @@ const client = new CozeAPI({
 
 ### 语音合成
 ```javascript
-import { WsSpeechClient, WebsocketsEventType } from '@coze/api/ws-tools';
+import { COZE_CN_BASE_WS_URL, WebsocketsEventType } from '@coze/api';
+import { WsSpeechClient } from '@coze/api/ws-tools';
 
 // 初始化
 const client = new WsSpeechClient({
