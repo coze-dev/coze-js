@@ -169,6 +169,63 @@ async function wsChat() {
 }
 ```
 
+### Websocket Speech
+```javascript
+import { WsSpeechClient, WebsocketsEventType } from '@coze/api/ws-tools';
+
+// Initialize
+const client = new WsSpeechClient({
+  token: 'your_pat_token',
+  baseWsURL: COZE_CN_BASE_WS_URL,
+  allowPersonalAccessTokenInBrowser: true, // optional
+});
+
+// Listen for all downstream events (including error)
+client.on('data', data => {
+  console.log('[speech] ws data', data);
+});
+
+// Or, listen for a single event
+client.on(WebsocketsEventType.ERROR, data => {
+  console.error('[speech] ws error', data);
+});
+
+// Connect
+try {
+  await client.connect({voiceId: 'your_voice_id'});
+  console.log('[speech] ws connect success');
+} catch (error) {
+  console.error('[speech] ws connect error', error);
+  return;
+}
+
+// Send message and play
+client.appendAndComplete(message);
+
+// Interrupt
+client.interrupt();
+
+// Disconnect, destroy instance
+client.disconnect();
+
+// Pause speech playback
+client.pause();
+
+// Resume speech playback
+client.resume();
+
+// Toggle speech playback
+client.togglePlay();
+
+// Check if speech is playing
+client.isPlaying();
+
+// Send text fragment
+client.append(message);
+// End sending text
+client.complete();
+```
+
 ## More Examples
 
 | Feature | Description | Example |

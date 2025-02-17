@@ -25,6 +25,7 @@ import {
   PaperClipOutlined,
   PhoneOutlined,
   PhoneTwoTone,
+  PlayCircleFilled,
   PlusOutlined,
 } from '@ant-design/icons';
 
@@ -93,8 +94,7 @@ const ChatX: React.FC = () => {
     stopTranscriptions,
     sendWsMessage,
     startSpeech,
-    stopSpeech,
-    getIsSpeech,
+    togglePlay,
   } = useWsAPI(clientRef, data => {
     if (data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE) {
       setContent(lastContentRef.current + data.data.content);
@@ -252,11 +252,21 @@ const ChatX: React.FC = () => {
             icon={<PhoneOutlined />}
             style={{ marginInlineEnd: 'auto' }}
             onClick={() => {
-              if (getIsSpeech()) {
-                stopSpeech();
-              } else {
-                startSpeech(msg);
-              }
+              startSpeech(msg);
+              // if (getIsSpeech()) {
+              //   stopSpeech();
+              // } else {
+              //   startSpeech(msg);
+              // }
+            }}
+          />
+          <Button
+            size="small"
+            type="text"
+            icon={<PlayCircleFilled />}
+            style={{ marginInlineEnd: 'auto' }}
+            onClick={() => {
+              togglePlay();
             }}
           />
         </Flex>
