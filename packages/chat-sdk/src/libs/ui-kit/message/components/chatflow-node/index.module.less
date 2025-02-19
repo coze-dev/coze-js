@@ -1,0 +1,61 @@
+.input-node {
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--chat-bg-color-primary, rgba(6, 7, 9, 0.04));
+  color: rgb(34, 34, 34);
+  border-radius: 8px;
+
+  .btn {
+    text-align: center;
+  }
+
+  .input-node-input {
+    padding: 4px;
+    border: 1px solid rgba(6, 7, 9, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  &.disabled {
+    .btn {
+      background-color: rgba(148, 152, 247, 0.44);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.switch-node {
+  padding: 16px;
+  box-sizing: border-box;
+  background-color: var(--chat-bg-color-primary, rgba(6, 7, 9, 0.04));
+  color: rgb(34, 34, 34);
+  border-radius: 8px;
+  max-width: 100^;
+  overflow: hidden;
+
+  .switch-node-text {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 400;
+    margin-bottom: 12px;
+
+  }
+
+  .switch-node-switch-item {
+    background-color: #FFF;
+    font-size: 14px;
+    padding: 6px 15px;
+    line-height: 20px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  &.disabled {
+    .switch-node-switch-item {
+      opacity: 0.3;
+      color: rgb(25, 25, 25);
+      cursor: not-allowed;
+    }
+  }
+}

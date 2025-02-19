@@ -1,0 +1,11 @@
+{
+  "extends": "@coze-infra/ts-config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "types": ["vitest/globals"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "vitest.setup.tsx"]
+}

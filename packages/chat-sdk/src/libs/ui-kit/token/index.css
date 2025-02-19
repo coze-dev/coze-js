@@ -1,0 +1,84 @@
+.chat-root {
+  --chat-size-avatar-large: 48px;
+  --chat-size-avatar-middle: 32px;
+  --chat-size-avatar-default: 24px;
+
+  --chat-pp-avatar-border-radius: 20px;
+  --chat-app-avatar-size: 80px;
+
+  --chat-app-select-border-color: rgba(68, 83, 130, 0.25);
+
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: Inter, -apple-system, "system-ui", "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+}
+
+.light-theme {
+  --chat-bg-color-container: transparent;
+
+  --chat-bg-color-light: rgba(46, 46, 56, 0.04);
+  --chat-bg-color-default: #fff;
+  --chat-bg-color-primary: rgba(6, 7, 9, 0.04);
+  --chat-bg-color-secondary: rgba(74, 86, 111, 0.2);
+  --chat-bg-color-hglt: rgba(148, 152, 247, 0.44);
+  --chat-bg-color-waiting: rgba(0, 0, 0, 0.8);
+
+  --chat-bg-color-suggestion: #fff;
+  --chat-bg-color-suggestion-hover: rgba(230, 230, 230);
+  --chat-bg-color-input: #fff;
+
+  --chat-bg-color-active: rgba(220, 220, 220);
+  --chat-bg-color-hover: rgba(230, 230, 230);
+
+  --chat-bg-border-color-light: rgba(28, 31, 35, 0.08);
+  --chat-bg-border-color-default: rgba(58, 85, 138, 0.25);
+  --chat-bg-border-color-primary: rgba(6, 7, 9, 0.15);
+  --chat-bg-border-color-hglt: rgba(78, 64, 229);
+
+  --chat-font-color-light: rgb(28, 31, 35, 0.35);
+  --chat-font-color-default: rgb(28, 31, 35);
+  --chat-font-color-primary: rgb(34, 34, 34);
+  --chat-font-color-secondary: rgba(6, 7, 9, 0.3);
+  --chat-font-color-hglt: rgba(6, 7, 9, 0.8);
+  --chat-font-color-suggestion: rgba(6, 7, 9, 0.8);
+
+  --chat-font-color-file: rgba(15, 21, 40, 0.82);
+  --chat-font-color-file-size: rgba(32, 41, 69, 0.62);
+
+  --chat-font-color-input: rgb(28, 31, 35);
+
+  --chat-font-color-microphone: rgba(11, 21, 43, 0.82);
+
+  --chat-font-color-link-default: rgb(77, 83, 232);
+
+  --chat-box-shadow-1: rgba(0, 0, 0, 0.3);
+  --chat-box-shadow-2: rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme {
+  --chat-bg-color-default: #161823;
+}
+.dark-theme,
+.bg-theme {
+  --chat-font-color-default: #fff;
+  --chat-bg-color-hglt: rgba(56, 57, 58, 0.7);
+  --chat-bg-color-primary: rgba(250, 250, 250, 0.9);
+  --chat-bg-color-secondary: rgba(255, 255, 255, 0.6);
+  --chat-bg-color-light: transparent;
+
+  --chat-bg-color-suggestion: rgba(235, 235, 235, 0.52);
+  --chat-bg-color-suggestion-hover: rgba(235, 235, 235, 0.7);
+  --chat-bg-color-input: rgba(255, 255, 255, 0.8);
+
+  --chat-font-color-hglt: #fff;
+  --chat-font-color-primary: #fff;
+  --chat-font-color-secondary: rgba(255, 255, 255, 0.6);
+  --chat-font-color-light: rgba(255, 255, 255, 0.6);
+}
+
+.bg-mobile {
+  --chat-pp-avatar-border-radius: 16px;
+  --chat-app-avatar-size: 64px;
+}

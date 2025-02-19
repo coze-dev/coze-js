@@ -1,0 +1,21 @@
+{
+  //"extends": "@coze-infra/ts-config/tsconfig.node.json",
+  "compilerOptions": {
+    "incremental": true,
+    "jsx": "preserve",
+    "composite": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "exclude": ["**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.test.json"
+    },
+    {
+      "path": "./tsconfig.build.json"
+    }
+  ],
+  "compileOnSave": false
+}

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "Coze Chat",
+  "enablePullDownRefresh": false,
+  "navigationStyle": "custom",
+  "disableScroll": true,
+  "usingComponents": { "comp": "../../comp" }
+}

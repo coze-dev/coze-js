@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "Coze Chat",
+  "usingComponents": { "comp": "../../comp" }
+}

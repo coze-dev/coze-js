@@ -1,0 +1,30 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.list-item {
+
+  .dot {
+    background-color: currentColor;
+    height: 4px;
+    width: 4px;
+    border-radius: 8px;
+  }
+}
+.task-item {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background-color: var(--md-stream-task-bg-color-default, #FCFCFF);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--md-stream-task-bg-color-hover, rgba(87, 104, 161, 0.08));
+
+  }
+  &:active {
+    background-color: var(--md-stream-task-bg-color-hover, rgba(82, 100, 154, 0.13));
+  }
+}
+
