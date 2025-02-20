@@ -1,7 +1,10 @@
-import { defineConfig } from '@coze-infra/vitest-config';
 import path from 'path';
 
+import { defineConfig } from '@coze-infra/vitest-config';
+
 export default defineConfig({
+  dirname: __dirname,
+  preset: 'node',
   test: {
     globals: true,
     include: ['__tests__/**/*.test.{js,jsx,ts,tsx}'],
