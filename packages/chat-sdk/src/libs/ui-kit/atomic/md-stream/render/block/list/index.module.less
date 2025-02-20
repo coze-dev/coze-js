@@ -4,7 +4,6 @@
   gap: 8px;
 }
 .list-item {
-
   .dot {
     background-color: currentColor;
     height: 4px;
@@ -13,18 +12,21 @@
   }
 }
 .task-item {
-  margin-top: 8px;
   padding: 8px 10px;
   border-radius: 6px;
-  background-color: var(--md-stream-task-bg-color-default, #FCFCFF);
+  background-color: var(--md-stream-task-bg-color-default, #fcfcff);
   cursor: pointer;
 
   &:hover {
-    background-color: var(--md-stream-task-bg-color-hover, rgba(87, 104, 161, 0.08));
-
+    background-color: var(
+      --md-stream-task-bg-color-hover,
+      rgba(87, 104, 161, 0.08)
+    );
   }
   &:active {
-    background-color: var(--md-stream-task-bg-color-hover, rgba(82, 100, 154, 0.13));
+    background-color: var(
+      --md-stream-task-bg-color-hover,
+      rgba(82, 100, 154, 0.13)
+    );
   }
 }
-
