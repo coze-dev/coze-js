@@ -1,7 +1,7 @@
 import type { Parent } from 'mdast';
 
-export const isParent = (value?: { children: unknown }): value is Parent =>
-  !!value?.children;
+export const isParent = (value?: unknown): value is Parent =>
+  !!(value as { children?: unknown })?.children;
 export const getRegResult = (
   value: string,
   regExps: RegExp[],

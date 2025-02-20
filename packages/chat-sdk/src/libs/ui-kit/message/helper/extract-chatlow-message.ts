@@ -6,7 +6,11 @@ export const extractChatflowMessage = (
   item: ChatMessage,
 ): ChatflowNodeData | undefined => {
   if (item.content_type === 'card') {
-    const contentStruct = safeJSONParse(item.content);
+    const contentStruct = safeJSONParse<{
+      x_properties: {
+        workflow_card_info: string;
+      };
+    }>(item.content);
     const workflowDataStr = contentStruct?.x_properties?.workflow_card_info;
     if (workflowDataStr) {
       const cardData = safeJSONParse<ChatflowNodeData>(workflowDataStr);

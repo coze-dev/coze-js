@@ -65,5 +65,12 @@ export interface IChatService {
     params: CreateFileReq,
     options?: RequestOptions,
   ) => Promise<FileObject>;
-  audioSpeech: (params: unknown) => Promise<unknown>;
+  audioSpeech: (params: {
+    input: string;
+    voice_id: string;
+    response_format?: 'wav' | 'pcm' | 'ogg' | 'opus' | 'mp3';
+    speed?: number;
+    sample_rate?: number;
+    sampling_rate?: number;
+  }) => Promise<ArrayBuffer>;
 }

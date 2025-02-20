@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
 
-export const usePersistCallback = <T extends (...args: unknown[]) => unknown>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const usePersistCallback = <T extends (...args: any[]) => any>(
   fn: T,
 ) => {
   const ref = useRef<T>(fn);

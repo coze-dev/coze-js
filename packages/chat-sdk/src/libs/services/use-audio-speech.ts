@@ -12,7 +12,7 @@ export const useAudioSpeech = () => {
     (input: string) =>
       chatService.audioSpeech({
         input,
-        voice_id: voiceId,
+        voice_id: voiceId || '',
         response_format: 'wav',
         sampling_rate: 8000,
       }),
