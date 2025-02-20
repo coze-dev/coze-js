@@ -6,7 +6,11 @@ export default defineConfig({
   test: {
     testTimeout: 100000,
     coverage: {
-      exclude: ['rslib.config.ts', 'src/resources/knowledge/index.ts'],
+      exclude: [
+        'rslib.config.ts',
+        'src/resources/knowledge/index.ts',
+        'src/ws-tools/wavtools',
+      ],
     },
   },
 });

@@ -22,7 +22,6 @@ class WsTranscriptionClient {
     Set<(data: CreateTranscriptionsWsRes) => void>
   > = new Map();
   private wavRecorder: WavRecorder;
-  private deviceList: MediaDeviceInfo[] = [];
 
   private api: CozeAPI;
   constructor(config: WsToolsOptions) {
@@ -33,6 +32,9 @@ class WsTranscriptionClient {
   }
 
   async init() {
+    if (this.ws) {
+      return this.ws;
+    }
     const ws = await this.api.websockets.audio.transcriptions.create();
     let isResolved = false;
 
@@ -87,7 +89,14 @@ class WsTranscriptionClient {
           return;
         }
         isResolved = true;
-        reject(error);
+        reject(
+          new APIError(
+            error.data.code,
+            error as unknown as ErrorRes,
+            error.data.msg,
+            undefined,
+          ),
+        );
       };
 
       ws.onclose = () => {
@@ -187,7 +196,7 @@ class WsTranscriptionClient {
   }
 
   private closeWs() {
-    if (this.ws?.readyState === WebSocket.OPEN) {
+    if (this.ws?.readyState === 1) {
       this.ws?.close();
     }
     this.ws = null;

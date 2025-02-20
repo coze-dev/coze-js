@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "paths": {
-      "@coze/coze-js/*": ["./node_modules/@coze/coze-js/*"]
-    }
-  }
-}

@@ -28,7 +28,12 @@ class WsSpeechClient {
   }
 
   async init() {
+    if (this.ws) {
+      return this.ws;
+    }
     const ws = await this.api.websockets.audio.speech.create();
+    this.ws = ws;
+
     let isResolved = false;
 
     return new Promise<WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes>>(
@@ -82,14 +87,19 @@ class WsSpeechClient {
             return;
           }
           isResolved = true;
-          reject(error);
+          reject(
+            new APIError(
+              error.data.code,
+              error as unknown as ErrorRes,
+              error.data.msg,
+              undefined,
+            ),
+          );
         };
 
         ws.onclose = () => {
           console.debug('[speech] ws close');
         };
-
-        this.ws = ws;
       },
     );
   }
@@ -169,7 +179,7 @@ class WsSpeechClient {
   }
 
   private closeWs() {
-    if (this.ws?.readyState === WebSocket.OPEN) {
+    if (this.ws?.readyState === 1) {
       this.ws?.close();
     }
     this.ws = null;

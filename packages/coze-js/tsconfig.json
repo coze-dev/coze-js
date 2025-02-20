@@ -3,18 +3,12 @@
   "extends": "@coze-infra/ts-config/tsconfig.node.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "baseUrl": ".",
     "moduleResolution": "node",
     "module": "ES2022",
     "lib": ["es2015", "dom"],
     "types": ["node"],
     "target": "es2022",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "experimentalDecorators": true
   },
   "references": [
     { "path": "./tsconfig.build.json" },

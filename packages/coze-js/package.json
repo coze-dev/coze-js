@@ -34,7 +34,16 @@
     "jsonwebtoken": false,
     "node-fetch": false
   },
-  "types": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/types/index.d.ts"
+      ],
+      "ws-tools": [
+        "dist/types/ws-tools/ws-tools/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist",
     "LICENSE",
@@ -86,7 +95,7 @@
       "./ws-tools": {
         "require": "./dist/cjs/ws-tools/index.cjs",
         "import": "./dist/esm/ws-tools/index.js",
-        "types": "./dist/types/ws-tools/index.d.ts"
+        "types": "./dist/types/ws-tools/ws-tools/index.d.ts"
       }
     },
     "main": "dist/cjs/index.cjs",
