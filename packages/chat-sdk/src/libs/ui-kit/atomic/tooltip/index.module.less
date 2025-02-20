@@ -1,0 +1,36 @@
+.tooltip {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+
+  .content {
+    position: absolute;
+    top: calc(100% - 10px);
+    right: -10px;
+    display: none;
+    z-index: 2;
+  }
+
+
+  &.top {
+    .content {
+      top: auto;
+      bottom: calc(100% - 20px);
+    }
+  }
+
+  &.click {
+    .content {
+      &.show {
+        display: block;
+      }
+    }
+  }
+
+  &.hover:hover {
+    .content {
+      display: block;
+    }
+  }
+
+}

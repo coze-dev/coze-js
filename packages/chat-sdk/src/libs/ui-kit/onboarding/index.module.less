@@ -1,0 +1,72 @@
+.container {
+  position: relative;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  padding-right: 16px;
+
+  width: 100%;
+  margin-top: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  &.vertical-center {
+    position: absolute;
+    height: 100%;
+    justify-content: center;
+
+  }
+
+  .app-avatar {
+    border-radius: var(--chat-pp-avatar-border-radius, 48px);
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+    width: var(--chat-app-avatar-size, 48px);
+    height: var(--chat-app-avatar-size, 48px);
+  }
+
+  .info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+
+    .chat-name {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 20px;
+      text-align: center;
+      margin-top: 12px;
+      margin-bottom: 16px;
+      width: 100%;
+      overflow: hidden;
+      display: inline-block;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+
+    }
+
+    .chat-desc {
+      border-radius: 16px;
+      border: none;
+    }
+  }
+
+  .prologue {
+    align-self: flex-start;
+    ;
+  }
+}
+
+:global(.bg-theme) {
+  .container {
+    .info-container {
+      .chat-name {
+        text-shadow: rgba(0, 0, 0, 0.5) 0px 0.5px 1px;
+      }
+    }
+  }
+}

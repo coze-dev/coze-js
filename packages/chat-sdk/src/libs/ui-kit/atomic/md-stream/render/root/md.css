@@ -1,0 +1,43 @@
+.md-stream {
+  --md-stream-font-size-h1: 18px;
+  --md-stream-line-height-h1: 24px;
+  --md-stream-font-weight-h1: 600;
+  --md-stream-margin-top-h1: 4px;
+
+  --md-stream-font-size-h2: 16px;
+  --md-stream-line-height-h2: 24px;
+  --md-stream-font-weight-h2: 600;
+  --md-stream-margin-top-h2: 4px;
+
+  --md-stream-font-size-h3: 14px;
+  --md-stream-line-height-h3: 24px;
+  --md-stream-font-weight-h3: 600;
+  --md-stream-margin-top-h3: 4px;
+
+  --md-stream-font-size-default: 14px;
+  --md-stream-line-height-default: 22px;
+  --md-stream-font-weight-default: 400;
+
+  --md-stream-font-weight-strong: 700;
+
+  --md-stream-font-size-code: 12px;
+}
+.light {
+  --md-stream-blockquote-color: rgb(87, 96, 106);
+  --md-stream-blockquote-line-color: rgb(208, 215, 222);
+  --md-stream-text-color: rgb(34, 34, 34);
+  --md-stream-a-color: rgb(78, 64, 229);
+  --md-stream-img-bg-color: rgba(0, 0, 0, 0.15);
+
+  --md-stream-code-content-bg-color: rgb(23, 23, 23);
+  --md-stream-code-content-font-color: rgba(255, 255, 255);
+
+  --md-stream-code-header-bg-color: rgb(46, 52, 62);
+  --md-stream-code-header-font-color: rgba(255, 255, 255, 0.55);
+
+  --md-stream-table-bg-color: rgb(242, 242, 242);
+
+  --md-stream-border-color: rgb(208, 215, 222);
+
+  --md-stream-checkbox-bg-color: rgb(0, 102, 255);
+}

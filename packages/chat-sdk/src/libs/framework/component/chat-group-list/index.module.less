@@ -1,0 +1,24 @@
+.container {
+  position: relative;
+  padding-bottom: 50px;
+
+  .chat-group {
+    position: relative;
+  }
+
+  taro-text-core[selectable=true],
+  taro-text-core {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  &.mobile {
+
+    text,
+    text.selectable,
+    taro-text-core[selectable=true],
+    taro-text-core {
+      user-select: none;
+    }
+  }
+}

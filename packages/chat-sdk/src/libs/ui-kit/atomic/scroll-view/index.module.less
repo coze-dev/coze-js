@@ -1,0 +1,44 @@
+.container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+
+  .arrow-down {
+    position: absolute;
+    right: 16px;
+    bottom: 32px;
+    transform: rotateZ(180deg);
+    opacity: 0;
+    z-index: -1;
+    &.arrow-down--show {
+      opacity: 1;
+      z-index: 1;
+
+    }
+  }
+}
+
+.scroll {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  transform: rotateY(180deg) rotateZ(180deg);
+  padding: 2px 0 0;
+
+  scrollbar-width: none;
+
+  .children {
+    min-height: 100%;
+    overflow: hidden;
+    transform: rotateY(-180deg) rotateZ(-180deg);
+  }
+
+  ::-webkit-scrollbar {
+    width: 0 !important;
+    display: none;
+    height: 0 !important;
+    -webkit-appearance: none;
+    background: transparent;
+    color: transparent;
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "chat",
+  "appid": "tta4b2d20f3bb8341701",
+  "setting": {
+    "es6": false,
+    "minified": false
+  }
+}

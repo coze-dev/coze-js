@@ -1,0 +1,35 @@
+.container {
+  position: relative;
+  padding: 0 16px 10px 0;
+  width: 100%;
+  box-sizing: border-box;
+
+  .slot-container {
+    position: relative;
+    transition: all 0.3s 0s ease-in-out;
+  }
+
+  .command-container {
+    position: relative;
+    transition: all 0.3s 0s ease-in-out;
+    padding-right: 12px
+  }
+
+
+  &.recording-audio {
+    .command-container {
+      transform: translateX(-40px);
+      opacity: 0;
+    }
+
+    .slot-container {
+      opacity: 0;
+    }
+  }
+
+  .input-container {
+    flex: 1;
+    transition: all 0.3s 0s ease-in-out;
+  }
+
+}
