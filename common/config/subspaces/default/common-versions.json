@@ -70,15 +70,9 @@
     "@tarojs/taro": ["4.0.7", "3.6.35"],
     "@tarojs/cli": ["4.0.7", "3.6.35"],
     "@tarojs/taro-loader": ["4.0.7", "3.6.35"],
-    "@tarojs/webpack5-runner": ["4.0.7", "3.6.35"],
-    "@coze/api": ["^1.0.15", "workspace:*"],
-    "react-refresh": ["^0.11.0", "0.14.0"],
-    "babel-preset-taro": ["4.0.7", "3.6.35"],
-    "typescript": ["^5.5.3", "^4.9.5"],
-    "@babel/core": ["^7.16.0", "^7.24.4"],
     "ts-node": ["^10.9.1", "^10.9.2"],
-    "babel-loader": ["^8.2.3", "~9.1.0"],
-    "@pmmmwh/react-refresh-webpack-plugin": ["^0.5.3", "^0.5.5"],
-    "webpack": ["^5.64.4", "5.91.0"]
+    "typescript": ["^5.5.3", "^4.9.5"],
+    "@tarojs/webpack5-runner": ["4.0.7", "3.6.35"],
+    "babel-preset-taro": ["4.0.7", "3.6.35"]
   }
 }

@@ -10,7 +10,8 @@
     "PKCE",
     "preinstall",
     "undici",
-    "Websockets"
+    "Websockets",
+    "chatflow"
   ],
   "ignoreWords": [],
   "import": []
