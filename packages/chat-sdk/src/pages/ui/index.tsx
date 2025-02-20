@@ -1,8 +1,10 @@
-import { View } from "@tarojs/components";
+import { useState } from 'react';
 
-import styles from "./index.module.less";
-import { Radio, Spacing } from "@/libs/ui-kit";
-import { useState } from "react";
+import { View } from '@tarojs/components';
+
+import { Radio, Spacing } from '@/libs/ui-kit';
+
+import styles from './index.module.less';
 
 export default function Index() {
   const [radioChecked, setRadioChecked] = useState<boolean>(false);
@@ -11,7 +13,7 @@ export default function Index() {
       <Spacing vertical gap={10} verticalCenter>
         <Radio
           checked={radioChecked}
-          onChange={(isChecked) => {
+          onChange={isChecked => {
             setRadioChecked(isChecked);
           }}
         />

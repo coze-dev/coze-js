@@ -1,10 +1,5 @@
 export const markdown = `
 # Code
-    sadf
-    as
-    what's
-     asdf
-
 as
 \`\`\`javascript
 $(document).ready(function () {
@@ -12,8 +7,6 @@ $(document).ready(function () {
 });
 \`\`\`
 
-
-![这是图片](/assets/img/philly-magic-garden.jpg "Magic Gardens")
 
 as s \`node\`
 ## Html

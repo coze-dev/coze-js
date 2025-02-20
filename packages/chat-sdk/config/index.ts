@@ -82,6 +82,13 @@ export default defineConfig(async merge => {
           .loader('babel-loader')
           .end()
           .include.add(packagesDir);
+        chain.resolve.alias.set(
+          '@tarojs/plugin-framework-react',
+          path.resolve(
+            __dirname,
+            '../node_modules/@tarojs/plugin-framework-react',
+          ),
+        );
 
         if (isBuildNative && isWeapp) {
           chain.output.publicPath(`/miniprogram_npm/${pkgJson.name}/`);
@@ -123,6 +130,7 @@ export default defineConfig(async merge => {
           },
         },
       },
+
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
         chain.module
@@ -130,14 +138,21 @@ export default defineConfig(async merge => {
           .test(/\.(js|mjs)$/)
           .use('babel-loader')
           .loader('babel-loader');
-        /*chain.module
+        chain.resolve.alias.set(
+          '@tarojs/plugin-framework-react',
+          path.resolve(
+            __dirname,
+            '../node_modules/@tarojs/plugin-framework-react',
+          ),
+        );
+
+        chain.module
           .rule('taroApiBabel')
           .test(/\.ts$/)
           .use('babel-loader')
           .loader('babel-loader')
           .end()
           .include.add(packagesDir);
-          */
       },
     },
     rn: {

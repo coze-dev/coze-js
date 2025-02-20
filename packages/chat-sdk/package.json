@@ -80,7 +80,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.4",
+    "@babel/core": "^7.16.0",
     "@babel/plugin-proposal-class-properties": "~7.18.6",
     "@babel/plugin-transform-unicode-property-regex": "^7.25.9",
     "@babel/preset-react": "~7.13.13",
@@ -88,9 +88,9 @@
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.5",
     "@rsbuild/plugin-less": "^1.1.0",
     "@rsbuild/plugin-react": "^1.1.0",
+    "@swc/types": "^0.1.17",
     "@tarojs/cli": "4.0.7",
     "@tarojs/components": "4.0.7",
     "@tarojs/helper": "4.0.7",
@@ -131,7 +131,7 @@
     "postcss": "^8.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-refresh": "0.14.0",
+    "react-refresh": "^0.11.0",
     "ts-node": "^10.9.1",
     "ts-patch": "^3.3.0",
     "tsconfig-paths": "4.1.0",
