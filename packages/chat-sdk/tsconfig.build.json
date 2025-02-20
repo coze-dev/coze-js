@@ -1,0 +1,36 @@
+{
+  "extends": "./config/tsconfig.web.json",
+  "compilerOptions": {
+    "target": "ES2015",
+    "preserveConstEnums": true,
+    "noUnusedLocals": true,
+    "composite": true,
+    "incremental": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "allowJs": false,
+    "pretty": true,
+    "module": "es6",
+    "outDir": "./dist/lib-source",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      },
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
+  },
+
+  "include": ["./src/exports", "./src/libs", "./src/chatflow"],
+  "compileOnSave": false,
+  "references": []
+}

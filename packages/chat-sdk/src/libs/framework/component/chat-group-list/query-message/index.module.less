@@ -1,0 +1,26 @@
+.query-message {
+  //padding-right: 32px;
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+
+  width: fit-content;
+  color: var(--chat-font-color-primary, rgb(34, 34, 34));
+
+
+  .state-slot {
+    position: absolute;
+    bottom: 2px;
+    right: -18px;
+    cursor: pointer;
+
+    &.disable {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.query-container {
+  overflow: visible;
+}

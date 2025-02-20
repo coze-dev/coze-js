@@ -1,0 +1,39 @@
+.table-wrapper {
+  width: fit-content;
+  max-width: 100%;
+  max-height: 1000px;
+  overflow-x: auto;
+  overflow: auto;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid var(--md-stream-border-color, rgb(208, 215, 222));
+  scrollbar-width: thin !important;
+}
+
+.table {
+  overflow: hidden;
+
+
+  display: table;
+  width: max-content;
+
+  .table-row {
+    display: table-row;
+
+    .table-cell {
+      display: table-cell;
+      padding: 12px 18px;
+      border-top: 1px solid var(--md-stream-border-color, rgb(208, 215, 222));
+    }
+  }
+
+  .table-header {
+    background: var(--md-stream-table-bg-color, rgb(242, 242, 242));
+    font-weight: 500;
+
+    .table-cell {
+      max-width: 480px;
+      border: none;
+    }
+  }
+}

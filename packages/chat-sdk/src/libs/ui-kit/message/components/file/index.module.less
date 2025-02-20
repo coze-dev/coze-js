@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  align-items: center;
+  min-width: 100px;
+  max-width: 100%;
+  width: 280px;
+  overflow: hidden;
+  box-sizing: border-box;
+  gap: 8px;
+
+  .svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .txt {
+    font-size: 14px;
+    font-weight: 400;
+    overflow: hidden;
+    flex: 1;
+    color: var(--chat-font-color-file, rgba(15, 21, 40, 0.82));
+  }
+
+  .size {
+    font-size: 12px;
+    color: var(--chat-font-color-file-size, rgba(32, 41, 69, 0.62); );
+  }
+}
+
+.file {
+  width: 100%;
+  overflow: hidden;
+}
+
+:global(.bg-theme) {
+  .container {
+    background-color: var(--chat-bg-color-primary, rgba(6, 7, 9, 0.04));
+  }
+}
