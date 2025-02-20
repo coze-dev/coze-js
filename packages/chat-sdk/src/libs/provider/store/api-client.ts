@@ -35,10 +35,11 @@ export const createApiClientStore = ({
   const chatService =
     onGetCustomChatService?.(chatServiceProps) ||
     new ChatService(chatServiceProps);
-  return create<ApiClientStore>()(_set => ({
+  return create<ApiClientStore>()((_set, _get) => ({
     connectorId,
     apiClient,
     chatService,
+    getSetting: () => setting,
   }));
 };
 

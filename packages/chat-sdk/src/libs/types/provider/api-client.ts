@@ -14,4 +14,6 @@ export interface ApiCreateStoreProps {
   setting?: SettingInfo;
   chat: ChatInfo;
 }
-export type ApiClientStore = ApiClientState;
+export type ApiClientStore = ApiClientState & {
+  getSetting: () => SettingInfo | undefined;
+};

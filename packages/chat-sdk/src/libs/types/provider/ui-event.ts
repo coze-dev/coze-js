@@ -4,4 +4,6 @@ interface UiEventState {
   event: InstanceType<TaroStatic['Events']>;
 }
 
-export type UiEventStore = UiEventState;
+export type UiEventStore = UiEventState & {
+  getEvent: () => InstanceType<TaroStatic['Events']>;
+};

@@ -5,8 +5,9 @@ import { Events } from '@tarojs/taro';
 
 import type { UiEventStore } from '@/libs/types';
 const createUiEventStore = () =>
-  create<UiEventStore>()(() => ({
+  create<UiEventStore>()((_set, get) => ({
     event: new Events(),
+    getEvent: () => get().event,
   }));
 
 export type CreateUiEventStore = ReturnType<typeof createUiEventStore>;
