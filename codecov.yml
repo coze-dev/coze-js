@@ -60,3 +60,15 @@ component_management:
         - type: patch
           target: 90%
           threshold: 10%
+
+    - component_id: chat-sdk # this is an identifier that should not be changed
+      name: chat-sdk # this is a display name, and can be changed freely
+      paths:
+        - packages/chat-sdk/**
+      statuses:
+        - type: project
+          target: 20%
+          threshold: 1%
+        - type: patch
+          target: 0%
+          threshold: 1%
