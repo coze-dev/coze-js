@@ -1,25 +1,34 @@
 import {
-  BgImageInfo,
-  ChatInfo,
-  ChatService,
-  type ChatServiceProps,
-} from "@/libs";
-import { type IChatFlowProps } from "../type";
-import { getConnectorId } from "./get-connector-id";
-import { StreamChatReq, RequestOptions, StreamChatData } from "@coze/api";
+  StreamChatReq,
+  RequestOptions,
+  StreamChatData,
+  type ChatWorkflowReq,
+  CreateConversationReq,
+} from '@coze/api';
+
 import {
   getCdnUrl,
   logger,
   MiniChatError,
   MiniChatErrorCode,
-} from "@/libs/utils";
+} from '@/libs/utils';
+import { SuggestPromoteInfo } from '@/libs/types/base/chat';
+import {
+  BgImageInfo,
+  ChatInfo,
+  ChatService,
+  type ChatServiceProps,
+} from '@/libs';
+
+import { type IChatFlowProps } from '../type';
+import { getConnectorId } from './get-connector-id';
 import type {
   ProjectInfoResp,
   WorkflowInfoResp,
   BackgroundImageResp,
-} from "./chat-service-type";
-import { SuggestPromoteInfo } from "@/libs/types/base/chat";
+} from './chat-service-type';
 
+// eslint-disable-next-line complexity
 export const getCustomAppInfo = (chatFlowProps: IChatFlowProps) => {
   let bgInfo: BgImageInfo | undefined;
   if (chatFlowProps.areaUi?.bgInfo && chatFlowProps.areaUi?.bgInfo?.imgUrl) {
@@ -42,7 +51,7 @@ export const getCustomAppInfo = (chatFlowProps: IChatFlowProps) => {
     name: chatFlowProps?.project?.name,
     icon_url: chatFlowProps?.project?.iconUrl,
     onboarding_info: {
-      prologue: chatFlowProps?.project?.onBoarding?.prologue || "",
+      prologue: chatFlowProps?.project?.onBoarding?.prologue || '',
       suggested_questions:
         chatFlowProps?.project?.onBoarding?.suggestions || [],
     },
@@ -57,8 +66,9 @@ export const getCustomAppInfo = (chatFlowProps: IChatFlowProps) => {
   };
 };
 
+// eslint-disable-next-line complexity
 export const getBgInfo = (
-  resp?: BackgroundImageResp
+  resp?: BackgroundImageResp,
 ): BgImageInfo | undefined => {
   if (resp?.origin_image_url) {
     return {
@@ -72,28 +82,28 @@ export const getBgInfo = (
         left: resp.gradient_position?.left || 0,
         right: resp.gradient_position?.right || 0,
       },
-      imgUrl: resp.origin_image_url || "",
-      themeColor: resp.theme_color || "",
+      imgUrl: resp.origin_image_url || '',
+      themeColor: resp.theme_color || '',
     };
   }
 };
-
+// eslint-disable-next-line complexity
 export const combineRequestOptions = (
-  appData?: ProjectInfoResp["data"],
-  workflowData?: WorkflowInfoResp["role"],
-  chatFlowProps?: IChatFlowProps
+  appData?: ProjectInfoResp['data'],
+  workflowData?: WorkflowInfoResp['role'],
+  chatFlowProps?: IChatFlowProps,
 ) => {
-  const { icon_url: iconUrl, name = "" } = appData || {};
+  const { icon_url: iconUrl, name = '' } = appData || {};
 
   const appInfoResult: Partial<ChatInfo> = {
-    name: name,
+    name,
     icon_url: iconUrl,
-    description: "",
+    description: '',
     create_time: 0,
     update_time: 0,
-    version: "",
+    version: '',
   };
-  appInfoResult.onboarding_info = { prologue: "", suggested_questions: [] };
+  appInfoResult.onboarding_info = { prologue: '', suggested_questions: [] };
   appInfoResult.name =
     workflowData?.name ||
     appInfoResult.name ||
@@ -104,12 +114,12 @@ export const combineRequestOptions = (
     chatFlowProps?.project.defaultIconUrl;
 
   appInfoResult.onboarding_info = {
-    prologue: workflowData?.onboarding_info?.prologue || "",
+    prologue: workflowData?.onboarding_info?.prologue || '',
     display_all_suggestions:
       workflowData?.onboarding_info?.display_all_suggestions,
     suggested_questions:
       workflowData?.onboarding_info?.suggested_questions?.filter(
-        (item) => !!item
+        item => !!item,
       ) || [],
   };
   appInfoResult.suggestPromoteInfo = workflowData?.suggest_reply_info
@@ -122,7 +132,7 @@ export const combineRequestOptions = (
   appInfoResult.bgInfo = {
     pc: getBgInfo(workflowData?.background_image_info?.web_background_image),
     mobile: getBgInfo(
-      workflowData?.background_image_info?.mobile_background_image
+      workflowData?.background_image_info?.mobile_background_image,
     ),
   };
   appInfoResult.voiceInfo = {
@@ -147,13 +157,14 @@ export class ChatFlowService extends ChatService {
   async createNewConversation() {
     return this._createNewConversation(false);
   }
+  // eslint-disable-next-line complexity
   async getAppInfo() {
     const connectorId = getConnectorId(this.chatFlowProps);
-    const isWebSdk = this.chatFlowProps?.project?.mode === "websdk";
+    const isWebSdk = this.chatFlowProps?.project?.mode === 'websdk';
     const [appRes, workflowRes] = await Promise.allSettled([
       isWebSdk
         ? this.apiClient?.get<unknown, ProjectInfoResp>(
-            `/v1/apps/${this.chatFlowProps?.project?.id}?connector_id=${connectorId}`
+            `/v1/apps/${this.chatFlowProps?.project?.id}?connector_id=${connectorId}`,
           )
         : null,
       this.chatFlowProps?.workflow?.id
@@ -161,24 +172,24 @@ export class ChatFlowService extends ChatService {
             `/v1/workflows/${this.chatFlowProps?.workflow?.id}?${[
               `connector_id=${connectorId}`,
               `is_debug=${
-                this.chatFlowProps?.project?.mode === "draft" ? "true" : ""
+                this.chatFlowProps?.project?.mode === 'draft' ? 'true' : ''
               }`,
-              `caller=${this.chatFlowProps?.project?.caller || ""}`,
-            ].join("&")}`
+              `caller=${this.chatFlowProps?.project?.caller || ''}`,
+            ].join('&')}`,
           )
         : null,
     ]);
     const appData =
-      appRes?.status === "fulfilled" ? appRes?.value?.data : undefined;
+      appRes?.status === 'fulfilled' ? appRes?.value?.data : undefined;
     const workflowData =
-      workflowRes?.status === "fulfilled"
+      workflowRes?.status === 'fulfilled'
         ? workflowRes?.value?.data?.role
         : undefined;
-    logger.debug("Get Workflow Info: ", { appRes, workflowRes });
+    logger.debug('Get Workflow Info: ', { appRes, workflowRes });
     if (isWebSdk && !appData) {
       throw new MiniChatError(
         MiniChatErrorCode.SDK_API_APP_UnPublished,
-        "The app is not published"
+        'The app is not published',
       );
     }
     // 默认数据不用合并进去
@@ -186,11 +197,11 @@ export class ChatFlowService extends ChatService {
     if (this.chatFlowProps?.workflow?.id && !appInfo.icon_url) {
       appInfo.icon_url = getCdnUrl(
         this.chatFlowProps.setting?.cdnBaseUrlPath,
-        "assets/imgs/chatflow-logo.png"
+        'assets/imgs/chatflow-logo.png',
       );
     }
 
-    logger.debug("Get Workflow Info(Combine):", appInfo);
+    logger.debug('Get Workflow Info(Combine):', appInfo);
     return {
       appId: this.appId,
       type: this.chatType,
@@ -200,34 +211,34 @@ export class ChatFlowService extends ChatService {
   getOrCreateConversationId() {
     return this._createNewConversation(true);
   }
-  private async _createNewConversation(isCreateNew: boolean = false) {
-    if (this.chatFlowProps?.project?.type === "bot") {
-      const { id: conversationId, last_section_id: sectionId = "" } =
+  private async _createNewConversation(isCreateNew = false) {
+    if (this.chatFlowProps?.project?.type === 'bot') {
+      const { id: conversationId, last_section_id: sectionId = '' } =
         await this.apiClient.conversations.create({
           // @ts-expect-error -- linter-disable-autofix
           connector_id: this.connectorId,
         });
       return { conversationId, sectionId };
     } else {
-      const { id: conversationId, last_section_id: sectionId = "" } =
+      const { id: conversationId, last_section_id: sectionId = '' } =
         await this.apiClient.conversations.create({
-          // @ts-expect-error -- linter-disable-autofix
           app_id: this.appId,
           conversation_name: this.chatFlowProps?.project?.conversationName,
           get_or_create: isCreateNew,
           workflow_id: this.chatFlowProps?.workflow?.id,
-          draft_mode: this.chatFlowProps?.project?.mode === "draft",
+          draft_mode: this.chatFlowProps?.project?.mode === 'draft',
           connector_id: getConnectorId(this.chatFlowProps),
-        });
+        } as unknown as CreateConversationReq);
       return { conversationId, sectionId };
     }
   }
+  // eslint-disable-next-line complexity
   asyncChat(
     params: StreamChatReq & {
       connector_id?: string;
       suggestPromoteInfo?: SuggestPromoteInfo;
     },
-    options?: RequestOptions
+    options?: RequestOptions,
   ): AsyncIterable<StreamChatData> {
     const bodyData: Record<string, unknown> = {};
     bodyData.additional_messages = params.additional_messages || [];
@@ -237,13 +248,13 @@ export class ChatFlowService extends ChatService {
     bodyData.workflow_id = this.chatFlowProps?.workflow?.id;
     bodyData.parameters = this.chatFlowProps?.workflow?.parameters;
     bodyData.execute_mode =
-      this.chatFlowProps?.project?.mode === "draft" ? "DEBUG" : undefined;
+      this.chatFlowProps?.project?.mode === 'draft' ? 'DEBUG' : undefined;
     bodyData.app_id =
-      this.chatFlowProps?.project?.type === "app"
+      this.chatFlowProps?.project?.type === 'app'
         ? this.chatFlowProps?.project?.id
         : undefined;
     bodyData.bot_id =
-      this.chatFlowProps?.project?.type === "bot"
+      this.chatFlowProps?.project?.type === 'bot'
         ? this.chatFlowProps?.project?.id
         : undefined;
 
@@ -258,7 +269,9 @@ export class ChatFlowService extends ChatService {
             params.suggestPromoteInfo?.customizedSuggestPrompt,
         }
       : undefined;
-    // @ts-expect-error -- linter-disable-autofix
-    return this.apiClient.workflows.chat.stream(bodyData, options);
+    return this.apiClient.workflows.chat.stream(
+      bodyData as unknown as ChatWorkflowReq,
+      options,
+    );
   }
 }

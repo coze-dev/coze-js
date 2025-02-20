@@ -1,9 +1,11 @@
 {
-  "extends": "@coze-infra/ts-config/tsconfig.web.json",
+  "extends": "./config/tsconfig.web.json",
   "compilerOptions": {
     "target": "ES2015",
     "preserveConstEnums": true,
     "noUnusedLocals": true,
+    "composite": true,
+    "incremental": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "sourceMap": true,
@@ -25,7 +27,7 @@
         "afterDeclarations": true
       }
     ],
-    "tsBuildInfoFile": "./lib-ts/tsconfig.build.tsbuildinfo"
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
   },
 
   "include": ["./src/exports", "./src/libs", "./src/chatflow"],

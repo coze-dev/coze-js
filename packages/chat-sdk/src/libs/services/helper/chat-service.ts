@@ -6,12 +6,13 @@ import type {
   StreamChatReq,
   StreamChatData,
   APIError,
-} from "@coze/api";
-import { IChatService, ChatServiceProps } from "@/libs/types";
-import { logger, MiniChatError } from "@/libs/utils";
-import { type CozeAPI } from "@coze/api";
-import type { ChatInfo, ChatType } from "@/libs/types";
-import { SuggestPromoteInfo } from "@/libs/types/base/chat";
+  CozeAPI,
+} from '@coze/api';
+
+import { logger, MiniChatError } from '@/libs/utils';
+import { SuggestPromoteInfo } from '@/libs/types/base/chat';
+import { IChatService, ChatServiceProps } from '@/libs/types';
+import type { ChatInfo, ChatType } from '@/libs/types';
 
 const MESSAGE_LIST_NUM = 20;
 
@@ -23,12 +24,12 @@ export class ChatService implements IChatService {
 
   constructor({ apiClient, connectorId, appId, chatType }: ChatServiceProps) {
     this.apiClient = apiClient;
-    this.connectorId = connectorId || "999";
+    this.connectorId = connectorId || '999';
     this.appId = appId;
     this.chatType = chatType;
   }
   async createNewConversation() {
-    const { id: conversationId, last_section_id: sectionId = "" } =
+    const { id: conversationId, last_section_id: sectionId = '' } =
       await this.apiClient.conversations.create({
         bot_id: this.appId,
         // @ts-expect-error -- linter-disable-autofix
@@ -36,9 +37,9 @@ export class ChatService implements IChatService {
       });
     return { conversationId, sectionId };
   }
-  async createNewSection(conversationId) {
+  async createNewSection(conversationId: string) {
     const { id: sectionId } = await this.apiClient.conversations.clear(
-      conversationId || ""
+      conversationId || '',
     );
     return { sectionId };
   }
@@ -61,13 +62,13 @@ export class ChatService implements IChatService {
   }
   async getOrCreateConversationId() {
     const { data: conversationRes } = (await this.apiClient.get(
-      "/v1/conversations",
+      '/v1/conversations',
       {
         bot_id: this.appId,
         connector_id: this.connectorId,
         page_num: 1,
         page_size: 1,
-      }
+      },
     )) as {
       data: {
         conversations: {
@@ -87,6 +88,10 @@ export class ChatService implements IChatService {
     conversationId,
     prevCursorId,
     limit = MESSAGE_LIST_NUM,
+  }: {
+    conversationId: string;
+    prevCursorId?: string;
+    limit?: number;
   }) {
     try {
       const resMessage = await this.apiClient.conversations.messages.list(
@@ -94,30 +99,30 @@ export class ChatService implements IChatService {
         {
           after_id: prevCursorId || undefined,
           limit,
-        }
+        },
       );
       return getFormatMessageListInfo(resMessage);
     } catch (error) {
-      logger.error("Get Message Error", error);
+      logger.error('Get Message Error', error);
       return {
         prevCursorId: undefined,
         nextCursorId: undefined,
         prevHasMore: false,
         nextHasMore: false,
         messages: [],
-        error: new MiniChatError(-1, "Get Message Error"),
+        error: new MiniChatError(-1, 'Get Message Error'),
       };
     }
 
     function getFormatMessageListInfo(resMessage: ListMessageData) {
       const {
         first_id: nextCursorId,
-        last_id: prevCursorId,
+        last_id: prevCursorIdNew,
         has_more: prevHasMore,
         data: messageList,
       } = resMessage;
       return {
-        prevCursorId,
+        prevCursorId: prevCursorIdNew,
         nextCursorId,
         prevHasMore,
         nextHasMore: false,
@@ -130,7 +135,7 @@ export class ChatService implements IChatService {
       connector_id?: string;
       suggestPromoteInfo?: SuggestPromoteInfo;
     },
-    options?: RequestOptions
+    options?: RequestOptions,
   ): AsyncIterable<StreamChatData> {
     return this.apiClient.chat.stream(params, options);
   }
@@ -141,7 +146,13 @@ export class ChatService implements IChatService {
     // @ts-expect-error -- linter-disable-autofix
     return await this.apiClient.audio.transcriptions(params, options);
   }
-  async audioSpeech(params) {
+  async audioSpeech(params: {
+    input: string;
+    voice_id: string;
+    response_format?: 'wav' | 'pcm' | 'ogg' | 'opus' | 'mp3';
+    speed?: number;
+    sample_rate?: number;
+  }) {
     return await this.apiClient.audio.speech.create(params);
   }
 }

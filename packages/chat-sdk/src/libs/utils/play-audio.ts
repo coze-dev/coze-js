@@ -1,19 +1,20 @@
-import Taro, { InnerAudioContext, TaroStatic, Events } from "@tarojs/taro";
-import { isWeb } from "./device";
-import { logger } from "./logger";
-import { MiniChatError } from "./mini-chat-error";
+import Taro, { InnerAudioContext, TaroStatic, Events } from '@tarojs/taro';
+
+import { MiniChatError } from './mini-chat-error';
+import { logger } from './logger';
+import { isWeb } from './device';
 
 export enum AudioPlayEvent {
-  STOP = "stop",
-  PLAY = "play",
+  STOP = 'stop',
+  PLAY = 'play',
 }
 
 let playNo = 1000;
 export class PlayAudio {
   private static instance: PlayAudio;
-  private isStop: boolean = true;
+  private isStop = true;
   private audioContext?: InnerAudioContext;
-  private event: InstanceType<TaroStatic["Events"]> = new Events();
+  private event: InstanceType<TaroStatic['Events']> = new Events();
   private audioPrm: Promise<ArrayBuffer> | null = null;
 
   static stopNow() {
@@ -21,7 +22,7 @@ export class PlayAudio {
   }
   async playText(
     text: string,
-    audioSpeechFunc: (text: string) => Promise<ArrayBuffer>
+    audioSpeechFunc: (text: string) => Promise<ArrayBuffer>,
   ) {
     if (!PlayAudio.instance?.isStop) {
       PlayAudio.instance?.stop();
@@ -38,22 +39,22 @@ export class PlayAudio {
       this.playData(audioData);
     } catch (e) {
       this.audioPrm = null;
-      logger.error("PlayAudio Get audio speech error", e);
-      throw new MiniChatError(-1, "Get Speech Failed");
+      logger.error('PlayAudio Get audio speech error', e);
+      throw new MiniChatError(-1, 'Get Speech Failed');
     }
   }
   playData(data: ArrayBuffer) {
-    let tempFile = "";
+    let tempFile = '';
     if (isWeb) {
       const blobData = new Blob([data], {
-        type: "audio/wav",
+        type: 'audio/wav',
       });
       tempFile = URL.createObjectURL(blobData);
     } else {
-      tempFile = Taro.env.USER_DATA_PATH + `/tempFile${playNo++}.wav`;
-      Taro.getFileSystemManager().writeFileSync(tempFile, data, "binary");
+      tempFile = `${Taro.env.USER_DATA_PATH}/tempFile${playNo++}.wav`;
+      Taro.getFileSystemManager().writeFileSync(tempFile, data, 'binary');
     }
-    logger.debug("playData:", tempFile);
+    logger.debug('playData:', tempFile);
     this.play(tempFile);
   }
   async play(audioSrc: string) {
@@ -69,38 +70,38 @@ export class PlayAudio {
     if (!isWeb) {
       this.audioContext.obeyMuteSwitch = false;
     }
-    logger.debug("audioContext", audioSrc);
+    logger.debug('audioContext', audioSrc);
 
     this.audioContext.onPlay(() => {
-      logger.debug("audioContext onPlay");
+      logger.debug('audioContext onPlay');
       this.event.trigger(AudioPlayEvent.PLAY);
     });
     this.audioContext.onPause(() => {
       this.stop();
     });
-    this.audioContext.onError((res) => {
-      logger.error("audioContext onError", res);
+    this.audioContext.onError(res => {
+      logger.error('audioContext onError', res);
       this.emitStopEvent(true);
 
       this.stop();
     });
     this.audioContext.onEnded(() => {
-      logger.debug("audioContext onEnded");
+      logger.debug('audioContext onEnded');
       this.stop();
     });
     this.audioContext.onStop(() => {
       this.unregister();
-      logger.debug("audioContext onStop");
+      logger.debug('audioContext onStop');
     });
     try {
       await this.audioContext.play();
     } catch (err) {
-      logger.error("audioContext play error", err);
+      logger.error('audioContext play error', err);
     }
-    logger.debug("audioContext", audioSrc);
+    logger.debug('audioContext', audioSrc);
   }
   stop() {
-    logger.debug("audioContext stop1", this.isStop);
+    logger.debug('audioContext stop1', this.isStop);
     if (this.isStop) {
       return;
     }
@@ -114,16 +115,16 @@ export class PlayAudio {
       this.emitStopEvent(true);
     }
   }
-  on(event: AudioPlayEvent, callback: (params: any) => void) {
+  on(event: AudioPlayEvent, callback: (params: unknown) => void) {
     this.event.on(event, callback);
   }
-  emitStopEvent(isError: boolean = false) {
-    logger.debug("audioContext emitStopEvent", this.isStop);
+  emitStopEvent(isError = false) {
+    logger.debug('audioContext emitStopEvent', this.isStop);
     if (this.isStop) {
       return;
     }
     this.event.trigger(AudioPlayEvent.STOP, {
-      isError: isError,
+      isError,
     });
   }
   unregister() {

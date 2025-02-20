@@ -1,23 +1,24 @@
+import axios, {
+  type AxiosInstance,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
+import Taro from '@tarojs/taro';
 import {
   CozeAPI,
   RequestOptions,
   type ClientOptions,
   type CreateFileReq,
   type FileObject,
-} from "@coze/api";
-import axios, {
-  type AxiosInstance,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from "axios";
-import Taro from "@tarojs/taro";
-import { requestSSE } from "./event-source/request";
-import { EventJsonDataType } from "./event-source/event-source";
-import { convertToMinChatError, MiniChatError } from "./mini-chat-error";
-import { safeJSONParse } from "./safe-json-parse";
-import { logger } from "./logger";
-import { taroAdapter } from "./adapter";
-import { isTT, isWeb } from "./device";
+} from '@coze/api';
+
+import { safeJSONParse } from './safe-json-parse';
+import { convertToMinChatError, MiniChatError } from './mini-chat-error';
+import { logger } from './logger';
+import { requestSSE } from './event-source/request';
+import { EventJsonDataType } from './event-source/event-source';
+import { isTT, isWeb } from './device';
+import { taroAdapter } from './adapter';
 
 enum ApiAuthError {
   ERROR_FORBIDDEN = 401,
@@ -58,13 +59,13 @@ export class MiniCozeApi extends CozeAPI {
   }
   useAuthError() {
     this.useResponseInterceptors(
-      async (response) => {
+      async response => {
         const { code } = response?.data || {};
         if (this.isAuthErrorCode(code || response.status)) {
           // 由于 鉴权问题导致的失败，进行一次重新发送数据。
-          logger.error("request auth error :", code || response.status);
+          logger.error('request auth error :', code || response.status);
           const oldToken = this.getTokenFromHeaderAuth(
-            String(response.config.headers.getAuthorization() || "")
+            String(response.config.headers.getAuthorization() || ''),
           );
           const token = await this.refreshToken(oldToken);
           if (token) {
@@ -73,17 +74,17 @@ export class MiniCozeApi extends CozeAPI {
           }
         }
         if (response.status < 200 || response.status > 400) {
-          logger.error("request error:", response);
+          logger.error('request error:', response);
           throw new Error(response.statusText);
         }
         return response;
       },
-      async (response) => {
+      async response => {
         const { code } = response?.data || {};
         if (this.isAuthErrorCode(code || response.status)) {
           // 由于 鉴权问题导致的失败，进行一次重新发送数据。
           const oldToken = this.getTokenFromHeaderAuth(
-            String(response.config.headers.getAuthorization() || "")
+            String(response.config.headers.getAuthorization() || ''),
           );
           const token = await this.refreshToken(oldToken);
           if (token) {
@@ -92,7 +93,7 @@ export class MiniCozeApi extends CozeAPI {
           }
         }
         return response;
-      }
+      },
     );
   }
   private isAuthErrorCode(code: number) {
@@ -104,7 +105,7 @@ export class MiniCozeApi extends CozeAPI {
     ].includes(code);
   }
   getTokenFromHeaderAuth(authorization: string) {
-    return authorization.replace(/^\s*Bearer\s*/, "").replace(/\s+$/, "");
+    return authorization.replace(/^\s*Bearer\s*/, '').replace(/\s+$/, '');
   }
   async refreshToken(oldToken: string) {
     if (this.refreshTokenPromise) {
@@ -117,7 +118,7 @@ export class MiniCozeApi extends CozeAPI {
     this.refreshTokenPromise = this.onRefreshToken?.(this.token);
     const token = await this.refreshTokenPromise;
     this.refreshTokenPromise = undefined;
-    this.token = token || "";
+    this.token = token || '';
     return this.token;
   }
   useResponseInterceptors(
@@ -126,46 +127,72 @@ export class MiniCozeApi extends CozeAPI {
       | undefined,
     rejectResponseInterceptor:
       | ((response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>)
-      | undefined
+      | undefined,
   ) {
     this.getAxiosInstance().interceptors.response.use(
       responseInterceptor,
-      rejectResponseInterceptor
+      rejectResponseInterceptor,
     );
   }
   useRequestInterceptors(
     requestInterceptor: (
-      request: InternalAxiosRequestConfig
-    ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
+      request: InternalAxiosRequestConfig,
+    ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>,
   ) {
     this.getAxiosInstance().interceptors.request.use(requestInterceptor);
   }
   getAxiosInstance() {
     return this.axiosInstance as AxiosInstance;
   }
+  // eslint-disable-next-line max-params
   makeRequest<Req, Rsp>(
     apiUrl: string,
-    method: "GET" | "POST" | "PUT" | "DELETE",
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     body?: Req,
     isStream?: boolean,
-    options?: RequestOptions
+    options?: RequestOptions,
   ): Promise<Rsp> {
     if (isWeb || !isStream) {
       return super.makeRequest(apiUrl, method, body, isStream, options);
     }
-    return this.requestMiniSse(apiUrl, method, body, options) as Promise<Rsp>;
+    return this.requestMiniSse({
+      apiUrl,
+      method,
+      body,
+      options,
+    }) as unknown as Promise<Rsp>;
   }
-  private async *requestMiniSse<Req, Rsp>(
-    apiUrl: string,
-    method: "GET" | "POST" | "PUT" | "DELETE",
-    body?: Req,
-    options?: RequestOptions,
-    retryNum: number = 0
-  ) {
+  // eslint-disable-next-line complexity
+  private async *requestMiniSse<Req, Rsp>({
+    apiUrl,
+    method,
+    body,
+    options,
+    retryNum = 0,
+  }: {
+    apiUrl: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    body?: Req;
+    options?: RequestOptions;
+    retryNum?: number;
+  }): AsyncGenerator<Rsp> {
     // request intercptions处理
-    const self = this;
+    const refreshTokenAndRetry = async (code = -1, msg = 'unknown error') => {
+      if (retryNum === 0) {
+        await this.refreshToken(oldToken as string);
+        return this.requestMiniSse({
+          apiUrl,
+          method,
+          body,
+          options,
+          retryNum: retryNum + 1,
+        });
+      } else {
+        throw new MiniChatError(code, msg);
+      }
+    };
     const oldToken = this.token;
-    const url = `${this.baseURL ?? ""}/${apiUrl}`;
+    const url = `${this.baseURL ?? ''}/${apiUrl}`;
     const res = requestSSE({
       url,
       method,
@@ -181,7 +208,7 @@ export class MiniCozeApi extends CozeAPI {
 
     for await (const eventData of res) {
       if (eventData?.event === EventJsonDataType) {
-        const { code = -1, msg = "unknown error" } = (eventData.data || {}) as {
+        const { code = -1, msg = 'unknown error' } = (eventData.data || {}) as {
           code: number;
           msg: string;
         };
@@ -201,45 +228,33 @@ export class MiniCozeApi extends CozeAPI {
         // 无法分辨是否token过期了， 直接重试
         return await refreshTokenAndRetry();
       } else {
-        throw new MiniChatError(-1, "unknown error");
-      }
-    }
-
-    async function refreshTokenAndRetry(
-      code: number = -1,
-      msg: string = "unknown error"
-    ) {
-      if (retryNum === 0) {
-        await self.refreshToken(oldToken as string);
-        return self.requestMiniSse(apiUrl, method, body, options, retryNum + 1);
-      } else {
-        throw new MiniChatError(code, msg);
+        throw new MiniChatError(-1, 'unknown error');
       }
     }
   }
   private mixTaroUpload() {
     if (!isWeb) {
-      this.files.upload = (params: CreateFileReq, options?: RequestOptions) => {
-        return this._uploadFile({
+      this.files.upload = (params: CreateFileReq, options?: RequestOptions) =>
+        this._uploadFile({
           params,
           options,
-          urlPath: "/v1/files/upload",
+          urlPath: '/v1/files/upload',
         });
-      };
     }
     // @ts-expect-error -- linter-disable-autofix
     this.audio.transcriptions = (
       params: CreateFileReq,
-      options?: RequestOptions
+      options?: RequestOptions,
     ) => {
-      logger.debug("translation params", params);
+      logger.debug('translation params', params);
       return this._uploadFile({
         params,
         options,
-        urlPath: "/v1/audio/transcriptions",
+        urlPath: '/v1/audio/transcriptions',
       });
     };
   }
+  // eslint-disable-next-line complexity
   private async _uploadFile({
     params,
     options,
@@ -250,14 +265,14 @@ export class MiniCozeApi extends CozeAPI {
     options?: RequestOptions;
     urlPath: string;
     retryNum?: number;
-  }) {
-    const url = `${this.baseURL ?? ""}${urlPath}`;
+  }): Promise<FileResult['data']> {
+    const url = `${this.baseURL ?? ''}${urlPath}`;
     const oldToken = this.token;
     try {
       const rawResult = await Taro.uploadFile({
         url,
         filePath: params.file.filePath,
-        name: "file",
+        name: 'file',
         fileName: params.file.fileName,
         withCredentials: false,
         header: {
@@ -270,7 +285,7 @@ export class MiniCozeApi extends CozeAPI {
       const { code = -1, data } = safeJSONParse<FileResult>(rawResult.data) || {
         code: -1,
       };
-      logger.debug("_uploadFile:", { code, data });
+      logger.debug('_uploadFile:', { code, data });
       if (code !== 0 || !data) {
         if (
           this.isAuthErrorCode(code || rawResult.statusCode) &&
@@ -285,12 +300,12 @@ export class MiniCozeApi extends CozeAPI {
             urlPath,
           });
         }
-        throw new MiniChatError(code || -1, "upload file failed");
+        throw new MiniChatError(code || -1, 'upload file failed');
       }
       return data;
     } catch (error) {
       const miniChatError = convertToMinChatError(error);
-      logger.error("upload file error", error);
+      logger.error('upload file error', error);
       throw miniChatError;
     }
   }

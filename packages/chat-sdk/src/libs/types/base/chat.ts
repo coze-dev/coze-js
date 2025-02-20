@@ -1,8 +1,9 @@
-import { BotInfo } from "@coze/api";
-import type { BgImageInfoMap } from "./ui";
+import { BotInfo } from '@coze/api';
+
+import type { BgImageInfoMap } from './ui';
 export enum ChatType {
-  Bot = "bot",
-  App = "App",
+  Bot = 'bot',
+  App = 'App',
 }
 export interface VoiceInfo {
   isTextToVoiceEnable?: boolean;
@@ -22,12 +23,12 @@ export interface ChatInfo
   extends Partial<
     Omit<
       BotInfo,
-      | "bot_id"
-      | "model_info"
-      | "plugin_info_list"
-      | "bot_mode"
-      | "prompt_info"
-      | "onboarding_info"
+      | 'bot_id'
+      | 'model_info'
+      | 'plugin_info_list'
+      | 'bot_mode'
+      | 'prompt_info'
+      | 'onboarding_info'
     >
   > {
   appId: string;
