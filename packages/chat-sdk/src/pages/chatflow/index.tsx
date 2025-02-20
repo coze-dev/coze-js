@@ -9,29 +9,24 @@ import { ChatFlowFramework } from '@/chatflow';
 
 import styles from './index.module.less';
 
-export const cnBotInfo = {
-  appId: '7472176199100645402',
-  workflowId: '7472209247696551955',
-  apiBaseUrl: 'https://api.coze.cn',
-  conversationName: 'Test3',
-  tokenType: 'external',
-  token: 'pat_CCit2upKNLH778OtaoAspgyYYh5clTvg****************',
+interface EnvInfo {
+  appId: string;
+  workflowId: string;
+  apiBaseUrl: string;
+  tokenType: string;
+  conversationName: string;
+  token: string;
+  cdnBaseUrlPath: string;
+}
+const botInfo: EnvInfo = {
+  appId: process.env.TARO_APP_CHATFLOW_COZE_APP_ID ?? '',
+  workflowId: process.env.TARO_APP_CHATFLOW_COZE_WORKFLOW_ID ?? '',
+  apiBaseUrl: process.env.TARO_APP_CHATFLOW_COZE_API_BASE_URL ?? '',
+  conversationName: process.env.TARO_APP_CHATFLOW_COZE_CONVERSATION_NAME ?? '',
+  tokenType: process.env.TARO_APP_CHATFLOW_COZE_TOKEN_TYPE ?? '',
+  token: process.env.TARO_APP_CHATFLOW_COZE_TOKEN ?? '',
+  cdnBaseUrlPath: process.env.TARO_APP_CHATFLOW_COZE_CDN_BASE_URL_PATH ?? '',
 };
-export const enBotInfo = {
-  appId: '7329529575539572743',
-  apiBaseUrl: 'https://api.coze.com',
-  token: 'pat_CCit2upKNLH778OtaoAspgyYYh5clTvg****************',
-};
-export const boeBotInfo = {
-  appId: '7440555625941631020',
-  workflowId: '7441166757690064940',
-  apiBaseUrl: 'https://api-bot-boe.bytedance.net',
-  tokenType: 'internal',
-  conversationName: 'Chatflow3',
-  token: 'pat_CCit2upKNLH778OtaoAspgyYYh5clTvg****************',
-};
-
-const botInfo = cnBotInfo;
 
 export default function Index() {
   const [workflow, setWorkflow] = useState({
@@ -46,28 +41,21 @@ export default function Index() {
   const setting: IChatFlowProps['setting'] = {
     apiBaseUrl: botInfo.apiBaseUrl,
     logLevel: 'debug',
-    cdnBaseUrlPath:
-      'https://lf3-static.bytednsdoc.com/obj/eden-cn/rkzild_lgvj/ljhwZthlaukjlkulzlp/',
-    requestHeader: {
-      'x-tt-env': 'ppe_chatflow_role',
-      'x-use-ppe': '1',
-    },
+    cdnBaseUrlPath: botInfo.cdnBaseUrlPath,
   };
   const [onBoarding, setOnBoarding] = useState({
-    suggestions: [
-      'asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf asdf ',
-    ],
+    suggestions: ['Hello World '],
   });
   const [userInfo, setUserInfo] = useState({
     id: 'ID1234567890',
-    name: 'GaoTest',
+    name: 'CozeUser',
     avatar: UserIcon,
   });
   const [project, setProject] = useState<IChatFlowProps['project']>({
     id: botInfo.appId,
     type: 'app',
-    conversationName: botInfo.conversationName || 'asf',
-    name: 'https://www.coze.cn/space/7321567613585424403/project-ide/7459982518834446351/workflow/7459756038184026112',
+    conversationName: botInfo.conversationName || 'Default',
+    name: 'Coze',
     mode: 'draft',
     onBoarding,
   });
@@ -94,7 +82,6 @@ export default function Index() {
     },
     renderLoading: () => <View className={styles.loading}>Loading</View>,
     input: {
-      placeholder: '请输入你的s问题',
       isNeed: true,
       isNeedTaskMessage: true,
       isNeedAudio: true,

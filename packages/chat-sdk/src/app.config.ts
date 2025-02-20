@@ -3,9 +3,9 @@ const isWeapp = process.env.TARO_ENV === 'weapp';
 
 export default defineAppConfig({
   pages: [
+    'pages/chatflow/index',
     'pages/index/index',
     'pages/markdown/index',
-    'pages/chatflow/index',
     'pages/ui/index',
   ],
   components:

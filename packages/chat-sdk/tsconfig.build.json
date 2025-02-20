@@ -4,8 +4,8 @@
     "target": "ES2015",
     "preserveConstEnums": true,
     "noUnusedLocals": true,
-    "composite": true,
-    "incremental": true,
+    "composite": false,
+    "incremental": false,
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "sourceMap": true,
@@ -14,7 +14,7 @@
     "allowJs": false,
     "pretty": true,
     "module": "es6",
-    "outDir": "./dist/lib-source",
+    "outDir": "./dist/lib-source/src",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -26,8 +26,7 @@
         "transform": "typescript-transform-paths",
         "afterDeclarations": true
       }
-    ],
-    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo"
+    ]
   },
 
   "include": ["./src/exports", "./src/libs", "./src/chatflow"],
