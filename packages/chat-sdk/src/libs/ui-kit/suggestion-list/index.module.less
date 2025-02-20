@@ -1,0 +1,22 @@
+.suggestion {
+  color: var(--chat-font-color-suggestion, rgba(6, 7, 9, 0.8));
+  background-color: var(--chat-bg-color-suggestion, #fff);
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--chat-bg-color-suggestion-hover, #fff);
+  }
+}
+
+.suggestion-list {
+  flex-wrap: wrap;
+}
+
+/*:global(.bg-theme) {
+  .suggestion {
+    background: rgba(235, 235, 235, 0.52);
+
+    backdrop-filter: blur(20px);
+  }
+}*/

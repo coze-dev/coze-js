@@ -1,0 +1,27 @@
+.radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 32px;
+  border: 1px solid var(---chat-app-select-border-color, rgba(68, 83, 130, 0.25));
+  box-sizing: border-box;
+  cursor: pointer;
+  &.checked {
+    border: none;
+    background: rgb(10, 102, 214);
+
+    .checked-circle {
+      display: block;
+      width: 7px;
+      height: 7px;
+      background-color: #FFF;
+      border-radius: 16px;
+    }
+  }
+  .checked-circle {
+    display: none;
+  }
+}

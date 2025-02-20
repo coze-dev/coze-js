@@ -74,6 +74,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -90,6 +91,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+dist_dev
 
 # Gatsby files
 .cache/
@@ -167,3 +169,4 @@ examples/coze-js-node/tmp/
 examples/coze-js-node/src/config/config.ts
 
 !examples/coze-js-web/src/lib/wavtools/dist
+packages/chat-sdk/.env.development

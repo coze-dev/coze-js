@@ -1,0 +1,44 @@
+.app-avatar {
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+  width: var(--chat-size-avatar-default, 24px);
+  height: var(--chat-size-avatar-default, 24px);
+}
+
+.title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.container {
+  padding: 0 16px;
+  height: 55px;
+  z-index: 1;
+  position: relative;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--chat-bg-border-color-light, rgba(29, 28, 35, 0.08))
+}
+
+:global(.bg-theme) {
+  .container {
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      filter: blur(40px);
+      z-index: 0
+    }
+  }
+}
+
+:global(.bg-mobile) {
+  .container {
+    height: 72px;
+    padding: 24px 16px 16px;
+  }
+}

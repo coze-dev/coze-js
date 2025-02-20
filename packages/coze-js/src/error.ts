@@ -120,13 +120,7 @@ export class APIError extends CozeError {
 export class APIConnectionError extends APIError {
   override readonly status: undefined = undefined;
 
-  constructor({
-    message,
-    cause,
-  }: {
-    message?: string;
-    cause?: Error | undefined;
-  }) {
+  constructor({ message }: { message?: string; cause?: Error | undefined }) {
     super(undefined, undefined, message || 'Connection error.', undefined);
     // if (cause) {
     //   this.cause = cause;

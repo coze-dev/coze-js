@@ -421,6 +421,11 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@coze/chat-sdk",
+      "projectFolder": "packages/chat-sdk",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@coze/taro-api",
       "projectFolder": "packages/coze-taro",
       "shouldPublish": true

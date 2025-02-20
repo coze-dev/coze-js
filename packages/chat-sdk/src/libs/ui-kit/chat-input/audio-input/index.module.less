@@ -1,0 +1,123 @@
+.container {
+  flex: 1;
+  height: 32px;
+  position: relative;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+
+  .text {
+    color: rgba(48, 68, 112, 0.38);
+    line-height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    padding-right: 12px;
+  }
+
+  &.focused {
+    .text {
+      color: rgba(11, 21, 43, 0.82);
+    }
+  }
+
+  &.touching {
+    overflow: visible;
+    position: absolute;
+    z-index: 8;
+    height: 100%;
+    width: 100%;
+    height: calc(100% + 2px);
+    width: calc(100% + 2px);
+    top: -1px;
+    left: -1px;
+    background: linear-gradient(117deg, #5448FF 4.74%, #B026F1 131.42%);
+    border-radius: 24px;
+
+    &.outside {
+      background: #FF0030;
+    }
+
+    .text {
+      display: none;
+    }
+  }
+
+  .audio {
+    width: 100%;
+    overflow: hidden;
+    z-index: 4;
+    padding: 0;
+  }
+
+
+
+  &.primary {
+
+    &.touching {
+
+      background: #FFF;
+      border: 1px solid var(--chat-bg-border-color-hglt, rgba(78, 64, 229));
+
+      &.outside {
+        border: 1px solid #F00;
+      }
+    }
+  }
+
+  .text {
+    overflow: hidden;
+  }
+}
+
+
+.tips-container {
+  position: absolute;
+  height: 40px;
+  top: -52px;
+  left: 50%;
+  padding: 0 24px;
+  transform: translateX(-50%);
+  max-width: 100%;
+  width: fit-content;
+  overflow: hidden;
+  z-index: 5;
+  background-color: #F2F3F7;
+  border-radius: 100px;
+  color: rgba(11, 21, 43, 0.82);
+  -webkit-user-select: none;
+  user-select: none;
+
+  .left-duration {
+    color: #5546FF;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    margin-right: 6px;
+  }
+
+  &.outside-tips {
+    background-color: #FFEFF1;
+
+    .tips-text {
+      color: #FF002B;
+      font-weight: 500;
+    }
+  }
+
+  .tips-text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    text-align: center;
+    position: relative;
+  }
+}
