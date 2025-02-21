@@ -116,10 +116,8 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
             case 'file': {
               return (
                 <FileMessage
-                  // @ts-expect-error -- linter-disable-autofix
                   filename={item.name || ''}
                   key={`${item.type}_${index}`}
-                  // @ts-expect-error -- linter-disable-autofix
                   size={item.size || 0}
                 />
               );
@@ -127,7 +125,6 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
             case 'image': {
               return (
                 <ImageMessage
-                  // @ts-expect-error -- linter-disable-autofix
                   url={item.file_url as string}
                   onImageClick={onImageClick}
                   key={`${item.type}_${index}`}
