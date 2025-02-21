@@ -785,9 +785,9 @@ export type MessageType =
 
 export type ObjectStringItem =
   | { type: 'text'; text: string }
-  | { type: 'file'; file_id: string }
-  | { type: 'file'; file_url: string }
-  | { type: 'image'; file_id: string }
+  | { type: 'file'; file_id: string; name?: string; size?: number }
+  | { type: 'file'; file_url: string; name?: string; size?: number }
+  | { type: 'image'; file_id: string; file_url?: string }
   | { type: 'image'; file_url: string }
   | { type: 'audio'; file_id: string }
   | { type: 'audio'; file_url: string };
