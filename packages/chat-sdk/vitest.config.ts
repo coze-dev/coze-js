@@ -7,18 +7,18 @@ export default defineConfig({
   preset: 'node',
   test: {
     globals: true,
-    include: ['__tests__/**/*.test.{js,jsx,ts,tsx}'],
+    include: ['test/**/*.test.{js,jsx,ts,tsx}'],
     server: {
       deps: {
         inline: ['@tarojs/runtime'],
       },
     },
-    setupFiles: './vitest.setup.jsx',
+    setupFiles: './test/vitest.setup.jsx',
     environment: 'jsdom',
   },
   esbuild: {
     loader: 'tsx',
-    include: [/src\/.*\.[jt]sx?$/, /__tests__\/.*\.[jt]sx?$/],
+    include: [/src\/.*\.[jt]sx?$/, /test\/.*\.[jt]sx?$/],
     exclude: /node_modules\/(?!@taro)/,
   },
   resolve: {

@@ -1,7 +1,7 @@
-export const safeJSONParse = <T>(
+export const safeJSONParse = <T, T2>(
   v: T | string,
-  defaultValue: T | null = null,
-): T | null => {
+  defaultValue: T2 | T | null = null,
+): T | T2 | null => {
   if (typeof v === 'object') {
     return v;
   }
