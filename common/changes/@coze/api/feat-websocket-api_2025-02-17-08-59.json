@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "ws-tools rslib config",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "wangfocheng@bytedance.com"
+}
