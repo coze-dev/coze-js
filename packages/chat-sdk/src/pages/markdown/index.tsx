@@ -33,6 +33,17 @@ export default function Index() {
         enableCodeBy4Space={false}
         markdown={content}
         enableHtmlTags={true}
+        onTaskChange={value => {
+          console.log({ value });
+        }}
+        eventCallbacks={{
+          onLinkClick: (e, { url }) => {
+            console.log({ url });
+          },
+          onImageClick: ({ url }) => {
+            console.log({ url });
+          },
+        }}
       />
     </View>
   );

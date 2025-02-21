@@ -3,6 +3,7 @@ import { FC, memo, PropsWithChildren, useMemo, useRef } from 'react';
 import type { Root as RootMdType } from 'mdast';
 
 import { Logger } from '@/libs/utils';
+import { ElementEventCallbacks } from '@/libs/types/base/event-callback';
 import {
   Language,
   type IOnImageClickEvent,
@@ -36,6 +37,7 @@ export interface MarkdownProps {
   debug?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  eventCallbacks?: ElementEventCallbacks;
 }
 const MarkdownRender: FC<
   PropsWithChildren<
@@ -90,6 +92,7 @@ const MdStreamOp: FC<PropsWithChildren<MarkdownProps>> = ({
   taskDisabled,
   enableHtmlTags = false,
   enableCodeBy4Space = false,
+  eventCallbacks,
 }) => {
   const { showMarkdown, isShowIndicator, showMoreByte } = useSmoothShowMarkdown(
     {
@@ -126,6 +129,7 @@ const MdStreamOp: FC<PropsWithChildren<MarkdownProps>> = ({
       onTaskChangeHandle={onTaskChangeHandle}
       onImageClick={onImageClick}
       i18n={i18n}
+      eventCallbacks={eventCallbacks}
       logger={logger}
       selectable={selectable}
       taskDisabled={!isFinish || taskDisabled}
