@@ -100,6 +100,10 @@ const RealtimeConsole: React.FC = () => {
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
+            videoInputDeviceId: localManager.get(
+              LocalStorageKey.VIDEO_INPUT_DEVICE_ID,
+              undefined,
+            ),
             videoOnDefault:
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true',
           }
