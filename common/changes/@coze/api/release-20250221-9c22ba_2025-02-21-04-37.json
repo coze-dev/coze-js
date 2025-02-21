@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "修改代码2",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "gaoding.devingao@bytedance.com"
+}
