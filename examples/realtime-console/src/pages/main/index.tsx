@@ -25,6 +25,7 @@ import {
 } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import logo from '../../logo.svg';
+import useInterrupt from '../../hooks/use-interrupt';
 import { useAccessToken } from '../../hooks/use-access-token';
 import Settings from './settings';
 import Player from './player';
@@ -53,6 +54,7 @@ const RealtimeConsole: React.FC = () => {
   const localManager = new LocalManager();
   const { getAccessToken, removeAccessToken, initLocalManager } =
     useAccessToken();
+  const { handleMessage } = useInterrupt({ clientRef });
 
   const handleSaveSettings = async () => {
     if (clientRef.current) {
@@ -152,6 +154,9 @@ const RealtimeConsole: React.FC = () => {
     if (eventName === EventNames.PLAYER_EVENT) {
       return;
     }
+
+    // handle interrupt message
+    handleMessage(eventName);
 
     const now = new Date();
     const time = `${now.toTimeString().split(' ')[0]}.${String(

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, message, Typography, Select } from 'antd';
 import {
+  EventNames,
   RealtimeAPIError,
   type RealtimeClient,
   RealtimeUtils,
@@ -11,9 +12,9 @@ import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 import '../../App.css';
 import { ChatEventType } from '@coze/api';
 
+import { isShowVideo } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
-import { isShowVideo } from '../../utils/utils';
 import useCozeAPI from '../../hooks/use-coze-api';
 import MessageForm, { type MessageFormRef } from './message-form';
 import ComfortStrategyForm from './comfort-strategy-form';
@@ -166,6 +167,14 @@ const Header: React.FC<HeaderProps> = ({
     const eventName = `server.${ChatEventType.CONVERSATION_CHAT_REQUIRES_ACTION}`;
     clientRef.current.on(eventName, onMessage);
 
+    clientRef.current.on(EventNames.AUDIO_MUTED, () => {
+      onToggleMicrophone(false);
+    });
+
+    clientRef.current.on(EventNames.AUDIO_UNMUTED, () => {
+      onToggleMicrophone(true);
+    });
+
     return () => {
       try {
         clientRef.current?.off(eventName, onMessage);
@@ -216,7 +225,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleToggleMicrophone = () => {
     if (clientRef.current) {
       clientRef.current.setAudioEnable(!isMicrophoneOn);
-      onToggleMicrophone(!isMicrophoneOn);
+      // onToggleMicrophone(!isMicrophoneOn);
       message.success(`Microphone ${!isMicrophoneOn ? 'unmuted' : 'muted'}`);
     } else {
       message.error('Please click Settings to set configuration first');
