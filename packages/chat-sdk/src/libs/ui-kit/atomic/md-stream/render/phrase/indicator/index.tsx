@@ -8,4 +8,4 @@ import styles from './index.module.less';
 
 export const Indicator: FC<{
   node: IndicatorLocal;
-}> = () => <Text className={styles.indicator}>{'\b'}</Text>;
+}> = () => <Text className={styles.indicator} />;

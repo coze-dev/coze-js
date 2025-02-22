@@ -13,8 +13,9 @@
 .indicator {
   position: relative;
   display: inline-block;
-  line-height: 22px;
+  line-height: var(--md-stream-line-height-default, 22px);
   width: 18px;
+  white-space: pre-wrap;
   &:before {
     content: '';
     border-radius: 50%;
@@ -29,5 +30,9 @@
 
     animation: indicator-frame.8s infinite alternate;
     animation-timing-function: ease;
+  }
+  &::after {
+    content: ' ';
+    display: inline-block;
   }
 }

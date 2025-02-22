@@ -3,7 +3,7 @@ import { FC, useMemo, useState } from 'react';
 import cls from 'classnames';
 
 import { logger } from '@/libs/utils';
-import { IOnImageClickEvent, IOnTaskListChange } from '@/libs/types';
+import { IOnImageClickEvent, IOnTaskListChange, Language } from '@/libs/types';
 import { useI18n } from '@/libs/provider';
 import { usePersistCallback, useUpdateEffect } from '@/libs/hooks';
 
@@ -49,7 +49,7 @@ const MarkdownContent: FC<{
       onImageClick={onImageClick}
       onTaskChange={onTaskChange}
       taskDisabled={taskDisabled}
-      language={i18n.language}
+      language={i18n.language as Language}
       debug={logger.isDebug()}
     />
   );
