@@ -1313,8 +1313,8 @@ importers:
   ../../../packages/chat-sdk:
     dependencies:
       '@coze/api':
-        specifier: workspace:*
-        version: link:../coze-js
+        specifier: ^1.0.17
+        version: 1.0.20(axios@1.7.7)
       classnames:
         specifier: ^2.3.2
         version: 2.5.1
@@ -2684,6 +2684,11 @@ packages:
   '@commitlint/types@17.8.1':
     resolution: {integrity: sha512-PXDQXkAmiMEG162Bqdh9ChML/GJZo6vU+7F03ALKDK8zYc6SuAr47LjG7hGYRqUOz+WK0dU7bQ0xzuqFMdxzeQ==}
     engines: {node: '>=v14'}
+
+  '@coze/api@1.0.20':
+    resolution: {integrity: sha512-cCx8mGJCcrjd66NgxK7iRE1akTs53i6J02TKT66C8F7LGsGYCDruJ7N0RQJ404JxIiXWTjROLygWKFV55lZrPg==}
+    peerDependencies:
+      axios: ^1.7.1
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -15915,6 +15920,18 @@ snapshots:
   '@commitlint/types@17.8.1':
     dependencies:
       chalk: 4.1.2
+
+  '@coze/api@1.0.20(axios@1.7.7)':
+    dependencies:
+      axios: 1.7.7(debug@4.3.7)
+      jsonwebtoken: 9.0.2
+      node-fetch: 2.7.0
+      reconnecting-websocket: 4.4.0
+      ws: 8.18.0
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - utf-8-validate
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
