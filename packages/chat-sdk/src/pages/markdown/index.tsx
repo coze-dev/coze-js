@@ -18,12 +18,12 @@ const streamOutput = (onChange: (content: string) => void) => {
   }, 150);
 };
 
-const isSmooth = false;
+const isSmooth = true;
 export default function Index() {
-  const [content, setContent] = useState(isSmooth ? markdown : '');
+  const [content, setContent] = useState(!isSmooth ? markdown : '');
 
   useEffect(() => {
-    if (isSmooth) {
+    if (!isSmooth) {
       return;
     }
     streamOutput(setContent);
@@ -33,7 +33,7 @@ export default function Index() {
     <View className="light">
       <MdStream
         isSmooth={isSmooth}
-        isFinish={content.length === markdown.length}
+        //isFinish={content.length === markdown.length}
         enableCodeBy4Space={false}
         markdown={content}
         enableHtmlTags={true}

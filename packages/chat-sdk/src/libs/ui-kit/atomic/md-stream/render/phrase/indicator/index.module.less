@@ -1,21 +1,21 @@
 @keyframes indicator-frame {
   0% {
-    background-color: #FFF;
+    background-color: #fff;
   }
   50% {
     background-color: currentColor;
   }
   100% {
-    background-color: #FFF;
+    background-color: #fff;
   }
 }
 
 .indicator {
-  position:relative;
-  display: inline;
+  position: relative;
+  display: inline-block;
   line-height: 22px;
   width: 18px;
-  &:before{
+  &:before {
     content: '';
     border-radius: 50%;
     height: 6px;
@@ -26,7 +26,6 @@
     left: 0;
     margin-left: 5px;
     margin-top: -3px;
-
 
     animation: indicator-frame.8s infinite alternate;
     animation-timing-function: ease;
