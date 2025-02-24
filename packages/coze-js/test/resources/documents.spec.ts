@@ -156,7 +156,7 @@ describe('Documents', () => {
           },
         ],
       };
-      vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
+      vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
       const params: ListDocumentReq = {
         dataset_id: 'dataset-id',
@@ -166,7 +166,7 @@ describe('Documents', () => {
 
       const result = await documents.list(params);
 
-      expect(client.get).toHaveBeenCalledWith(
+      expect(client.post).toHaveBeenCalledWith(
         '/open_api/knowledge/document/list',
         params,
         false,
