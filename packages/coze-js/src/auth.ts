@@ -258,12 +258,18 @@ export const _getJWTToken = async (
     baseURL?: string;
     durationSeconds?: number;
     scope?: JWTScope;
+    accountId?: string;
   },
   options?: RequestOptions,
 ) => {
   const api = new APIClient({ token: config.token, baseURL: config.baseURL });
 
-  const apiUrl = '/api/permission/oauth2/token';
+  let apiUrl;
+  if (config.accountId) {
+    apiUrl = `/api/permission/oauth2/account/${config.accountId}/token`;
+  } else {
+    apiUrl = '/api/permission/oauth2/token';
+  }
   const payload = {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     duration_seconds: config.durationSeconds ?? 900, // 15 minutes
@@ -444,6 +450,7 @@ export interface JWTTokenConfig {
   scope?: JWTScope;
   /**Isolate different sub-resources under the same jwt account */
   sessionName?: string;
+  accountId?: string; // Same as  user id
 }
 
 export enum PKCEAuthErrorType {

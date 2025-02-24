@@ -609,6 +609,34 @@ xrGqcXz5Qf+wdt0=
       );
     });
 
+    it('should call APIClient.post with correct parameters for accountId', async () => {
+      const mockPost = vi
+        .fn()
+        .mockResolvedValue({ access_token: 'test-jwt-token' });
+      (APIClient as unknown as vi.Mock).mockImplementation(() => ({
+        post: mockPost,
+      }));
+      await getJWTToken({
+        appId: 'test-app-id',
+        aud: 'test-aud',
+        keyid: 'test-key-id',
+        privateKey: mockPrivateKey,
+        baseURL: mockConfig.baseURL,
+        accountId: '123',
+      });
+
+      expect(mockPost).toHaveBeenCalledWith(
+        '/api/permission/oauth2/account/123/token',
+        {
+          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          duration_seconds: 900,
+          scope: undefined,
+        },
+        false,
+        undefined,
+      );
+    });
+
     it('should use default RS256 algorithm if not specified', async () => {
       const mockPost = vi
         .fn()
