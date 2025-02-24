@@ -1,5 +1,20 @@
 # @coze/api
 
+## 1.0.21 - 2025-02-24
+
+### New Features
+
+- eslint处理
+- 修改问题
+- add proxy example for coze-api
+- add accountId support for JWT token generation
+- Add  plugin_id_list and workflow_id_list to UpdateBotReq
+
+### Bug Fixes
+
+- change document list endpoint from GET to POST
+
+
 ## 1.0.20 - 2025-02-12
 
 ### New Features
