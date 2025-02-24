@@ -19,9 +19,9 @@ import { ChatToast } from '../chat-toast';
 import { ChatSlot } from '../chat-slot';
 import { ChatModal } from '../chat-modal';
 import { ChatLoading } from '../chat-loading';
+import { ChatHeader } from '../chat-header';
 import { ChatFooter } from '../chat-footer';
 import { ChatBackground } from '../chat-background';
-import { ChatHeader } from '../chat-header';
 
 import '../../../ui-kit/token/index.css';
 import styles from './index.module.less';
@@ -97,7 +97,7 @@ export const ChatContent = ({ children }: { children?: ReactNode }) => {
 };
 
 export const ChatFramework = ({ children, ...props }: ChatFrameworkProps) => {
-  logger.info('SdkVersion: 0.1.3-alpha.2025021406');
+  logger.info('SdkVersion: 0.1.10-beta.1');
   return (
     <ChatFrameProvider {...props}>
       <ChatContent>{children}</ChatContent>
