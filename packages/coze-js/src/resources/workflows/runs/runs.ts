@@ -39,7 +39,10 @@ export class Runs extends APIResource {
    * @param params.app_id - Optional The ID of the app.  | 可选 要进行会话聊天的 App ID
    * @returns Stream<WorkflowEvent, { id: string; event: string; data: string }> | 工作流事件流
    */
-  async *stream(params: RunWorkflowReq, options?: RequestOptions) {
+  async *stream(
+    params: Omit<RunWorkflowReq, 'is_async'>,
+    options?: RequestOptions,
+  ) {
     const apiUrl = '/v1/workflow/stream_run';
     const result = await this._client.post<
       RunWorkflowReq,
@@ -90,6 +93,26 @@ export class Runs extends APIResource {
     >(apiUrl, params, false, options);
     return response;
   }
+
+  /**
+   * Get the workflow run history | 工作流异步运行后，查看执行结果
+   * @docs zh: https://www.coze.cn/open/docs/developer_guides/workflow_history
+   * @param workflowId - Required The ID of the workflow. | 必选 工作流 ID。
+   * @param executeId - Required The ID of the workflow execution. | 必选 工作流执行 ID。
+   * @returns WorkflowExecuteHistory[] | 工作流执行历史
+   */
+  async history(
+    workflowId: string,
+    executeId: string,
+    options?: RequestOptions,
+  ) {
+    const apiUrl = `/v1/workflows/${workflowId}/run_histories/${executeId}`;
+    const response = await this._client.get<
+      undefined,
+      { data: WorkflowExecuteHistory[] }
+    >(apiUrl, undefined, false, options);
+    return response.data;
+  }
 }
 
 export interface RunWorkflowReq {
@@ -97,16 +120,17 @@ export interface RunWorkflowReq {
   bot_id?: string;
   parameters?: Record<string, unknown>;
   ext?: Record<string, string>;
-  execute_mode?: string;
-  connector_id?: string;
   app_id?: string;
+  is_async?: boolean;
 }
 
 export interface RunWorkflowData {
   data: string;
   cost: string;
   token: number;
+  msg: string;
   debug_url: string;
+  execute_id: string;
 }
 
 export interface ResumeWorkflowReq {
@@ -186,6 +210,24 @@ export interface WorkflowEventError {
 
   // Status message. You can get detailed error information when the API call fails.
   error_message: string;
+}
+
+export interface WorkflowExecuteHistory {
+  execute_id: string;
+  execute_status: 'Success' | 'Running' | 'Fail';
+  bot_id: string;
+  connector_id: string;
+  connector_uid: string;
+  run_mode: 0 | 1 | 2;
+  logid: string;
+  create_time: number;
+  update_time: number;
+  output: string;
+  token: string;
+  cost: string;
+  error_code: string;
+  error_message: string;
+  debug_url: string;
 }
 
 export class WorkflowEvent {
