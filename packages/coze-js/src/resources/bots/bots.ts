@@ -182,6 +182,69 @@ export interface UpdateBotReq {
     suggested_questions?: string[];
   };
   knowledge?: KnowledgeInfo;
+  plugin_id_list: {
+    id_list?: PluginIdInfo[];
+  };
+  workflow_id_list: {
+    ids?: WorkflowIdInfo[];
+  };
+  model_info_config?: ModelInfoConfig;
+}
+
+export interface PluginIdInfo {
+  plugin_id: string;
+  api_id?: string;
+}
+
+export interface WorkflowIdInfo {
+  id: string;
+}
+
+export interface ModelInfoConfig {
+  /**
+   * The unique identifier of the model.
+   */
+  model_id: string;
+
+  /**
+   * Top K sampling.
+   */
+  top_k?: number;
+
+  /**
+   * Top P sampling (nucleus sampling).
+   */
+  top_p?: number;
+
+  /**
+   * Maximum number of tokens to generate.
+   */
+  max_tokens?: number;
+
+  /**
+   * Sampling temperature.
+   */
+  temperature?: number;
+
+  /**
+   * Number of context rounds to carry.
+   */
+  context_round?: number;
+
+  /**
+   * Output format.
+   */
+  response_format?: 'text' | 'markdown' | 'json';
+
+  /**
+   * Penalty for repeated topics.
+   */
+  presence_penalty?: number;
+
+  /**
+   * Penalty for repeated statements.
+   */
+  frequency_penalty?: number;
 }
 
 export interface PublishBotReq {
@@ -294,6 +357,9 @@ export interface BotInfo {
      */
     model_name: string;
   };
+  knowledge: CommonKnowledge;
+  shortcut_commands: ShortcutCommandInfo[];
+  workflow_info_list: WorkflowInfo[];
 }
 
 export interface BotPlugin {
@@ -371,6 +437,116 @@ export interface KnowledgeInfo {
   auto_call?: boolean;
 
   search_strategy?: number;
+}
+
+export interface CommonKnowledge {
+  knowledge_infos: {
+    id: string;
+    name: string;
+  }[];
+}
+
+export interface ShortcutCommandInfo {
+  /**
+   * The unique identifier of the shortcut command.
+   */
+  id: string;
+
+  /**
+   * The button name of the shortcut command.
+   */
+  name: string;
+
+  /**
+   * The tool information used by the shortcut command.
+   */
+  tool: ShortcutCommandToolInfo;
+
+  /**
+   * The command name of the shortcut command.
+   */
+  command: string;
+
+  /**
+   * For multi-agent bots, this returns the node ID specified by the shortcut command.
+   */
+  agent_id?: string;
+
+  /**
+   * The icon URL of the shortcut command.
+   */
+  icon_url: string;
+
+  /**
+   * The components list of the shortcut command.
+   */
+  components: ShortcutCommandComponent[];
+
+  /**
+   * The description of the shortcut command.
+   */
+  description: string;
+
+  /**
+   * The command content of the shortcut command.
+   */
+  query_template: string;
+}
+
+export interface ShortcutCommandToolInfo {
+  /**
+   * The name of the tool.
+   */
+  name: string;
+
+  /**
+   * The type of the tool.
+   */
+  type: 'plugin' | 'workflow';
+}
+
+export interface ShortcutCommandComponent {
+  /**
+   * The name of the component.
+   */
+  name: string;
+
+  /**
+   * The description of the component.
+   */
+  description: string;
+
+  /**
+   * The type of the component.
+   */
+  type: 'text' | 'select' | 'file';
+
+  /**
+   * The tool parameter name.
+   */
+  tool_parameter: string;
+
+  /**
+   * The default value of the component.
+   */
+  default_value: string;
+
+  /**
+   * Whether the component is hidden.
+   */
+  is_hide: boolean;
+
+  /**
+   * The options of the component.
+   */
+  options?: string[];
+}
+
+export interface WorkflowInfo {
+  id: string;
+  name: string;
+  icon_url: string;
+  description: string;
 }
 
 export namespace Bots {
