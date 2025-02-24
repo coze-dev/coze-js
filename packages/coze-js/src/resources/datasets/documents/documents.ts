@@ -20,7 +20,7 @@ export class Documents extends APIResource {
     options?: RequestOptions,
   ): Promise<ListDocumentData> {
     const apiUrl = '/open_api/knowledge/document/list';
-    const response = await this._client.get<ListDocumentReq, ListDocumentData>(
+    const response = await this._client.post<ListDocumentReq, ListDocumentData>(
       apiUrl,
       params,
       false,
