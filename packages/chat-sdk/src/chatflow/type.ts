@@ -13,6 +13,7 @@ import type {
   ThemeType,
   MessageUiConfigMap,
   IMessageCallback,
+  MessageWrapperConfig,
 } from '@/libs/types';
 
 export type OnImageClick = (extra: { url: string }) => void;
@@ -69,6 +70,7 @@ export interface IChatFlowProps {
       themeColor: string; // 背景颜色
     };
     message?: MessageUiConfigMap;
+    messageWrapper?: MessageWrapperConfig;
   };
   auth?: {
     type: 'external' | 'internal'; // 内部： cookie换token， 外部： internal

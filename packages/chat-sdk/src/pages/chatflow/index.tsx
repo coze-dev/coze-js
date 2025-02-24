@@ -88,6 +88,17 @@ export default function Index() {
 
       renderChatInputTopSlot: () => <div> Input Top Slot</div>,
     },
+    messageWrapper: {
+      senderName: {
+        renderRightSlot: ({ isQuery }) =>
+          isQuery ? null : (
+            <View>
+              Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right
+              Slot Slot Right Slot Slot Right Slot
+            </View>
+          ),
+      },
+    },
   });
   console.log('chatflow props:', {
     workflow,
