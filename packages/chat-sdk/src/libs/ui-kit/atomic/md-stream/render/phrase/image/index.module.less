@@ -3,12 +3,15 @@
   display: block;
   border-radius: 12px;
   min-width: 48px;
-  max-width: 400px;
+  max-width: min(100%, 400px);
   min-height: 48px;
   max-height: 200px;
   background-color: var(--md-stream-img-bg-color, rgba(0, 0, 0, 0.15));
   text-decoration: inherit;
 
+  img {
+    object-fit: cover;
+  }
   &.image-error {
     background-image: url(../../../../../assets/svg/image.svg);
     background-position: center;

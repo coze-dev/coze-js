@@ -18,7 +18,7 @@ const streamOutput = (onChange: (content: string) => void) => {
   }, 150);
 };
 
-const isSmooth = true;
+const isSmooth = false;
 export default function Index() {
   const [content, setContent] = useState(!isSmooth ? markdown : '');
 
