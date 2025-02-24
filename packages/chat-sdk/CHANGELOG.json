@@ -1,0 +1,83 @@
+{
+  "name": "@coze/chat-sdk",
+  "entries": [
+    {
+      "version": "0.1.9",
+      "tag": "HEAD",
+      "date": "2025-02-24T08:18:16.023Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "eslint处理"
+          },
+          {
+            "comment": "修改eslint"
+          },
+          {
+            "comment": "修改test代码"
+          },
+          {
+            "comment": "修改评论"
+          },
+          {
+            "comment": "提交"
+          },
+          {
+            "comment": "去掉间距"
+          },
+          {
+            "comment": "去掉token"
+          },
+          {
+            "comment": "修改配置"
+          },
+          {
+            "comment": "修改类型问题"
+          },
+          {
+            "comment": "修改package.json"
+          },
+          {
+            "comment": "添加单测"
+          },
+          {
+            "comment": "修改图片问题"
+          },
+          {
+            "comment": "修改版本号"
+          },
+          {
+            "comment": "修改问题"
+          },
+          {
+            "comment": "防止外边元素影响"
+          },
+          {
+            "comment": "修改覆盖率范围"
+          },
+          {
+            "comment": "add eventcallback on Markdown"
+          },
+          {
+            "comment": "小图片处理"
+          },
+          {
+            "comment": "changet coze/api version"
+          },
+          {
+            "comment": "修改图片及markdown语法"
+          },
+          {
+            "comment": "image and indicator bugfix"
+          },
+          {
+            "comment": "add env file"
+          },
+          {
+            "comment": "修改图片拉伸问题"
+          }
+        ]
+      }
+    }
+  ]
+}
