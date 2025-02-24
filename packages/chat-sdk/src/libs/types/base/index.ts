@@ -30,6 +30,7 @@ export type {
   MessageUiConfig,
   IMessageContentProps,
   MessageUiConfigMap,
+  MessageWrapperConfig,
 } from './ui';
 export type { ChooseFileInfo } from './file';
 export type { SettingInfo, LogLevel } from './setting';
