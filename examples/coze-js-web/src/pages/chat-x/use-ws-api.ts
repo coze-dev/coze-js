@@ -1,13 +1,12 @@
 import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
+import { WsSpeechClient, WsTranscriptionClient } from '@coze/api/ws-tools';
 import {
+  COZE_CN_BASE_WS_URL,
   type CozeAPI,
   type CreateChatData,
   type CreateChatWsReq,
   type CreateChatWsRes,
-  type CreateSpeechWsReq,
-  type CreateSpeechWsRes,
-  type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
   type WebSocketAPI,
   WebsocketsEventType,
@@ -26,14 +25,9 @@ const useWsAPI = (
   const wsRef = useRef<WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null>(
     null,
   );
-  const transcriptionsRef = useRef<WebSocketAPI<
-    CreateTranscriptionsWsReq,
-    CreateTranscriptionsWsRes
-  > | null>(null);
-  const speechRef = useRef<WebSocketAPI<
-    CreateSpeechWsReq,
-    CreateSpeechWsRes
-  > | null>(null);
+
+  const speechClientRef = useRef<WsSpeechClient | null>(null);
+  const transcriptionClientRef = useRef<WsTranscriptionClient | null>(null);
   const isConnected = useRef(false);
   const trackId = useRef('my-track');
   const deviceListRef = useRef<MediaDeviceInfo[]>([]);
@@ -47,85 +41,6 @@ const useWsAPI = (
       deviceListRef.current = deviceList;
     });
   }, []);
-
-  const initTranscriptionsWs = useCallback(async () => {
-    closeTranscriptionsWs();
-    if (!clientRef.current) {
-      return;
-    }
-    const ws = await clientRef.current.websockets.audio.transcriptions.create();
-
-    return new Promise<
-      WebSocketAPI<CreateTranscriptionsWsReq, CreateTranscriptionsWsRes>
-    >((resolve, reject) => {
-      ws.onopen = () => {
-        console.log('[transcriptions] ws open');
-
-        ws.send({
-          id: '1',
-          event_type: WebsocketsEventType.TRANSCRIPTIONS_UPDATE,
-          data: {
-            input_audio: {
-              format: 'pcm',
-              codec: 'pcm',
-              sample_rate: 24000,
-              channel: 1,
-              bit_depth: 16,
-            },
-          },
-        });
-
-        resolve(ws);
-      };
-
-      ws.onmessage = (data, event) => {
-        if (data.event_type === WebsocketsEventType.ERROR) {
-          if (data.data.code === 4100) {
-            console.error('Unauthorized Error', data);
-          } else if (data.data.code === 4101) {
-            console.error('Forbidden Error', data);
-          } else {
-            console.error('WebSocket error', data);
-          }
-          ws.close();
-          return;
-        }
-        console.log('[transcriptions] ws message', data);
-        if (
-          data.event_type ===
-          WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_COMPLETED
-        ) {
-          console.log('[transcriptions] ws transcriptions completed', data);
-          closeTranscriptionsWs();
-        }
-        onTranscription(data);
-      };
-
-      ws.onerror = (error, event) => {
-        console.error('[transcriptions] WebSocket error', error, event);
-
-        ws.close();
-
-        reject(error);
-      };
-
-      ws.onclose = () => {
-        console.log('[transcriptions] ws close');
-      };
-
-      transcriptionsRef.current = ws;
-    });
-  }, []);
-
-  const closeTranscriptionsWs = () => {
-    if (
-      transcriptionsRef.current &&
-      transcriptionsRef.current.readyState === WebSocket.OPEN
-    ) {
-      transcriptionsRef.current.close(1000, 'close');
-      transcriptionsRef.current = null;
-    }
-  };
 
   const initWs = useCallback(
     async ({
@@ -238,65 +153,6 @@ const useWsAPI = (
     }
   };
 
-  const initSpeechWs = useCallback(
-    async (onMessage?: (data: CreateSpeechWsRes) => void) => {
-      closeSpeechWs();
-      if (!clientRef.current) {
-        return;
-      }
-      const ws = await clientRef.current.websockets.audio.speech.create();
-
-      return new Promise<WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes>>(
-        (resolve, reject) => {
-          ws.onopen = () => {
-            console.log('[speech] ws open');
-
-            resolve(ws);
-          };
-
-          ws.onmessage = (data, event) => {
-            if (data.event_type === WebsocketsEventType.ERROR) {
-              if (data.data.code === 4100) {
-                console.error('Unauthorized Error', data);
-              } else if (data.data.code === 4101) {
-                console.error('Forbidden Error', data);
-              } else {
-                console.error('WebSocket error', data);
-              }
-              ws.close();
-              return;
-            }
-            console.log('[transcriptions] ws message', data);
-
-            onMessage?.(data);
-          };
-
-          ws.onerror = (error, event) => {
-            console.error('[speech] WebSocket error', error, event);
-
-            ws.close();
-
-            reject(error);
-          };
-
-          ws.onclose = () => {
-            console.log('[speech] ws close');
-          };
-
-          speechRef.current = ws;
-        },
-      );
-    },
-    [],
-  );
-
-  const closeSpeechWs = () => {
-    if (speechRef.current && speechRef.current.readyState === WebSocket.OPEN) {
-      speechRef.current.close();
-    }
-    speechRef.current = null;
-  };
-
   const handleAudioMessage = useCallback(async (message: string) => {
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);
@@ -353,51 +209,37 @@ const useWsAPI = (
   }, []);
 
   const startTranscriptions = useCallback(async () => {
-    interruptAudio();
-    await initTranscriptionsWs();
-    await wavRecorder.begin(deviceListRef.current[0].deviceId);
+    const transcriptionClient = new WsTranscriptionClient({
+      token: config.getPat(),
+      baseWsURL: COZE_CN_BASE_WS_URL,
+      allowPersonalAccessTokenInBrowser: true,
+    });
 
-    // await wavRecorder.clear();
-    await wavRecorder.record(data => {
-      const { raw } = data;
+    transcriptionClientRef.current = transcriptionClient;
 
-      // Convert ArrayBuffer to base64 string
-      const base64String = btoa(
-        Array.from(new Uint8Array(raw))
-          .map(byte => String.fromCharCode(byte))
-          .join(''),
-      );
+    transcriptionClient.on('data', data => {
+      console.log('[transcriptions] ws data', data);
 
-      // send audio to ws
-      if (transcriptionsRef.current?.readyState === WebSocket.OPEN) {
-        transcriptionsRef.current?.send({
-          id: '1',
-          event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-          data: {
-            delta: base64String,
-          },
-        });
-        console.log('[transcriptions] send input_audio_buffer_append');
+      if (
+        data.event_type === WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE
+      ) {
+        onTranscription(data);
       }
     });
+
+    try {
+      await transcriptionClient.connect();
+      console.log('[transcriptions] ws connect success');
+    } catch (error) {
+      console.error('[transcriptions] ws connect error', error);
+    }
+
+    transcriptionClient.record();
   }, []);
 
   const stopTranscriptions = useCallback(async () => {
-    if (!transcriptionsRef.current) {
-      return;
-    }
-
-    transcriptionsRef.current.send({
-      id: '1',
-      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-    });
-    console.log('[transcriptions] send input_audio_buffer_complete');
-
-    await wavRecorder.pause();
-    const finalAudio = await wavRecorder.end();
+    const finalAudio = await transcriptionClientRef.current?.end();
     console.log('[transcriptions] finalAudio:', finalAudio);
-
-    // closeTranscriptionsWs();
   }, []);
 
   const interruptAudio = useCallback(() => {
@@ -459,50 +301,47 @@ const useWsAPI = (
   );
 
   const startSpeech = useCallback(async (message: string) => {
-    // interrupt audio if it's playing
-    interruptAudio();
+    if (getIsSpeech()) {
+      console.log('[speech] stop speech');
+      stopSpeech();
+      return;
+    }
 
-    await initSpeechWs(data => {
-      if (data.event_type === WebsocketsEventType.SPEECH_AUDIO_COMPLETED) {
-        console.log('[speech] ws transcriptions completed', data);
-        closeSpeechWs();
-      }
-      if (data.event_type === WebsocketsEventType.SPEECH_AUDIO_UPDATE) {
-        handleAudioMessage(data.data.delta);
-      }
-    });
-
-    // See https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc#HrVcdpW4Oo3A25xCQIDcGBlknOc
-    speechRef.current?.send({
-      id: '1',
-      event_type: WebsocketsEventType.SPEECH_UPDATE,
-      data: {
-        output_audio: {
-          codec: 'pcm',
-          // voice_id: 'xxx',
-        },
-      },
+    const client = new WsSpeechClient({
+      token: config.getPat(),
+      baseWsURL: COZE_CN_BASE_WS_URL,
+      allowPersonalAccessTokenInBrowser: true,
     });
 
-    speechRef.current?.send({
-      id: '1',
-      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_APPEND,
-      data: {
-        delta: message,
-      },
+    client.on('data', data => {
+      console.log('[speech] ws data', data);
     });
-    speechRef.current?.send({
-      id: '1',
-      event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_COMPLETE,
+
+    client.on(WebsocketsEventType.ERROR, data => {
+      console.error('[speech] ws error', data);
     });
+
+    try {
+      await client.connect();
+      console.log('[speech] ws connect success');
+    } catch (error) {
+      console.error('[speech] ws connect error', error);
+      return;
+    }
+
+    client.appendAndComplete(message);
+    speechClientRef.current = client;
   }, []);
 
-  const stopSpeech = useCallback(() => {
-    interruptAudio();
-    closeSpeechWs();
-  }, []);
+  const stopSpeech = () => {
+    speechClientRef.current?.interrupt();
+  };
 
-  const getIsSpeech = useCallback(() => wavStreamPlayer.stream !== null, []);
+  const getIsSpeech = () => speechClientRef.current?.isPlaying();
+
+  const togglePlay = () => {
+    speechClientRef.current?.togglePlay();
+  };
 
   return {
     initWs,
@@ -513,8 +352,7 @@ const useWsAPI = (
     stopTranscriptions,
     sendWsMessage,
     startSpeech,
-    stopSpeech,
-    getIsSpeech,
+    togglePlay,
   };
 };
 

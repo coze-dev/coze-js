@@ -11,6 +11,5 @@
     "types": ["node", "vitest/globals"],
     "target": "es2022"
   },
-  "include": ["**/*.ts"],
-  "exclude": ["src"]
+  "include": ["src/**/*", "test/**/*"]
 }
