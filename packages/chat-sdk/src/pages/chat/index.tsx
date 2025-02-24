@@ -53,6 +53,17 @@ export default function Index() {
                 isNeedAudio: true,
                 renderChatInputTopSlot: props => <View>Input Slot</View>,
               },
+              messageWrapper: {
+                senderName: {
+                  renderRightSlot: ({ isQuery }) =>
+                    isQuery ? null : (
+                      <View>
+                        Right Slot Right Slot Slot Right Slot Slot Right Slot
+                        Slot Right Slot Slot Right Slot Slot Right Slot
+                      </View>
+                    ),
+                },
+              },
             },
             header: {
               isNeed: true,

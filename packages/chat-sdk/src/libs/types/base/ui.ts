@@ -2,7 +2,7 @@ import React from 'react';
 
 import { II18n } from '../utils/i18n';
 import { IMiniChatError } from '../utils/error';
-import { ChatMessage } from './message';
+import { ChatMessage, ChatMessageGroup } from './message';
 import { IOnImageClickEvent, IOnTaskListChange } from './event-callback';
 
 export type MessageUiConfigMap = Partial<
@@ -69,6 +69,15 @@ export interface UploadBtnConfig {
   isNeed?: boolean; //是否显示, 默认是true
 }
 
+export interface MessageSenderNameConfig {
+  renderRightSlot?: (options: {
+    isQuery?: boolean;
+    chatGroup?: ChatMessageGroup;
+  }) => React.ReactNode | null;
+}
+export interface MessageWrapperConfig {
+  senderName?: MessageSenderNameConfig;
+}
 export interface ChatSlotConfig {
   base?: {
     maxWidth?: number;
@@ -78,6 +87,7 @@ export interface ChatSlotConfig {
   clearMessage?: ClearMessageConfig;
   uploadBtn?: UploadBtnConfig;
   message?: MessageUiConfigMap;
+  messageWrapper?: MessageWrapperConfig;
 }
 export interface ErrorUiConfig {
   renderError?: (

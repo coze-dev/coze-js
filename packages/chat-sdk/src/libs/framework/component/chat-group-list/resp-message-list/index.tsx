@@ -10,6 +10,7 @@ import {
 } from '@/libs/ui-kit';
 import {
   ChatMessage,
+  ChatMessageGroup,
   IOnTaskListChange,
   IOnTaskListChangeProps,
 } from '@/libs/types';
@@ -35,13 +36,17 @@ export const RespMessageList: FC<{
   isAWaiting: boolean;
   isShowSuggestion?: boolean;
   isLastMessage?: boolean;
-}> = ({ messages, isAWaiting, isShowSuggestion, isLastMessage }) => {
+  chatGroup?: ChatMessageGroup;
+}> = ({ messages, isAWaiting, isShowSuggestion, isLastMessage, chatGroup }) => {
   const appInfo = useChatInfoStore(info => info.info);
   const cdnBaseUrlPath = useChatPropsStore(
     store => store.setting?.cdnBaseUrlPath,
   );
   const messageUiConfigMap = useChatPropsStore(
     store => store.ui?.chatSlot?.message,
+  );
+  const messageWrapperConf = useChatPropsStore(
+    store => store.ui?.chatSlot?.messageWrapper,
   );
   const answerMessages = useMemo(
     () =>
@@ -75,6 +80,9 @@ export const RespMessageList: FC<{
           getCdnUrl(cdnBaseUrlPath, 'assets/imgs/coze-logo.png'),
         id: appInfo?.appId || '',
       }}
+      chatGroup={chatGroup}
+      isQuery={false}
+      messageWrapperConf={messageWrapperConf}
     >
       <RespMessageListContent
         isAWaiting={isAWaiting}
