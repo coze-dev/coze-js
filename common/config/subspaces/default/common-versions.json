@@ -73,6 +73,7 @@
     "ts-node": ["^10.9.1", "^10.9.2"],
     "typescript": ["^5.5.3", "^4.9.5"],
     "@tarojs/webpack5-runner": ["4.0.7", "3.6.35"],
-    "babel-preset-taro": ["4.0.7", "3.6.35"]
+    "babel-preset-taro": ["4.0.7", "3.6.35"],
+    "@coze/api": ["workspace:*", "^1.0.17"]
   }
 }

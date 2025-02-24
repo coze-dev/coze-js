@@ -1,4 +1,4 @@
-import { showToast as showToastTaro, TaroStatic } from '@tarojs/taro';
+import { showToast as showToastTaro, type TaroStatic } from '@tarojs/taro';
 
 import { type UIChatToastEvent, UIEventType } from '../types';
 

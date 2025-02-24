@@ -12,7 +12,7 @@ import styles from './index.module.less';
 export const Image: FC<{
   node: ImageMdType;
 }> = ({ node }) => {
-  const { onImageClick } = useMdStreamContext();
+  const { onImageClick, eventCallbacks } = useMdStreamContext();
   const [url, setUrl] = useState(node.url);
   useEffect(() => {
     setUrl(node.url);
@@ -29,7 +29,9 @@ export const Image: FC<{
       }}
       onClick={() => {
         if (node.url) {
-          if (onImageClick) {
+          if (eventCallbacks?.onImageClick) {
+            eventCallbacks.onImageClick({ url: node.url });
+          } else if (onImageClick) {
             onImageClick?.({ url: node.url });
           } else {
             previewImage({

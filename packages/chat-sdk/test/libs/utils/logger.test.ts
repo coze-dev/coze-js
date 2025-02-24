@@ -4,6 +4,7 @@ import { Logger, logger } from '../../../src/libs/utils/logger';
 
 describe('utils/logger', () => {
   test('logger', () => {
+    logger.setLoglevel();
     logger.setLoglevel('release');
     logger.error('Logger Error Teset');
     logger.debug('Logger Debug Test');

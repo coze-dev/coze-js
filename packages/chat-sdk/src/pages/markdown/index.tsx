@@ -18,21 +18,36 @@ const streamOutput = (onChange: (content: string) => void) => {
   }, 150);
 };
 
+const isSmooth = false;
 export default function Index() {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState(!isSmooth ? markdown : '');
 
   useEffect(() => {
+    if (!isSmooth) {
+      return;
+    }
     streamOutput(setContent);
   }, []);
 
   return (
     <View className="light">
       <MdStream
-        isSmooth
-        isFinish={content.length === markdown.length}
+        isSmooth={isSmooth}
+        //isFinish={content.length === markdown.length}
         enableCodeBy4Space={false}
         markdown={content}
         enableHtmlTags={true}
+        onTaskChange={value => {
+          console.log({ value });
+        }}
+        eventCallbacks={{
+          onLinkClick: (e, { url }) => {
+            console.log({ url });
+          },
+          onImageClick: ({ url }) => {
+            console.log({ url });
+          },
+        }}
       />
     </View>
   );

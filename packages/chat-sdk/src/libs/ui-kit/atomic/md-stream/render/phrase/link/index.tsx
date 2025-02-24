@@ -7,7 +7,7 @@ import { View } from '@tarojs/components';
 
 import { isWeb } from '@/libs/utils';
 
-import { useMdStreamI18n } from '../../../context';
+import { useMdStreamI18n, useMdStreamContext } from '../../../context';
 import { Phrase } from '../';
 
 import styles from './index.module.less';
@@ -16,11 +16,16 @@ export const Link: FC<{
   node: LinkMdType;
 }> = ({ node }) => {
   const i18n = useMdStreamI18n();
+  const { eventCallbacks } = useMdStreamContext();
   const isValidUrl = node.url && node.url !== '#';
   return (
     <View
-      onClick={() => {
+      onClick={e => {
         if (isValidUrl) {
+          if (eventCallbacks?.onLinkClick) {
+            eventCallbacks.onLinkClick(e, { url: node.url });
+            return;
+          }
           if (isWeb) {
             window.open(node.url);
           } else {

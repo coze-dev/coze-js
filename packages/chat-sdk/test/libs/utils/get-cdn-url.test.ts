@@ -17,4 +17,9 @@ describe('utils/get-cdn-url', () => {
     const url = getCdnUrl('https://www.coze.cn/asdf', 'test.png');
     expect(url).toBe('https://www.coze.cn/asdf/test.png');
   });
+
+  test('getCdnUrl-4', () => {
+    const url = getCdnUrl(5 as unknown as string, 'test.png');
+    expect(url).toBe('');
+  });
 });
