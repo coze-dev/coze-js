@@ -2,6 +2,35 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.0.21",
+      "tag": "HEAD",
+      "date": "2025-02-24T12:07:56.836Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "eslint处理"
+          },
+          {
+            "comment": "修改问题"
+          },
+          {
+            "comment": "add proxy example for coze-api"
+          },
+          {
+            "comment": "add accountId support for JWT token generation"
+          },
+          {
+            "comment": "Add  plugin_id_list and workflow_id_list to UpdateBotReq"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "change document list endpoint from GET to POST"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.20",
       "tag": "HEAD",
       "date": "2025-02-12T08:07:08.384Z",
