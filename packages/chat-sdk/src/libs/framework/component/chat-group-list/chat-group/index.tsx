@@ -27,6 +27,7 @@ export const ChatGroup: FC<{
           isAWaiting={isProcessing || false}
           hasRespMessage={!!chatGroup.respMessages.length}
           isLastMessage={isLastMessage}
+          chatGroup={chatGroup}
         />
       ) : null}
       <RespMessageList
@@ -35,6 +36,7 @@ export const ChatGroup: FC<{
         // 当进行中，同时已经消息有返回了，则认为等待接收消息中
         isAWaiting={isProcessing && !!chatGroup.query?.chat_id}
         isShowSuggestion={isShowSuggestion}
+        chatGroup={chatGroup}
       />
     </Spacing>
   ),
