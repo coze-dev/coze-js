@@ -1,3 +1,5 @@
+import { ITouchEvent } from '@tarojs/components';
+
 import { ChatMessageGroup } from './message';
 
 export interface IOnTaskListChangeProps {
@@ -26,4 +28,18 @@ export interface IMessageCallback {
       };
     },
   ) => void;
+}
+export interface LinkEventData {
+  url: string;
+}
+
+export type OnLinkClickCallback = (
+  event: ITouchEvent,
+  eventData: LinkEventData,
+) => void;
+export interface ElementEventCallbacks {
+  /** 链接点击回调 */
+  onLinkClick?: OnLinkClickCallback;
+  /** 图片点击回调 */
+  onImageClick?: IOnImageClickEvent;
 }

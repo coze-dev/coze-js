@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
 // reference: https://gist.github.com/Yaffle/5458286
-class TextEncoderPonyfill {
+export class TextEncoderPonyfill {
   encode(str: string) {
     const octets: number[] = [];
     const { length } = str;
@@ -33,7 +33,7 @@ class TextEncoderPonyfill {
     return octets;
   }
 }
-class TextDecoderPonyfill {
+export class TextDecoderPonyfill {
   decode(octets: Uint8Array) {
     let string = '';
     let i = 0;

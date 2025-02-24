@@ -2,7 +2,6 @@ import Taro from '@tarojs/taro';
 
 import { logger } from './logger';
 import { TextEncoder } from './decorder';
-
 export const getSvgBase64 = (svg: string) => {
   try {
     const encoder = new TextEncoder();

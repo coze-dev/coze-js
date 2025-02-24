@@ -64,13 +64,6 @@ export class MultiSendMessage extends RawSendMessage {
         file_id: item.file_id,
       })),
     );
-
-    // @ts-expect-error -- linter-disable-autofix
-    message.content = content;
-    this.sendStartMessage({
-      ...message,
-    });
-
     this.sendMessage(message, historyMessages);
   }
   async sendAudioMessage(audio: AudioRaw, historyMessages?: EnterMessage[]) {

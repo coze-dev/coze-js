@@ -7,6 +7,7 @@ import {
 } from 'react';
 
 import { Logger } from '@/libs/utils';
+import { ElementEventCallbacks } from '@/libs/types/base/event-callback';
 import type { IOnImageClickEvent } from '@/libs/types';
 import { I18n } from '@/libs/i18n';
 import { usePersistCallback } from '@/libs/hooks';
@@ -23,6 +24,7 @@ interface MdStreamContext {
   enableHtmlTags?: boolean;
   getMarkdown?: () => string;
   onTaskChangeHandle?: (taskValue: TaskValue) => void;
+  eventCallbacks?: ElementEventCallbacks;
 }
 
 const MdStreamPropsContext = createContext<MdStreamContext>({});
@@ -40,6 +42,7 @@ export const ChatFamePropsProvider: FC<
   enableHtmlTags,
   enableCodeBy4Space,
   onTaskChangeHandle,
+  eventCallbacks,
 }) => {
   const getMarkdown = usePersistCallback(() => markdown || '');
   const value = useMemo(
@@ -53,6 +56,7 @@ export const ChatFamePropsProvider: FC<
       enableCodeBy4Space,
       onTaskChangeHandle,
       getMarkdown,
+      eventCallbacks,
     }),
     [
       onImageClick,
@@ -64,6 +68,7 @@ export const ChatFamePropsProvider: FC<
       enableCodeBy4Space,
       onTaskChangeHandle,
       getMarkdown,
+      eventCallbacks,
     ],
   );
   return (

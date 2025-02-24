@@ -1,19 +1,21 @@
 .image {
-  display: block;
   margin: 8px 0;
+  display: block;
   border-radius: 12px;
   min-width: 48px;
-  max-width: 100%;
+  max-width: min(100%, 400px);
   min-height: 48px;
   max-height: 200px;
   background-color: var(--md-stream-img-bg-color, rgba(0, 0, 0, 0.15));
-  width: 100%;
   text-decoration: inherit;
 
+  img {
+    object-fit: cover;
+  }
   &.image-error {
-  background-image: url(../../../../../assets/svg/image.svg);
-  background-position: center;
-  background-size: auto;
-  background-repeat: no-repeat;
-}
+    background-image: url(../../../../../assets/svg/image.svg);
+    background-position: center;
+    background-size: auto;
+    background-repeat: no-repeat;
+  }
 }

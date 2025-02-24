@@ -20,4 +20,18 @@ describe('utils/get-file-type', () => {
     );
     expect(fileType).toBe(FileTypeEnum.IMAGE);
   });
+
+  test('getFileTypeByFileName_Unknown', () => {
+    const fileType = getFileTypeByFileName('test.asdfasf');
+    expect(fileType).toBe(FileTypeEnum.DEFAULT_UNKNOWN);
+  });
+
+  test('getFileTypeByFile_Unknown', () => {
+    const fileType = getFileTypeByFile(
+      new File([], 'test.asdfasdfasdf', {
+        type: 'imagesafas/jpeg',
+      }),
+    );
+    expect(fileType).toBe(FileTypeEnum.DEFAULT_UNKNOWN);
+  });
 });

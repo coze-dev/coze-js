@@ -1,7 +1,5 @@
 import { FC } from 'react';
 
-import type { ObjectStringItem } from '@coze/api';
-
 import { safeJSONParse } from '@/libs/utils';
 import { IMessageContentProps } from '@/libs/types';
 import { useI18n } from '@/libs/provider';
@@ -13,6 +11,14 @@ import { ImageMessage } from '../components/image';
 import { FileMessage } from '../components/file';
 import { ChatflowNode } from '../components/chatflow-node';
 import { ErrorBoundary } from '../../atomic/error-boundary';
+type ObjectStringItem =
+  | { type: 'text'; text: string }
+  | { type: 'file'; file_id: string; name?: string; size?: number }
+  | { type: 'file'; file_url: string; name?: string; size?: number }
+  | { type: 'image'; file_id: string; file_url?: string }
+  | { type: 'image'; file_url: string }
+  | { type: 'audio'; file_id: string }
+  | { type: 'audio'; file_url: string };
 const getObjectValue = (objectString: string) =>
   safeJSONParse<ObjectStringItem[]>(objectString, []);
 
@@ -116,10 +122,8 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
             case 'file': {
               return (
                 <FileMessage
-                  // @ts-expect-error -- linter-disable-autofix
                   filename={item.name || ''}
                   key={`${item.type}_${index}`}
-                  // @ts-expect-error -- linter-disable-autofix
                   size={item.size || 0}
                 />
               );
@@ -127,7 +131,6 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
             case 'image': {
               return (
                 <ImageMessage
-                  // @ts-expect-error -- linter-disable-autofix
                   url={item.file_url as string}
                   onImageClick={onImageClick}
                   key={`${item.type}_${index}`}

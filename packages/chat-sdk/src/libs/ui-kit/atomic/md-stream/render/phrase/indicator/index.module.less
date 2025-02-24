@@ -1,21 +1,22 @@
 @keyframes indicator-frame {
   0% {
-    background-color: #FFF;
+    background-color: #fff;
   }
   50% {
     background-color: currentColor;
   }
   100% {
-    background-color: #FFF;
+    background-color: #fff;
   }
 }
 
 .indicator {
-  position:relative;
-  display: inline;
-  line-height: 22px;
+  position: relative;
+  display: inline-block;
+  line-height: var(--md-stream-line-height-default, 22px);
   width: 18px;
-  &:before{
+  white-space: pre-wrap;
+  &:before {
     content: '';
     border-radius: 50%;
     height: 6px;
@@ -27,8 +28,11 @@
     margin-left: 5px;
     margin-top: -3px;
 
-
     animation: indicator-frame.8s infinite alternate;
     animation-timing-function: ease;
+  }
+  &::after {
+    content: ' ';
+    display: inline-block;
   }
 }
