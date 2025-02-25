@@ -13,7 +13,6 @@
     &.arrow-down--show {
       opacity: 1;
       z-index: 1;
-
     }
   }
 }
@@ -24,6 +23,19 @@
   overflow: auto;
   transform: rotateY(180deg) rotateZ(180deg);
   padding: 2px 0 0;
+
+  &.scroll-web {
+    display: flex;
+    height: auto;
+    max-height: 100%;
+    flex-direction: column-reverse;
+    transform: unset;
+    .children {
+      min-height: unset;
+      transform: unset;
+      overflow: visible;
+    }
+  }
 
   scrollbar-width: none;
 
