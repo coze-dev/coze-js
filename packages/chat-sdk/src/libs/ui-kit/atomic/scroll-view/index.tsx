@@ -16,10 +16,9 @@ import {
   type ScrollViewProps,
 } from '@tarojs/components';
 
-import { logger } from '@/libs/utils';
+import { isWeb, logger } from '@/libs/utils';
 import { usePersistCallback } from '@/libs/hooks';
 
-import { useWheelHandle } from './use-wheel-handle';
 import { SvgArrowUp } from '../svg';
 import { IconButton } from '../icon-button';
 import { useHelperButton } from './use-helper-button';
@@ -44,6 +43,7 @@ const ScrollViewSlot = memo(
         children,
         isLoadMore,
         checkArrowDownVisible,
+        onScrollToLower,
         ...restProps
       }: ScrollViewType & {
         checkArrowDownVisible?: (scrollTop: number) => void;
@@ -51,11 +51,28 @@ const ScrollViewSlot = memo(
       ref: ForwardedRef<ScrollViewRef>,
     ) => {
       const [scrollTop, setScrollTop] = useState<number | undefined>(0);
+      const refAnchorBottom = useRef<boolean>(false);
       const refScrollNow = useRef<number>(1);
-      const { onInitScrollRefForWheel } = useWheelHandle();
+
+      const scrollToAnchorBottom = usePersistCallback(() => {
+        if (scrollTop !== 0) {
+          delayToSetScroll(0);
+        } else {
+          delayToSetScroll(1);
+          // 先设置1居于底部，然后设置为0， 锚定在底部
+          // 由于scrollTop为0，如果直接设置为0，不能出发锚定。
+          delayToSetScroll(0, 200);
+        }
+      });
+
       const onScrollHandle = usePersistCallback(e => {
         refScrollNow.current = e.detail.scrollTop;
         checkArrowDownVisible?.(e.detail.scrollTop);
+        if (isWeb) {
+          if (refScrollNow.current > 0) {
+            scrollToAnchorBottom();
+          }
+        }
       });
       const refSetScrollTimeout = useRef<number | undefined>(undefined);
 
@@ -95,20 +112,15 @@ const ScrollViewSlot = memo(
           scrollToAnchorBottom: () => {
             // 如果重复设置0的话，不会生效，因此如果是0的时候，需要先设置1，然后再设置锚定位置0
             logger.debug('ScrollView, scrollToAnchorBottom', { scrollTop });
-            if (scrollTop !== 0) {
-              delayToSetScroll(0);
-            } else {
-              delayToSetScroll(1);
-              // 先设置1居于底部，然后设置为0， 锚定在底部
-              // 由于scrollTop为0，如果直接设置为0，不能出发锚定。
-              delayToSetScroll(0, 200);
-            }
+            refAnchorBottom.current = true;
+            scrollToAnchorBottom();
           },
           removeAnchorBottom: () => {
             logger.debug('ScrollView, removeAnchorBottom', {
               currentTop: refScrollNow.current,
               scrollTop,
             });
+            refAnchorBottom.current = false;
             if (refScrollNow.current === 0 && scrollTop === 0) {
               // 防止内容未渲染完成，改处已经制定了修改，导致新内容未能锚定底部，预防措施
               delayToSetScroll(1, 50);
@@ -133,11 +145,14 @@ const ScrollViewSlot = memo(
           {...restProps}
           id={id}
           scrollTop={scrollTop}
-          ref={onInitScrollRefForWheel}
+          onScrollToLower={isWeb ? undefined : onScrollToLower}
+          onScrollToUpper={isWeb ? onScrollToLower : undefined}
           reverse={false}
           showScrollbar={false}
           enhanced={true}
-          className={styles.scroll}
+          className={cls(styles.scroll, {
+            [styles['scroll-web']]: isWeb,
+          })}
           onScroll={onScrollHandle}
         >
           {chatScrollContent}
