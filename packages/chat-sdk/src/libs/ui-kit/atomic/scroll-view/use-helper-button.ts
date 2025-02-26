@@ -8,7 +8,7 @@ export const useHelperButton = (isShowHelper?: boolean) => {
       if (!isShowHelper) {
         return;
       }
-      if (scrollTop > 500) {
+      if (Math.abs(scrollTop) > 500) {
         setArrowDownVisible(true);
       } else {
         setArrowDownVisible(false);

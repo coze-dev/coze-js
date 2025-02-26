@@ -24,7 +24,7 @@ export {
   convertToMinChatError,
 } from './mini-chat-error';
 
-export { isWeb, isWeapp, isTT, isMini } from './device';
+export { isWeb, isWeapp, isTT, isMini, isSafari } from './device';
 export { getSvgBase64 } from './get-svg-base64';
 export {
   getRecorderManager,
