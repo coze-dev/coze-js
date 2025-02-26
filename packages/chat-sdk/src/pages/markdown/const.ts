@@ -1,4 +1,6 @@
-export const markdown = `
+export const markdown =
+  '\\[\n   \\sin^2\\theta + \\cos^2\\theta = 1, \\quad 1 + \\tan^2\\theta = \\sec^2\\theta, \\quad 1 + \\cot^2\\theta = \\csc^2\\theta\n   \\]' +
+  `
 # Code
 as
 \`\`\`javascript
@@ -7,10 +9,21 @@ $(document).ready(function () {
 });
 \`\`\`
 
+
+
+$$
+  1 + \\tan^2x = \\sec^2x,
+  1 + \\tan^2x = \\sec^2x
+$$
+
+$1 + \\tan^2x = \\sec^2x$
+
+
 [Google](https://www.google.com)
 ![Alt Text](https://pic1.zhimg.com/v2-b444070848d54baf536222b22a51fba4_b.jpg)
 
 ![Alt Text](https://s.coze.cn/t/cmdAkWul_g4/)
+
 
 
 

@@ -40,6 +40,7 @@ export default function Index() {
         onTaskChange={value => {
           console.log({ value });
         }}
+        debug={true}
         eventCallbacks={{
           onLinkClick: (e, { url }) => {
             console.log({ url });
