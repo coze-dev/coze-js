@@ -232,6 +232,12 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.WORKFLOW_ID]: localManager.get(
           LocalStorageKey.WORKFLOW_ID,
         ),
+        [LocalStorageKey.INTERRUPT_TEXT]: localManager.get(
+          LocalStorageKey.INTERRUPT_TEXT,
+        ),
+        [LocalStorageKey.INTERRUPT_BOT_ID]: localManager.get(
+          LocalStorageKey.INTERRUPT_BOT_ID,
+        ),
       });
     })().catch(err => {
       console.error(err);
@@ -246,6 +252,8 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       user_id,
       conversation_id,
       workflow_id,
+      interrupt_text,
+      interrupt_bot_id,
     } = form.getFieldsValue();
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
@@ -253,6 +261,8 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.USER_ID, user_id);
     localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
     localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
+    localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
+    localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
   };
 
   const handleOk = () => {
@@ -465,6 +475,20 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             tooltip="Optional: Specify a custom workflow ID"
           >
             <Input placeholder="Enter workflow ID" />
+          </Form.Item>
+          <Form.Item
+            name={LocalStorageKey.INTERRUPT_TEXT}
+            label="Interrupt Text"
+            tooltip="Optional: Specify a custom interrupt text"
+          >
+            <Input placeholder="Enter interrupt text" />
+          </Form.Item>
+          <Form.Item
+            name={LocalStorageKey.INTERRUPT_BOT_ID}
+            label="Interrupt Bot ID"
+            tooltip="Optional: Specify a custom interrupt bot ID"
+          >
+            <Input placeholder="Enter interrupt bot ID" />
           </Form.Item>
         </div>
 

@@ -15,6 +15,8 @@ export enum LocalStorageKey {
   USER_ID = 'user_id',
   CONVERSATION_ID = 'conversation_id',
   WORKFLOW_ID = 'workflow_id',
+  INTERRUPT_TEXT = 'interrupt_text',
+  INTERRUPT_BOT_ID = 'interrupt_bot_id',
 }
 
 export class LocalManager {
