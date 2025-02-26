@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { CozeAPI, type WorkSpace, type CloneVoiceReq } from '@coze/api';
+import {
+  CozeAPI,
+  type WorkSpace,
+  type CloneVoiceReq,
+  type Voice,
+} from '@coze/api';
 
 import {
   getBaseUrl,
@@ -112,13 +117,23 @@ const useCozeAPI = () => {
 
   const fetchAllVoices = async (): Promise<VoiceOption[]> => {
     try {
-      const response = await api?.audio.voices.list();
+      const pageSize = 100;
+      let pageNum = 1;
+      let hasMore = true;
+      let allVoices: Voice[] = [];
+      while (hasMore) {
+        const response = await api?.audio.voices.list({
+          page_size: pageSize,
+          page_num: pageNum,
+        });
+        hasMore = response?.has_more || false;
+        allVoices = [...allVoices, ...(response?.voice_list || [])];
+        pageNum++;
+      }
 
       // Separate system voices and custom voices
-      const customVoices =
-        response?.voice_list.filter(voice => !voice.is_system_voice) || [];
-      const systemVoices =
-        response?.voice_list.filter(voice => voice.is_system_voice) || [];
+      const customVoices = allVoices.filter(voice => !voice.is_system_voice);
+      const systemVoices = allVoices.filter(voice => voice.is_system_voice);
 
       // Group system voices by language
       const systemVoicesByLanguage = systemVoices.reduce<
