@@ -101,6 +101,23 @@ describe('Workflows', () => {
         expect(result).toEqual(mockResponse);
       });
     });
+
+    describe('history', () => {
+      it('should get the workflow run history', async () => {
+        const mockResponse = { data: [{ id: 'event-id' }] };
+        vi.spyOn(client, 'get').mockResolvedValue(mockResponse);
+
+        const result = await workflows.runs.history('workflow-id', 'run-id');
+
+        expect(client.get).toHaveBeenCalledWith(
+          '/v1/workflows/workflow-id/run_histories/run-id',
+          undefined,
+          false,
+          undefined,
+        );
+        expect(result).toEqual(mockResponse.data);
+      });
+    });
   });
 
   describe('Chat', () => {

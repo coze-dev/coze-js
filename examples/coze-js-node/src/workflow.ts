@@ -48,6 +48,30 @@ async function chatWorkflow() {
   }
 }
 
+async function asyncWorkflow() {
+  assert(botId, 'botId is required');
+  assert(workflowId, 'workflowId is required');
+  const workflow = await client.workflows.runs.create({
+    workflow_id: workflowId,
+    parameters: { input: 'Hello World' },
+    is_async: true,
+  });
+  console.log('workflow', workflow);
+
+  while (true) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const history = await client.workflows.runs.history(
+      workflowId,
+      workflow.execute_id,
+    );
+    console.log('history', history);
+    if (history[0].execute_status !== 'Running') {
+      break;
+    }
+  }
+}
+
 streamWorkflow().catch(console.error);
 nonStreamWorkflow().catch(console.error);
 chatWorkflow().catch(console.error);
+asyncWorkflow().catch(console.error);
