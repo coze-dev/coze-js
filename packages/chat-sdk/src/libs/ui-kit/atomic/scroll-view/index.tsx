@@ -21,6 +21,7 @@ import { usePersistCallback } from '@/libs/hooks';
 
 import { SvgArrowUp } from '../svg';
 import { IconButton } from '../icon-button';
+import { useSafariAnchorHack } from './use-safari-anchor-hack';
 import { useHelperButton } from './use-helper-button';
 
 import styles from './index.module.less';
@@ -43,6 +44,7 @@ const ScrollViewSlot = memo(
         children,
         isLoadMore,
         checkArrowDownVisible,
+        lowerThreshold,
         onScrollToLower,
         ...restProps
       }: ScrollViewType & {
@@ -50,10 +52,14 @@ const ScrollViewSlot = memo(
       },
       ref: ForwardedRef<ScrollViewRef>,
     ) => {
+      const refScrollEl = useRef<HTMLDivElement | null>(null);
       const [scrollTop, setScrollTop] = useState<number | undefined>(0);
       const refAnchorBottom = useRef<boolean>(false);
       const refScrollNow = useRef<number>(1);
-
+      const { onInitViewEl, onCollectScrollInfo } = useSafariAnchorHack({
+        refAnchorBottom,
+        refScrollEl,
+      });
       const scrollToAnchorBottom = usePersistCallback(() => {
         if (scrollTop !== 0) {
           delayToSetScroll(0);
@@ -64,13 +70,35 @@ const ScrollViewSlot = memo(
           delayToSetScroll(0, 200);
         }
       });
-
+      const onInitScrollEl = usePersistCallback((el: HTMLDivElement) => {
+        refScrollEl.current = el;
+      });
       const onScrollHandle = usePersistCallback(e => {
         refScrollNow.current = e.detail.scrollTop;
+        onCollectScrollInfo();
+
         checkArrowDownVisible?.(e.detail.scrollTop);
         if (isWeb) {
           if (refScrollNow.current > 0) {
+            // web的时候， scroll 只会为复制， 如果大于0， 需重置为0；
             scrollToAnchorBottom();
+          }
+          // Web需判断是否居于底部
+          const scrollHeight = Number(refScrollEl.current?.offsetHeight);
+          const scrollInnerHeight = Number(refScrollEl.current?.scrollHeight);
+          if (
+            scrollInnerHeight > 0 &&
+            scrollHeight > 0 &&
+            Math.abs(refScrollNow.current) > 0
+          ) {
+            if (
+              scrollInnerHeight -
+                Math.abs(refScrollNow.current) -
+                scrollHeight <
+              (lowerThreshold || 100)
+            ) {
+              onScrollToLower?.(e);
+            }
           }
         }
       });
@@ -132,7 +160,9 @@ const ScrollViewSlot = memo(
       const chatScrollContent = useMemo(
         () => (
           // 防止  scrollView 重新渲染，导致重新设置scrollTop。
-          <View className={cls(styles.children)}>{children}</View>
+          <View className={cls(styles.children)} ref={onInitViewEl}>
+            {children}
+          </View>
         ),
         [children],
       );
@@ -144,9 +174,10 @@ const ScrollViewSlot = memo(
         <TaroScrollViewMemo
           {...restProps}
           id={id}
+          ref={onInitScrollEl}
           scrollTop={scrollTop}
+          lowerThreshold={isWeb ? undefined : lowerThreshold}
           onScrollToLower={isWeb ? undefined : onScrollToLower}
-          onScrollToUpper={isWeb ? onScrollToLower : undefined}
           reverse={false}
           showScrollbar={false}
           enhanced={true}
