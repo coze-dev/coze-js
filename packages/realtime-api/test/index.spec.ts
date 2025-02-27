@@ -118,7 +118,7 @@ describe('RealtimeClient', () => {
       const configWithVideo = {
         ...config,
         videoConfig: {
-          videoInputDeviceId: 'shareScreen',
+          videoInputDeviceId: 'screenShare',
         },
       };
       client = new RealtimeClient(configWithVideo);
@@ -128,7 +128,7 @@ describe('RealtimeClient', () => {
       expect(mockEngineClient.createLocalStream).toHaveBeenCalledWith(
         'test-uid',
         {
-          videoInputDeviceId: 'shareScreen',
+          videoInputDeviceId: 'screenShare',
         },
       );
     });
@@ -221,6 +221,17 @@ describe('RealtimeClient', () => {
 
       expect(mockChangeVideoState).toHaveBeenCalledWith(true);
       expect(dispatchSpy).toHaveBeenCalledWith(EventNames.VIDEO_ON, {});
+    });
+
+    it('should disable video', async () => {
+      const mockChangeVideoState = vi.fn();
+      (client as any)._client = { changeVideoState: mockChangeVideoState };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setVideoEnable(false);
+
+      expect(mockChangeVideoState).toHaveBeenCalledWith(false);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.VIDEO_OFF, {});
     });
   });
 
