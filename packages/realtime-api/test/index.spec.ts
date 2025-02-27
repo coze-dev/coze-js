@@ -114,6 +114,44 @@ describe('RealtimeClient', () => {
       // ... existing expectations ...
     });
 
+    it('should connect successfully with video config', async () => {
+      const configWithVideo = {
+        ...config,
+        videoConfig: {
+          videoInputDeviceId: 'shareScreen',
+        },
+      };
+      client = new RealtimeClient(configWithVideo);
+
+      await client.connect();
+
+      expect(mockEngineClient.createLocalStream).toHaveBeenCalledWith(
+        'test-uid',
+        {
+          videoInputDeviceId: 'shareScreen',
+        },
+      );
+    });
+
+    it('should connect successfully with video config2', async () => {
+      const configWithVideo = {
+        ...config,
+        videoConfig: {
+          videoInputDeviceId: 'default',
+        },
+      };
+      client = new RealtimeClient(configWithVideo);
+
+      await client.connect();
+
+      expect(mockEngineClient.createLocalStream).toHaveBeenCalledWith(
+        'test-uid',
+        {
+          videoInputDeviceId: 'default',
+        },
+      );
+    });
+
     it('should throw error when joinRoom throw error', async () => {
       (mockEngineClient.joinRoom as vi.Mock).mockRejectedValue(
         new Error('test'),
