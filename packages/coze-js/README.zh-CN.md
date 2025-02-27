@@ -199,6 +199,11 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
+// 监听播放完成事件
+client.on('completed', () => {
+  console.log('[speech] playback completed');
+});
+
 // 连接
 try {
   await client.connect({voiceId: 'your_voice_id'});

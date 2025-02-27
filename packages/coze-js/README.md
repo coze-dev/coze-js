@@ -200,6 +200,11 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
+// Listen for playback completed event
+client.on('completed', () => {
+  console.log('[speech] playback completed');
+});
+
 // Connect
 try {
   await client.connect({voiceId: 'your_voice_id'});
@@ -234,6 +239,7 @@ client.isPlaying();
 client.append(message);
 // End sending text
 client.complete();
+
 ```
 
 ## More Examples
