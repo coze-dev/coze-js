@@ -1,5 +1,6 @@
 import { FC, useState, useEffect } from 'react';
 
+import cls from 'classnames';
 import {
   Textarea as TaroTextarea,
   type TextareaProps,
@@ -15,7 +16,7 @@ export const Textarea: FC<
     onSendTextMessage: () => void;
     onInputChange: (val: string) => void;
   } & TextareaProps
-> = ({ onSendTextMessage, onInputChange, ...rest }) => {
+> = ({ onSendTextMessage, onInputChange, placeholder, ...rest }) => {
   const [lineNum, setLineNum] = useState(0);
   const { value, id = '' } = rest;
 
@@ -31,11 +32,21 @@ export const Textarea: FC<
   return (
     <View className={styles['input-padding-container']}>
       <View className={styles['input-container']}>
+        {/** Weixin Textarea 未居中，需要自己hack */}
+        <View
+          className={cls(styles.placeholder, {
+            [styles['placeholder-hidden']]: !!value || !isMini,
+          })}
+        >
+          {placeholder}
+        </View>
         <TaroTextarea
           className={styles.input}
           maxlength={-1}
           ref={onInputInit}
           showConfirmBar={true}
+          cursorSpacing={20}
+          placeholder={!isMini ? placeholder : undefined}
           placeholderClass={styles.placeholder}
           style={{
             height: Math.max(1, lineNum) * 20,

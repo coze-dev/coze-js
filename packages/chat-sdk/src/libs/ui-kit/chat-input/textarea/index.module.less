@@ -1,10 +1,11 @@
 .input-padding-container {
-  padding: 13px 0;
+  padding: 14px 0;
   overflow: hidden;
   flex: 1;
 }
 .input-container {
   display: block;
+  position: relative;
   box-sizing: border-box;
   max-height: 80px;
   overflow: auto;
@@ -35,7 +36,19 @@
     }
   }
   .placeholder {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
     font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    display: block;
+
     color: rgba(55, 67, 106, 0.38);
+
+    &.placeholder-hidden {
+      display: none;
+    }
   }
 }
