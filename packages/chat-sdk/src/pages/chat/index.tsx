@@ -29,7 +29,7 @@ export default function Index() {
           setting={{
             apiBaseUrl: botInfo.apiBaseUrl,
             cdnBaseUrlPath: botInfo.cdnBaseUrlPath,
-            language: Language.EN,
+            language: Language.ZH_CN,
             logLevel: 'debug',
           }}
           auth={{
