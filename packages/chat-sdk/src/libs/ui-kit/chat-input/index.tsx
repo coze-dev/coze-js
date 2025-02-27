@@ -1,15 +1,15 @@
 import { FC, useState, useMemo } from 'react';
 
 import cls from 'classnames';
-import { Input, View } from '@tarojs/components';
+import { View } from '@tarojs/components';
 
 import { isWeb, logger } from '@/libs/utils';
 
 import { Spacing } from '../atomic/spacing';
 import { DisableContainer } from '../atomic/disable-container';
-import { CenterAlignedBox } from '../atomic/center-aligned-box';
 import { UploadBtn } from './upload-btn';
 import { InputType, type IChatInputProps } from './type';
+import { Textarea } from './textarea';
 import { TaskMessage } from './task-message/indext';
 import { SendSwitchBtn } from './send-switch-btn';
 import { useTextInputHandle } from './hooks/use-text-input-handle';
@@ -19,7 +19,6 @@ import { useAudioMessageHandle } from './hooks/use-audio-message-handle';
 import { AudioInput } from './audio-input';
 
 import styles from './index.module.less';
-
 let inputNo = 1000;
 export const ChatInput: FC<IChatInputProps> = props => {
   const {
@@ -36,7 +35,6 @@ export const ChatInput: FC<IChatInputProps> = props => {
   } = props;
   const inputId = useMemo(() => `chat-input-${inputNo++}`, []);
   const [inputType, setInputType] = useState<InputType>(defaultInputType);
-
   const { onRecording, isRecording, isRealAudioInputFocusing } =
     useAudioMessageHandle(props, {
       inputType,
@@ -63,6 +61,7 @@ export const ChatInput: FC<IChatInputProps> = props => {
     focused,
     inputType,
   });
+
   return (
     <DisableContainer className={styles.container}>
       <View
@@ -78,7 +77,7 @@ export const ChatInput: FC<IChatInputProps> = props => {
           </>
         ) : null}
 
-        <Spacing verticalCenter className={styles['chat-input-content']}>
+        <Spacing className={styles['chat-input-content']}>
           {inputType === InputType.Voice ? (
             <AudioInput
               onSendAudioMessage={onSendAudioMessage}
@@ -90,74 +89,72 @@ export const ChatInput: FC<IChatInputProps> = props => {
               onAudioRecording={onRecording}
             />
           ) : (
-            <CenterAlignedBox className={styles['input-container']}>
-              <Input
-                id={inputId}
-                focus={focused}
-                placeholder={placeholder}
-                className={styles.input}
-                maxlength={-1}
-                placeholderClass={styles.placeholder}
-                onConfirm={() => {
-                  onSendTextMessage();
-                }}
-                value={inputValue}
-                onInput={event => {
-                  logger.debug('ChatInput onInput:', event);
-                  setInputValue(event.detail.value);
-                }}
-                onFocus={event => {
-                  onKeyBoardHeightChange?.(event.detail.height);
-                  setFocused(true);
-                }}
-                onBlur={() => {
-                  onKeyBoardHeightChange?.(0);
-                  logger.debug('ChatInput onBlur');
-                  setFocused(false);
-                }}
-                adjustPosition={inputAdjustDefault}
-              />
-            </CenterAlignedBox>
-          )}
-          {isNeedUpload ? (
-            <>
-              <UploadBtn
-                onSendFileMessage={onSendFileMessage}
-                frameEventTarget={frameEventTarget}
-                disabled={disabled}
-              />
-              <View className={styles.divider} />
-            </>
-          ) : null}
-          <SendSwitchBtn
-            inputDisabled={disabled}
-            hasTextToSend={!!toSendInputValue}
-            inputType={inputType}
-            isNeedAudio={isNeedAudio}
-            focused={focused}
-            onSendBtnClick={() => {
-              onSendTextMessage();
-            }}
-            onKeyboardClick={() => {
-              setFocused(false);
-              setInputType(InputType.Text);
-              // 需要延迟才能 触发 focus效果
-              setTimeout(() => {
+            <Textarea
+              id={inputId}
+              focus={focused}
+              placeholder={placeholder}
+              adjustPosition={inputAdjustDefault}
+              value={inputValue}
+              onSendTextMessage={onSendTextMessage}
+              onInputChange={value => {
+                setInputValue(value);
+              }}
+              onFocus={event => {
+                onKeyBoardHeightChange?.(event.detail.height);
                 setFocused(true);
-                if (isWeb) {
-                  // web下无法获取焦点，需要手动添加焦点
-                  document
-                    .getElementById(inputId)
-                    ?.querySelector('input')
-                    ?.focus();
-                }
-              }, 100);
-            }}
-            onMicrophoneClick={() => {
-              setInputType(InputType.Voice);
-              setFocused(false);
-            }}
-          />
+              }}
+              onBlur={() => {
+                onKeyBoardHeightChange?.(0);
+                logger.debug('ChatInput onBlur');
+                setFocused(false);
+              }}
+            />
+          )}
+          <Spacing
+            verticalCenter
+            horizontalCenter
+            className={styles['op-container']}
+          >
+            {isNeedUpload ? (
+              <>
+                <UploadBtn
+                  onSendFileMessage={onSendFileMessage}
+                  frameEventTarget={frameEventTarget}
+                  disabled={disabled}
+                />
+                <View className={styles.divider} />
+              </>
+            ) : null}
+            <SendSwitchBtn
+              inputDisabled={disabled}
+              hasTextToSend={!!toSendInputValue}
+              inputType={inputType}
+              isNeedAudio={isNeedAudio}
+              focused={focused}
+              onSendBtnClick={() => {
+                onSendTextMessage();
+              }}
+              onKeyboardClick={() => {
+                setFocused(false);
+                setInputType(InputType.Text);
+                // 需要延迟才能 触发 focus效果
+                setTimeout(() => {
+                  setFocused(true);
+                  if (isWeb) {
+                    // web下无法获取焦点，需要手动添加焦点
+                    document
+                      .getElementById(inputId)
+                      ?.querySelector('textarea')
+                      ?.focus();
+                  }
+                }, 100);
+              }}
+              onMicrophoneClick={() => {
+                setInputType(InputType.Voice);
+                setFocused(false);
+              }}
+            />
+          </Spacing>
         </Spacing>
       </View>
     </DisableContainer>
