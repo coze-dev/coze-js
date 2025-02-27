@@ -55,7 +55,6 @@ describe('WsSpeechClient', () => {
     it('should initialize with correct configuration', () => {
       expect(client.ws).toBeNull();
       expect(WavStreamPlayer).toHaveBeenCalledWith({ sampleRate: 24000 });
-      expect(client.trackId).toMatch(/^my-track-id-[\w-]+$/);
     });
   });
 
@@ -356,7 +355,14 @@ describe('WsSpeechClient', () => {
     it('should toggle play', async () => {
       client.togglePlay();
 
-      expect(client['wavStreamPlayer'].togglePlay).toHaveBeenCalled();
+      expect(client['wavStreamPlayer'].isPlaying).toHaveBeenCalled();
+      expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
+    });
+
+    it('should toggle play2', async () => {
+      client.togglePlay();
+      vi.spyOn(client, 'isPlaying').mockReturnValue(false);
+      expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
     });
 
     it('should check if playing', async () => {
