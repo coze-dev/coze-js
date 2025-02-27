@@ -36,6 +36,7 @@ const useInterrupt = ({
         suppressStationaryNoise: true,
         suppressNonStationaryNoise: true,
         isAutoSubscribeAudio: false,
+        allowPersonalAccessTokenInBrowser: true,
       });
       interruptClientRef.current = client;
 
