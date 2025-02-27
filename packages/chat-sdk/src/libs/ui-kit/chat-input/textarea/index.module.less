@@ -9,11 +9,11 @@
   max-height: 80px;
   overflow: auto;
   &::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
   }
   &::-webkit-scrollbar-thumb {
-    background: #eee;
-    border-radius: 5px;
+    background: #e6e6e7;
+    border-radius: 4px;
   }
 
   .input {
@@ -23,7 +23,6 @@
 
     line-height: 20px;
     box-sizing: border-box;
-    overflow: auto;
     background-color: transparent;
 
     :global {
@@ -31,6 +30,7 @@
         line-height: 20px;
         resize: none;
         background-color: transparent;
+        overflow: hidden;
       }
     }
   }
