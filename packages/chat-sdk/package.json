@@ -54,7 +54,6 @@
     "preinstall": "npx only-allow pnpm",
     "prepublishOnly": "npm run build:lib",
     "publish:lib:byte": "./scripts/lib-publish.sh",
-    "publish:lib:npm": "npm publish",
     "test": "vitest --run",
     "test:cov": "vitest --coverage --run"
   },
