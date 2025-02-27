@@ -36,7 +36,7 @@ export class LocalManager {
   }
 
   set(key: string, value: string): void {
-    localStorage.setItem(this.getKey(key), value);
+    localStorage.setItem(this.getKey(key), value || '');
   }
 
   remove(key: string): void {
