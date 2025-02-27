@@ -5,6 +5,7 @@ import Taro from '@tarojs/taro';
 import { isSafari, logger } from '@/libs/utils';
 import { usePersistCallback } from '@/libs/hooks';
 
+// 底部在流式输出的时候，如果此时滚动到了上边视图中，在safari会有bug，页面会不断网上顶上去，需做hack，仅safari发现该问题
 export const useSafariAnchorHack = ({
   refAnchorBottom,
   refScrollEl,
@@ -17,27 +18,47 @@ export const useSafariAnchorHack = ({
     return isSafari && !['ios', 'android'].includes(platform.toLowerCase());
   }, []);
   const [viewEl, setViewEl] = useState<HTMLDivElement | null>();
-  const refScrollRecord = useRef<Array<{ height: number; scrollTop: number }>>(
-    [],
-  );
+  const refScrollRecord = useRef<
+    Array<{ groupId: string; height: number; scrollTop: number }>
+  >([]);
   logger.info('useSafariAnchorHack isNeedHack: ', isNeedHack);
 
   const onInitViewEl = usePersistCallback((el: HTMLDivElement) => {
     setViewEl(el);
   });
+  const getLastElementInfo = usePersistCallback(() => {
+    const query = viewEl?.getElementsByClassName('chat-group-for-query');
+    if (!query || query.length === 0) {
+      return;
+    }
+    const lastElement = query[query.length - 1] as HTMLDivElement;
+
+    const lastElementInfo = {
+      groupId: lastElement.getAttribute('data-group-id'),
+      height: lastElement.offsetHeight || 0,
+      scrollTop: refScrollEl?.current?.scrollTop || 0,
+    };
+    if (!lastElementInfo?.groupId || !lastElementInfo?.height) {
+      return;
+    }
+    return lastElementInfo;
+  });
   const onCollectScrollInfo = usePersistCallback(() => {
     if (!isNeedHack) {
       return;
     }
-    const height = viewEl?.offsetHeight || 0;
-    const scrollTop = refScrollEl?.current?.scrollTop || 0;
+    if (!refAnchorBottom?.current) {
+      return;
+    }
+    const lastElementInfo = getLastElementInfo();
+    if (!lastElementInfo) {
+      return;
+    }
+
     const leftData = refScrollRecord.current.filter(
-      item => item.height !== height,
+      item => item.groupId !== lastElementInfo.groupId,
     );
-    leftData.unshift({
-      height,
-      scrollTop,
-    });
+    leftData.unshift(lastElementInfo);
     leftData.splice(5);
     refScrollRecord.current = leftData;
   });
@@ -57,16 +78,19 @@ export const useSafariAnchorHack = ({
 
         if (newHeight !== oldHeight) {
           if (refScrollEl?.current?.scrollTop !== 0) {
-            const lastScrollTop = Number(
-              refScrollRecord.current.find(item => item.height === oldHeight)
-                ?.scrollTop,
+            const newElementInfo = getLastElementInfo();
+            const oldElementInfo = refScrollRecord.current.find(
+              item => item.groupId === newElementInfo?.groupId,
             );
-            const nowScrollTop = Number(refScrollEl?.current?.scrollTop);
+            if (!oldElementInfo) {
+              return;
+            }
 
             const diff = Math.abs(
-              newHeight - oldHeight - lastScrollTop + nowScrollTop,
+              Math.abs(newElementInfo.height - oldElementInfo.height) -
+                Math.abs(newElementInfo.scrollTop - oldElementInfo.scrollTop),
             );
-            if (diff < 5 || diff > 300) {
+            if (diff < 5) {
               return;
             }
             refScrollEl?.current?.scrollBy(0, oldHeight - newHeight);

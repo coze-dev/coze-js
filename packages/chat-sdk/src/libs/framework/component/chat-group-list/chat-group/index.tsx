@@ -1,5 +1,7 @@
 import { FC, memo } from 'react';
 
+import cls from 'classnames';
+
 import { Spacing } from '@/libs/ui-kit';
 import { type ChatMessageGroup } from '@/libs/types';
 
@@ -20,7 +22,12 @@ export const ChatGroup: FC<{
     isLastMessage = false,
     isShowSuggestion = false,
   }) => (
-    <Spacing vertical gap={16} className={styles['chat-group']}>
+    <Spacing
+      vertical
+      gap={16}
+      className={cls(styles['chat-group'], 'chat-group-for-query')}
+      data-groupId={chatGroup.id}
+    >
       {chatGroup.query ? (
         <QueryMessage
           message={chatGroup.query}

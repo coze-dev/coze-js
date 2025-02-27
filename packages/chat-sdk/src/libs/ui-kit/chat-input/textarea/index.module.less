@@ -1,0 +1,41 @@
+.input-padding-container {
+  padding: 13px 0;
+  overflow: hidden;
+  flex: 1;
+}
+.input-container {
+  display: block;
+  box-sizing: border-box;
+  max-height: 80px;
+  overflow: auto;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 5px;
+  }
+
+  .input {
+    width: 100%;
+    font-size: 14px;
+    font-weight: 400;
+
+    line-height: 20px;
+    box-sizing: border-box;
+    overflow: auto;
+    background-color: transparent;
+
+    :global {
+      .taro-textarea {
+        line-height: 20px;
+        resize: none;
+        background-color: transparent;
+      }
+    }
+  }
+  .placeholder {
+    font-weight: 500;
+    color: rgba(55, 67, 106, 0.38);
+  }
+}

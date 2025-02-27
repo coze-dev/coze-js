@@ -74,12 +74,13 @@ const ScrollViewSlot = memo(
         refScrollEl.current = el;
       });
       const onScrollHandle = usePersistCallback(e => {
-        refScrollNow.current = e.detail.scrollTop;
+        const scrollTopNum = e.detail.scrollTop;
+        refScrollNow.current = Math.abs(e.detail.scrollTop);
         onCollectScrollInfo();
 
-        checkArrowDownVisible?.(e.detail.scrollTop);
+        checkArrowDownVisible?.(refScrollNow.current);
         if (isWeb) {
-          if (refScrollNow.current > 0) {
+          if (scrollTopNum > 0) {
             // web的时候， scroll 只会为复制， 如果大于0， 需重置为0；
             scrollToAnchorBottom();
           }
@@ -89,12 +90,10 @@ const ScrollViewSlot = memo(
           if (
             scrollInnerHeight > 0 &&
             scrollHeight > 0 &&
-            Math.abs(refScrollNow.current) > 0
+            refScrollNow.current > 0
           ) {
             if (
-              scrollInnerHeight -
-                Math.abs(refScrollNow.current) -
-                scrollHeight <
+              scrollInnerHeight - refScrollNow.current - scrollHeight <
               (lowerThreshold || 100)
             ) {
               onScrollToLower?.(e);
@@ -166,10 +165,7 @@ const ScrollViewSlot = memo(
         ),
         [children],
       );
-      logger.debug('ScrollView, render', {
-        currentTop: refScrollNow.current,
-        scrollTop,
-      });
+
       return (
         <TaroScrollViewMemo
           {...restProps}
@@ -224,7 +220,6 @@ export const ScrollView = forwardRef(
       }),
       [],
     );
-    logger.debug('ScrollView, arrowDownVisible', arrowDownVisible);
     return (
       <View className={cls(styles.container, className)}>
         <ScrollViewSlot

@@ -38,7 +38,7 @@ export const useTextInputHandle = (
     setFocused(false);
     if (isWeb) {
       // Mobile browser cannot blur the input element, need to manually blur the input element
-      document.getElementById(inputId)?.querySelector('input')?.blur();
+      document.getElementById(inputId)?.querySelector('textarea')?.blur();
     }
   });
   const clearInput = usePersistCallback((isBlur: boolean) => {
@@ -69,11 +69,11 @@ export const useTextInputHandle = (
       clearInput(!isWeb);
     }
   });
+
   return {
     focused,
     clearInput,
     setFocused,
-
     inputValue,
     setInputValue,
     toSendInputValue,
