@@ -1,4 +1,5 @@
 import { ITouchEvent } from '@tarojs/components';
+import { CreateChatData } from '@coze/api';
 
 import { ChatMessageGroup } from './message';
 
@@ -25,6 +26,13 @@ export interface IMessageCallback {
     context: IMessageCallbackContext & {
       extra: {
         processChatMessageGroup: ChatMessageGroup;
+      };
+    },
+  ) => void;
+  onRequiresAction?: (
+    context: IMessageCallbackContext & {
+      extra: {
+        requireAction?: CreateChatData;
       };
     },
   ) => void;

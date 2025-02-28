@@ -13,6 +13,7 @@ import {
   useI18n,
   useUiEventStore,
   useChatInputStore,
+  useChatPropsStore,
 } from '../provider/context/chat-store-context';
 import {
   getSendMessageHandler,
@@ -20,6 +21,7 @@ import {
   RawMessageType,
 } from './helper/message';
 import { usePersistCallback } from '../hooks';
+// eslint-disable-next-line max-lines-per-function
 export const useSendMessage = () => {
   const {
     setSendMessageService,
@@ -46,7 +48,9 @@ export const useSendMessage = () => {
     chatService: store.chatService,
   }));
   const targetEventCenter = useUiEventStore(store => store.event);
-
+  const onRequiresAction = useChatPropsStore(
+    store => store.eventCallbacks?.message?.onRequiresAction,
+  );
   const sendMessage = usePersistCallback(
     (rawMessage: RawMessage, historyMessages?: EnterMessage[]) => {
       const { clearMessage: disableState } = getOpDisabledState();
@@ -70,6 +74,13 @@ export const useSendMessage = () => {
         i18n,
       });
 
+      sendMessageHandler.on(SendMessageEvent.RequireAction, event => {
+        onRequiresAction?.({
+          extra: {
+            requireAction: event.event,
+          },
+        });
+      });
       sendMessageHandler.on(SendMessageEvent.Close, () => {
         setIsDeleting(false);
       });

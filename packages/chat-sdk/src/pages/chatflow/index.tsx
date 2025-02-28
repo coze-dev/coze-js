@@ -155,6 +155,9 @@ export default function Index() {
                 afterMessageReceivedFinish: props => {
                   console.log('afterMessageReceivedFinish:', props);
                 },
+                onRequiresAction: props => {
+                  console.log('onRequiresAction:', props);
+                },
               },
             },
           }}
