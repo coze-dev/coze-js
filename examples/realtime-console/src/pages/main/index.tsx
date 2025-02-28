@@ -102,6 +102,10 @@ const RealtimeConsole: React.FC = () => {
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
+            videoInputDeviceId: localManager.get(
+              LocalStorageKey.VIDEO_INPUT_DEVICE_ID,
+              undefined,
+            ),
             videoOnDefault:
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true',
           }
@@ -172,6 +176,7 @@ const RealtimeConsole: React.FC = () => {
       (data?.data?.role === 'user' ||
         data?.data?.role === 'assistant' ||
         data?.event_type === 'conversation.created' ||
+        data?.event_type === 'conversation.chat.failed' ||
         data?.event_type === 'conversation.audio_transcript.delta' ||
         data?.event_type === 'error')
     ) {
@@ -182,7 +187,8 @@ const RealtimeConsole: React.FC = () => {
         }
         if (
           data?.event_type === 'error' ||
-          data?.event_type === 'conversation.created'
+          data?.event_type === 'conversation.created' ||
+          data?.event_type === 'conversation.chat.failed'
         ) {
           data.data.content = JSON.stringify(data.data);
           data.data.role = 'assistant';

@@ -18,6 +18,11 @@ export interface CreateRoomReq {
   connector_id: string;
   uid?: string;
   workflow_id?: string;
+  config?: {
+    video_config?: {
+      stream_video_type: 'main' | 'screen';
+    };
+  };
 }
 
 export interface CreateRoomData {

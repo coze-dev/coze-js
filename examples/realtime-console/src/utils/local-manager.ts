@@ -12,6 +12,7 @@ export enum LocalStorageKey {
   TOKEN_EXPIRES_AT = 'token_expires_at',
   EVENT_DATA = 'event_data',
   ENABLE_VIDEO = 'enable_video',
+  VIDEO_INPUT_DEVICE_ID = 'video_input_device_id',
   USER_ID = 'user_id',
   CONVERSATION_ID = 'conversation_id',
   WORKFLOW_ID = 'workflow_id',
