@@ -1,5 +1,10 @@
 import { Events, type TaroStatic } from '@tarojs/taro';
-import { type EnterMessage, RoleType, type ContentType } from '@coze/api';
+import {
+  type EnterMessage,
+  RoleType,
+  type ContentType,
+  CreateChatData,
+} from '@coze/api';
 
 import { MiniChatError, logger, nanoid } from '@/libs/utils';
 import {
@@ -169,6 +174,13 @@ export abstract class RawSendMessage implements ISendMessage {
     this.emit(SendMessageEvent.ReceiveMessage, {
       status: 'in_process',
       messages: this.messageList,
+    });
+  }
+  protected sendRequireActionEvent(event: CreateChatData) {
+    this.emit(SendMessageEvent.RequireAction, {
+      status: 'action',
+      messages: this.messageList,
+      event,
     });
   }
 

@@ -34,7 +34,7 @@ export class AsyncSendMessage extends MultiSendMessage {
       this.close();
     }
   }
-
+  // eslint-disable-next-line max-lines-per-function, complexity
   protected async pollAnswer() {
     if (!this.chatStream) {
       logger.error('asyncChat pollAnswer', 'chatStream is undefined');
@@ -128,6 +128,13 @@ export class AsyncSendMessage extends MultiSendMessage {
 
                 this.messageList = [this.messageSended, ...(messageList || [])];
                 this.sendProcessEvent();
+              }
+              break;
+            case ChatEventType.CONVERSATION_CHAT_REQUIRES_ACTION:
+              {
+                // 消息结束
+                const actionEvent = safeJSONParse(data) as CreateChatData;
+                this.sendRequireActionEvent(actionEvent);
               }
               break;
             case ChatEventType.ERROR: {

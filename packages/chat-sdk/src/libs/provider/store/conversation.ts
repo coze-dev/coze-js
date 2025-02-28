@@ -100,9 +100,10 @@ const defaultData = {
   inProcessChatMessageGroup: undefined,
   isUnshiftingMessageFlag: false,
 };
-
+// eslint-disable-next-line max-lines-per-function
 const createConversationStore = ({ eventCallbacks }: ChatFrameworkProps) => {
   let eventCallbacksAboutMessage = eventCallbacks?.message;
+  // eslint-disable-next-line max-lines-per-function
   return create<ConversationStore>()((set, get) => {
     const clearConversation = () => {
       set({

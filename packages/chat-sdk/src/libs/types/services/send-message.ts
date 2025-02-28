@@ -1,4 +1,4 @@
-import { type EnterMessage } from '@coze/api';
+import { CreateChatData, type EnterMessage } from '@coze/api';
 
 import { MiniChatError } from '@/libs/utils';
 import {
@@ -10,6 +10,7 @@ import {
 export enum SendMessageEvent {
   ReceiveMessage = 'receiveMessage',
   ReceiveComplete = 'receiveComplete',
+  RequireAction = 'RequireAction', // 发送消息过程中，有action事件发生
   Close = 'close', // sendMessage结束了
 }
 export enum RawMessageType {
@@ -33,7 +34,8 @@ export type RawMessage =
 
 export interface SendMessageEventData {
   messages: ChatMessage[];
-  status: 'complete' | 'in_process' | 'break' | 'error';
+  event?: CreateChatData;
+  status: 'complete' | 'in_process' | 'break' | 'error' | 'action';
   error?: MiniChatError;
 }
 
