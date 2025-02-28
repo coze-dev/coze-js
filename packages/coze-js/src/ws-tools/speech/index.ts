@@ -14,17 +14,24 @@ import { type WsToolsOptions } from '..';
 
 class WsSpeechClient {
   public ws: WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes> | null = null;
-  private listeners: Map<string, Set<(data: CreateSpeechWsRes) => void>> =
-    new Map();
+  private listeners: Map<
+    string,
+    Set<(data: CreateSpeechWsRes | undefined) => void>
+  > = new Map();
   private wavStreamPlayer: WavStreamPlayer;
-  private trackId: string;
+  private trackId = 'default';
   private api: CozeAPI;
+  private totalDuration = 0;
+  private playbackStartTime: number | null = null;
+  private playbackPauseTime: number | null = null;
+  private playbackTimeout: NodeJS.Timeout | null = null;
+  private elapsedBeforePause = 0;
+
   constructor(config: WsToolsOptions) {
     this.api = new CozeAPI({
       ...config,
     });
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
-    this.trackId = `my-track-id-${uuid()}`;
   }
 
   async init() {
@@ -35,6 +42,14 @@ class WsSpeechClient {
     this.ws = ws;
 
     let isResolved = false;
+
+    this.trackId = `my-track-id-${uuid()}`;
+    this.totalDuration = 0;
+    if (this.playbackTimeout) {
+      clearTimeout(this.playbackTimeout);
+      this.playbackTimeout = null;
+    }
+    this.playbackStartTime = null;
 
     return new Promise<WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes>>(
       (resolve, reject) => {
@@ -72,6 +87,7 @@ class WsSpeechClient {
           } else if (
             data.event_type === WebsocketsEventType.SPEECH_AUDIO_COMPLETED
           ) {
+            console.debug('[speech] totalDuration', this.totalDuration);
             this.closeWs();
           }
         };
@@ -149,32 +165,63 @@ class WsSpeechClient {
   async interrupt() {
     await this.wavStreamPlayer.interrupt();
     this.trackId = `my-track-id-${uuid()}`;
+    this.emit('completed', undefined);
+    console.debug('[speech] playback completed', this.totalDuration);
   }
 
   async pause() {
+    if (this.playbackTimeout) {
+      clearTimeout(this.playbackTimeout);
+      this.playbackTimeout = null;
+    }
+    if (this.playbackStartTime && !this.playbackPauseTime) {
+      this.playbackPauseTime = Date.now();
+      this.elapsedBeforePause +=
+        (this.playbackPauseTime - this.playbackStartTime) / 1000;
+    }
     await this.wavStreamPlayer.pause();
   }
 
   async resume() {
+    if (this.playbackPauseTime) {
+      this.playbackStartTime = Date.now();
+      this.playbackPauseTime = null;
+
+      // Update the timeout with remaining duration
+      if (this.playbackTimeout) {
+        clearTimeout(this.playbackTimeout);
+      }
+      const remaining = this.totalDuration - this.elapsedBeforePause;
+      this.playbackTimeout = setTimeout(() => {
+        this.emit('completed', undefined);
+        console.debug('[speech] playback completed', this.totalDuration);
+        this.playbackStartTime = null;
+        this.elapsedBeforePause = 0;
+      }, remaining * 1000);
+    }
     await this.wavStreamPlayer.resume();
   }
 
   async togglePlay() {
-    await this.wavStreamPlayer.togglePlay();
+    if (this.isPlaying()) {
+      await this.pause();
+    } else {
+      await this.resume();
+    }
   }
 
   isPlaying() {
     return this.wavStreamPlayer.isPlaying();
   }
 
-  on(event: string, callback: (data: CreateSpeechWsRes) => void) {
+  on(event: string, callback: (data: CreateSpeechWsRes | undefined) => void) {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
     this.listeners.get(event)?.add(callback);
   }
 
-  off(event: string, callback: (data: CreateSpeechWsRes) => void) {
+  off(event: string, callback: (data: CreateSpeechWsRes | undefined) => void) {
     this.listeners.get(event)?.delete(callback);
   }
 
@@ -185,7 +232,7 @@ class WsSpeechClient {
     this.ws = null;
   }
 
-  private emit(event: string, data: CreateSpeechWsRes) {
+  private emit(event: string, data: CreateSpeechWsRes | undefined) {
     this.listeners.get(event)?.forEach(callback => callback(data));
   }
 
@@ -197,8 +244,39 @@ class WsSpeechClient {
       view[i] = decodedContent.charCodeAt(i);
     }
 
+    // Calculate duration in seconds
+    const bytesPerSecond = 24000 * 1 * (16 / 8); // sampleRate * channels * (bitDepth/8)
+    const duration = arrayBuffer.byteLength / bytesPerSecond;
+    this.totalDuration += duration;
+
     try {
       await this.wavStreamPlayer.add16BitPCM(arrayBuffer, this.trackId);
+
+      // Start or update the playback timer
+      if (!this.playbackStartTime && !this.playbackPauseTime) {
+        this.playbackStartTime = Date.now();
+        this.elapsedBeforePause = 0;
+      }
+
+      // Clear existing timeout if any
+      if (this.playbackTimeout) {
+        clearTimeout(this.playbackTimeout);
+      }
+
+      // Calculate remaining time
+      const elapsed =
+        this.elapsedBeforePause +
+        (this.playbackPauseTime
+          ? 0
+          : (Date.now() - (this.playbackStartTime || Date.now())) / 1000);
+      const remaining = this.totalDuration - elapsed;
+
+      // Set new timeout
+      this.playbackTimeout = setTimeout(() => {
+        this.emit('completed', undefined);
+        this.playbackStartTime = null;
+        this.elapsedBeforePause = 0;
+      }, remaining * 1000);
     } catch (error) {
       console.warn('[speech] wavStreamPlayer error', error);
     }
