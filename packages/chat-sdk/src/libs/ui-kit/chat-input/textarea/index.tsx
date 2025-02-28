@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 
 import cls from 'classnames';
 import {
@@ -32,7 +32,7 @@ export const Textarea: FC<
         el.style.height = '0px';
         const scrollHeight = Number(el?.scrollHeight) || 0;
         const lineNumTemp = Math.floor(scrollHeight / 20);
-        el.style.height = getHeight(lineNumTemp);
+        el.style.height = 'inherit';
         setLineNum(lineNumTemp);
       }
     }
@@ -100,6 +100,7 @@ const useInputKeyDownOnWeb = ({
   onSendTextMessage: () => void;
   handleInputChange: (val: string) => void;
 }) => {
+  const refIsComposing = useRef(false);
   const getInputElInWeb = usePersistCallback(
     (): HTMLTextAreaElement | undefined | null =>
       isWeb
@@ -107,7 +108,10 @@ const useInputKeyDownOnWeb = ({
         : undefined,
   );
   const onInputKeyDown = usePersistCallback((e: KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (refIsComposing.current) {
+      return;
+    }
+    if (e.code === 'Enter') {
       if (e.ctrlKey || e.metaKey || e.altKey) {
         const el = e.target as HTMLTextAreaElement;
         const start = el?.selectionStart;
@@ -127,22 +131,37 @@ const useInputKeyDownOnWeb = ({
           handleInputChange(el.value);
         }
       } else if (!e.shiftKey) {
+        e.stopPropagation();
         e.preventDefault();
         onSendTextMessage();
       }
     }
   });
+  const onCompositionstart = usePersistCallback(() => {
+    //alert('compositionstart');
+    refIsComposing.current = true;
+  });
+  const onCompositionend = usePersistCallback(() => {
+    //alert('compositionend');
+    refIsComposing.current = false;
+  });
   const onInputInit = usePersistCallback(() => {
     if (isWeb) {
       const el = getInputElInWeb();
+      el?.removeEventListener('compositionstart', onCompositionstart);
+      el?.removeEventListener('compositionend', onCompositionend);
       el?.removeEventListener('keydown', onInputKeyDown);
       el?.addEventListener('keydown', onInputKeyDown);
+      el?.addEventListener('compositionstart', onCompositionstart);
+      el?.addEventListener('compositionend', onCompositionend);
     }
   });
   useEffect(() => {
     if (isWeb) {
       const el = getInputElInWeb();
       return () => {
+        el?.removeEventListener('compositionstart', onCompositionstart);
+        el?.removeEventListener('compositionend', onCompositionend);
         el?.removeEventListener('keydown', onInputKeyDown);
       };
     }
