@@ -80,6 +80,31 @@ describe('WsSpeechClient', () => {
         undefined as unknown as MessageEvent,
       );
 
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_UPDATE,
+          id: 'test-id',
+          data: {
+            delta: btoa('test audio data'),
+          },
+          detail: {
+            logid: 'test-logid',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_COMPLETED,
+          id: 'test-id',
+          detail: {
+            logid: 'test-logid',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+
       await initPromise;
 
       expect(WebSocketAPI).toHaveBeenCalledWith(
@@ -341,7 +366,13 @@ describe('WsSpeechClient', () => {
     });
 
     it('should resume', async () => {
-      client.resume();
+      const mockMessage = btoa('test audio data');
+
+      await (client as any).handleAudioMessage(mockMessage);
+
+      await client.pause();
+
+      await client.resume();
 
       expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
     });
@@ -350,6 +381,17 @@ describe('WsSpeechClient', () => {
       client.pause();
 
       expect(client['wavStreamPlayer'].pause).toHaveBeenCalled();
+    });
+
+    it('should clear playbackTimeout before pause', async () => {
+      const mockMessage = btoa('test audio data');
+
+      await (client as any).handleAudioMessage(mockMessage);
+
+      await client.pause();
+
+      expect(client['playbackTimeout']).toBeNull();
+      expect(client['elapsedBeforePause']).toBeDefined();
     });
 
     it('should toggle play', async () => {
