@@ -6,7 +6,6 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 
 import cls from 'classnames';
@@ -17,10 +16,11 @@ import {
 } from '@tarojs/components';
 
 import { isWeb, logger } from '@/libs/utils';
-import { usePersistCallback } from '@/libs/hooks';
 
 import { SvgArrowUp } from '../svg';
 import { IconButton } from '../icon-button';
+import { useScrollTop } from './use-scroll-top';
+import { useScrollHandle } from './use-scroll-handle';
 import { useSafariAnchorHack } from './use-safari-anchor-hack';
 import { useHelperButton } from './use-helper-button';
 
@@ -44,7 +44,7 @@ const ScrollViewSlot = memo(
         children,
         isLoadMore,
         checkArrowDownVisible,
-        lowerThreshold,
+        lowerThreshold: lowerThresholdRaw,
         onScrollToLower,
         ...restProps
       }: ScrollViewType & {
@@ -52,72 +52,33 @@ const ScrollViewSlot = memo(
       },
       ref: ForwardedRef<ScrollViewRef>,
     ) => {
-      const refScrollEl = useRef<HTMLDivElement | null>(null);
-      const [scrollTop, setScrollTop] = useState<number | undefined>(0);
+      const {
+        scrollTop,
+        delayToSetScroll,
+        scrollToAnchorBottom,
+        onInitScrollEl,
+        refScrollEl,
+      } = useScrollTop();
+
       const refAnchorBottom = useRef<boolean>(false);
-      const refScrollNow = useRef<number>(1);
       const { onInitViewEl, onCollectScrollInfo } = useSafariAnchorHack({
         refAnchorBottom,
         refScrollEl,
       });
-      const scrollToAnchorBottom = usePersistCallback(() => {
-        if (scrollTop !== 0) {
-          delayToSetScroll(0);
-        } else {
-          delayToSetScroll(1);
-          // 先设置1居于底部，然后设置为0， 锚定在底部
-          // 由于scrollTop为0，如果直接设置为0，不能出发锚定。
-          delayToSetScroll(0, 200);
-        }
-      });
-      const onInitScrollEl = usePersistCallback((el: HTMLDivElement) => {
-        refScrollEl.current = el;
-      });
-      const onScrollHandle = usePersistCallback(e => {
-        const scrollTopNum = e.detail.scrollTop;
-        refScrollNow.current = Math.abs(e.detail.scrollTop);
-        onCollectScrollInfo();
 
-        checkArrowDownVisible?.(refScrollNow.current);
-        if (isWeb) {
-          if (scrollTopNum > 0) {
-            // web的时候， scroll 只会为复制， 如果大于0， 需重置为0；
-            scrollToAnchorBottom();
-          }
-          // Web需判断是否居于底部
-          const scrollHeight = Number(refScrollEl.current?.offsetHeight);
-          const scrollInnerHeight = Number(refScrollEl.current?.scrollHeight);
-          if (
-            scrollInnerHeight > 0 &&
-            scrollHeight > 0 &&
-            refScrollNow.current > 0
-          ) {
-            if (
-              scrollInnerHeight - refScrollNow.current - scrollHeight <
-              (lowerThreshold || 100)
-            ) {
-              onScrollToLower?.(e);
-            }
-          }
-        }
+      const {
+        refScrollNow,
+        onScrollToLowerHandle,
+        lowerThreshold,
+        onScrollHandle,
+      } = useScrollHandle({
+        refScrollEl,
+        scrollToAnchorBottom,
+        onCollectScrollInfoInSafari: onCollectScrollInfo,
+        checkArrowDownVisible,
+        onScrollToLower,
+        lowerThreshold: lowerThresholdRaw,
       });
-      const refSetScrollTimeout = useRef<number | undefined>(undefined);
-
-      const delayToSetScroll = usePersistCallback(
-        (scrollTopNum: number, timeoutNumber: number | undefined = 0) => {
-          if (refSetScrollTimeout.current) {
-            clearTimeout(refSetScrollTimeout.current);
-          }
-          if (timeoutNumber <= 0) {
-            setScrollTop(scrollTopNum);
-            return;
-          } else {
-            refSetScrollTimeout.current = setTimeout(() => {
-              setScrollTop(scrollTopNum);
-            }, timeoutNumber) as unknown as number;
-          }
-        },
-      );
 
       useLayoutEffect(() => {
         if (isLoadMore) {
@@ -130,11 +91,7 @@ const ScrollViewSlot = memo(
         () => ({
           scrollToBottom: () => {
             logger.debug('ScrollView, scrollToBottom', { scrollTop });
-            if (scrollTop !== 1) {
-              delayToSetScroll(1);
-            } else {
-              delayToSetScroll(2);
-            }
+            scrollToAnchorBottom();
           },
           scrollToAnchorBottom: () => {
             // 如果重复设置0的话，不会生效，因此如果是0的时候，需要先设置1，然后再设置锚定位置0
@@ -149,7 +106,7 @@ const ScrollViewSlot = memo(
             });
             refAnchorBottom.current = false;
             if (refScrollNow.current === 0 && scrollTop === 0) {
-              // 防止内容未渲染完成，改处已经制定了修改，导致新内容未能锚定底部，预防措施
+              // 防止内容未渲染完成，已经完成了修改，导致新内容未能锚定底部，预防措施
               delayToSetScroll(1, 50);
             }
           },
@@ -172,8 +129,8 @@ const ScrollViewSlot = memo(
           id={id}
           ref={onInitScrollEl}
           scrollTop={scrollTop}
-          lowerThreshold={isWeb ? undefined : lowerThreshold}
-          onScrollToLower={isWeb ? undefined : onScrollToLower}
+          lowerThreshold={lowerThreshold}
+          onScrollToLower={onScrollToLowerHandle}
           reverse={false}
           showScrollbar={false}
           enhanced={true}
