@@ -20,15 +20,34 @@ export const Textarea: FC<
   const [lineNum, setLineNum] = useState(0);
   const { value, id = '' } = rest;
 
-  const { onInputInit } = useInputKeyDownOnWeb({
+  const getHeight = usePersistCallback(
+    (lineNumTemp: number) => `${Math.max(1, lineNumTemp) * 20}px`,
+  );
+  const handleInputChange = usePersistCallback((val: string) => {
+    onInputChange(val);
+
+    if (isWeb) {
+      const el = getInputElInWeb();
+      if (el) {
+        el.style.height = '0px';
+        const scrollHeight = Number(el?.scrollHeight) || 0;
+        const lineNumTemp = Math.floor(scrollHeight / 20);
+        el.style.height = getHeight(lineNumTemp);
+        setLineNum(lineNumTemp);
+      }
+    }
+  });
+  const { onInputInit, getInputElInWeb } = useInputKeyDownOnWeb({
     inputId: id,
     onSendTextMessage,
+    handleInputChange,
   });
   useUpdateEffect(() => {
     if (!value) {
       setLineNum(0);
     }
   }, [value]);
+
   return (
     <View className={styles['input-padding-container']}>
       <View className={styles['input-container']}>
@@ -45,11 +64,12 @@ export const Textarea: FC<
           maxlength={-1}
           ref={onInputInit}
           showConfirmBar={true}
+          controlled
           cursorSpacing={20}
           placeholder={!isMini ? placeholder : undefined}
           placeholderClass={styles.placeholder}
           style={{
-            height: Math.max(1, lineNum) * 20,
+            height: getHeight(lineNum),
           }}
           onConfirm={() => {
             if (isMini) {
@@ -57,11 +77,12 @@ export const Textarea: FC<
             }
           }}
           onInput={event => {
-            onInputChange(event.detail.value);
+            console.log('onInputKeyDown: onInput ', event.detail.value);
+            handleInputChange(event.detail.value);
           }}
           onLineChange={event => {
             logger.debug('ChatInput onLineChange:', event);
-            setLineNum(event.detail.lineCount);
+            !isWeb && setLineNum(event.detail.lineCount);
           }}
           {...rest}
         />
@@ -73,18 +94,39 @@ export const Textarea: FC<
 const useInputKeyDownOnWeb = ({
   inputId,
   onSendTextMessage,
+  handleInputChange,
 }: {
   inputId: string;
   onSendTextMessage: () => void;
+  handleInputChange: (val: string) => void;
 }) => {
-  const getInputElInWeb = usePersistCallback(() =>
-    isWeb
-      ? document.getElementById(inputId)?.querySelector('textarea')
-      : undefined,
+  const getInputElInWeb = usePersistCallback(
+    (): HTMLTextAreaElement | undefined | null =>
+      isWeb
+        ? document.getElementById(inputId)?.querySelector('textarea')
+        : undefined,
   );
   const onInputKeyDown = usePersistCallback((e: KeyboardEvent) => {
     if (e.key === 'Enter') {
-      if (!e.shiftKey) {
+      if (e.ctrlKey || e.metaKey || e.altKey) {
+        const el = e.target as HTMLTextAreaElement;
+        const start = el?.selectionStart;
+        const end = el?.selectionEnd;
+        const val = el?.value;
+        if (start !== undefined && end !== undefined && val !== undefined) {
+          e.preventDefault();
+          e.stopPropagation();
+          const before = val.substring(0, start);
+          const after = val.substring(end);
+          console.log('onInputKeyDown: start ', el.value);
+          el.value = `${before}\n${after}`;
+          el.selectionStart = start + 1;
+          el.selectionEnd = start + 1;
+          console.log('onInputKeyDown: end ', el.value);
+
+          handleInputChange(el.value);
+        }
+      } else if (!e.shiftKey) {
         e.preventDefault();
         onSendTextMessage();
       }
@@ -105,5 +147,5 @@ const useInputKeyDownOnWeb = ({
       };
     }
   }, []);
-  return { onInputInit };
+  return { onInputInit, getInputElInWeb };
 };
