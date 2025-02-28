@@ -6,6 +6,7 @@ import {
 import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
+import { isScreenShareDevice } from './utils';
 import { RealtimeEventHandler, EventNames } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { EngineClient } from './client';
@@ -38,7 +39,7 @@ export interface RealtimeClientConfig {
 }
 
 class RealtimeClient extends RealtimeEventHandler {
-  private _config: RealtimeClientConfig;
+  public _config: RealtimeClientConfig;
   private _client: EngineClient | null = null;
   public isConnected = false;
   private _api: CozeAPI;
@@ -116,6 +117,22 @@ class RealtimeClient extends RealtimeEventHandler {
     let roomInfo: CreateRoomData;
     try {
       // Step1 get token
+      let config = undefined;
+      if (this._config.videoConfig) {
+        if (isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)) {
+          config = {
+            video_config: {
+              stream_video_type: 'screen' as const,
+            },
+          };
+        } else {
+          config = {
+            video_config: {
+              stream_video_type: 'main' as const,
+            },
+          };
+        }
+      }
       roomInfo = await this._api.audio.rooms.create({
         bot_id: botId,
         conversation_id: conversationId || undefined,
@@ -123,6 +140,7 @@ class RealtimeClient extends RealtimeEventHandler {
         connector_id: this._config.connectorId,
         uid: this._config.userId || undefined,
         workflow_id: this._config.workflowId || undefined,
+        config,
       });
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);

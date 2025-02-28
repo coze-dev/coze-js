@@ -114,6 +114,44 @@ describe('RealtimeClient', () => {
       // ... existing expectations ...
     });
 
+    it('should connect successfully with video config', async () => {
+      const configWithVideo = {
+        ...config,
+        videoConfig: {
+          videoInputDeviceId: 'screenShare',
+        },
+      };
+      client = new RealtimeClient(configWithVideo);
+
+      await client.connect();
+
+      expect(mockEngineClient.createLocalStream).toHaveBeenCalledWith(
+        'test-uid',
+        {
+          videoInputDeviceId: 'screenShare',
+        },
+      );
+    });
+
+    it('should connect successfully with video config2', async () => {
+      const configWithVideo = {
+        ...config,
+        videoConfig: {
+          videoInputDeviceId: 'default',
+        },
+      };
+      client = new RealtimeClient(configWithVideo);
+
+      await client.connect();
+
+      expect(mockEngineClient.createLocalStream).toHaveBeenCalledWith(
+        'test-uid',
+        {
+          videoInputDeviceId: 'default',
+        },
+      );
+    });
+
     it('should throw error when joinRoom throw error', async () => {
       (mockEngineClient.joinRoom as vi.Mock).mockRejectedValue(
         new Error('test'),
@@ -183,6 +221,17 @@ describe('RealtimeClient', () => {
 
       expect(mockChangeVideoState).toHaveBeenCalledWith(true);
       expect(dispatchSpy).toHaveBeenCalledWith(EventNames.VIDEO_ON, {});
+    });
+
+    it('should disable video', async () => {
+      const mockChangeVideoState = vi.fn();
+      (client as any)._client = { changeVideoState: mockChangeVideoState };
+      const dispatchSpy = vi.spyOn(client, 'dispatch');
+
+      await client.setVideoEnable(false);
+
+      expect(mockChangeVideoState).toHaveBeenCalledWith(false);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.VIDEO_OFF, {});
     });
   });
 

@@ -138,6 +138,11 @@ const Header: React.FC<HeaderProps> = ({
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
     const onMessage = (event: string, data: any) => {
+      const type =
+        data?.data?.required_action?.submit_tool_outputs?.tool_calls?.[0]?.type;
+      if (type === 'reply_message') {
+        return;
+      }
       const functionCall =
         data?.data?.required_action?.submit_tool_outputs?.tool_calls?.[0]
           ?.function;
@@ -297,8 +302,24 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleVideoInputDeviceChange = async (value: string) => {
     try {
-      setVideoInputDeviceId(value);
-      await clientRef.current?.setVideoInputDevice(value);
+      const isScreenShareDevice = RealtimeUtils.isScreenShareDevice(
+        clientRef.current?._config.videoConfig?.videoInputDeviceId,
+      );
+      const currentIsScreenShareDevice =
+        RealtimeUtils.isScreenShareDevice(value);
+
+      if (currentIsScreenShareDevice) {
+        localManager.set(LocalStorageKey.VIDEO_INPUT_DEVICE_ID, value);
+      } else {
+        localManager.remove(LocalStorageKey.VIDEO_INPUT_DEVICE_ID);
+      }
+
+      if (isScreenShareDevice !== currentIsScreenShareDevice) {
+        window.location.reload();
+      } else {
+        setVideoInputDeviceId(value);
+        await clientRef.current?.setVideoInputDevice(value);
+      }
     } catch (error) {
       message.error(`Failed to set video input device: ${error}`);
       console.error(error);
