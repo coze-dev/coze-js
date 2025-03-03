@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View } from '@tarojs/components';
 
 import UserIcon from '@/libs/ui-kit/assets/imgs/coze-logo.png';
-import { ChatSlot } from '@/libs';
+import { ChatSlot, useApiClientStore } from '@/libs';
 import { IChatFlowProps } from '@/chatflow/type';
 import { ChatFlowFramework } from '@/chatflow';
 
@@ -156,7 +156,7 @@ export default function Index() {
                   console.log('afterMessageReceivedFinish:', props);
                 },
                 onRequiresAction: props => {
-                  console.log('onRequiresAction:', props);
+                  console.log('ForRequireAction onRequiresAction:', props);
                 },
               },
             },
@@ -169,4 +169,8 @@ export default function Index() {
   );
 }
 
-const ChatFlowNode = () => <ChatSlot className={styles.ChatSlot} />;
+const ChatFlowNode = () => {
+  const apiClient = useApiClientStore(store => store.apiClient);
+  console.log('ForRequireAction apiClient', apiClient);
+  return <ChatSlot className={styles.ChatSlot} />;
+};
