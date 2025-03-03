@@ -1,5 +1,14 @@
 # @coze/realtime-api
 
+## 1.1.0 - 2025-03-03
+
+### New Features
+
+- add screen sharing support and video device persistence
+- Add test code
+- add unit test
+
+
 ## 1.0.5 - 2025-02-12
 
 ### New Features
