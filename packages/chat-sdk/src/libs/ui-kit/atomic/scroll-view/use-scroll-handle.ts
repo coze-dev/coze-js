@@ -10,6 +10,7 @@ export const useScrollHandle = ({
   onCollectScrollInfoInSafari,
   checkArrowDownVisible,
   onScrollToLower,
+  reCheckToLower,
   lowerThreshold: lowerThresholdRaw,
   refScrollEl,
 }: {
@@ -18,6 +19,7 @@ export const useScrollHandle = ({
   onScrollToLower?: ScrollViewProps['onScrollToLower'];
   lowerThreshold?: number;
   checkArrowDownVisible?: (scrollTopNum: number) => void;
+  reCheckToLower?: () => void;
   refScrollEl: MutableRefObject<HTMLDivElement | null>;
 }) => {
   const refScrollNow = useRef<number>(1);
@@ -38,15 +40,11 @@ export const useScrollHandle = ({
       refScrollToLowerTimeout.current = 0;
     }
     onScrollToLower?.(e);
-    console.log('Test_T...', Date.now());
     // 由于在头部加载，所以渲染会有延迟，因此在onScrollToLower 中距离上次发送必须有1500s的限制。
     // 但是有情况1500s的时候确实需要发送请求，这个时候页面会停留在加载中部分，无法发送，所以过2500s之后再次判断判断是否已到底部了，如果到底部就触发
     refScrollToLowerTimeout.current = setTimeout(() => {
-      console.log('Test_T2...', Date.now());
-      if (checkToLowerInWeb()) {
-        onScrollToLower?.(e);
-      }
       refScrollToLowerTimeout.current = 0;
+      reCheckToLower?.();
     }, 1500) as unknown as number;
   });
   const onScrollHandle = usePersistCallback(e => {
