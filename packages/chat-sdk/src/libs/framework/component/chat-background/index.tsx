@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react';
 
 import { Image, View } from '@tarojs/components';
 
-import { logger } from '@/libs/utils';
+import { logger, nanoid } from '@/libs/utils';
 import { type BgImageInfoMap } from '@/libs/types';
 import { useSize } from '@/libs/hooks';
 
@@ -12,7 +12,7 @@ import styles from './index.module.less';
 
 let chatBackGroundId = 1000;
 export const ChatBackground: FC<BgImageInfoMap> = props => {
-  const id = useMemo(() => `chatbg_id_${chatBackGroundId++}`, []);
+  const id = useMemo(() => `chatbg_id_${nanoid()}_${chatBackGroundId++}`, []);
   const {
     width: containerWidth,
     height: containerHeight,

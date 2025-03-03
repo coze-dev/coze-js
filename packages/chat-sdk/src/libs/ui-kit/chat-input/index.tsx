@@ -3,7 +3,7 @@ import { FC, useState, useMemo } from 'react';
 import cls from 'classnames';
 import { View } from '@tarojs/components';
 
-import { isWeb, logger } from '@/libs/utils';
+import { isWeb, logger, nanoid } from '@/libs/utils';
 
 import { Spacing } from '../atomic/spacing';
 import { DisableContainer } from '../atomic/disable-container';
@@ -33,7 +33,7 @@ export const ChatInput: FC<IChatInputProps> = props => {
     isPcMode,
     defaultInputType = InputType.Text,
   } = props;
-  const inputId = useMemo(() => `chat-input-${inputNo++}`, []);
+  const inputId = useMemo(() => `chat-input-${nanoid()}-${inputNo++}`, []);
   const [inputType, setInputType] = useState<InputType>(defaultInputType);
   const { onRecording, isRecording, isRealAudioInputFocusing } =
     useAudioMessageHandle(props, {
