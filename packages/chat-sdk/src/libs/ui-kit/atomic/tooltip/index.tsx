@@ -11,7 +11,7 @@ import cls from 'classnames';
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 
-import { isWeb } from '@/libs/utils';
+import { isWeb, nanoid } from '@/libs/utils';
 import { UIEventType } from '@/libs/types';
 
 import styles from './index.module.less';
@@ -28,7 +28,7 @@ export const Tooltip: FC<
   }>
 > = ({ children, content, type = 'hover', isActive, direction = 'bottom' }) => {
   const [isShow, setIsShow] = useState(false);
-  const containerId = useMemo(() => `tooltip_${toolTipId++}`, []);
+  const containerId = useMemo(() => `tooltip_${nanoid()}_${toolTipId++}`, []);
   useEffect(() => {
     const onHideToolTip = () => {
       setIsShow(false);

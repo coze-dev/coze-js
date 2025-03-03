@@ -3,7 +3,7 @@ import { Fragment, useMemo } from 'react';
 import cls from 'classnames';
 import { View } from '@tarojs/components';
 
-import { logger } from '@/libs/utils';
+import { logger, nanoid } from '@/libs/utils';
 import { ChatInput as ChatInputUi, Spacing } from '@/libs/ui-kit';
 import { useSendMessage } from '@/libs/services';
 import {
@@ -46,7 +46,7 @@ export const ChatInput = () => {
   const inputUiConfig = uiConfig?.chatSlot?.input;
   const uploadConfig = uiConfig?.chatSlot?.uploadBtn;
   const renderChatInputTopSlot = inputUiConfig?.renderChatInputTopSlot;
-  const inputId = useMemo(() => `chatInput${chatInputNo++}`, []);
+  const inputId = useMemo(() => `chatInput_${nanoid()}_${chatInputNo++}`, []);
   const { changeInputLocation, bottomOffset, inputAdjustDefault } =
     useInputAdjust(inputId);
   const targetFrameEvent = useUiEventStore(store => store.event);

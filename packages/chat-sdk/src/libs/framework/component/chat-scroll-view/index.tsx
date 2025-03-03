@@ -108,7 +108,6 @@ export const ChatScrollView: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <ScrollView
-      id="chatScroll"
       ref={refScroll}
       className={cls(styles['scroll-container'])}
       scrollY={true}
