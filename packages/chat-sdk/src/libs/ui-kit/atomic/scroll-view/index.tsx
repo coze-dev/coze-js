@@ -16,6 +16,7 @@ import {
 } from '@tarojs/components';
 
 import { isWeb, logger } from '@/libs/utils';
+import { usePersistCallback } from '@/libs/hooks';
 
 import { SvgArrowUp } from '../svg';
 import { IconButton } from '../icon-button';
@@ -65,7 +66,11 @@ const ScrollViewSlot = memo(
         refAnchorBottom,
         refScrollEl,
       });
-
+      const reCheckToLower = usePersistCallback(() => {
+        if (refScrollNow.current > 100) {
+          delayToSetScroll(refScrollNow.current - 0.5);
+        }
+      });
       const {
         refScrollNow,
         onScrollToLowerHandle,
@@ -78,6 +83,7 @@ const ScrollViewSlot = memo(
         checkArrowDownVisible,
         onScrollToLower,
         lowerThreshold: lowerThresholdRaw,
+        reCheckToLower,
       });
 
       useLayoutEffect(() => {
