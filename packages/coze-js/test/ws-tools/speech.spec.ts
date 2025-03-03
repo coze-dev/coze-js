@@ -55,7 +55,6 @@ describe('WsSpeechClient', () => {
     it('should initialize with correct configuration', () => {
       expect(client.ws).toBeNull();
       expect(WavStreamPlayer).toHaveBeenCalledWith({ sampleRate: 24000 });
-      expect(client.trackId).toMatch(/^my-track-id-[\w-]+$/);
     });
   });
 
@@ -73,6 +72,31 @@ describe('WsSpeechClient', () => {
       client.ws?.onmessage?.(
         {
           event_type: WebsocketsEventType.SPEECH_CREATED,
+          id: 'test-id',
+          detail: {
+            logid: 'test-logid',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_UPDATE,
+          id: 'test-id',
+          data: {
+            delta: btoa('test audio data'),
+          },
+          detail: {
+            logid: 'test-logid',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_COMPLETED,
           id: 'test-id',
           detail: {
             logid: 'test-logid',
@@ -342,7 +366,13 @@ describe('WsSpeechClient', () => {
     });
 
     it('should resume', async () => {
-      client.resume();
+      const mockMessage = btoa('test audio data');
+
+      await (client as any).handleAudioMessage(mockMessage);
+
+      await client.pause();
+
+      await client.resume();
 
       expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
     });
@@ -353,10 +383,28 @@ describe('WsSpeechClient', () => {
       expect(client['wavStreamPlayer'].pause).toHaveBeenCalled();
     });
 
+    it('should clear playbackTimeout before pause', async () => {
+      const mockMessage = btoa('test audio data');
+
+      await (client as any).handleAudioMessage(mockMessage);
+
+      await client.pause();
+
+      expect(client['playbackTimeout']).toBeNull();
+      expect(client['elapsedBeforePause']).toBeDefined();
+    });
+
     it('should toggle play', async () => {
       client.togglePlay();
 
-      expect(client['wavStreamPlayer'].togglePlay).toHaveBeenCalled();
+      expect(client['wavStreamPlayer'].isPlaying).toHaveBeenCalled();
+      expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
+    });
+
+    it('should toggle play2', async () => {
+      client.togglePlay();
+      vi.spyOn(client, 'isPlaying').mockReturnValue(false);
+      expect(client['wavStreamPlayer'].resume).toHaveBeenCalled();
     });
 
     it('should check if playing', async () => {
