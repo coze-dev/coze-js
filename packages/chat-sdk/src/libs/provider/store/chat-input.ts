@@ -2,10 +2,19 @@ import { useMemo } from 'react';
 
 import { create } from 'zustand';
 
+import { logger } from '@/libs/utils';
 import type { ChatInputStore } from '@/libs/types';
 const createChatInputStore = () =>
   create<ChatInputStore>()(set => ({
     taskList: [],
+    setInputValue: (val: string) => {
+      logger.error('setInputValue is not implemented');
+    },
+    initSetInputValueFunc: func => {
+      set({
+        setInputValue: func,
+      });
+    },
     setTaskList: props => {
       set({
         taskList: props?.taskList || [],

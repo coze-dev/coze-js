@@ -53,7 +53,9 @@ export const useTextInputHandle = (
     }, 50);
   });
   useUpdateEffect(() => {
-    setInputValue(defaultValue);
+    if (defaultValue !== undefined) {
+      setInputValue(defaultValue);
+    }
   }, [defaultValue]);
 
   const onSendTextMessage = usePersistCallback(() => {

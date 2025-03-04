@@ -12,6 +12,7 @@ import {
   useSendMessage,
   useApiClientStore,
   useConversationStore,
+  useChatInputStore,
 } from '../libs';
 import { ChatFlowFramework } from '../chatflow';
 
@@ -30,6 +31,7 @@ export default {
   useSendMessage,
   useApiClientStore,
   useConversationStore,
+  useChatInputStore,
 };
 export {
   MdStream,
@@ -46,6 +48,7 @@ export {
   useSendMessage,
   useApiClientStore,
   useConversationStore,
+  useChatInputStore,
 };
 export * from '@/libs/types';
 export { type IChatFlowProps } from '../chatflow/type';
