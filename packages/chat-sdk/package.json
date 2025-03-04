@@ -1,6 +1,6 @@
 {
   "name": "@coze/chat-sdk",
-  "version": "0.1.10-beta.5",
+  "version": "0.1.10",
   "description": "Coze chat components for taro",
   "author": "gaoding.devingao@bytedance.com",
   "exports": {
