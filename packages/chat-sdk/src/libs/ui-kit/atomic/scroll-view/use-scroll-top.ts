@@ -50,7 +50,7 @@ export const useScrollTop = () => {
         clearTimeout(refSetScrollTimeout.current);
       }
     },
-    [scrollTop],
+    [],
   );
   logger.debug('useScrollTop', { scrollTop });
 
