@@ -70,7 +70,8 @@ export default {
     'There is already a running conversation in the current session, please wait for the conversation to complete before initiating a new conversation',
   miniChatError_4019:
     'The account has an overdue payment, please recharge immediately.',
-  miniChatError_4020: 'The current RPM has exceeded the purchased quota',
+  miniChatError_4020:
+    'You have exceeded the model RPM limit. Please try again later or contact Coze for an upgrade.',
   miniChatError_4027:
     'Your account has an overdue payment, please recharge immediately.',
   miniChatError_4028:
@@ -90,5 +91,5 @@ export default {
     'Workflow code node execution timeout: The node in the workflow has exceeded its max execution time one minute. ',
   miniChatError_700012006: 'The personal access token (PAT) is incorrect',
   miniChatError_788788103:
-    'Your account has an overdue payment, please recharge immediately.',
+    'Your account has an outstanding balance. Please top up your balance on Volcengine.',
 };

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View } from '@tarojs/components';
 
 import UserIcon from '@/libs/ui-kit/assets/imgs/coze-logo.png';
-import { ChatSlot, useApiClientStore } from '@/libs';
+import { ChatSlot, useApiClientStore, useChatInputStore } from '@/libs';
 import { IChatFlowProps } from '@/chatflow/type';
 import { ChatFlowFramework } from '@/chatflow';
 
@@ -172,6 +172,8 @@ export default function Index() {
 
 const ChatFlowNode = () => {
   const apiClient = useApiClientStore(store => store.apiClient);
-  console.log('ForRequireAction apiClient', apiClient);
+  const setInputValue = useChatInputStore(store => store.setInputValue);
+  console.log('ForRequireAction apiClient', apiClient, setInputValue);
+
   return <ChatSlot className={styles.ChatSlot} />;
 };

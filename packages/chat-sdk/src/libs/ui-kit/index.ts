@@ -34,7 +34,7 @@ export { CImage } from './atomic/c-image';
 
 export { OnBoarding } from './onboarding';
 export { SuggestionList } from './suggestion-list';
-export { ChatInput } from './chat-input';
+export { ChatInput, type ChatInputRef } from './chat-input';
 export {
   MessageContainer,
   MessageContent,
