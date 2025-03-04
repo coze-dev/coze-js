@@ -115,6 +115,7 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async connect() {
     const { botId, conversationId, voiceId, getRoomInfo } = this._config;
+    this.dispatch(EventNames.CONNECTING, {});
 
     let roomInfo: CreateRoomData;
     try {
@@ -124,7 +125,9 @@ class RealtimeClient extends RealtimeEventHandler {
       } else {
         let config = undefined;
         if (this._config.videoConfig) {
-          if (isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)) {
+          if (
+            isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)
+          ) {
             config = {
               video_config: {
                 stream_video_type: 'screen' as const,
@@ -226,8 +229,8 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async disconnect() {
     await this._client?.disconnect();
-
     this.isConnected = false;
+    this._client = null;
     this.dispatch(EventNames.DISCONNECTED, {});
   }
 

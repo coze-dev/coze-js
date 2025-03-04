@@ -22,6 +22,11 @@ export enum EventNames {
    */
   CONNECTED = 'client.connected',
   /**
+   * en: Client connecting
+   * zh: 客户端连接中
+   */
+  CONNECTING = 'client.connecting',
+  /**
    * en: Client interrupted
    * zh: 客户端中断
    */
@@ -86,6 +91,11 @@ export enum EventNames {
    * zh: 视频输入设备改变
    */
   VIDEO_INPUT_DEVICE_CHANGED = 'client.video.input.device.changed',
+  /**
+   * en: Network quality changed
+   * zh: 网络质量改变
+   */
+  NETWORK_QUALITY = 'client.network.quality',
   /**
    * en: Bot joined
    * zh: Bot 加入
@@ -162,10 +172,10 @@ export class RealtimeEventHandler {
     if (callback) {
       const index = handlers.indexOf(callback);
       if (index === -1) {
-        throw new RealtimeAPIError(
-          RealtimeError.EVENT_HANDLER_ERROR,
+        console.warn(
           `Could not turn off specified event listener for "${eventName}": not found as a listener`,
         );
+        return;
       }
       handlers.splice(index, 1);
     } else {
@@ -196,7 +206,7 @@ export class RealtimeEventHandler {
 
   dispatch(eventName: string, event: unknown, consoleLog = true) {
     if (consoleLog) {
-      this._log(`dispatch ${eventName} event`);
+      this._log(`dispatch ${eventName} event`, event);
     }
 
     const handlers = (
@@ -220,9 +230,9 @@ export class RealtimeEventHandler {
     this._dispatchToHandlers(eventName, event, allServerHandlers, 'server.');
   }
 
-  _log(message: string) {
+  _log(message: string, event?: unknown) {
     if (this._debug) {
-      console.log(`[RealtimeClient] ${message}`);
+      console.log(`[RealtimeClient] ${message}`, event);
     }
   }
 }
