@@ -8,7 +8,7 @@ const createChatInputStore = () =>
   create<ChatInputStore>()(set => ({
     taskList: [],
     setInputValue: (val: string) => {
-      logger.error('setInputValue is not implemented');
+      logger.error('setInputValue is not implemented', val);
     },
     initSetInputValueFunc: func => {
       set({
