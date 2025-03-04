@@ -21,6 +21,7 @@ export type OnImageClick = (extra: { url: string }) => void;
 export interface IWorkflow {
   id?: string;
   parameters?: Record<string, unknown>;
+  header?: Record<string, string>;
 }
 
 export interface IProject {
