@@ -8,7 +8,7 @@ import {
 } from '@tarojs/components';
 
 import { isMini, isWeb, logger } from '@/libs/utils';
-import { usePersistCallback, useUpdateEffect } from '@/libs/hooks';
+import { usePersistCallback } from '@/libs/hooks';
 
 import styles from './index.module.less';
 export const Textarea: FC<
@@ -25,7 +25,6 @@ export const Textarea: FC<
   );
   const handleInputChange = usePersistCallback((val: string) => {
     onInputChange(val);
-
     if (isWeb) {
       const el = getInputElInWeb();
       if (el) {
@@ -42,7 +41,7 @@ export const Textarea: FC<
     onSendTextMessage,
     handleInputChange,
   });
-  useUpdateEffect(() => {
+  useEffect(() => {
     if (!value) {
       setLineNum(0);
     }
@@ -100,6 +99,7 @@ const useInputKeyDownOnWeb = ({
   onSendTextMessage: () => void;
   handleInputChange: (val: string) => void;
 }) => {
+  const refInputEl = useRef<HTMLTextAreaElement>();
   const refIsComposing = useRef(false);
   const getInputElInWeb = usePersistCallback(
     (): HTMLTextAreaElement | undefined | null =>
@@ -148,6 +148,7 @@ const useInputKeyDownOnWeb = ({
   const onInputInit = usePersistCallback(() => {
     if (isWeb) {
       const el = getInputElInWeb();
+      refInputEl.current = el;
       el?.removeEventListener('compositionstart', onCompositionstart);
       el?.removeEventListener('compositionend', onCompositionend);
       el?.removeEventListener('keydown', onInputKeyDown);
@@ -158,11 +159,17 @@ const useInputKeyDownOnWeb = ({
   });
   useEffect(() => {
     if (isWeb) {
-      const el = getInputElInWeb();
       return () => {
-        el?.removeEventListener('compositionstart', onCompositionstart);
-        el?.removeEventListener('compositionend', onCompositionend);
-        el?.removeEventListener('keydown', onInputKeyDown);
+        refInputEl.current?.removeEventListener(
+          'compositionstart',
+          onCompositionstart,
+        );
+        refInputEl.current?.removeEventListener(
+          'compositionend',
+          onCompositionend,
+        );
+        refInputEl.current?.removeEventListener('keydown', onInputKeyDown);
+        refInputEl.current = undefined;
       };
     }
   }, []);
