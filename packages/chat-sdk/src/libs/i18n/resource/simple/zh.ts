@@ -63,7 +63,7 @@ export default {
   miniChatError_4016:
     '当前会话中已有运行中的对话，请等待对话完成后再发起新的对话',
   miniChatError_4019: '扣子专业版账号已欠费',
-  miniChatError_4020: '当前 RPM 已超出购买的额度',
+  miniChatError_4020: '您已超过模型并发上限，请稍后尝试或联系扣子扩容',
 
   miniChatError_4027: '专业版账户已欠费，请立即充值',
   miniChatError_4028: '资源点余额不足，请等待额度刷新或升级到专业版',
@@ -78,5 +78,5 @@ export default {
   miniChatError_5000: '服务端内部错误',
   miniChatError_6006: 'code节点超时',
   miniChatError_700012006: '个人访问令牌（PAT）不正确',
-  miniChatError_788788103: '专业版账户已欠费，请立即充值',
+  miniChatError_788788103: '您的账户已产生欠费，请前往火山充值',
 };

@@ -85,7 +85,8 @@ export default function Index() {
       isNeed: true,
       isNeedTaskMessage: true,
       isNeedAudio: true,
-
+      defaultText:
+        'Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right',
       renderChatInputTopSlot: () => <div> Input Top Slot</div>,
     },
     messageWrapper: {
