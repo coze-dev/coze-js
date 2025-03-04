@@ -4,6 +4,7 @@ import {
   PropsWithChildren,
   useContext,
   useMemo,
+  CSSProperties,
 } from 'react';
 
 import { Logger } from '@/libs/utils';
@@ -13,13 +14,14 @@ import { I18n } from '@/libs/i18n';
 import { usePersistCallback } from '@/libs/hooks';
 
 import { TaskValue } from '../ast';
-
 interface MdStreamContext {
   onImageClick?: IOnImageClickEvent;
   i18n?: I18n;
   logger?: Logger;
   selectable?: boolean;
   taskDisabled?: boolean;
+  imgClassName?: string;
+  imgStyle?: CSSProperties;
   enableCodeBy4Space?: boolean;
   enableHtmlTags?: boolean;
   getMarkdown?: () => string;
@@ -43,6 +45,8 @@ export const ChatFamePropsProvider: FC<
   enableCodeBy4Space,
   onTaskChangeHandle,
   eventCallbacks,
+  imgClassName,
+  imgStyle,
 }) => {
   const getMarkdown = usePersistCallback(() => markdown || '');
   const value = useMemo(
@@ -57,6 +61,8 @@ export const ChatFamePropsProvider: FC<
       onTaskChangeHandle,
       getMarkdown,
       eventCallbacks,
+      imgClassName,
+      imgStyle,
     }),
     [
       onImageClick,
@@ -69,6 +75,8 @@ export const ChatFamePropsProvider: FC<
       onTaskChangeHandle,
       getMarkdown,
       eventCallbacks,
+      imgClassName,
+      imgStyle,
     ],
   );
   return (
