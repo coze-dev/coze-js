@@ -113,6 +113,7 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async connect() {
     const { botId, conversationId, voiceId } = this._config;
+    this.dispatch(EventNames.CONNECTING, {});
 
     let roomInfo: CreateRoomData;
     try {
@@ -220,8 +221,8 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async disconnect() {
     await this._client?.disconnect();
-
     this.isConnected = false;
+    this._client = null;
     this.dispatch(EventNames.DISCONNECTED, {});
   }
 

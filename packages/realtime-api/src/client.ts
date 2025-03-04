@@ -3,6 +3,7 @@ import VERTC, {
   type AudioPropertiesConfig,
   type IRTCEngine,
   MediaType,
+  type NetworkQuality,
   type onUserJoinedEvent,
   type onUserLeaveEvent,
   StreamIndex,
@@ -45,6 +46,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.handleUserLeave = this.handleUserLeave.bind(this);
     this.handleEventError = this.handleEventError.bind(this);
     this.handlePlayerEvent = this.handlePlayerEvent.bind(this);
+    this.handleNetworkQuality = this.handleNetworkQuality.bind(this);
 
     // Debug only
     this.handleLocalAudioPropertiesReport =
@@ -61,6 +63,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.on(VERTC.events.onUserJoined, this.handleUserJoin);
     this.engine.on(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.on(VERTC.events.onError, this.handleEventError);
+    this.engine.on(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
 
     if (this._isSupportVideo) {
       this.engine.on(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -83,6 +86,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.off(VERTC.events.onUserJoined, this.handleUserJoin);
     this.engine.off(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.off(VERTC.events.onError, this.handleEventError);
+    this.engine.off(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
 
     if (this._isSupportVideo) {
       this.engine.off(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -150,6 +154,16 @@ export class EngineClient extends RealtimeEventHandler {
 
   handlePlayerEvent(event: unknown) {
     this.dispatch(EventNames.PLAYER_EVENT, event);
+  }
+
+  handleNetworkQuality(
+    uplinkNetworkQuality: NetworkQuality,
+    downlinkNetworkQuality: NetworkQuality,
+  ) {
+    this.dispatch(EventNames.NETWORK_QUALITY, {
+      uplinkNetworkQuality,
+      downlinkNetworkQuality,
+    });
   }
 
   async joinRoom(options: {
@@ -280,13 +294,10 @@ export class EngineClient extends RealtimeEventHandler {
 
   async disconnect() {
     try {
-      if (this._isSupportVideo) {
-        await this.changeVideoState(false);
-      }
-      await this.changeAudioState(false);
-      await this.engine.unpublishStream(MediaType.AUDIO);
       await this.engine.leaveRoom();
       this.removeEventListener();
+      this.clearEventHandlers();
+      VERTC.destroyEngine(this.engine);
     } catch (e) {
       this.dispatch(EventNames.ERROR, e);
       throw e;
