@@ -66,42 +66,46 @@ export const useSafariAnchorHack = ({
     if (!isNeedHack) {
       return;
     }
-    if (viewEl) {
-      let height = viewEl.offsetHeight;
-      const observer = new ResizeObserver(function () {
-        const oldHeight = height;
-        const newHeight = viewEl.offsetHeight;
-        height = newHeight;
-        if (!refAnchorBottom?.current) {
-          return;
-        }
-
-        if (newHeight !== oldHeight) {
-          if (refScrollEl?.current?.scrollTop !== 0) {
-            const newElementInfo = getLastElementInfo();
-            const oldElementInfo = refScrollRecord.current.find(
-              item => item.groupId === newElementInfo?.groupId,
-            );
-            if (!oldElementInfo) {
-              return;
-            }
-
-            const diff = Math.abs(
-              Math.abs(newElementInfo.height - oldElementInfo.height) -
-                Math.abs(newElementInfo.scrollTop - oldElementInfo.scrollTop),
-            );
-            if (diff < 5) {
-              return;
-            }
-            refScrollEl?.current?.scrollBy(0, oldHeight - newHeight);
+    try {
+      if (viewEl) {
+        let height = viewEl.offsetHeight;
+        const observer = new ResizeObserver(function () {
+          const oldHeight = height;
+          const newHeight = viewEl.offsetHeight;
+          height = newHeight;
+          if (!refAnchorBottom?.current) {
+            return;
           }
-        }
-      });
-      observer.observe(viewEl);
 
-      return () => {
-        observer.disconnect();
-      };
+          if (newHeight !== oldHeight) {
+            if (refScrollEl?.current?.scrollTop !== 0) {
+              const newElementInfo = getLastElementInfo();
+              const oldElementInfo = refScrollRecord.current.find(
+                item => item.groupId === newElementInfo?.groupId,
+              );
+              if (!oldElementInfo) {
+                return;
+              }
+
+              const diff = Math.abs(
+                Math.abs(newElementInfo.height - oldElementInfo.height) -
+                  Math.abs(newElementInfo.scrollTop - oldElementInfo.scrollTop),
+              );
+              if (diff < 5) {
+                return;
+              }
+              refScrollEl?.current?.scrollBy(0, oldHeight - newHeight);
+            }
+          }
+        });
+        observer.observe(viewEl);
+
+        return () => {
+          observer.disconnect();
+        };
+      }
+    } catch (err) {
+      logger.error('useSafariAnchorHack useEffect err: ', err);
     }
   }, [viewEl]);
   return {

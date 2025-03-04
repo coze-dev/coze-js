@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { isWeb, logger } from '@/libs/utils';
 import { usePersistCallback } from '@/libs/hooks';
@@ -43,6 +43,15 @@ export const useScrollTop = () => {
   const onInitScrollEl = usePersistCallback((el: HTMLDivElement) => {
     refScrollEl.current = el;
   });
+
+  useEffect(
+    () => () => {
+      if (refSetScrollTimeout.current) {
+        clearTimeout(refSetScrollTimeout.current);
+      }
+    },
+    [scrollTop],
+  );
   logger.debug('useScrollTop', { scrollTop });
 
   return {
