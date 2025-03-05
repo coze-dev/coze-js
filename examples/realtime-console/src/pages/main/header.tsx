@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, message, Typography, Select } from 'antd';
+import { Button, message, Typography, Select, Row, Col, Checkbox } from 'antd';
 import {
   EventNames,
   RealtimeAPIError,
@@ -15,6 +15,7 @@ import { ChatEventType } from '@coze/api';
 import { isShowVideo } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DISCONNECT_TIME } from '../../utils/constants';
+import useIsMobile from '../../hooks/use-is-mobile';
 import useCozeAPI from '../../hooks/use-coze-api';
 import MessageForm, { type MessageFormRef } from './message-form';
 import ComfortStrategyForm from './comfort-strategy-form';
@@ -68,6 +69,8 @@ const Header: React.FC<HeaderProps> = ({
   const formRef = useRef<MessageFormRef>(null);
   const [comfortStrategyVisible, setComfortStrategyVisible] = useState(false);
   const { uploadFile } = useCozeAPI();
+  const isMobile = useIsMobile();
+  const [isSampleMode, setIsSampleMode] = useState(isMobile);
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkDevicePermission(true).then(result => {
@@ -403,72 +406,83 @@ const Header: React.FC<HeaderProps> = ({
           Disconnect ({Math.floor(connectLeftTime / 60)}m {connectLeftTime % 60}
           s)
         </Button>
-        <div style={{ marginTop: '10px' }}></div>
-        <MessageForm onSubmit={handleSendMessage} ref={formRef} />
-        <Button
-          type="primary"
-          style={{ marginRight: '10px', marginLeft: '10px' }}
-          onClick={handleEnableAudioPropertiesReport}
-        >
-          Enable Audio Report
-        </Button>
-        <Button
-          type="primary"
-          className="button-margin-right"
-          onClick={handleAudioPlaybackDeviceTest}
-        >
-          {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
-        </Button>
-        <Button
-          type="primary"
-          style={{ marginRight: '10px' }}
-          onClick={() => setComfortStrategyVisible(true)}
-        >
-          Comfort Strategy
-        </Button>
-        <div
-          style={{
-            marginTop: '10px',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '10px',
-          }}
-        >
-          <span style={{ marginBottom: '10px' }}>
-            <Text style={{ marginRight: 8 }}>Capture Device:</Text>
-            <Select
-              style={{ width: 200 }}
-              value={audioCapture}
-              onChange={handleAudioCaptureChange}
-              options={inputDeviceOptions}
+        {isMobile && (
+          <Checkbox
+            checked={isSampleMode}
+            onChange={e => setIsSampleMode(e.target.checked)}
+          >
+            Sample Mode
+          </Checkbox>
+        )}
+        {!isSampleMode && (
+          <>
+            <div style={{ marginTop: '10px' }}></div>
+            <MessageForm onSubmit={handleSendMessage} ref={formRef} />
+            <Button
+              type="primary"
+              style={{ marginRight: '10px', marginLeft: '10px' }}
+              onClick={handleEnableAudioPropertiesReport}
+            >
+              Enable Audio Report
+            </Button>
+            <Button
+              type="primary"
+              className="button-margin-right"
+              onClick={handleAudioPlaybackDeviceTest}
+            >
+              {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
+            </Button>
+            <Button
+              type="primary"
+              style={{ marginRight: '10px' }}
+              onClick={() => setComfortStrategyVisible(true)}
+            >
+              Comfort Strategy
+            </Button>
+            <Row gutter={[16, 16]} justify="center" align="middle">
+              <Col xs={24} sm={12} md={8}>
+                <div>
+                  <Text style={{ marginRight: 8 }}>Capture Device:</Text>
+                  <Select
+                    style={{ width: '100%' }}
+                    value={audioCapture}
+                    onChange={handleAudioCaptureChange}
+                    options={inputDeviceOptions}
+                  />
+                </div>
+              </Col>
+              <Col xs={24} sm={12} md={8}>
+                <div>
+                  <Text style={{ marginRight: 8 }}>Playback Device:</Text>
+                  <Select
+                    style={{ width: '100%' }}
+                    value={audioPlayback}
+                    onChange={handleAudioPlaybackChange}
+                    options={outputDeviceOptions}
+                  />
+                </div>
+              </Col>
+              {isShowVideo() && (
+                <Col xs={24} sm={12} md={8}>
+                  <div>
+                    <Text style={{ marginRight: 8 }}>Video Device:</Text>
+                    <Select
+                      style={{ width: '100%' }}
+                      value={videoInputDeviceId}
+                      onChange={handleVideoInputDeviceChange}
+                      options={videoInputDeviceOptions}
+                    />
+                  </div>
+                </Col>
+              )}
+            </Row>
+            <ComfortStrategyForm
+              visible={comfortStrategyVisible}
+              onClose={() => setComfortStrategyVisible(false)}
+              onSubmit={handleComfortStrategySubmit}
             />
-          </span>
-          <span>
-            <Text style={{ marginRight: 8 }}>Playback Device:</Text>
-            <Select
-              style={{ width: 200 }}
-              value={audioPlayback}
-              onChange={handleAudioPlaybackChange}
-              options={outputDeviceOptions}
-            />
-          </span>
-          {isShowVideo() && (
-            <span>
-              <Text style={{ marginRight: 8 }}>Video Device:</Text>
-              <Select
-                style={{ width: 200 }}
-                value={videoInputDeviceId}
-                onChange={handleVideoInputDeviceChange}
-                options={videoInputDeviceOptions}
-              />
-            </span>
-          )}
-        </div>
-        <ComfortStrategyForm
-          visible={comfortStrategyVisible}
-          onClose={() => setComfortStrategyVisible(false)}
-          onSubmit={handleComfortStrategySubmit}
-        />
+          </>
+        )}
       </>
     );
   }

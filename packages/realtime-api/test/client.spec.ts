@@ -46,7 +46,9 @@ vi.mock('@volcengine/rtc', () => ({
       onPlayerEvent: 'onPlayerEvent',
       onLocalAudioPropertiesReport: 'onLocalAudioPropertiesReport',
       onRemoteAudioPropertiesReport: 'onRemoteAudioPropertiesReport',
+      onNetworkQuality: 'onNetworkQuality',
     },
+    destroyEngine: vi.fn(),
   },
   StreamIndex: {
     STREAM_INDEX_MAIN: 0,
@@ -97,12 +99,12 @@ describe('EngineClient', () => {
   describe('event handling', () => {
     it('should bind engine events', () => {
       client.bindEngineEvents();
-      expect(mockEngine.on).toHaveBeenCalledTimes(6);
+      expect(mockEngine.on).toHaveBeenCalledTimes(7);
     });
 
     it('should remove event listeners', () => {
       client.removeEventListener();
-      expect(mockEngine.off).toHaveBeenCalledTimes(6);
+      expect(mockEngine.off).toHaveBeenCalledTimes(7);
     });
 
     it('should handle message parsing error', () => {
@@ -332,14 +334,13 @@ describe('EngineClient', () => {
   describe('connection management', () => {
     it('should disconnect properly', async () => {
       await client.disconnect();
-      expect(mockEngine.unpublishStream).toHaveBeenCalledWith(MediaType.AUDIO);
       expect(mockEngine.leaveRoom).toHaveBeenCalled();
       expect(mockEngine.off).toHaveBeenCalled();
     });
 
     it('should handle disconnect error', async () => {
       const error = new Error('Disconnect failed');
-      mockEngine.unpublishStream.mockRejectedValueOnce(error);
+      mockEngine.leaveRoom.mockRejectedValueOnce(error);
       const dispatchSpy = vi.spyOn(client as any, 'dispatch');
 
       await expect(client.disconnect()).rejects.toThrow();

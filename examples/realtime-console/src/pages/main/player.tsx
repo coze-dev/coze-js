@@ -14,6 +14,7 @@ const Player: React.FC<{
 
     localManager.set(LocalStorageKey.VIDEO_STATE, e.target.checked.toString());
   };
+  const videoState = localManager.get(LocalStorageKey.VIDEO_STATE);
 
   return (
     <div className="player-container">
@@ -30,7 +31,6 @@ const Player: React.FC<{
             defaultChecked={
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true'
             }
-            disabled={!clientRef.current?.isConnected}
             onChange={handleToggleVideo}
           />{' '}
           Video
@@ -48,7 +48,7 @@ const Player: React.FC<{
       <div
         style={{
           width: '100%',
-          height: '300px',
+          height: videoState === 'true' ? '300px' : '0',
           position: 'relative',
           background: '#000',
         }}

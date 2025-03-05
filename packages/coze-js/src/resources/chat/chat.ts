@@ -648,7 +648,7 @@ export interface ChatV3Message {
   type: MessageType;
 }
 
-interface ToolCallType {
+export interface ToolCallType {
   /**
    * The ID of the run result.
    */
