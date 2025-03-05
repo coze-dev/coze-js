@@ -56,6 +56,15 @@ const client = new RealtimeClient({
   voiceId: "your_voice_id",           // Optional: Specify voice ID
   conversationId: "conversation_id",   // Optional: For conversation continuity
   debug: true,                        // Optional: Enable debug logging
+  getRoomInfo: async () => {
+    // Customize get room info
+    return {
+      token: "your_token",
+      uid: "your_uid",
+      room_id: "your_room_id",
+      app_id: "your_app_id",
+    };
+  },
   allowPersonalAccessTokenInBrowser: true,  // Optional: Enable PAT token usage in browser
   audioMutedDefault: false,           // Optional: Initial audio state (default: false)
   suppressStationaryNoise: false,     // Optional: Enable stationary noise suppression(default: false)
