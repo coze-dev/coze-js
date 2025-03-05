@@ -36,9 +36,9 @@ const useNetworkError = ({
       console.log('visibilitychange', document.hidden);
       if (!document.hidden) {
         if (navigator.onLine && isDisconnectedRef.current) {
+          isDisconnectedRef.current = false;
           setTimeout(async () => {
             try {
-              isDisconnectedRef.current = false;
               await clientRef.current?.connect();
               console.log('reconnect success');
             } catch (e) {
@@ -140,15 +140,15 @@ const useNetworkError = ({
       }
     };
 
-    async function handleMicAccess() {
+    function handleMicAccess() {
       if (clientRef.current?.isConnected === false || document.hidden) {
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        stream.getTracks().forEach(track => track.stop()); // Release stream
+        // const stream = await navigator.mediaDevices.getUserMedia({
+        //   audio: true,
+        // });
+        // stream.getTracks().forEach(track => track.stop()); // Release stream
 
         const localStream = clientRef.current
           ?.getRtcEngine()

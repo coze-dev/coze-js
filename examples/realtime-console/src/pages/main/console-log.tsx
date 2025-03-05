@@ -23,9 +23,7 @@ const ConsoleLog = () => {
         setMaxHeight(window.innerHeight - headerRect.top);
       }
     };
-    const t = setInterval(() => {
-      handleResize;
-    }, 5000);
+    const t = setInterval(handleResize, 5000);
 
     handleResize();
     return () => clearInterval(t);

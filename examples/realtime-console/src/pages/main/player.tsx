@@ -31,7 +31,6 @@ const Player: React.FC<{
             defaultChecked={
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true'
             }
-            disabled={!clientRef.current?.isConnected}
             onChange={handleToggleVideo}
           />{' '}
           Video
