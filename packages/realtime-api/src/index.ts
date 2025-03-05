@@ -40,6 +40,9 @@ export interface RealtimeClientConfig {
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
 }
 
+// Only use for test
+const TEST_APP_ID = '6705332c79516e015e3e5f0c';
+
 class RealtimeClient extends RealtimeEventHandler {
   public _config: RealtimeClientConfig;
   private _client: EngineClient | null = null;
@@ -104,7 +107,6 @@ class RealtimeClient extends RealtimeEventHandler {
       allowPersonalAccessTokenInBrowser:
         this._config.allowPersonalAccessTokenInBrowser,
     });
-    this._isTestEnv = defaultBaseURL !== 'https://api.coze.cn';
     this._isSupportVideo = !!config.videoConfig;
   }
 
@@ -159,6 +161,8 @@ class RealtimeClient extends RealtimeEventHandler {
         error,
       );
     }
+
+    this._isTestEnv = TEST_APP_ID === roomInfo.app_id;
 
     // Step2 create engine
     this._client = new EngineClient(
