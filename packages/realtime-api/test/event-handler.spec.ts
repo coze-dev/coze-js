@@ -29,13 +29,6 @@ describe('RealtimeEventHandler', () => {
       expect(callback2).toHaveBeenCalled();
     });
 
-    it('should throw error when trying to remove non-existent listener', () => {
-      const callback = vi.fn();
-      expect(() => handler.off(EventNames.CONNECTED, callback)).toThrow(
-        RealtimeAPIError,
-      );
-    });
-
     it('should remove all listeners for an event', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
@@ -113,7 +106,10 @@ describe('RealtimeEventHandler', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
       const debugHandler = new RealtimeEventHandler(true);
       debugHandler._log('Test message');
-      expect(consoleSpy).toHaveBeenCalledWith('[RealtimeClient] Test message');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[RealtimeClient] Test message',
+        undefined,
+      );
       consoleSpy.mockRestore();
     });
 

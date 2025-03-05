@@ -25,11 +25,13 @@ import {
 } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import logo from '../../logo.svg';
+import useIsMobile from '../../hooks/use-is-mobile';
 import useInterrupt from '../../hooks/use-interrupt';
 import { useAccessToken } from '../../hooks/use-access-token';
 import Settings from './settings';
 import Player from './player';
 import Header from './header';
+import { ConsoleLog } from './console-log';
 
 const { Content, Footer } = Layout;
 const { Text } = Typography;
@@ -55,6 +57,7 @@ const RealtimeConsole: React.FC = () => {
   const { getAccessToken, removeAccessToken, initLocalManager } =
     useAccessToken();
   const { handleMessage } = useInterrupt({ clientRef });
+  const isMobile = useIsMobile();
 
   const handleSaveSettings = async () => {
     if (clientRef.current) {
@@ -153,9 +156,12 @@ const RealtimeConsole: React.FC = () => {
   };
 
   const handleAllMessage = useCallback((eventName: string, data: any) => {
-    console.log('event', eventName, data);
+    // console.log('event', eventName, data);
 
-    if (eventName === EventNames.PLAYER_EVENT) {
+    if (
+      eventName === EventNames.PLAYER_EVENT ||
+      eventName === EventNames.NETWORK_QUALITY
+    ) {
       return;
     }
 
@@ -169,7 +175,7 @@ const RealtimeConsole: React.FC = () => {
     const type = eventName.split('.')[0]; // server or client
     const event = eventName.substring(eventName.indexOf('.') + 1); // event name
 
-    setEvents(prevEvents => [...prevEvents, { time, type, event }]);
+    setEvents(prevEvents => [...prevEvents.slice(-200), { time, type, event }]);
 
     if (
       type === 'server' &&
@@ -193,7 +199,7 @@ const RealtimeConsole: React.FC = () => {
           data.data.content = JSON.stringify(data.data);
           data.data.role = 'assistant';
         }
-        return [...prevEvents, { time, event, data }];
+        return [...prevEvents.slice(-200), { time, event, data }];
       });
     }
   }, []);
@@ -236,8 +242,6 @@ const RealtimeConsole: React.FC = () => {
 
     try {
       await clientRef.current.disconnect();
-      clientRef.current.off(EventNames.ALL, handleAllMessage);
-      clientRef.current = null;
       message.success('Disconnected');
     } catch (e) {
       if (e instanceof RealtimeAPIError) {
@@ -291,7 +295,7 @@ const RealtimeConsole: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Settings onSaveSettings={handleSaveSettings} />
+      <Settings onSaveSettings={handleSaveSettings} clientRef={clientRef} />
       <Footer style={{ textAlign: 'center' }}>
         <Header
           onConnect={handleConnect}
@@ -303,81 +307,84 @@ const RealtimeConsole: React.FC = () => {
         />
       </Footer>
       {isShowVideo() && <Player clientRef={clientRef} />}
-      <Content style={{ padding: '20px' }}>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-            <Card
-              title="Events"
-              style={{ marginBottom: '20px' }}
-              extra={
-                <Checkbox
-                  checked={autoScrollEvents}
-                  onChange={e => setAutoScrollEvents(e.target.checked)}
-                >
-                  Auto Scroll
-                </Checkbox>
-              }
-            >
-              <List
-                dataSource={[...events, { event: 'end', time: '', type: '' }]}
-                style={{ maxHeight: '420px', overflow: 'auto' }}
-                renderItem={item =>
-                  item.event === 'end' ? (
-                    <div ref={eventsEndRef} />
-                  ) : (
-                    <List.Item>
-                      <Text>{item.time}</Text>&nbsp;&nbsp;&nbsp;
-                      <Text>[{item.type}]</Text>&nbsp;&nbsp;&nbsp;
-                      <Text>{item.event}</Text>
-                    </List.Item>
-                  )
+      {isMobile && <ConsoleLog />}
+      {!isMobile && (
+        <Content style={{ padding: '20px' }}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Card
+                title="Events"
+                style={{ marginBottom: '20px' }}
+                extra={
+                  <Checkbox
+                    checked={autoScrollEvents}
+                    onChange={e => setAutoScrollEvents(e.target.checked)}
+                  >
+                    Auto Scroll
+                  </Checkbox>
                 }
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-            <Card
-              title="User & Assistant"
-              extra={
-                <Checkbox
-                  checked={autoScrollServerEvents}
-                  onChange={e => setAutoScrollServerEvents(e.target.checked)}
-                >
-                  Auto Scroll
-                </Checkbox>
-              }
-            >
-              <List
-                dataSource={[
-                  ...serverEvents,
-                  { event: 'end', time: '', type: '' },
-                ]}
-                style={{ maxHeight: '420px', overflow: 'auto' }}
-                renderItem={item =>
-                  item.event === 'end' ? (
-                    <div ref={serverEventsEndRef} />
-                  ) : (
-                    <List.Item>
-                      <Typography.Paragraph
-                        ellipsis={{
-                          rows: 1,
-                          expandable: true,
-                          symbol: 'Show more',
-                        }}
-                        style={{ margin: 0, width: '100%' }}
-                      >
-                        {item.time}&nbsp;&nbsp;
-                        {item.event}&nbsp;[{item.data?.data?.role}]&nbsp;
-                        {item.data?.data?.content}
-                      </Typography.Paragraph>
-                    </List.Item>
-                  )
+              >
+                <List
+                  dataSource={[...events, { event: 'end', time: '', type: '' }]}
+                  style={{ maxHeight: '320px', overflow: 'auto' }}
+                  renderItem={item =>
+                    item.event === 'end' ? (
+                      <div ref={eventsEndRef} />
+                    ) : (
+                      <List.Item>
+                        <Text>{item.time}</Text>&nbsp;&nbsp;&nbsp;
+                        <Text>[{item.type}]</Text>&nbsp;&nbsp;&nbsp;
+                        <Text>{item.event}</Text>
+                      </List.Item>
+                    )
+                  }
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <Card
+                title="User & Assistant"
+                extra={
+                  <Checkbox
+                    checked={autoScrollServerEvents}
+                    onChange={e => setAutoScrollServerEvents(e.target.checked)}
+                  >
+                    Auto Scroll
+                  </Checkbox>
                 }
-              />
-            </Card>
-          </Col>
-        </Row>
-      </Content>
+              >
+                <List
+                  dataSource={[
+                    ...serverEvents,
+                    { event: 'end', time: '', type: '' },
+                  ]}
+                  style={{ maxHeight: '320px', overflow: 'auto' }}
+                  renderItem={item =>
+                    item.event === 'end' ? (
+                      <div ref={serverEventsEndRef} />
+                    ) : (
+                      <List.Item>
+                        <Typography.Paragraph
+                          ellipsis={{
+                            rows: 1,
+                            expandable: true,
+                            symbol: 'Show more',
+                          }}
+                          style={{ margin: 0, width: '100%' }}
+                        >
+                          {item.time}&nbsp;&nbsp;
+                          {item.event}&nbsp;[{item.data?.data?.role}]&nbsp;
+                          {item.data?.data?.content}
+                        </Typography.Paragraph>
+                      </List.Item>
+                    )
+                  }
+                />
+              </Card>
+            </Col>
+          </Row>
+        </Content>
+      )}
     </Layout>
   );
 };

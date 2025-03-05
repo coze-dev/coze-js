@@ -40,6 +40,9 @@ export interface RealtimeClientConfig {
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
 }
 
+// Only use for test
+const TEST_APP_ID = '6705332c79516e015e3e5f0c';
+
 class RealtimeClient extends RealtimeEventHandler {
   public _config: RealtimeClientConfig;
   private _client: EngineClient | null = null;
@@ -104,7 +107,6 @@ class RealtimeClient extends RealtimeEventHandler {
       allowPersonalAccessTokenInBrowser:
         this._config.allowPersonalAccessTokenInBrowser,
     });
-    this._isTestEnv = defaultBaseURL !== 'https://api.coze.cn';
     this._isSupportVideo = !!config.videoConfig;
   }
 
@@ -115,6 +117,7 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async connect() {
     const { botId, conversationId, voiceId, getRoomInfo } = this._config;
+    this.dispatch(EventNames.CONNECTING, {});
 
     let roomInfo: CreateRoomData;
     try {
@@ -124,7 +127,9 @@ class RealtimeClient extends RealtimeEventHandler {
       } else {
         let config = undefined;
         if (this._config.videoConfig) {
-          if (isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)) {
+          if (
+            isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)
+          ) {
             config = {
               video_config: {
                 stream_video_type: 'screen' as const,
@@ -156,6 +161,8 @@ class RealtimeClient extends RealtimeEventHandler {
         error,
       );
     }
+
+    this._isTestEnv = TEST_APP_ID === roomInfo.app_id;
 
     // Step2 create engine
     this._client = new EngineClient(
@@ -226,8 +233,8 @@ class RealtimeClient extends RealtimeEventHandler {
    */
   async disconnect() {
     await this._client?.disconnect();
-
     this.isConnected = false;
+    this._client = null;
     this.dispatch(EventNames.DISCONNECTED, {});
   }
 

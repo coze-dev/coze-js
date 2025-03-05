@@ -2,23 +2,27 @@ import React, { useState } from 'react';
 
 import Link from 'antd/es/typography/Link';
 import { Layout, Button, Modal } from 'antd';
+import { type RealtimeClient } from '@coze/realtime-api';
 import { SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DOCS_URL } from '../../utils/constants';
 import logo from '../../logo.svg';
+import useNetworkError from '../../hooks/use-network-error';
 import SettingForm from './setting-form';
 const { Header } = Layout;
 
 interface SettingsProps {
   onSaveSettings: () => void;
+  clientRef: React.MutableRefObject<RealtimeClient | null>;
 }
 
-const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
+const Settings: React.FC<SettingsProps> = ({ onSaveSettings, clientRef }) => {
   const localManager = new LocalManager();
   const [isModalVisible, setIsModalVisible] = useState(
     !localManager.get(LocalStorageKey.BOT_ID),
   );
+  const { connectStatus } = useNetworkError({ clientRef });
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -83,11 +87,26 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings }) => {
             alignItems: 'center',
           }}
         >
+          <div
+            style={{
+              color: 'white',
+              padding: '0 8px',
+              borderRadius: '4px',
+              height: '32px',
+              textAlign: 'center',
+              lineHeight: '32px',
+              backgroundColor:
+                connectStatus === 'connected' ? '#52c41a' : '#ff4d4f',
+            }}
+          >
+            Status: {connectStatus}
+          </div>
           <Link href={DOCS_URL} target="_blank">
             <Button type="primary" icon={<FileTextOutlined />}>
-              Documentation
+              Document
             </Button>
           </Link>
+
           <Button icon={<SettingOutlined />} onClick={showModal}>
             Settings
           </Button>
