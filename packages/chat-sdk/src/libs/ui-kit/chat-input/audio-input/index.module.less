@@ -5,6 +5,7 @@
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;
+  align-self: center;
 
   .text {
     color: rgba(48, 68, 112, 0.38);
@@ -34,11 +35,11 @@
     width: calc(100% + 2px);
     top: -1px;
     left: -1px;
-    background: linear-gradient(117deg, #5448FF 4.74%, #B026F1 131.42%);
+    background: linear-gradient(117deg, #5448ff 4.74%, #b026f1 131.42%);
     border-radius: 24px;
 
     &.outside {
-      background: #FF0030;
+      background: #ff0030;
     }
 
     .text {
@@ -53,17 +54,13 @@
     padding: 0;
   }
 
-
-
   &.primary {
-
     &.touching {
-
-      background: #FFF;
+      background: #fff;
       border: 1px solid var(--chat-bg-border-color-hglt, rgba(78, 64, 229));
 
       &.outside {
-        border: 1px solid #F00;
+        border: 1px solid #f00;
       }
     }
   }
@@ -72,7 +69,6 @@
     overflow: hidden;
   }
 }
-
 
 .tips-container {
   position: absolute;
@@ -85,14 +81,14 @@
   width: fit-content;
   overflow: hidden;
   z-index: 5;
-  background-color: #F2F3F7;
+  background-color: #f2f3f7;
   border-radius: 100px;
   color: rgba(11, 21, 43, 0.82);
   -webkit-user-select: none;
   user-select: none;
 
   .left-duration {
-    color: #5546FF;
+    color: #5546ff;
     font-size: 16px;
     font-weight: 500;
     line-height: 22px;
@@ -100,10 +96,10 @@
   }
 
   &.outside-tips {
-    background-color: #FFEFF1;
+    background-color: #ffeff1;
 
     .tips-text {
-      color: #FF002B;
+      color: #ff002b;
       font-weight: 500;
     }
   }

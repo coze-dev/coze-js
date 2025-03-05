@@ -58,6 +58,7 @@ export const useInitChat = (props: IChatFlowProps) => {
           clearMessage: props?.areaUi?.clearMessage,
           uploadBtn: props?.areaUi?.uploadBtn,
           message: props?.areaUi?.message,
+          messageWrapper: props?.areaUi?.messageWrapper,
         },
       },
       eventCallbacks: {

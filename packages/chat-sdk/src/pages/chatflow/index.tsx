@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { View } from '@tarojs/components';
 
 import UserIcon from '@/libs/ui-kit/assets/imgs/coze-logo.png';
-import { ChatSlot } from '@/libs';
+import { ChatSlot, useApiClientStore, useChatInputStore } from '@/libs';
 import { IChatFlowProps } from '@/chatflow/type';
 import { ChatFlowFramework } from '@/chatflow';
 
@@ -85,8 +85,20 @@ export default function Index() {
       isNeed: true,
       isNeedTaskMessage: true,
       isNeedAudio: true,
-
+      defaultText:
+        'Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right',
       renderChatInputTopSlot: () => <div> Input Top Slot</div>,
+    },
+    messageWrapper: {
+      senderName: {
+        renderRightSlot: ({ isQuery }) =>
+          isQuery ? null : (
+            <View>
+              Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right
+              Slot Slot Right Slot Slot Right Slot
+            </View>
+          ),
+      },
     },
   });
   console.log('chatflow props:', {
@@ -144,6 +156,9 @@ export default function Index() {
                 afterMessageReceivedFinish: props => {
                   console.log('afterMessageReceivedFinish:', props);
                 },
+                onRequiresAction: props => {
+                  console.log('ForRequireAction onRequiresAction:', props);
+                },
               },
             },
           }}
@@ -155,4 +170,10 @@ export default function Index() {
   );
 }
 
-const ChatFlowNode = () => <ChatSlot className={styles.ChatSlot} />;
+const ChatFlowNode = () => {
+  const apiClient = useApiClientStore(store => store.apiClient);
+  const setInputValue = useChatInputStore(store => store.setInputValue);
+  console.log('ForRequireAction apiClient', apiClient, setInputValue);
+
+  return <ChatSlot className={styles.ChatSlot} />;
+};

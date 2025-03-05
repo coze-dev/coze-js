@@ -1,4 +1,11 @@
-import { FC, memo, PropsWithChildren, useMemo, useRef } from 'react';
+import {
+  FC,
+  memo,
+  PropsWithChildren,
+  useMemo,
+  useRef,
+  CSSProperties,
+} from 'react';
 
 import type { Root as RootMdType } from 'mdast';
 
@@ -37,6 +44,8 @@ export interface MarkdownProps {
   debug?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  imgClassName?: string;
+  imgStyle?: CSSProperties;
   eventCallbacks?: ElementEventCallbacks;
 }
 const MarkdownRender: FC<
@@ -89,6 +98,8 @@ const MdStreamOp: FC<PropsWithChildren<MarkdownProps>> = ({
   selectable = true,
   className,
   style,
+  imgClassName,
+  imgStyle,
   taskDisabled,
   enableHtmlTags = false,
   enableCodeBy4Space = false,
@@ -135,6 +146,8 @@ const MdStreamOp: FC<PropsWithChildren<MarkdownProps>> = ({
       taskDisabled={!isFinish || taskDisabled}
       enableHtmlTags={enableHtmlTags}
       enableCodeBy4Space={enableCodeBy4Space}
+      imgClassName={imgClassName}
+      imgStyle={imgStyle}
     >
       <MarkdownRender
         theme={theme}

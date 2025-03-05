@@ -9,7 +9,7 @@ import {
   Spinning,
   SvgError,
 } from '@/libs/ui-kit';
-import { ChatMessage } from '@/libs/types';
+import { ChatMessage, ChatMessageGroup } from '@/libs/types';
 import { useSendMessage } from '@/libs/services';
 import { useChatPropsStore, useUserInfoStore } from '@/libs/provider';
 
@@ -21,8 +21,15 @@ export const QueryMessage: FC<{
   isAWaiting?: boolean;
   isLastMessage?: boolean;
   hasRespMessage?: boolean;
+  chatGroup?: ChatMessageGroup;
 }> = memo(
-  ({ message, isAWaiting = false, hasRespMessage, isLastMessage = false }) => {
+  ({
+    message,
+    isAWaiting = false,
+    hasRespMessage,
+    isLastMessage = false,
+    chatGroup,
+  }) => {
     const userInfo = useUserInfoStore(store => store.info);
     const { reSendLastErrorMessage } = useSendMessage();
     const isShowError = message.error && !hasRespMessage;
@@ -31,10 +38,16 @@ export const QueryMessage: FC<{
     const onImageClick = useChatPropsStore(
       store => store.eventCallbacks?.onImageClick,
     );
+    const messageWrapperConf = useChatPropsStore(
+      store => store.ui?.chatSlot?.messageWrapper,
+    );
     return (
       <MessageContainer
         senderInfo={userInfo || undefined}
         className={styles['query-container']}
+        isQuery={true}
+        chatGroup={chatGroup}
+        messageWrapperConf={messageWrapperConf}
       >
         <View className={styles['query-message']}>
           <CommandTooltip

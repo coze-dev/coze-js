@@ -10,6 +10,9 @@ import {
   RawMessageType,
   useInitSuccess,
   useSendMessage,
+  useApiClientStore,
+  useConversationStore,
+  useChatInputStore,
 } from '../libs';
 import { ChatFlowFramework } from '../chatflow';
 
@@ -26,6 +29,9 @@ export default {
   RawMessageType,
   useInitSuccess,
   useSendMessage,
+  useApiClientStore,
+  useConversationStore,
+  useChatInputStore,
 };
 export {
   MdStream,
@@ -40,6 +46,9 @@ export {
   RawMessageType,
   useInitSuccess,
   useSendMessage,
+  useApiClientStore,
+  useConversationStore,
+  useChatInputStore,
 };
 export * from '@/libs/types';
 export { type IChatFlowProps } from '../chatflow/type';

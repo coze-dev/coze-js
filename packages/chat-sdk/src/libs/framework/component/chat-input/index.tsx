@@ -1,10 +1,14 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 
 import cls from 'classnames';
 import { View } from '@tarojs/components';
 
-import { logger } from '@/libs/utils';
-import { ChatInput as ChatInputUi, Spacing } from '@/libs/ui-kit';
+import { logger, nanoid } from '@/libs/utils';
+import {
+  ChatInput as ChatInputUi,
+  Spacing,
+  type ChatInputRef,
+} from '@/libs/ui-kit';
 import { useSendMessage } from '@/libs/services';
 import {
   useChatInputStore,
@@ -30,6 +34,7 @@ let chatInputNo = 1;
 export const ChatInput = () => {
   const i18n = useI18n();
 
+  const ref = useRef<ChatInputRef>(null);
   const { sendTextMessage, sendFileMessage, sendAudioMessage } =
     useSendMessage();
   const { input: inputDisableState } = useChatStatusStore(
@@ -46,7 +51,7 @@ export const ChatInput = () => {
   const inputUiConfig = uiConfig?.chatSlot?.input;
   const uploadConfig = uiConfig?.chatSlot?.uploadBtn;
   const renderChatInputTopSlot = inputUiConfig?.renderChatInputTopSlot;
-  const inputId = useMemo(() => `chatInput${chatInputNo++}`, []);
+  const inputId = useMemo(() => `chatInput_${nanoid()}_${chatInputNo++}`, []);
   const { changeInputLocation, bottomOffset, inputAdjustDefault } =
     useInputAdjust(inputId);
   const targetFrameEvent = useUiEventStore(store => store.event);
@@ -57,7 +62,15 @@ export const ChatInput = () => {
       setIsAudioRecording(isAudioRecordingNew);
     },
   );
+  const initSetInputValueFunc = useChatInputStore(
+    state => state.initSetInputValueFunc,
+  );
 
+  useEffect(() => {
+    initSetInputValueFunc((val: string) => {
+      ref.current?.setInputValue(val);
+    });
+  }, []);
   logger.info('ChatInput input info', {
     isNeedAudio,
     inputType,
@@ -115,6 +128,7 @@ export const ChatInput = () => {
           }}
         >
           <ChatInputUi
+            ref={ref}
             isNeedUpload={uploadConfig?.isNeed !== false}
             isNeedTaskMessage={inputUiConfig?.isNeedTaskMessage}
             disabled={inputDisableState}

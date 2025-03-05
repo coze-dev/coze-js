@@ -12,7 +12,8 @@ import styles from './index.module.less';
 export const Image: FC<{
   node: ImageMdType;
 }> = ({ node }) => {
-  const { onImageClick, eventCallbacks } = useMdStreamContext();
+  const { onImageClick, eventCallbacks, imgClassName, imgStyle } =
+    useMdStreamContext();
   const [url, setUrl] = useState(node.url);
   useEffect(() => {
     setUrl(node.url);
@@ -21,12 +22,17 @@ export const Image: FC<{
     <TaroImage
       src={url}
       mode="aspectFill"
-      className={cls(styles.image, {
-        [styles['image-error']]: !url,
-      })}
+      className={cls(
+        styles.image,
+        {
+          [styles['image-error']]: !url,
+        },
+        imgClassName,
+      )}
       onError={() => {
         setUrl('');
       }}
+      style={imgStyle}
       onClick={() => {
         if (node.url) {
           if (eventCallbacks?.onImageClick) {

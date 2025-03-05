@@ -37,6 +37,11 @@ export default function Index() {
         enableCodeBy4Space={false}
         markdown={content}
         enableHtmlTags={true}
+        imgClassName={'img-class2'}
+        imgStyle={{
+          width: '100%',
+          maxWidth: '100%',
+        }}
         onTaskChange={value => {
           console.log({ value });
         }}
