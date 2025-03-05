@@ -1,5 +1,23 @@
 # @coze/api
 
+## 1.1.0 - 2025-03-03
+
+### New Features
+
+- Add playback timing and state management
+- update README.md
+- add unit test
+- add screen sharing support and video device persistence
+- add WebSocket speech and transcription clients
+- ws-tools rslib config
+- Update readme
+- feat: add async workflow execution and history tracking
+
+### Bug Fixes
+
+- add unit test
+
+
 ## 1.0.21 - 2025-02-24
 
 ### New Features
