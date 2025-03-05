@@ -56,6 +56,15 @@ const client = new RealtimeClient({
   voiceId: "your_voice_id",           // 可选：指定音色 ID
   conversationId: "conversation_id",   // 可选：用于对话连续性
   debug: true,                        // 可选：启用调试日志
+  getRoomInfo: async () => {
+    // 自定义获取房间信息
+    return {
+      token: "your_token",
+      uid: "your_uid",
+      room_id: "your_room_id",
+      app_id: "your_app_id",
+    };
+  },
   allowPersonalAccessTokenInBrowser: true,  // 可选：在浏览器中启用 PAT 令牌使用
   audioMutedDefault: false,           // 可选：初始音频状态（默认：false）
   suppressStationaryNoise: false,     // 可选：启用静态噪声抑制（默认：false）
