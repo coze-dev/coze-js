@@ -10,7 +10,7 @@ export const useWheelHandle = () => {
     const { deltaY } = event;
     refScroll.current?.scrollBy(0, -deltaY);
   }, []);
-  const onInitScrollRefForWheel = useCallback(el => {
+  const onInitScrollRefForWheel = useCallback((el: HTMLDivElement) => {
     if (isWeb) {
       if (refScroll.current) {
         refScroll.current.removeEventListener('wheel', onWheelHandle);

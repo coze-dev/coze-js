@@ -269,9 +269,14 @@ export class ChatFlowService extends ChatService {
             params.suggestPromoteInfo?.customizedSuggestPrompt,
         }
       : undefined;
+    const optionNew = options || {};
+    optionNew.headers = {
+      ...(options?.headers || {}),
+      ...(this.chatFlowProps?.workflow?.header || {}),
+    };
     return this.apiClient.workflows.chat.stream(
       bodyData as unknown as ChatWorkflowReq,
-      options,
+      optionNew,
     );
   }
 }

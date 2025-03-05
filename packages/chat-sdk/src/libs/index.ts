@@ -3,6 +3,8 @@ export {
   useChatInfoStore,
   useConversationStore,
   useInitSuccess,
+  useApiClientStore,
+  useChatInputStore,
 } from './provider';
 export { MdStream } from './ui-kit';
 export { ChatService, useSendMessage } from './services';

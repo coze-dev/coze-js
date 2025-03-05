@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { View } from '@tarojs/components';
+import { View, Textarea } from '@tarojs/components';
 
 import { Radio, Spacing } from '@/libs/ui-kit';
 
@@ -18,6 +18,13 @@ export default function Index() {
           }}
         />
       </Spacing>
+      <View className={styles['text-container']}>
+        <Textarea
+          placeholder="有什么问题"
+          className={styles.textarea}
+          placeholderClass={styles.placeholder}
+        />
+      </View>
     </View>
   );
 }

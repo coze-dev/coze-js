@@ -29,7 +29,7 @@ export default function Index() {
           setting={{
             apiBaseUrl: botInfo.apiBaseUrl,
             cdnBaseUrlPath: botInfo.cdnBaseUrlPath,
-            language: Language.EN,
+            language: Language.ZH_CN,
             logLevel: 'debug',
           }}
           auth={{
@@ -52,6 +52,17 @@ export default function Index() {
               input: {
                 isNeedAudio: true,
                 renderChatInputTopSlot: props => <View>Input Slot</View>,
+              },
+              messageWrapper: {
+                senderName: {
+                  renderRightSlot: ({ isQuery }) =>
+                    isQuery ? null : (
+                      <View>
+                        Right Slot Right Slot Slot Right Slot Slot Right Slot
+                        Slot Right Slot Slot Right Slot Slot Right Slot
+                      </View>
+                    ),
+                },
               },
             },
             header: {

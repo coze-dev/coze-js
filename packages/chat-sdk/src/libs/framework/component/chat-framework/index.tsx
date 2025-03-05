@@ -1,7 +1,7 @@
 import cls from 'classnames';
 import { View } from '@tarojs/components';
 
-import { logger } from '@/libs/utils';
+import { logger, nanoid } from '@/libs/utils';
 import { Spacing } from '@/libs/ui-kit';
 import { UIEventType, type ChatFrameworkProps } from '@/libs/types';
 import { useChatInit } from '@/libs/services';
@@ -19,20 +19,20 @@ import { ChatToast } from '../chat-toast';
 import { ChatSlot } from '../chat-slot';
 import { ChatModal } from '../chat-modal';
 import { ChatLoading } from '../chat-loading';
+import { ChatHeader } from '../chat-header';
 import { ChatFooter } from '../chat-footer';
 import { ChatBackground } from '../chat-background';
-import { ChatHeader } from '../chat-header';
 
 import '../../../ui-kit/token/index.css';
 import styles from './index.module.less';
 
 import { ChatError } from '../chat-error';
 
-import { ReactNode, useEffect, useMemo } from 'react';
+import { FC, PropsWithChildren, ReactNode, useEffect, useMemo } from 'react';
 
 import { eventCenter } from '@tarojs/taro';
 
-const ChatFrameInit = ({ children }) => {
+const ChatFrameInit: FC<PropsWithChildren> = ({ children }) => {
   const { isLoading, error } = useChatInfoStore(store => ({
     isLoading: store.isLoading,
     error: store.error,
@@ -53,7 +53,7 @@ const ChatFrameInit = ({ children }) => {
 let frameId = 1000;
 export const ChatContent = ({ children }: { children?: ReactNode }) => {
   const bgInfo = useInitBgInfo();
-  const chatFrameId = useMemo(() => `chat_frame_${frameId++}`, []);
+  const chatFrameId = useMemo(() => `chat_frame_${nanoid()}_${frameId++}`, []);
   const isMobile = useIsMobile();
   const themeType = useThemeType();
   const onThemeChange = useChatPropsStore(
@@ -97,7 +97,7 @@ export const ChatContent = ({ children }: { children?: ReactNode }) => {
 };
 
 export const ChatFramework = ({ children, ...props }: ChatFrameworkProps) => {
-  logger.info('SdkVersion: 0.1.3-alpha.2025021406');
+  logger.info('SdkVersion: 0.1.10-beta.1');
   return (
     <ChatFrameProvider {...props}>
       <ChatContent>{children}</ChatContent>

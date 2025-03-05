@@ -7,6 +7,7 @@ export {
   useUserInfoStore,
   useI18n,
   useChatPropsStore,
+  useChatInputStore,
 } from './context';
 export { ChatFrameProvider } from './framework';
 export { useInitBgInfo } from './hooks/use-init-bg-info';

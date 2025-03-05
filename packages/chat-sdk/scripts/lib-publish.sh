@@ -1,1 +1,1 @@
-npx @bytedance-dev/bnpm@latest publish
+npx @bytedance-dev/bnpm@latest publish --tag alpha

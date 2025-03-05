@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 
 import type { List as ListMdType, ListItem as ListMdItem } from 'mdast';
+import cls from 'classnames';
 import { isBoolean } from '@tarojs/shared';
 import { Text, View } from '@tarojs/components';
 
@@ -116,8 +117,14 @@ const ListItemWrapper: FC<{
         {children}
       </ListTaskWrapper>
     ) : (
-      <Spacing className={styles['list-item']} gap={6} width100>
-        <CenterAlignedBox width={16} height={22}>
+      <Spacing
+        className={cls(styles['list-item'], {
+          [styles['order-list']]: listItemInfo.isOrder,
+        })}
+        gap={6}
+        width100
+      >
+        <CenterAlignedBox width={21} height={22}>
           {listItemInfo.isOrder ? (
             <Text>{listItemInfo.orderNo}.</Text>
           ) : (
