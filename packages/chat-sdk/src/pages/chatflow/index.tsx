@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { View } from '@tarojs/components';
+import { RoleType } from '@coze/api';
 
+import { nanoid } from '@/libs/utils';
 import UserIcon from '@/libs/ui-kit/assets/imgs/coze-logo.png';
-import { ChatSlot, useApiClientStore, useChatInputStore } from '@/libs';
+import {
+  ChatSlot,
+  useApiClientStore,
+  useChatInputStore,
+  useConversationStore,
+} from '@/libs';
 import { IChatFlowProps } from '@/chatflow/type';
 import { ChatFlowFramework } from '@/chatflow';
 
@@ -173,7 +180,53 @@ export default function Index() {
 const ChatFlowNode = () => {
   const apiClient = useApiClientStore(store => store.apiClient);
   const setInputValue = useChatInputStore(store => store.setInputValue);
-  console.log('ForRequireAction apiClient', apiClient, setInputValue);
+  const pushMessageList = useConversationStore(store => store.pushMessageList);
+  const { conversationId, sectionID } = useConversationStore(store => ({
+    conversationId: store.id,
+    sectionID: store.sectionId,
+  }));
+  console.log(
+    'ForRequireAction apiClient',
+    apiClient,
+    setInputValue,
+    pushMessageList,
+  );
+  useEffect(() => {
+    pushMessageList([
+      {
+        id: '1298',
+        role: RoleType.User,
+        conversation_id: conversationId || '',
+        section_id: sectionID,
+        bot_id: '',
+        chat_id: '123',
+        localId: nanoid(),
+        meta_data: {},
+        content: '你好a adsfadsf, 我去',
+        content_type: 'text',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        type: 'question',
+      },
+      {
+        id: '1298',
+        role: RoleType.Assistant,
+        conversation_id: conversationId || '',
+        section_id: sectionID,
+        bot_id: '',
+        chat_id: '123',
+        localId: nanoid(),
+        meta_data: {},
+        content: '好',
+
+        content_type: 'text',
+        created_at: Date.now(),
+        updated_at: Date.now(),
+        type: 'answer',
+        isComplete: true,
+      },
+    ]);
+  }, []);
 
   return <ChatSlot className={styles.ChatSlot} />;
 };
