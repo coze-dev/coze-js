@@ -436,6 +436,10 @@
       "projectFolder": "examples/realtime-console"
     },
     {
+      "packageName": "@coze/realtime-uniapp",
+      "projectFolder": "examples/realtime-uniapp"
+    },
+    {
       "packageName": "@coze/realtime-call-up",
       "projectFolder": "examples/realtime-call-up"
     },
