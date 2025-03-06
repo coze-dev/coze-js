@@ -134,6 +134,7 @@ const ListItemWrapper: FC<{
         <View
           style={{
             flex: 1,
+            overflow: 'hidden',
           }}
         >
           {children}

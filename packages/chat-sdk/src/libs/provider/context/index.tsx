@@ -13,4 +13,5 @@ export {
   useI18n,
   useChatPropsStore,
   useChatInputStore,
+  useUiEventStore,
 } from './chat-store-context';

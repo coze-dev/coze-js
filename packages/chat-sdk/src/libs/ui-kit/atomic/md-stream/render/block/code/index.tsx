@@ -1,8 +1,10 @@
 import { FC, Fragment, useMemo } from 'react';
 
 import cls from 'classnames';
-import { setClipboardData, showToast } from '@tarojs/taro';
+import { showToast } from '@tarojs/taro';
 import { View } from '@tarojs/components';
+
+import { setClipboardData } from '@/libs/utils';
 
 import { Text } from '../../phrase/text';
 import { Indicator } from '../../phrase/indicator';
