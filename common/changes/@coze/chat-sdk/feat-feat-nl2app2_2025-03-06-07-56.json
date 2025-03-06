@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "chagng version",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "gaoding.devingao@bytedance.com"
+}
