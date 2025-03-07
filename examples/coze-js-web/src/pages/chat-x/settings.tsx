@@ -14,9 +14,11 @@ const Settings = ({ onSettingsChange }: { onSettingsChange: () => void }) => {
     const baseUrl = config.getBaseUrl();
     const pat = config.getPat();
     const botId = config.getBotId();
+    const baseWsUrl = config.getBaseWsUrl();
 
     form.setFieldsValue({
       base_url: baseUrl,
+      base_ws_url: baseWsUrl,
       pat,
       bot_id: botId,
     });
@@ -51,6 +53,13 @@ const Settings = ({ onSettingsChange }: { onSettingsChange: () => void }) => {
             name="base_url"
             label="Base URL"
             rules={[{ required: true, message: 'Please input Base URL!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="base_ws_url"
+            label="Base WS URL"
+            rules={[{ required: true, message: 'Please input Base WS URL!' }]}
           >
             <Input />
           </Form.Item>

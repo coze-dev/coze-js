@@ -2,7 +2,6 @@ import { type MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 import { WsSpeechClient, WsTranscriptionClient } from '@coze/api/ws-tools';
 import {
-  COZE_CN_BASE_WS_URL,
   type CozeAPI,
   type CreateChatData,
   type CreateChatWsReq,
@@ -211,7 +210,7 @@ const useWsAPI = (
   const startTranscriptions = useCallback(async () => {
     const transcriptionClient = new WsTranscriptionClient({
       token: config.getPat(),
-      baseWsURL: COZE_CN_BASE_WS_URL,
+      baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
     });
 
@@ -309,7 +308,7 @@ const useWsAPI = (
 
     const client = new WsSpeechClient({
       token: config.getPat(),
-      baseWsURL: COZE_CN_BASE_WS_URL,
+      baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
     });
 
