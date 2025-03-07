@@ -1,7 +1,7 @@
 import { Modal } from 'antd';
 import { type OAuthToken, refreshOAuthToken } from '@coze/api';
 
-import { type LocalManager, LocalStorageKey } from './local-manager';
+import { LocalManager, LocalStorageKey } from './local-manager';
 import { DEFAULT_OAUTH_CLIENT_ID } from './constants';
 
 declare global {
@@ -24,6 +24,29 @@ export const isShowVideo = () => {
   return (
     enableVideo === 'true' && `${process.env.REACT_APP_ENABLE_VIDEO}` === 'true'
   );
+};
+
+export const getTokenByCookie = async () => {
+  if (location.hostname !== 'www.coze.cn') {
+    return null;
+  }
+  try {
+    const result = await fetch(
+      'https://www.coze.cn/api/permission_api/coze_web_app/impersonate_coze_user',
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: '{}',
+      },
+    ).then(res => res.json());
+    console.log('getTokenByCookie', result);
+    return result.data as OAuthToken;
+  } catch (e) {
+    console.error('getTokenByCookie', e);
+  }
+  return null;
 };
 
 export const redirectToLogin = (
@@ -73,7 +96,10 @@ export const saveOAuthToken = (
 ) => {
   const expiresAt = response.expires_in * 1000;
   localManager.set(LocalStorageKey.ACCESS_TOKEN, response.access_token);
-  localManager.set(LocalStorageKey.REFRESH_TOKEN, response.refresh_token);
+  localManager.set(
+    LocalStorageKey.REFRESH_TOKEN,
+    response.refresh_token || 'cookie_token',
+  );
   localManager.set(LocalStorageKey.TOKEN_EXPIRES_AT, expiresAt.toString());
 };
 
@@ -90,17 +116,29 @@ export const getOrRefreshToken = async (localManager: LocalManager) => {
 
     if (Date.now() > expiresAt || !accessToken) {
       // refresh token
-      const response = await refreshOAuthToken({
-        baseURL: baseUrl,
-        clientId: DEFAULT_OAUTH_CLIENT_ID,
-        refreshToken,
-        clientSecret: '',
-      });
+      let response;
+      if (refreshToken === 'cookie_token') {
+        response = await getTokenByCookie();
+      }
+      if (!response) {
+        response = await refreshOAuthToken({
+          baseURL: baseUrl,
+          clientId: DEFAULT_OAUTH_CLIENT_ID,
+          refreshToken,
+          clientSecret: '',
+        });
+      }
 
       console.log('refresh token', response);
       saveOAuthToken(localManager, response);
 
       return response.access_token;
+    }
+  } else {
+    const result = await getTokenByCookie();
+    if (result) {
+      saveOAuthToken(localManager, result);
+      return result.access_token;
     }
   }
 
@@ -112,6 +150,12 @@ export const getOrRefreshToken = async (localManager: LocalManager) => {
 };
 
 export const isTeamWorkspace = (workspaceId?: string) => {
+  const localManager = new LocalManager();
+  const refreshToken = localManager.get(LocalStorageKey.REFRESH_TOKEN);
+  if (refreshToken === 'cookie_token') {
+    return false;
+  }
+
   const id = workspaceId || localStorage.getItem(LocalStorageKey.WORKSPACE_ID);
   return id?.startsWith('team_');
 };
