@@ -26,6 +26,9 @@
       </a-button>
     </a-space>
     <br />
+    <div>
+      <p>Connection Status: {{ connectStatus }}</p>
+    </div>
     <a-space direction="vertical">
       <a-space v-if="isSupportVideo">
         <div
@@ -58,7 +61,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script>
 import { ref, onUnmounted } from 'vue';
 import { message } from 'ant-design-vue';
 import {
@@ -76,144 +79,164 @@ import {
   useTokenWithDevice,
   useTokenWithPKCE,
 } from './hooks/index';
+import { NetworkErrorManager } from './network-error-manager';
 
-const botId = '7428177321599***';
-
-const client = ref<RealtimeClient | null>(null);
-const messageList = ref<string[]>([]);
-const isConnecting = ref(false);
-const isConnected = ref(false);
-const audioEnabled = ref(true);
-const isSupportVideo = ref(false);
-
+const botId = '742817732159922***';
 const { getToken } = useTokenWithPat();
-// const { getToken } = useTokenWithWeb();
 
-async function getVoices() {
-  const api = new CozeAPI({
-    token: getToken,
-    baseURL: COZE_CN_BASE_URL,
-    allowPersonalAccessTokenInBrowser: true,
-  });
+export default {
+  data() {
+    return {
+      client: null,
+      messageList: [],
+      isConnecting: false,
+      isConnected: false,
+      audioEnabled: true,
+      isSupportVideo: false,
+      connectStatus: 'disconnected',
+      networkManager: null,
+    };
+  },
 
-  const voices = await api.audio.voices.list();
-  return voices.voice_list;
-}
+  methods: {
+    async getVoices() {
+      const api = new CozeAPI({
+        token: getToken,
+        baseURL: COZE_CN_BASE_URL,
+        allowPersonalAccessTokenInBrowser: true,
+      });
+      const voices = await api.audio.voices.list();
+      return voices.voice_list;
+    },
 
-async function initClient() {
-  const permission = await RealtimeUtils.checkDevicePermission(true);
-  if (!permission.audio) {
-    throw new Error('需要麦克风访问权限');
-  }
-  isSupportVideo.value = permission.video;
-
-  const voices = await getVoices();
-
-  client.value = new RealtimeClient({
-    accessToken: getToken,
-    botId,
-    connectorId: '1024',
-    voiceId: voices.length > 0 ? voices[0].voice_id : undefined,
-    allowPersonalAccessTokenInBrowser: true,
-    debug: true,
-    videoConfig: permission.video
-      ? {
-          renderDom: 'local-player',
-        }
-      : undefined,
-  });
-
-  handleMessageEvent();
-}
-
-const handleMessageEvent = () => {
-  let lastEvent: any;
-
-  client.value?.on(EventNames.ALL_SERVER, (eventName, event: any) => {
-    if (
-      event.event_type !== ChatEventType.CONVERSATION_MESSAGE_DELTA &&
-      event.event_type !== ChatEventType.CONVERSATION_MESSAGE_COMPLETED
-    ) {
-      return;
-    }
-    const content = event.data.content;
-
-    if (lastEvent?.event_type === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-      messageList.value[messageList.value.length - 1] += content;
-    } else if (event.event_type === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
-      messageList.value.push(content);
-    }
-    lastEvent = event;
-  });
-};
-
-const handleConnectClick = async () => {
-  isConnecting.value = true;
-  try {
-    await handleConnect();
-  } finally {
-    isConnecting.value = false;
-  }
-};
-
-const handleConnect = async () => {
-  try {
-    if (!client.value) {
-      await initClient();
-    }
-    await client.value?.connect();
-    isConnected.value = true;
-  } catch (error) {
-    console.error(error);
-    if (error instanceof RealtimeAPIError) {
-      switch (error.code) {
-        case RealtimeError.CREATE_ROOM_ERROR:
-          message.error(`创建房间失败: ${error.message}`);
-          break;
-        case RealtimeError.CONNECTION_ERROR:
-          message.error(`加入房间失败: ${error.message}`);
-          break;
-        case RealtimeError.DEVICE_ACCESS_ERROR:
-          message.error(`获取设备失败: ${error.message}`);
-          break;
-        default:
-          message.error(`连接错误: ${error.message}`);
+    async initClient() {
+      if (this.client) {
+        return;
       }
-    } else {
-      message.error('连接错误：' + error);
-    }
-  }
-};
+      const permission = await RealtimeUtils.checkDevicePermission(true);
+      if (!permission.audio) {
+        throw new Error('需要麦克风访问权限');
+      }
+      this.isSupportVideo = permission.video;
 
-const handleInterrupt = () => {
-  try {
-    client.value?.interrupt();
-  } catch (error) {
-    message.error('打断失败：' + error);
-  }
-};
+      const voices = await this.getVoices();
 
-const handleDisconnect = () => {
-  try {
-    client.value?.disconnect();
-    client.value?.clearEventHandlers();
-    client.value = null;
-    isConnected.value = false;
-  } catch (error) {
-    message.error('断开失败：' + error);
-  }
-};
+      this.client = new RealtimeClient({
+        accessToken: getToken,
+        botId,
+        connectorId: '1024',
+        voiceId: voices.length > 0 ? voices[0].voice_id : undefined,
+        allowPersonalAccessTokenInBrowser: true,
+        debug: true,
+        videoConfig: permission.video
+          ? {
+              renderDom: 'local-player',
+            }
+          : undefined,
+      });
 
-const toggleMicrophone = async () => {
-  try {
-    await client.value?.setAudioEnable(!audioEnabled.value);
-    audioEnabled.value = !audioEnabled.value;
-  } catch (error) {
-    message.error('切换麦克风状态失败：' + error);
-  }
-};
+      this.handleMessageEvent();
 
-onUnmounted(() => {
-  handleDisconnect();
-});
+      // 这段代码可选，主要处理移动端场景下，网络异常监控处理
+      this.networkManager = new NetworkErrorManager(this.client);
+      this.networkManager.onStatusChange = status => {
+        this.connectStatus = status;
+        this.isConnecting =
+          status === 'connecting' || status === 'reconnecting';
+        this.isConnected = status === 'connected';
+      };
+      // 这段代码可选，主要处理移动端场景下，网络异常监控处理
+    },
+
+    handleMessageEvent() {
+      let lastEvent;
+      this.client?.on(EventNames.ALL_SERVER, (eventName, event) => {
+        if (
+          event.event_type !== ChatEventType.CONVERSATION_MESSAGE_DELTA &&
+          event.event_type !== ChatEventType.CONVERSATION_MESSAGE_COMPLETED
+        ) {
+          return;
+        }
+        const content = event.data.content;
+
+        if (
+          lastEvent?.event_type === ChatEventType.CONVERSATION_MESSAGE_DELTA
+        ) {
+          this.messageList[this.messageList.length - 1] += content;
+        } else if (
+          event.event_type === ChatEventType.CONVERSATION_MESSAGE_DELTA
+        ) {
+          this.messageList.push(content);
+        }
+        lastEvent = event;
+      });
+    },
+
+    handleConnectClick() {
+      this.isConnecting = true;
+      this.handleConnect();
+    },
+
+    async handleConnect() {
+      try {
+        if (!this.client) {
+          await this.initClient();
+        }
+
+        await this.client?.connect();
+        this.isConnected = true;
+      } catch (error) {
+        this.isConnecting = false;
+        console.error(error);
+        if (error instanceof RealtimeAPIError) {
+          switch (error.code) {
+            case RealtimeError.CREATE_ROOM_ERROR:
+              message.error(`创建房间失败: ${error.message}`);
+              break;
+            case RealtimeError.CONNECTION_ERROR:
+              message.error(`加入房间失败: ${error.message}`);
+              break;
+            case RealtimeError.DEVICE_ACCESS_ERROR:
+              message.error(`获取设备失败: ${error.message}`);
+              break;
+            default:
+              message.error(`连接错误: ${error.message}`);
+          }
+        } else {
+          message.error('连接错误：' + error);
+        }
+      }
+    },
+
+    handleInterrupt() {
+      try {
+        this.client?.interrupt();
+      } catch (error) {
+        message.error('打断失败：' + error);
+      }
+    },
+
+    handleDisconnect() {
+      try {
+        this.client?.disconnect();
+      } catch (error) {
+        message.error('断开失败：' + error);
+      }
+    },
+
+    toggleMicrophone() {
+      try {
+        this.client?.setAudioEnable(!this.audioEnabled);
+        this.audioEnabled = !this.audioEnabled;
+      } catch (error) {
+        message.error('切换麦克风状态失败：' + error);
+      }
+    },
+  },
+
+  beforeUnmount() {
+    this.networkManager?.destroy();
+    this.handleDisconnect();
+  },
+};
 </script>

@@ -416,6 +416,10 @@
       "projectFolder": "examples/coze-js-web"
     },
     {
+      "packageName": "@coze/realtime-quickstart-vue",
+      "projectFolder": "examples/realtime-quickstart-vue"
+    },
+    {
       "packageName": "@coze/realtime-api",
       "projectFolder": "packages/realtime-api",
       "shouldPublish": true
