@@ -78,6 +78,7 @@ const combineMessageGroup = (
         ...lastGroupInBefore.respMessages,
         ...firstGroupInAfter.respMessages,
       ];
+      groupBefore[groupBefore.length - 1] = { ...lastGroupInBefore };
     }
   }
   messageGroupsToSave = [...groupBefore, ...groupAfter];

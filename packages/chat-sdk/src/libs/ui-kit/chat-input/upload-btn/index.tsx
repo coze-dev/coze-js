@@ -10,8 +10,8 @@ import { IconButton } from '../../atomic/icon-button';
 import { DisableContainer } from '../../atomic/disable-container';
 
 import styles from './index.module.less';
-// 文档：DOC、DOCX、XLS、XLSX、PPT、PPTX、PDF、Numbers、CSV
-// 图片：JPG、JPG2、PNG、GIF、WEBP、HEIC、HEIF、BMP、PCD、TIFF
+const acceptType =
+  '.doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.numbers,.csv,.jpg,.jpg2,.jpeg,.png,.gif,.webp,.heic,.heif,.bmp,.pcd,.tiff,.wav,.mp3,.flac,.m4a,.aac,.ogg,.wma,.midi,.mp4,.avi,.mov,.3gp,.3gpp,.flv,.webm,.wmv,.rmvb,.m4v,.mkv,.rar,.zip,.7z,.gz,.gzip,.bz2,.cpp,.py,.java,.c,image/*';
 export const UploadBtn: FC<{
   onSendFileMessage?: (file: ChooseFileInfo[]) => void;
   disabled?: boolean;
@@ -19,7 +19,7 @@ export const UploadBtn: FC<{
 }> = ({ onSendFileMessage, frameEventTarget, disabled }) => (
   <DisableContainer disabled={disabled}>
     <Upload
-      accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf,.numbers,.csv,.jpg,.jpg2,.png,.gif,.webp,.heic,.heif,.bmp,.pcd,.tiff,image/*"
+      accept={acceptType}
       onChooseFile={item => {
         onSendFileMessage?.(item);
       }}

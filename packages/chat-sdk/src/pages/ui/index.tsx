@@ -5,7 +5,6 @@ import { View, Textarea } from '@tarojs/components';
 import { Radio, Spacing } from '@/libs/ui-kit';
 
 import styles from './index.module.less';
-
 export default function Index() {
   const [radioChecked, setRadioChecked] = useState<boolean>(false);
   return (

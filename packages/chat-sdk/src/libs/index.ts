@@ -5,8 +5,15 @@ export {
   useInitSuccess,
   useApiClientStore,
   useChatInputStore,
+  useChatStatusStore,
+  useUiEventStore,
 } from './provider';
 export { MdStream } from './ui-kit';
-export { ChatService, useSendMessage } from './services';
+export {
+  ChatService,
+  useSendMessage,
+  useClearContext,
+  useClearMessage,
+} from './services';
 export { Logger } from './utils';
 export * from './types';

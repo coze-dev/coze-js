@@ -63,7 +63,7 @@ export default {
     'Insufficient balance of Coze Tokens in the current account.',
   miniChatError_4012: 'Invalid model',
   miniChatError_4013:
-    'Due to limited resources, the model usage frequency may be too high and the request may be intercepted by the system',
+    "Model's request rate limit exceeded. Please reduce your request frequency or try again later. If you need higher limits, consider upgrading your plan or contacting Coze support for expansion options.",
   miniChatError_4014: 'The Bot cannot answer this question',
   miniChatError_4015: 'The Bot is not published',
   miniChatError_4016:

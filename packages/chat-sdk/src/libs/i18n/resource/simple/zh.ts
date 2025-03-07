@@ -57,7 +57,8 @@ export default {
   miniChatError_4010: '前问题请求的 prompt token 数量超过模型上限',
   miniChatError_4011: '当前账户的 Coze Token 余额不足',
   miniChatError_4012: '无效模型',
-  miniChatError_4013: '因资源有限，模型使用频率过高时，请求可能会被系统拦截',
+  miniChatError_4013:
+    '模型的并发已超限。请减少请求频率或稍后重试。若需要更高并发量，可考虑升级您的计划或联系扣子扩容',
   miniChatError_4014: 'Bot 无法回答此问题',
   miniChatError_4015: '此 Bot 未发布',
   miniChatError_4016:

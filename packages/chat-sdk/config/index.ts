@@ -101,6 +101,7 @@ export default defineConfig(async merge => {
       output: isBuildNative
         ? {
             filename: 'exports/index.js',
+            chunkLoadingGlobal: `webpackJsonp_coze_chat_sdk`,
           }
         : undefined,
 
@@ -145,7 +146,7 @@ export default defineConfig(async merge => {
             '../node_modules/@tarojs/plugin-framework-react',
           ),
         );
-
+        //chain.output.jsonpFunction(`webpackJsonp_${pkgJson.name}`);
         chain.module
           .rule('taroApiBabel')
           .test(/\.ts$/)
