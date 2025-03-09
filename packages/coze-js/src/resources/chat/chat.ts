@@ -520,6 +520,23 @@ export interface StreamChatReq {
   conversation_id?: string;
 
   extra_params?: Record<string, string>;
+
+  /**
+   * Shortcut command information for executing a shortcut command in the conversation.
+   */
+  shortcut_command?: {
+    /**
+     * Required. The ID of the shortcut command to execute. Must be a shortcut command that is bound to the agent.
+     */
+    command_id: string;
+
+    /**
+     * Optional. Parameters for the shortcut command components.
+     * Custom key-value pairs where the key is the name of the shortcut command component,
+     * and the value is the user input for the component, serialized as a JSON string of object_string objects.
+     */
+    parameters?: Record<string, string>;
+  };
 }
 
 export enum ChatEventType {
@@ -785,9 +802,9 @@ export type MessageType =
 
 export type ObjectStringItem =
   | { type: 'text'; text: string }
-  | { type: 'file'; file_id: string; name?: string; size?: number }
-  | { type: 'file'; file_url: string; name?: string; size?: number }
+  | { type: 'file'; file_id: string; file_url?: string }
+  | { type: 'file'; file_url: string; file_id?: string }
   | { type: 'image'; file_id: string; file_url?: string }
-  | { type: 'image'; file_url: string }
-  | { type: 'audio'; file_id: string }
-  | { type: 'audio'; file_url: string };
+  | { type: 'image'; file_url: string; file_id?: string }
+  | { type: 'audio'; file_id: string; file_url?: string }
+  | { type: 'audio'; file_url: string; file_id?: string };
