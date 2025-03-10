@@ -3,7 +3,6 @@ import { useCallback, useRef, useState } from 'react';
 import {
   type BotInfo,
   ChatEventType,
-  COZE_CN_BASE_WS_URL,
   CozeAPI,
   type CreateChatData,
   type EnterMessage,
@@ -27,7 +26,7 @@ const useCozeAPI = () => {
       token: pat,
       baseURL: baseUrl,
       allowPersonalAccessTokenInBrowser: true,
-      baseWsURL: COZE_CN_BASE_WS_URL,
+      baseWsURL: config.getBaseWsUrl(),
       debug: false,
     });
   };
