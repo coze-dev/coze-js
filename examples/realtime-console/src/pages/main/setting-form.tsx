@@ -271,7 +271,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       .then(values => {
         const { workspace_id } = values;
 
-        const isTeam = workspace_id.startsWith('team_');
+        const isTeam = isTeamWorkspace(workspace_id);
         if (
           isTeam &&
           !localManager.get(LocalStorageKey.WORKSPACE_ACCESS_TOKEN)
