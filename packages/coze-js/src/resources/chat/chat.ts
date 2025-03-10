@@ -14,6 +14,20 @@ export const handleAdditionalMessages = (
     content:
       typeof i.content === 'object' ? JSON.stringify(i.content) : i.content,
   }));
+
+export const handleParameters = (
+  parameters?: Record<string, ObjectStringItem | string>,
+) => {
+  if (parameters) {
+    for (const [key, value] of Object.entries(parameters)) {
+      if (typeof value === 'object') {
+        parameters[key] = JSON.stringify(value);
+      }
+    }
+  }
+  return parameters;
+};
+
 export class Chat extends APIResource {
   messages: Messages = new Messages(this._client);
 
@@ -44,6 +58,12 @@ export class Chat extends APIResource {
     const payload = {
       ...rest,
       additional_messages: handleAdditionalMessages(params.additional_messages),
+      shortcut_command: params.shortcut_command
+        ? {
+            ...params.shortcut_command,
+            parameters: handleParameters(params.shortcut_command.parameters),
+          }
+        : undefined,
       stream: false,
     };
     const result = (await this._client.post(
@@ -82,6 +102,12 @@ export class Chat extends APIResource {
     const payload = {
       ...rest,
       additional_messages: handleAdditionalMessages(params.additional_messages),
+      shortcut_command: params.shortcut_command
+        ? {
+            ...params.shortcut_command,
+            parameters: handleParameters(params.shortcut_command.parameters),
+          }
+        : undefined,
       stream: false,
     };
     const result = (await this._client.post(
@@ -140,6 +166,12 @@ export class Chat extends APIResource {
     const payload = {
       ...rest,
       additional_messages: handleAdditionalMessages(params.additional_messages),
+      shortcut_command: params.shortcut_command
+        ? {
+            ...params.shortcut_command,
+            parameters: handleParameters(params.shortcut_command.parameters),
+          }
+        : undefined,
       stream: true,
     };
 
@@ -345,6 +377,11 @@ export interface CreateChatReq {
   conversation_id?: string;
 
   extra_params?: Record<string, string>;
+
+  /**
+   * Shortcut command information for executing a shortcut command in the conversation.
+   */
+  shortcut_command?: ShortcutCommand;
 }
 
 export interface CreateChatRes {
@@ -524,19 +561,7 @@ export interface StreamChatReq {
   /**
    * Shortcut command information for executing a shortcut command in the conversation.
    */
-  shortcut_command?: {
-    /**
-     * Required. The ID of the shortcut command to execute. Must be a shortcut command that is bound to the agent.
-     */
-    command_id: string;
-
-    /**
-     * Optional. Parameters for the shortcut command components.
-     * Custom key-value pairs where the key is the name of the shortcut command component,
-     * and the value is the user input for the component, serialized as a JSON string of object_string objects.
-     */
-    parameters?: Record<string, string>;
-  };
+  shortcut_command?: ShortcutCommand;
 }
 
 export enum ChatEventType {
@@ -808,3 +833,17 @@ export type ObjectStringItem =
   | { type: 'image'; file_url: string; file_id?: string }
   | { type: 'audio'; file_id: string; file_url?: string }
   | { type: 'audio'; file_url: string; file_id?: string };
+
+export interface ShortcutCommand {
+  /**
+   * Required. The ID of the shortcut command to execute. Must be a shortcut command that is bound to the agent.
+   */
+  command_id: string;
+
+  /**
+   * Optional. Parameters for the shortcut command components.
+   * Custom key-value pairs where the key is the name of the shortcut command component,
+   * and the value is the user input for the component, serialized as a JSON string of object_string objects.
+   */
+  parameters?: Record<string, ObjectStringItem | string>;
+}

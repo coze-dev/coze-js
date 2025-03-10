@@ -87,7 +87,7 @@ export class WebSocketAPI<Req, Rsp> {
         error.data.msg = 'Forbidden';
       } else {
         error.data.code = 500;
-        error.data.msg = String(event?.error) || 'WebSocket error';
+        error.data.msg = String(event?.error ?? '') || 'WebSocket error';
       }
 
       this.onerror?.(error, event);
