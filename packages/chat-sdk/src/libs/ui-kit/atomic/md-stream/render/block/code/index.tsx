@@ -62,6 +62,14 @@ export const Code: FC<{
                   icon: 'error',
                 });
               },
+              success(isUseWeb) {
+                if (isUseWeb) {
+                  showToast({
+                    title: i18n?.t('copySuccess') || '',
+                    icon: 'success',
+                  });
+                }
+              },
             });
           }}
         >
