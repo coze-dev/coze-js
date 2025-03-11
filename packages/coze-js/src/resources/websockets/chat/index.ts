@@ -1,4 +1,6 @@
 import {
+  type InputAudioBufferSpeechStartedEvent,
+  type InputAudioBufferSpeechStoppedEvent,
   type ChatCreatedEvent,
   type ChatUpdatedEvent,
   type ChatUpdateEvent,
@@ -57,4 +59,6 @@ export type CreateChatWsRes =
   | CommonErrorEvent
   | InputAudioBufferCompletedEvent
   | InputAudioBufferClearedEvent
-  | ConversationClearedEvent;
+  | ConversationClearedEvent
+  | InputAudioBufferSpeechStartedEvent
+  | InputAudioBufferSpeechStoppedEvent;
