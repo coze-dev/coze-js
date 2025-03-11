@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "Add shortcut command support and update file object types",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "shenxiaojie.316@bytedance.com"
+}

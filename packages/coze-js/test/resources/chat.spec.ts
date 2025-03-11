@@ -34,6 +34,12 @@ describe('Chat', () => {
             content_type: 'object_string',
           },
         ],
+        shortcut_command: {
+          command_id: 'test-command-id',
+          parameters: {
+            test: { type: 'text', text: 'Hello' },
+          },
+        },
       };
 
       const result = await chat.create(params);
@@ -51,6 +57,12 @@ describe('Chat', () => {
               content_type: 'object_string',
             },
           ],
+          shortcut_command: {
+            command_id: 'test-command-id',
+            parameters: {
+              test: JSON.stringify({ type: 'text', text: 'Hello' }),
+            },
+          },
         },
         false,
         undefined,
@@ -69,6 +81,12 @@ describe('Chat', () => {
         additional_messages: [
           { role: RoleType.User, content: 'Hello', content_type: 'text' },
         ],
+        shortcut_command: {
+          command_id: 'test-command-id',
+          parameters: {
+            test: JSON.stringify({ type: 'text', text: 'Hello' }),
+          },
+        },
       };
 
       const result = await chat.create(params);
@@ -79,6 +97,12 @@ describe('Chat', () => {
         {
           ...params,
           user_id: expect.any(String), // verify user_id was generated
+          shortcut_command: {
+            command_id: 'test-command-id',
+            parameters: {
+              test: JSON.stringify({ type: 'text', text: 'Hello' }),
+            },
+          },
           stream: false,
         },
         false,
@@ -116,6 +140,12 @@ describe('Chat', () => {
 
       const params = {
         bot_id: 'test-bot-id',
+        shortcut_command: {
+          command_id: 'test-command-id',
+          parameters: {
+            test: { type: 'text' as const, text: 'Hello' },
+          },
+        },
       };
 
       const result = await chat.createAndPoll(params);
@@ -161,6 +191,12 @@ describe('Chat', () => {
 
       const params = {
         bot_id: 'test-bot-id',
+        shortcut_command: {
+          command_id: 'test-command-id',
+          parameters: {
+            test: { type: 'text' as const, text: 'Hello' },
+          },
+        },
       };
 
       const result = chat.stream(params);
@@ -171,7 +207,17 @@ describe('Chat', () => {
 
       expect(client.post).toHaveBeenCalledWith(
         '/v3/chat',
-        { ...params, stream: true, user_id: expect.any(String) },
+        {
+          ...params,
+          stream: true,
+          user_id: expect.any(String),
+          shortcut_command: {
+            command_id: 'test-command-id',
+            parameters: {
+              test: JSON.stringify({ type: 'text', text: 'Hello' }),
+            },
+          },
+        },
         true,
         undefined,
       );
@@ -287,6 +333,12 @@ describe('Chat', () => {
         tool_outputs: [
           { tool_call_id: 'test-tool-call-id', output: 'Test output' },
         ],
+        shortcut_command: {
+          command_id: 'test-command-id',
+          parameters: {
+            test: JSON.stringify([{ type: 'text', text: 'Hello' }]),
+          },
+        },
         stream: true,
       };
 
@@ -298,7 +350,11 @@ describe('Chat', () => {
 
       expect(client.post).toHaveBeenCalledWith(
         '/v3/chat/submit_tool_outputs?conversation_id=test-conversation-id&chat_id=test-chat-id',
-        { tool_outputs: params.tool_outputs, stream: true },
+        {
+          tool_outputs: params.tool_outputs,
+          shortcut_command: params.shortcut_command,
+          stream: true,
+        },
         true,
         undefined,
       );

@@ -56,6 +56,10 @@ export class WebSocketAPI<Req, Rsp> {
     });
 
     this.rws.addEventListener('error', (event: ErrorEvent) => {
+      const { readyState } = this.rws;
+      if (readyState === 3) {
+        return;
+      }
       const statusCode = event.target?._req?.res?.statusCode;
       const rawHeaders = event.target?._req?.res?.rawHeaders || [];
       const logidIndex = rawHeaders.findIndex(
@@ -83,7 +87,7 @@ export class WebSocketAPI<Req, Rsp> {
         error.data.msg = 'Forbidden';
       } else {
         error.data.code = 500;
-        error.data.msg = String(event?.error) || 'WebSocket error';
+        error.data.msg = String(event?.error ?? '') || 'WebSocket error';
       }
 
       this.onerror?.(error, event);
