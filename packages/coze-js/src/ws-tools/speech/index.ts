@@ -135,8 +135,10 @@ class WsSpeechClient {
   }
 
   async disconnect() {
-    await this.interrupt();
-    this.listeners.clear();
+    if (this.playbackTimeout) {
+      clearTimeout(this.playbackTimeout);
+    }
+    await this.wavStreamPlayer.interrupt();
     this.closeWs();
   }
 

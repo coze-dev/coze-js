@@ -306,34 +306,39 @@ const useWsAPI = (
       return;
     }
 
-    const client = new WsSpeechClient({
-      token: config.getPat(),
-      baseWsURL: config.getBaseWsUrl(),
-      allowPersonalAccessTokenInBrowser: true,
-    });
+    if (!speechClientRef.current) {
+      const client = new WsSpeechClient({
+        token: config.getPat(),
+        baseWsURL: config.getBaseWsUrl(),
+        allowPersonalAccessTokenInBrowser: true,
+      });
 
-    client.on('data', data => {
-      console.log('[speech] ws data', data);
-    });
+      client.on('data', data => {
+        console.log('[speech] ws data', data);
+      });
 
-    client.on(WebsocketsEventType.ERROR, data => {
-      console.error('[speech] ws error', data);
-    });
+      client.on(WebsocketsEventType.ERROR, data => {
+        console.error('[speech] ws error', data);
+      });
+      client.on('completed', () => {
+        console.log('[speech] speech completed');
+      });
+      speechClientRef.current = client;
+    }
 
     try {
-      await client.connect();
+      await speechClientRef.current?.connect();
       console.log('[speech] ws connect success');
     } catch (error) {
       console.error('[speech] ws connect error', error);
       return;
     }
 
-    client.appendAndComplete(message);
-    speechClientRef.current = client;
+    speechClientRef.current?.appendAndComplete(message);
   }, []);
 
   const stopSpeech = () => {
-    speechClientRef.current?.interrupt();
+    speechClientRef.current?.disconnect();
   };
 
   const getIsSpeech = () => speechClientRef.current?.isPlaying();
