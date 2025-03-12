@@ -22,6 +22,10 @@ $(document).ready(function () {
 
 as s \`node\`
 ## Html
+<details>
+    <summary>查看图片</summary>
+    <img src="https://example.com/image.jpg" alt="示例图片">
+</details>
 
 <div>
  <strong>asdfasdf</strong>

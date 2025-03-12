@@ -104,7 +104,7 @@ export default function Index() {
 }
 ```
 
-### 3. Parameters Description
+##### Parameters Description
 
 - `chat`
   - `appId` - The app id of the bot or the conversation.
@@ -153,7 +153,7 @@ export default function Index() {
     - `isNeed` - Whether to show the upload button, default is true
 
 
-#### 2.1 Basic Usage For App
+#### 2.2 Basic Usage For App
 ##### For Taro
 ```javascript
 import { View } from "@tarojs/components";
@@ -294,7 +294,7 @@ export default function Index() {
   );
 }
 ```
-### 3. Parameters Description
+##### Parameters Description
 
 - `workflow`
   - `id` - The id of the workflow.

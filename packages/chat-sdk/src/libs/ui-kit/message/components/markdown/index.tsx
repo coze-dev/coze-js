@@ -45,6 +45,7 @@ const MarkdownContent: FC<{
       isSmooth={isSmooth}
       isFinish={isComplete}
       onMarkdownEnd={onMarkdownEnd}
+      enableHtmlTags={true}
       theme="light"
       onImageClick={onImageClick}
       onTaskChange={onTaskChange}
