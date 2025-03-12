@@ -7,10 +7,89 @@ import {
   type CreateChatWsReq,
   type CreateChatWsRes,
   type ErrorRes,
+  type InputAudioBufferAppendEvent,
   type WebSocketAPI,
   WebsocketsEventType,
 } from '../..';
 import { type WsToolsOptions } from '..';
+
+export interface WsChatClientOptions extends WsToolsOptions {
+  botId: string; // 智能体ID
+  voiceId?: string; // 音色ID
+}
+
+export enum WsChatEventNames {
+  /**
+   * en: All events
+   * zh: 所有事件
+   */
+  ALL = 'realtime.event',
+  /**
+   * en: Client connected
+   * zh: 客户端连接
+   */
+  CONNECTED = 'client.connected',
+  /**
+   * en: Client connecting
+   * zh: 客户端连接中
+   */
+  CONNECTING = 'client.connecting',
+  /**
+   * en: Client interrupted
+   * zh: 客户端中断
+   */
+  INTERRUPTED = 'client.interrupted',
+  /**
+   * en: Client disconnected
+   * zh: 客户端断开
+   */
+  DISCONNECTED = 'client.disconnected',
+  /**
+   * en: Client audio unmuted
+   * zh: 客户端音频未静音
+   */
+  AUDIO_UNMUTED = 'client.audio.unmuted',
+  /**
+   * en: Client audio muted
+   * zh: 客户端音频静音
+   */
+  AUDIO_MUTED = 'client.audio.muted',
+  /**
+   * en: Client error
+   * zh: 客户端错误
+   */
+  ERROR = 'client.error',
+  /**
+   * en: Audio noise reduction enabled
+   * zh: 抑制平稳噪声
+   */
+  SUPPRESS_STATIONARY_NOISE = 'client.suppress.stationary.noise',
+  /**
+   * en: Suppress non-stationary noise
+   * zh: 抑制非平稳噪声
+   */
+  SUPPRESS_NON_STATIONARY_NOISE = 'client.suppress.non.stationary.noise',
+  /**
+   * en: Audio input device changed
+   * zh: 音频输入设备改变
+   */
+  AUDIO_INPUT_DEVICE_CHANGED = 'client.input.device.changed',
+  /**
+   * en: Audio output device changed
+   * zh: 音频输出设备改变
+   */
+  AUDIO_OUTPUT_DEVICE_CHANGED = 'client.output.device.changed',
+  /**
+   * en: Video input device changed
+   * zh: 视频输入设备改变
+   */
+  VIDEO_INPUT_DEVICE_CHANGED = 'client.video.input.device.changed',
+  /**
+   * en: Network quality changed
+   * zh: 网络质量改变
+   */
+  NETWORK_QUALITY = 'client.network.quality',
+}
 
 class WsChatClient {
   public ws: WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null = null;
@@ -22,35 +101,29 @@ class WsChatClient {
   private trackId = 'default';
   private wavRecorder: WavRecorder;
   private api: CozeAPI;
-  private totalDuration = 0;
-  private playbackStartTime: number | null = null;
-  private playbackPauseTime: number | null = null;
-  private playbackTimeout: NodeJS.Timeout | null = null;
+  private config: WsChatClientOptions;
+  private audioDeltaList: string[] = [];
 
-  constructor(config: WsToolsOptions) {
+  constructor(config: WsChatClientOptions) {
     this.api = new CozeAPI({
       ...config,
     });
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
     this.wavRecorder = new WavRecorder({ sampleRate: 24000 });
+    this.config = config;
   }
 
-  private async init(botId: string) {
+  private async init() {
     if (this.ws) {
       return this.ws;
     }
-    const ws = await this.api.websockets.chat.create(botId);
+    const ws = await this.api.websockets.chat.create(this.config.botId);
     this.ws = ws;
 
+    // 标记 websocket 是否已 resolve or reject
     let isResolved = false;
 
     this.trackId = `my-track-id-${uuid()}`;
-    this.totalDuration = 0;
-    if (this.playbackTimeout) {
-      clearTimeout(this.playbackTimeout);
-      this.playbackTimeout = null;
-    }
-    this.playbackStartTime = null;
 
     return new Promise<WebSocketAPI<CreateChatWsReq, CreateChatWsRes>>(
       (resolve, reject) => {
@@ -60,48 +133,61 @@ class WsChatClient {
 
         ws.onmessage = (data, event) => {
           // Trigger all registered event listeners
-          this.emit('data', data);
           this.emit(data.event_type, data);
 
-          if (data.event_type === WebsocketsEventType.ERROR) {
-            this.closeWs();
-            if (isResolved) {
+          switch (data.event_type) {
+            case WebsocketsEventType.ERROR:
+              this.closeWs();
+              if (isResolved) {
+                return;
+              }
+              isResolved = true;
+              reject(
+                new APIError(
+                  data.data.code,
+                  data as unknown as ErrorRes,
+                  data.data.msg,
+                  undefined,
+                ),
+              );
               return;
-            }
-            isResolved = true;
-            reject(
-              new APIError(
-                data.data.code,
-                data as unknown as ErrorRes,
-                data.data.msg,
-                undefined,
-              ),
-            );
-            return;
-          } else if (data.event_type === WebsocketsEventType.CHAT_CREATED) {
-            resolve(ws);
-            isResolved = true;
-          } else if (
-            data.event_type ===
-            WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED
-          ) {
-            this.complete();
-          } else if (
-            data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_DELTA
-          ) {
-            this.handleAudioMessage(data.data.content);
-          } else if (
-            data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_COMPLETED
-          ) {
-            console.debug('[chat] totalDuration', this.totalDuration);
-            // this.closeWs();
+
+            case WebsocketsEventType.CHAT_CREATED:
+              resolve(ws);
+              isResolved = true;
+              break;
+
+            case WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED:
+              this.complete();
+              break;
+
+            case WebsocketsEventType.CONVERSATION_AUDIO_DELTA:
+              this.audioDeltaList.push(data.data.content);
+              if (this.audioDeltaList.length === 1) {
+                this.handleAudioMessage();
+              }
+              break;
+
+            case WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED:
+              this.clear();
+              break;
+
+            case WebsocketsEventType.CONVERSATION_AUDIO_COMPLETED:
+              // this.closeWs();
+              break;
+
+            case WebsocketsEventType.CONVERSATION_CHAT_CANCELED:
+              // this.isInterrupted = false;
+              this.clear();
+              break;
+            default:
+              break;
           }
         };
 
         ws.onerror = (error, event) => {
           console.error('[chat] WebSocket error', error, event);
 
-          this.emit('data', error);
           this.emit(WebsocketsEventType.ERROR, error);
 
           this.closeWs();
@@ -126,8 +212,10 @@ class WsChatClient {
     );
   }
 
-  private async startRecord() {
-    await this.wavRecorder.begin();
+  private async startRecord(
+    onAudioBufferAppend?: (data: InputAudioBufferAppendEvent) => void,
+  ) {
+    await this.wavRecorder.begin({});
 
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
@@ -150,12 +238,24 @@ class WsChatClient {
           delta: base64String,
         },
       });
+
+      onAudioBufferAppend?.({
+        id: uuid(),
+        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
+        data: {
+          delta: base64String,
+        },
+      });
       console.log('[chat] send input_audio_buffer_append');
     });
   }
 
-  async connect({ botId, voiceId }: { botId: string; voiceId?: string }) {
-    await this.init(botId);
+  async connect({
+    onAudioBufferAppend,
+  }: {
+    onAudioBufferAppend?: (data: InputAudioBufferAppendEvent) => void;
+  } = {}) {
+    await this.init();
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.CHAT_UPDATE,
@@ -169,25 +269,39 @@ class WsChatClient {
           pcm_config: {
             sample_rate: 24000,
           },
-          voice_id: voiceId || undefined,
+          voice_id: this.config.voiceId || undefined,
         },
         turn_detection: {
           type: 'server_vad',
         },
       },
     });
-    await this.startRecord();
+    await this.startRecord(onAudioBufferAppend);
+    this.emit(WsChatEventNames.CONNECTED, undefined);
   }
 
   async disconnect() {
-    await this.interrupt();
+    await this.wavStreamPlayer.interrupt();
     await this.wavRecorder.quit();
     this.listeners.clear();
     this.closeWs();
+    this.emit(WsChatEventNames.DISCONNECTED, undefined);
   }
 
-  sendUserMessage(message: CreateChatWsReq) {
-    this.ws?.send(message);
+  sendMessage(data: CreateChatWsReq) {
+    this.ws?.send(data);
+  }
+
+  sendTextMessage(text: string) {
+    this.ws?.send({
+      id: uuid(),
+      event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+      data: {
+        role: 'user',
+        content_type: 'text',
+        content: text,
+      },
+    });
   }
 
   complete() {
@@ -214,15 +328,41 @@ class WsChatClient {
     }
   }
 
-  async interrupt() {
+  async setAudioInputDevice(deviceId: string) {
+    if (this.wavRecorder.getStatus() !== 'ended') {
+      await this.wavRecorder.end();
+    }
+    const devices = await this.wavRecorder.listDevices();
+    if (deviceId === 'default') {
+      this.wavRecorder.begin({});
+    } else {
+      const device = devices.find(d => d.deviceId === deviceId);
+      if (!device) {
+        throw new Error(`Device with id ${deviceId} not found`);
+      }
+      this.wavRecorder.begin({
+        deviceId: device.deviceId,
+      });
+    }
+    this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
+  }
+  interrupt() {
+    console.debug('[chat] interrupt');
+
     this.ws?.send({
       id: uuid(),
-      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_CLEAR,
+      event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL,
     });
+
+    this.emit(WsChatEventNames.INTERRUPTED, undefined);
+  }
+
+  async clear() {
+    console.debug('[chat] clear');
+
+    this.audioDeltaList.length = 0;
     await this.wavStreamPlayer.interrupt();
     this.trackId = `my-track-id-${uuid()}`;
-    this.emit('completed', undefined);
-    console.debug('[chat] playback completed', this.totalDuration);
   }
 
   isPlaying() {
@@ -249,9 +389,15 @@ class WsChatClient {
 
   private emit(event: string, data: CreateChatWsRes | undefined) {
     this.listeners.get(event)?.forEach(callback => callback(data));
+    this.listeners
+      .get(WsChatEventNames.ALL)
+      ?.forEach(callback => callback(data));
   }
 
-  private handleAudioMessage = async (message: string) => {
+  private handleAudioMessage = async () => {
+    console.debug('[chat] handleAudioMessage', this.audioDeltaList.length);
+
+    const message = this.audioDeltaList[0];
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);
     const view = new Uint8Array(arrayBuffer);
@@ -259,35 +405,13 @@ class WsChatClient {
       view[i] = decodedContent.charCodeAt(i);
     }
 
-    // Calculate duration in seconds
-    const bytesPerSecond = 24000 * 1 * (16 / 8); // sampleRate * channels * (bitDepth/8)
-    const duration = arrayBuffer.byteLength / bytesPerSecond;
-    this.totalDuration += duration;
-
     try {
       await this.wavStreamPlayer.add16BitPCM(arrayBuffer, this.trackId);
 
-      // Start or update the playback timer
-      if (!this.playbackStartTime && !this.playbackPauseTime) {
-        this.playbackStartTime = Date.now();
+      this.audioDeltaList.shift();
+      if (this.audioDeltaList.length > 0) {
+        this.handleAudioMessage();
       }
-
-      // Clear existing timeout if any
-      if (this.playbackTimeout) {
-        clearTimeout(this.playbackTimeout);
-      }
-
-      // Calculate remaining time
-      const elapsed = this.playbackPauseTime
-        ? 0
-        : (Date.now() - (this.playbackStartTime || Date.now())) / 1000;
-      const remaining = this.totalDuration - elapsed;
-
-      // Set new timeout
-      this.playbackTimeout = setTimeout(() => {
-        this.emit('completed', undefined);
-        this.playbackStartTime = null;
-      }, remaining * 1000);
     } catch (error) {
       console.warn('[chat] wavStreamPlayer error', error);
     }

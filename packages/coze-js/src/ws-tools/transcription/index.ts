@@ -145,7 +145,9 @@ class WsTranscriptionClient {
 
     if (this.getStatus() === 'ended') {
       const deviceList = await this.getDeviceList();
-      await this.wavRecorder.begin(deviceList[0]?.deviceId);
+      await this.wavRecorder.begin({
+        deviceId: deviceList[0]?.deviceId,
+      });
     }
 
     await this.wavRecorder.record(data => {

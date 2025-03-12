@@ -18,4 +18,4 @@ export interface WsToolsOptions {
 
 export { default as WsSpeechClient } from './speech';
 export { default as WsTranscriptionClient } from './transcription';
-export { default as WsChatClient } from './chat';
+export { default as WsChatClient, WsChatEventNames } from './chat';

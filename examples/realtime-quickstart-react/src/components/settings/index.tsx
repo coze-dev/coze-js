@@ -22,12 +22,14 @@ const Settings = ({
     const pat = config.getPat();
     const botId = config.getBotId();
     const baseWsUrl = config.getBaseWsUrl();
+    const voiceId = config.getVoiceId();
 
     form.setFieldsValue({
       base_url: baseUrl,
       base_ws_url: baseWsUrl,
       pat,
       bot_id: botId,
+      voice_id: voiceId,
     });
   }, [form]);
 
@@ -81,6 +83,13 @@ const Settings = ({
             name="bot_id"
             label="Bot ID"
             rules={[{ required: true, message: 'Please input Bot ID!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="voice_id"
+            label="Voice ID"
+            rules={[{ message: 'Please input Voice ID!' }]}
           >
             <Input />
           </Form.Item>

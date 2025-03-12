@@ -22,6 +22,10 @@ import {
   type InputAudioBufferClearEvent,
   type InputAudioBufferCompletedEvent,
   type InputAudioBufferCompleteEvent,
+  type ConversationChatCancelEvent,
+  type ConversationChatCanceledEvent,
+  type ConversationAudioTranscriptUpdateEvent,
+  type ConversationAudioTranscriptCompletedEvent,
 } from '../types';
 import { APIResource } from '../../resource';
 import { type WebsocketOptions } from '../../../core';
@@ -43,7 +47,8 @@ export type CreateChatWsReq =
   | InputAudioBufferClearEvent
   | ConversationMessageCreateEvent
   | ConversationClearEvent
-  | ConversationChatSubmitToolOutputsEvent;
+  | ConversationChatSubmitToolOutputsEvent
+  | ConversationChatCancelEvent;
 
 export type CreateChatWsRes =
   | ChatCreatedEvent
@@ -61,4 +66,7 @@ export type CreateChatWsRes =
   | InputAudioBufferClearedEvent
   | ConversationClearedEvent
   | InputAudioBufferSpeechStartedEvent
-  | InputAudioBufferSpeechStoppedEvent;
+  | InputAudioBufferSpeechStoppedEvent
+  | ConversationChatCanceledEvent
+  | ConversationAudioTranscriptUpdateEvent
+  | ConversationAudioTranscriptCompletedEvent;

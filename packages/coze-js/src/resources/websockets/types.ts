@@ -154,6 +154,14 @@ export enum WebsocketsEventType {
   INPUT_AUDIO_BUFFER_SPEECH_STARTED = 'input_audio_buffer.speech_started',
   /** Speech stopped */
   INPUT_AUDIO_BUFFER_SPEECH_STOPPED = 'input_audio_buffer.speech_stopped',
+  /** Chat interrupted by client */
+  CONVERSATION_CHAT_CANCEL = 'conversation.chat.cancel',
+  /** Chat canceled */
+  CONVERSATION_CHAT_CANCELED = 'conversation.chat.canceled',
+  /** Audio transcript update */
+  CONVERSATION_AUDIO_TRANSCRIPT_UPDATE = 'conversation.audio_transcript.update',
+  /** Audio transcript completed */
+  CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED = 'conversation.audio_transcript.completed',
 }
 
 export interface EventDetail {
@@ -387,6 +395,28 @@ export interface InputAudioBufferSpeechStartedEvent extends BaseEvent {
 
 export interface InputAudioBufferSpeechStoppedEvent extends BaseEvent {
   event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED;
+}
+
+export interface ConversationChatCancelEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL;
+}
+
+export interface ConversationChatCanceledEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCELED;
+}
+
+export interface ConversationAudioTranscriptUpdateEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE;
+  data: {
+    content: string;
+  };
+}
+
+export interface ConversationAudioTranscriptCompletedEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED;
+  data: {
+    content: string;
+  };
 }
 
 export interface ChatCreatedEvent extends BaseEventWithDetail {

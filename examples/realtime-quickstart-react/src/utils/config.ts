@@ -6,6 +6,7 @@ const getConfig = (prefix: string) => {
       localStorage.getItem(`${prefix}_base_ws_url`) || 'wss://ws.coze.cn',
     getPat: () => localStorage.getItem(`${prefix}_pat`) || '',
     getBotId: () => localStorage.getItem(`${prefix}_bot_id`) || '',
+    getVoiceId: () => localStorage.getItem(`${prefix}_voice_id`) || '',
   };
   return config;
 };
