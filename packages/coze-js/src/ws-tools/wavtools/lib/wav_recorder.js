@@ -298,7 +298,7 @@ export class WavRecorder {
    * @param {string} [deviceId] if no device provided, default device will be used
    * @returns {Promise<true>}
    */
-  async begin(deviceId) {
+  async begin({ deviceId, }: { deviceId?: string; }) {
     if (this.processor) {
       throw new Error(
         `Already connected: please call .end() to start a new session`,
@@ -312,10 +312,17 @@ export class WavRecorder {
       throw new Error('Could not request user media');
     }
     try {
-      const config = { audio: true };
+      const audioConstraints = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      };
+
       if (deviceId) {
-        config.audio = { deviceId: { exact: deviceId } };
+        audioConstraints.deviceId = { exact: deviceId };
       }
+
+      const config = { audio: audioConstraints };
       this.stream = await navigator.mediaDevices.getUserMedia(config);
     } catch (err) {
       throw new Error('Could not start media stream');
