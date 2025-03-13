@@ -2,6 +2,7 @@ import React from 'react';
 
 import { II18n } from '../utils/i18n';
 import { IMiniChatError } from '../utils/error';
+import { type RawMessage } from '../services/send-message';
 import { ChatMessage, ChatMessageGroup } from './message';
 import { IOnImageClickEvent, IOnTaskListChange } from './event-callback';
 
@@ -55,6 +56,8 @@ export interface InputConfig {
   isNeedTaskMessage?: boolean; // Whether or not using task message， default is false
   placeholder?: string;
   defaultText?: string;
+  // 判断是否可以发送消息，返回false则不能发送，其他可发送（包括undefined）
+  checkCanSendMessage?: (message: RawMessage) => Promise<boolean | undefined>;
   renderChatInputTopSlot?: (isChatError?: boolean) => React.ReactNode;
 }
 export interface ClearContextConfig {
