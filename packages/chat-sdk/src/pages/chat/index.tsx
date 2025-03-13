@@ -52,6 +52,11 @@ export default function Index() {
               input: {
                 isNeedAudio: true,
                 renderChatInputTopSlot: props => <View>Input Slot</View>,
+                checkCanSendMessage: async _message => {
+                  alert('禁止发送消息');
+                  await 0;
+                  return false;
+                },
               },
               messageWrapper: {
                 senderName: {

@@ -24,10 +24,10 @@ export interface IChatInputProps {
   frameEventTarget?: InstanceType<TaroStatic['Events']>;
   isPcMode?: boolean;
   onKeyBoardHeightChange?: (height: number) => void;
-  onSendTextMessage?: (text: string) => void;
-  onSendFileMessage?: (files: ChooseFileInfo[]) => void;
-  onSendAudioMessage?: (audio: AudioRaw) => void;
-  onAudioRecording?: (isRecording: boolean) => void;
+  onSendTextMessage?: (text: string) => Promise<boolean | undefined>;
+  onSendFileMessage?: (files: ChooseFileInfo[]) => Promise<boolean | undefined>;
+  onSendAudioMessage?: (audio: AudioRaw) => Promise<boolean | undefined>;
+  onAudioRecording?: (isRecording: boolean) => Promise<boolean | undefined>;
 }
 
 export interface ITaskMessage {
