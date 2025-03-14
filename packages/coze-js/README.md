@@ -200,7 +200,7 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
-// Listen for playback completed event
+// Listen for playback completed event, if manually called disconnect, this event will not be triggered
 client.on('completed', () => {
   console.log('[speech] playback completed');
 });
@@ -215,13 +215,11 @@ try {
 }
 
 // Send message and play
-client.appendAndComplete(message);
+client.appendAndComplete('Hello, Coze!');
 
 // Interrupt
 client.interrupt();
 
-// Disconnect, destroy instance
-client.disconnect();
 
 // Pause speech playback
 client.pause();
@@ -235,8 +233,12 @@ client.togglePlay();
 // Check if speech is playing
 client.isPlaying();
 
+// Disconnect, destroy instance
+client.disconnect();
+
 // Send text fragment
-client.append(message);
+client.append('Hello,');
+client.append(' Coze!');
 // End sending text
 client.complete();
 

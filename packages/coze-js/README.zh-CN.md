@@ -199,7 +199,7 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
-// 监听播放完成事件
+// 监听播放完成事件，如果手动调用disconnect，则不会触发此事件
 client.on('completed', () => {
   console.log('[speech] playback completed');
 });
@@ -214,13 +214,11 @@ try {
 }
 
 // 发送消息并播放
-client.appendAndComplete(message);
+client.appendAndComplete('你好，Coze!');
 
 // 打断
 client.interrupt();
 
-// 断开连接，销毁实例
-client.disconnect();
 
 // 暂停语音播放
 client.pause();
@@ -234,8 +232,12 @@ client.togglePlay();
 // 语音是否播放中
 client.isPlaying();
 
+// 断开连接，销毁 websocket
+client.disconnect();
+
 // 发送文本片段
-client.append(message);
+client.append('你好，');
+client.append(' Coze!');
 // 结束发送文本
 client.complete();
 ```

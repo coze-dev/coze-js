@@ -88,6 +88,22 @@ class WsSpeechClient {
             data.event_type === WebsocketsEventType.SPEECH_AUDIO_COMPLETED
           ) {
             console.debug('[speech] totalDuration', this.totalDuration);
+
+            if (this.playbackStartTime) {
+              // 剩余时间 = 总时间 - 已播放时间 - 已暂停时间
+              const now = new Date().getTime();
+              const remaining =
+                this.totalDuration -
+                (now - this.playbackStartTime) / 1000 -
+                this.elapsedBeforePause;
+
+              this.playbackTimeout = setTimeout(() => {
+                this.emit('completed', undefined);
+                this.playbackStartTime = null;
+                this.elapsedBeforePause = 0;
+              }, remaining * 1000);
+            }
+
             this.closeWs();
           }
         };
@@ -135,8 +151,10 @@ class WsSpeechClient {
   }
 
   async disconnect() {
-    await this.interrupt();
-    this.listeners.clear();
+    if (this.playbackTimeout) {
+      clearTimeout(this.playbackTimeout);
+    }
+    await this.wavStreamPlayer.interrupt();
     this.closeWs();
   }
 
@@ -257,26 +275,6 @@ class WsSpeechClient {
         this.playbackStartTime = Date.now();
         this.elapsedBeforePause = 0;
       }
-
-      // Clear existing timeout if any
-      if (this.playbackTimeout) {
-        clearTimeout(this.playbackTimeout);
-      }
-
-      // Calculate remaining time
-      const elapsed =
-        this.elapsedBeforePause +
-        (this.playbackPauseTime
-          ? 0
-          : (Date.now() - (this.playbackStartTime || Date.now())) / 1000);
-      const remaining = this.totalDuration - elapsed;
-
-      // Set new timeout
-      this.playbackTimeout = setTimeout(() => {
-        this.emit('completed', undefined);
-        this.playbackStartTime = null;
-        this.elapsedBeforePause = 0;
-      }, remaining * 1000);
     } catch (error) {
       console.warn('[speech] wavStreamPlayer error', error);
     }
