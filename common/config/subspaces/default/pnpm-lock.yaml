@@ -867,7 +867,7 @@ importers:
         version: 5.5.0
       '@volcengine/rtc':
         specifier: ^4.62.1
-        version: 4.63.1
+        version: 4.66.1
       antd:
         specifier: ^5.21.3
         version: 5.21.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1226,7 +1226,7 @@ importers:
         version: link:../../packages/realtime-api
       '@volcengine/rtc':
         specifier: ^4.62.1
-        version: 4.63.1
+        version: 4.66.1
       ant-design-vue:
         specifier: ^4.2.6
         version: 4.2.6(vue@3.5.13(typescript@5.6.3))
@@ -1907,7 +1907,7 @@ importers:
         version: link:../coze-js
       '@volcengine/rtc':
         specifier: ^4.62.1
-        version: 4.63.1
+        version: 4.66.1
     devDependencies:
       '@coze-infra/eslint-config':
         specifier: workspace:*
@@ -6518,8 +6518,8 @@ packages:
   '@vitest/utils@2.1.4':
     resolution: {integrity: sha512-MXDnZn0Awl2S86PSNIim5PWXgIAx8CIkzu35mBdSApUip6RFOGXBCf3YFyeEu8n1IHk4bWD46DeYFu9mQlFIRg==}
 
-  '@volcengine/rtc@4.63.1':
-    resolution: {integrity: sha512-Hn1H226Act0NNATGN8z6vnSdKDv71lOApEgevLbx+Emk7SZctcomdWP/0/P5AygxqYfiIsnQYLb9yMtXRXe35g==}
+  '@volcengine/rtc@4.66.1':
+    resolution: {integrity: sha512-APznH6eosmKJC1HYJJ8s6G3Mq3OSgw6ivv6uCiayM5QNMBj+GW6zxf+MVsk5rm6r4R92TLwQErWonJ8yzGO4xA==}
 
   '@vue/babel-helper-vue-jsx-merge-props@1.4.0':
     resolution: {integrity: sha512-JkqXfCkUDp4PIlFdDQ0TdXoIejMtTHP67/pvxlgeY+u5k3LEdKuWZ3LK6xkxo52uDoABIVyRwqVkfLQJhk7VBA==}
@@ -21334,7 +21334,7 @@ snapshots:
       loupe: 3.1.2
       tinyrainbow: 1.2.0
 
-  '@volcengine/rtc@4.63.1':
+  '@volcengine/rtc@4.66.1':
     dependencies:
       eventemitter3: 4.0.7
 

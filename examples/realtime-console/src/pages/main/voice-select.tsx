@@ -90,6 +90,26 @@ const VoiceClone: React.FC<{
       onOk={handleSubmit}
       confirmLoading={loading}
     >
+      <div
+        style={{
+          backgroundColor: '#fff0f6',
+          border: '1px solid #ffadd2',
+          padding: '12px',
+          borderRadius: '4px',
+          marginBottom: '16px',
+        }}
+      >
+        <strong>注意：</strong> 音色复刻需要收费。请参阅
+        <a
+          href="https://www.coze.cn/open/docs/developer_guides/clone_voices?from=search"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ marginLeft: '4px' }}
+        >
+          音色复刻说明文档
+        </a>
+        了解价格详情。
+      </div>
       <Form
         form={form}
         layout="vertical"
