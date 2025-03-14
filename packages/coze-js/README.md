@@ -200,7 +200,7 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
-// Listen for playback completed event
+// Listen for playback completed event, if manually called disconnect, this event will not be triggered
 client.on('completed', () => {
   console.log('[speech] playback completed');
 });

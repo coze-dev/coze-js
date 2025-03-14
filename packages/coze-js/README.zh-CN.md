@@ -199,7 +199,7 @@ client.on(WebsocketsEventType.ERROR, data => {
   console.error('[speech] ws error', data);
 });
 
-// 监听播放完成事件
+// 监听播放完成事件，如果手动调用disconnect，则不会触发此事件
 client.on('completed', () => {
   console.log('[speech] playback completed');
 });
@@ -232,7 +232,7 @@ client.togglePlay();
 // 语音是否播放中
 client.isPlaying();
 
-// 断开连接，销毁实例
+// 断开连接，销毁 websocket
 client.disconnect();
 
 // 发送文本片段

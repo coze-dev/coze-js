@@ -93,7 +93,7 @@ describe('WsSpeechClient', () => {
         },
         undefined as unknown as MessageEvent,
       );
-
+      await new Promise(resolve => setTimeout(resolve, 50));
       client.ws?.onmessage?.(
         {
           event_type: WebsocketsEventType.SPEECH_AUDIO_COMPLETED,
