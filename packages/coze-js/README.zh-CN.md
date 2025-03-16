@@ -167,6 +167,60 @@ async function wsChat() {
 }
 ```
 
+
+### 流式对话 SDK
+基于Websocket的实时语音对话SDK，如果你使用 Web，推荐使用此 SDK
+```typescript
+import { WsChatClient, WsChatEventNames } from '@coze/api/ws-tools';
+import { COZE_CN_BASE_WS_URL, RoleType } from '@coze/api';
+
+try {
+  // 初始化
+  const client = new WsChatClient({
+    botId: 'your_bot_id',
+    token: 'your_auth_token',
+    voiceId: 'your_voice_id', // 可选
+    baseWsURL: COZE_CN_BASE_WS_URL, // 可选，默认是 COZE_CN_BASE_WS_URL
+    allowPersonalAccessTokenInBrowser: true, // 可选，默认是 false
+    debug: false, // 可选，默认是 false
+  });
+
+  await client.connect();
+} catch (error) {
+  console.error('error', error);
+}
+
+// 监听所有事件
+client.on(WsChatEventNames.ALL, (event: CreateChatWsRes | undefined) => {
+  console.log(event);
+});
+
+// 发送用户消息
+client.sendMessage({
+  id: 'event_id',
+  event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+  data: {
+    role: RoleType.User,
+    content: 'Hello!',
+    content_type: 'text',
+  },
+});
+
+// 打断
+client.interrupt();
+
+// 断开连接
+await client.disconnect();
+
+// 设置音频启用
+await client.setAudioEnable(false);
+
+// 设置音频输入设备
+await client.setAudioInputDevice('your_device_id');
+
+```
+
+
 ### Proxy 示例
 ```ts
 const client = new CozeAPI({

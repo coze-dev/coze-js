@@ -59,7 +59,11 @@ class WsTranscriptionClient {
           reject(
             new APIError(
               data.data.code,
-              data as unknown as ErrorRes,
+              {
+                code: data.data.code,
+                msg: data.data.msg,
+                detail: data.detail,
+              },
               data.data.msg,
               undefined,
             ),
