@@ -26,7 +26,6 @@ function WS() {
   // 是否开启麦克风
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [transcript, setTranscript] = useState('');
-  const [userMessage, setUserMessage] = useState('深圳天气');
   const { getToken } = useTokenWithPat(localStorageKey);
   const isRecordingRef = useRef(false);
   const [audioBuffer, setAudioBuffer] = useState<string[]>([]);
@@ -150,7 +149,7 @@ function WS() {
       setIsConnected(true);
     } catch (error) {
       console.error(error);
-      message.error('连接错误：' + error);
+      message.error('连接错误：' + (error as Error).message);
     }
   };
 
@@ -186,7 +185,6 @@ function WS() {
     console.log('[chat] current time', new Date().toLocaleString(), text);
 
     clientRef.current?.sendTextMessage(text);
-    setUserMessage(text);
   };
 
   const handleSendAudio = async () => {

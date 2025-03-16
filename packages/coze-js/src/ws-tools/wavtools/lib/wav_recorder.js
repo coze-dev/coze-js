@@ -258,6 +258,14 @@ export class WavRecorder {
     return true;
   }
 
+  async getSampleRate() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioTrack = stream.getAudioTracks()[0];
+    // 释放 stream
+    stream.getTracks().forEach((track) => track.stop());
+    return audioTrack.getSettings().sampleRate;
+  }
+
   /**
    * List all eligible devices for recording, will request permission to use microphone
    * @returns {Promise<Array<MediaDeviceInfo & {default: boolean}>>}
@@ -315,7 +323,7 @@ export class WavRecorder {
       const audioConstraints = {
         echoCancellation: true,
         noiseSuppression: true,
-        autoGainControl: true
+        autoGainControl: true,
       };
 
       if (deviceId) {
@@ -330,6 +338,7 @@ export class WavRecorder {
 
     const context = new AudioContext({ sampleRate: this.sampleRate });
     const source = context.createMediaStreamSource(this.stream);
+
     // Load and execute the module script.
     try {
       await context.audioWorklet.addModule(this.scriptSrc);

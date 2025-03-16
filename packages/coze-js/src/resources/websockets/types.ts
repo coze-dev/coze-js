@@ -215,6 +215,10 @@ export interface ChatUpdateEvent extends BaseEvent {
     input_audio?: AudioConfig;
     output_audio?: OutputAudio;
     turn_detection?: TurnDetection;
+    /** Need to subscribe to the event type list of the downstream event. If not set or set to an empty array, all downstream events are subscribed. */
+    event_subscriptions?: string[];
+    /** Whether to play the prologue, default is false. */
+    need_play_prologue?: boolean;
   };
 }
 
