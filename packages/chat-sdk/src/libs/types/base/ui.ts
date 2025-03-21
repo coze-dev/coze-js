@@ -57,7 +57,9 @@ export interface InputConfig {
   placeholder?: string;
   defaultText?: string;
   // 判断是否可以发送消息，返回false则不能发送，其他可发送（包括undefined）
-  checkCanSendMessage?: (message: RawMessage) => Promise<boolean | undefined>;
+  checkCanSendMessage?: (
+    message: RawMessage,
+  ) => Promise<boolean | undefined> | boolean | undefined;
   renderChatInputTopSlot?: (isChatError?: boolean) => React.ReactNode;
 }
 export interface ClearContextConfig {
