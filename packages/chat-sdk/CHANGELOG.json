@@ -2,6 +2,102 @@
   "name": "@coze/chat-sdk",
   "entries": [
     {
+      "version": "0.1.11",
+      "tag": "HEAD",
+      "date": "2025-03-21T01:49:47.714Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "add success toast in markdown code copy"
+          },
+          {
+            "comment": "change version"
+          },
+          {
+            "comment": "change version "
+          },
+          {
+            "comment": "修改代码"
+          },
+          {
+            "comment": "fix webpakckjson conflict; markdown list is overflow"
+          },
+          {
+            "comment": "del mock data"
+          },
+          {
+            "comment": "修改版本"
+          },
+          {
+            "comment": "打印版本号"
+          },
+          {
+            "comment": "add message wrapper renderslot"
+          },
+          {
+            "comment": "add chatflow message wrapper config"
+          },
+          {
+            "comment": "修改scrollview问题"
+          },
+          {
+            "comment": "修改safari问题"
+          },
+          {
+            "comment": "change input to textarea"
+          },
+          {
+            "comment": "fix audio and textarea height "
+          },
+          {
+            "comment": "修改键盘弹起位置,以及placeholder"
+          },
+          {
+            "comment": "opt scroll-view"
+          },
+          {
+            "comment": "fix click change "
+          },
+          {
+            "comment": "fix mobile keyborad handle"
+          },
+          {
+            "comment": "添加requireAction函数"
+          },
+          {
+            "comment": "延迟发送消息"
+          },
+          {
+            "comment": "通用触发判断"
+          },
+          {
+            "comment": "暴露新的接口"
+          },
+          {
+            "comment": "添加inputvalue设置"
+          },
+          {
+            "comment": "修改eslint"
+          },
+          {
+            "comment": "workflow添加header"
+          },
+          {
+            "comment": "change markdown"
+          },
+          {
+            "comment": "版本号修改"
+          },
+          {
+            "comment": "修改评论内容"
+          },
+          {
+            "comment": "clear timeout before exit"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.9",
       "tag": "HEAD",
       "date": "2025-02-24T08:18:16.023Z",
