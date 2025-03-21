@@ -79,22 +79,30 @@ export class TaroRecorderManager extends BaseRecorderManager {
         success: res => {
           logger.debug('TaroRecorderManager getSetting', res);
           if (res.authSetting['scope.record'] !== true) {
-            Taro.authorize({
-              scope: 'scope.record',
-              success: () => {
-                logger.debug('TaroRecorderManager authorize scope.record true');
-                resolve(true);
-              },
-              fail: resFail => {
-                logger.error(
-                  'TaroRecorderManager authorize scope.record false',
-                  resFail,
-                );
-                reject(
-                  new Error('TaroRecorderManager authorize scope.record false'),
-                );
-              },
-            });
+            if (isTT) {
+              resolve(true);
+            } else {
+              Taro.authorize({
+                scope: 'scope.record',
+                success: () => {
+                  logger.debug(
+                    'TaroRecorderManager authorize scope.record true',
+                  );
+                  resolve(true);
+                },
+                fail: resFail => {
+                  logger.error(
+                    'TaroRecorderManager authorize scope.record false',
+                    resFail,
+                  );
+                  reject(
+                    new Error(
+                      'TaroRecorderManager authorize scope.record false',
+                    ),
+                  );
+                },
+              });
+            }
           } else {
             logger.debug('TaroRecorderManager getSetting scope.record true');
             resolve(true);
