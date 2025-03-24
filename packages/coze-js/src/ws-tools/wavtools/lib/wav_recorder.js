@@ -142,14 +142,6 @@ export class WavRecorder {
   }
 
   /**
-   * Retrieves the current sampleRate for the recorder
-   * @returns {number}
-   */
-  getSampleRate() {
-    return this.sampleRate;
-  }
-
-  /**
    * Retrieves the current status of the recording
    * @returns {"ended"|"paused"|"recording"}
    */
@@ -259,11 +251,9 @@ export class WavRecorder {
   }
 
   async getSampleRate() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const audioTrack = stream.getAudioTracks()[0];
-    // 释放 stream
-    stream.getTracks().forEach((track) => track.stop());
-    return audioTrack.getSettings().sampleRate;
+    return this.sampleRate;
+    // console.log('[wav_recorder] getSampleRate', this.stream.getAudioTracks());
+    // return this.stream.getAudioTracks()[0].getSettings().sampleRate;
   }
 
   /**
@@ -306,7 +296,7 @@ export class WavRecorder {
    * @param {string} [deviceId] if no device provided, default device will be used
    * @returns {Promise<true>}
    */
-  async begin({ deviceId, }: { deviceId?: string; }) {
+  async begin({ deviceId, audioTrackConfig }) {
     if (this.processor) {
       throw new Error(
         `Already connected: please call .end() to start a new session`,
@@ -324,6 +314,7 @@ export class WavRecorder {
         echoCancellation: true,
         noiseSuppression: true,
         autoGainControl: true,
+        // sampleRate: this.sampleRate,
       };
 
       if (deviceId) {

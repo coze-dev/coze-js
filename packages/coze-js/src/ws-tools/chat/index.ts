@@ -1,280 +1,95 @@
 import { v4 as uuid } from 'uuid';
 
-import { WavRecorder, WavStreamPlayer } from '../wavtools';
-import {
-  APIError,
-  type ChatUpdateEvent,
-  CozeAPI,
-  type CreateChatWsReq,
-  type CreateChatWsRes,
-  type ErrorRes,
-  type InputAudioBufferAppendEvent,
-  RoleType,
-  type WebSocketAPI,
-  WebsocketsEventType,
-} from '../..';
-import { type WsToolsOptions } from '..';
+import PcmRecorder, {
+  AIDenoiserProcessorLevel,
+  AIDenoiserProcessorMode,
+} from '../recorder/pcm-recorder';
+import { type ChatUpdateEvent, WebsocketsEventType } from '../..';
+import { type WsChatClientOptions, WsChatEventNames } from './types';
+import BaseWsChatClient from './base';
+import { getAudioDevices } from '../utils';
+export { WsChatEventNames };
 
-export interface WsChatClientOptions extends WsToolsOptions {
-  botId: string; //
-  voiceId?: string;
-}
-
-export enum WsChatEventNames {
-  /**
-   * en: All events
-   * zh: 所有事件
-   */
-  ALL = 'realtime.event',
-  /**
-   * en: Client connected
-   * zh: 客户端连接
-   */
-  CONNECTED = 'client.connected',
-  /**
-   * en: Client connecting
-   * zh: 客户端连接中
-   */
-  CONNECTING = 'client.connecting',
-  /**
-   * en: Client interrupted
-   * zh: 客户端中断
-   */
-  INTERRUPTED = 'client.interrupted',
-  /**
-   * en: Client disconnected
-   * zh: 客户端断开
-   */
-  DISCONNECTED = 'client.disconnected',
-  /**
-   * en: Client audio unmuted
-   * zh: 客户端音频未静音
-   */
-  AUDIO_UNMUTED = 'client.audio.unmuted',
-  /**
-   * en: Client audio muted
-   * zh: 客户端音频静音
-   */
-  AUDIO_MUTED = 'client.audio.muted',
-  /**
-   * en: Client error
-   * zh: 客户端错误
-   */
-  ERROR = 'client.error',
-  /**
-   * en: Audio noise reduction enabled
-   * zh: 抑制平稳噪声
-   */
-  // SUPPRESS_STATIONARY_NOISE = 'client.suppress.stationary.noise',
-  /**
-   * en: Suppress non-stationary noise
-   * zh: 抑制非平稳噪声
-   */
-  // SUPPRESS_NON_STATIONARY_NOISE = 'client.suppress.non.stationary.noise',
-  /**
-   * en: Audio input device changed
-   * zh: 音频输入设备改变
-   */
-  AUDIO_INPUT_DEVICE_CHANGED = 'client.input.device.changed',
-  /**
-   * en: Audio output device changed
-   * zh: 音频输出设备改变
-   */
-  AUDIO_OUTPUT_DEVICE_CHANGED = 'client.output.device.changed',
-  /**
-   * en: Video input device changed
-   * zh: 视频输入设备改变
-   */
-  //VIDEO_INPUT_DEVICE_CHANGED = 'client.video.input.device.changed',
-  /**
-   * en: Network quality changed
-   * zh: 网络质量改变
-   */
-  NETWORK_QUALITY = 'client.network.quality',
-}
-
-class WsChatClient {
-  public ws: WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null = null;
-  private listeners: Map<
-    string,
-    Set<(data: CreateChatWsRes | undefined) => void>
-  > = new Map();
-  private wavStreamPlayer: WavStreamPlayer;
-  private trackId = 'default';
-  private wavRecorder: WavRecorder;
-  private api: CozeAPI;
-  private config: WsChatClientOptions;
-  private audioDeltaList: string[] = [];
+class WsChatClient extends BaseWsChatClient {
+  public readonly recorder: PcmRecorder;
 
   constructor(config: WsChatClientOptions) {
-    this.api = new CozeAPI({
-      ...config,
+    super(config);
+    this.recorder = new PcmRecorder({
+      audioCaptureConfig: config.audioCaptureConfig,
+      aiDenoisingConfig: config.aiDenoisingConfig,
+      mediaStreamTrack: config.mediaStreamTrack,
+      wavRecordConfig: config.wavRecordConfig,
+      debug: config.debug,
+      deviceId: config.deviceId,
     });
-    this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
-    this.wavRecorder = new WavRecorder();
-    // this.wavRecorder = new PcmRecorder();
     this.config = config;
   }
 
-  private async init() {
-    if (this.ws) {
-      return this.ws;
-    }
-    const ws = await this.api.websockets.chat.create(
-      this.config.botId,
-      this.config.websocketOptions,
-    );
-    this.ws = ws;
-
-    // 标记 websocket 是否已 resolve or reject
-    let isResolved = false;
-
-    this.trackId = `my-track-id-${uuid()}`;
-
-    return new Promise<WebSocketAPI<CreateChatWsReq, CreateChatWsRes>>(
-      (resolve, reject) => {
-        ws.onopen = () => {
-          console.debug('[chat] ws open');
-        };
-
-        ws.onmessage = (data, event) => {
-          // Trigger all registered event listeners
-          this.emit(data.event_type, data);
-
-          switch (data.event_type) {
-            case WebsocketsEventType.ERROR:
-              this.closeWs();
-              if (isResolved) {
-                return;
-              }
-              isResolved = true;
-              reject(
-                new APIError(
-                  data.data.code,
-                  {
-                    code: data.data.code,
-                    msg: data.data.msg,
-                    detail: data.detail,
-                  },
-                  undefined,
-                  undefined,
-                ),
-              );
-              return;
-
-            case WebsocketsEventType.CHAT_CREATED:
-              resolve(ws);
-              isResolved = true;
-              break;
-
-            case WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED:
-              this.complete();
-              break;
-
-            case WebsocketsEventType.CONVERSATION_AUDIO_DELTA:
-              this.audioDeltaList.push(data.data.content);
-              if (this.audioDeltaList.length === 1) {
-                this.handleAudioMessage();
-              }
-              break;
-
-            case WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED:
-              this.clear();
-              break;
-
-            case WebsocketsEventType.CONVERSATION_AUDIO_COMPLETED:
-              // this.closeWs();
-              break;
-
-            case WebsocketsEventType.CONVERSATION_CHAT_CANCELED:
-              // this.isInterrupted = false;
-              this.clear();
-              break;
-            default:
-              break;
-          }
-        };
-
-        ws.onerror = (error, event) => {
-          console.error('[chat] WebSocket error', error, event);
-
-          this.emit(WebsocketsEventType.ERROR, error);
-
-          this.closeWs();
-          if (isResolved) {
-            return;
-          }
-          isResolved = true;
-          reject(
-            new APIError(
-              error.data.code,
-              error as unknown as ErrorRes,
-              error.data.msg,
-              undefined,
-            ),
-          );
-        };
-
-        ws.onclose = () => {
-          console.debug('[chat] ws close');
-        };
-      },
-    );
-  }
-
-  private async startRecord(
-    onAudioBufferAppend?: (data: InputAudioBufferAppendEvent) => void,
-  ) {
-    await this.wavRecorder.begin({});
+  private async startRecord() {
+    // 1. start recorder
+    await this.recorder.start();
 
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
 
     let startTime = performance.now();
-    await this.wavRecorder.record(data => {
-      const { raw } = data;
+    // 2. recording
+    await this.recorder.record({
+      pcmAudioCallback: data => {
+        const { raw } = data;
 
-      // Convert ArrayBuffer to base64 string
-      const base64String = btoa(
-        Array.from(new Uint8Array(raw))
-          .map(byte => String.fromCharCode(byte))
-          .join(''),
-      );
+        // Convert ArrayBuffer to base64 string
+        const base64String = btoa(
+          Array.from(new Uint8Array(raw))
+            .map(byte => String.fromCharCode(byte))
+            .join(''),
+        );
 
-      // send audio to ws
-      this.ws?.send({
-        id: uuid(),
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-        data: {
-          delta: base64String,
-        },
-      });
+        // send audio to ws
+        this.ws?.send({
+          id: uuid(),
+          event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
+          data: {
+            delta: base64String,
+          },
+        });
 
-      onAudioBufferAppend?.({
-        id: uuid(),
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-        data: {
-          delta: base64String,
-        },
-      });
-      console.log(
-        '[chat] send input_audio_buffer_append',
-        performance.now() - startTime,
-      );
-      startTime = performance.now();
-    }, 1024);
+        // this.log('input_audio_buffer_append', performance.now() - startTime);
+        startTime = performance.now();
+      },
+      wavAudioCallback: (blob, name) => {
+        const event = {
+          event_type: 'audio.input.dump' as const,
+          data: {
+            name,
+            wav: blob,
+          },
+        };
+        this.emit(WsChatEventNames.AUDIO_INPUT_DUMP, event);
+      },
+      dumpAudioCallback: (blob, name) => {
+        const event = {
+          event_type: 'audio.input.dump' as const,
+          data: {
+            name,
+            wav: blob,
+          },
+        };
+        this.emit(WsChatEventNames.AUDIO_INPUT_DUMP, event);
+      },
+    });
   }
 
   async connect({
-    onAudioBufferAppend,
     chatUpdate,
   }: {
-    onAudioBufferAppend?: (data: InputAudioBufferAppendEvent) => void;
     chatUpdate?: ChatUpdateEvent;
   } = {}) {
     await this.init();
-    const sampleRate = await this.wavRecorder.getSampleRate();
-    console.log('[chat] sampleRate', sampleRate);
+
+    await this.startRecord();
+    const sampleRate = await this.recorder?.getSampleRate();
 
     this.ws?.send({
       id: chatUpdate?.id || uuid(),
@@ -299,80 +114,74 @@ class WsChatClient {
         ...chatUpdate?.data,
       },
     });
-    await this.startRecord(onAudioBufferAppend);
+
     this.emit(WsChatEventNames.CONNECTED, undefined);
   }
 
   async disconnect() {
     await this.wavStreamPlayer.interrupt();
-    await this.wavRecorder.quit();
+    await this.recorder?.destroy();
+    this.emit(WsChatEventNames.DISCONNECTED, undefined);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
     this.listeners.clear();
     this.closeWs();
-    this.emit(WsChatEventNames.DISCONNECTED, undefined);
   }
 
-  sendMessage(data: CreateChatWsReq) {
-    this.ws?.send(data);
-  }
-
-  sendTextMessage(text: string) {
-    this.ws?.send({
-      id: uuid(),
-      event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
-      data: {
-        role: RoleType.User,
-        content_type: 'text',
-        content: text,
-      },
-    });
-  }
-
-  complete() {
-    this.ws?.send({
-      id: uuid(),
-      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-    });
-  }
+  /**
+   * en: Set the audio enable
+   * zh: 设置是否静音
+   * @param enable - The enable to set
+   */
   async setAudioEnable(enable: boolean) {
-    const status = await this.wavRecorder.getStatus();
+    const status = await this.recorder?.getStatus();
     if (enable) {
       if (status === 'ended') {
-        await this.startRecord();
+        await this.recorder?.resume();
+        this.emit(WsChatEventNames.AUDIO_UNMUTED, undefined);
       } else {
-        console.warn('[chat] wavRecorder is not ended with status', status);
+        this.warn('recorder is not ended with status', status);
       }
     } else {
       if (status === 'recording') {
-        await this.wavRecorder.pause();
-        const result = await this.wavRecorder.end();
-        console.log('[chat] wavRecorder end', result);
+        await this.recorder.pause();
+        this.emit(WsChatEventNames.AUDIO_MUTED, undefined);
       } else {
-        console.warn('[chat] wavRecorder is not recording with status', status);
+        this.warn('recorder is not recording with status', status);
       }
     }
   }
 
+  /**
+   * en: Set the audio input device
+   * zh: 设置音频输入设备
+   * @param deviceId - The device ID to set
+   */
   async setAudioInputDevice(deviceId: string) {
-    if (this.wavRecorder.getStatus() !== 'ended') {
-      await this.wavRecorder.end();
+    if (this.recorder.getStatus() !== 'ended') {
+      await this.recorder.destroy();
     }
-    const devices = await this.wavRecorder.listDevices();
+    const devices = await getAudioDevices();
     if (deviceId === 'default') {
-      this.wavRecorder.begin({});
+      this.recorder.config.deviceId = undefined;
+      this.startRecord();
+      this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     } else {
-      const device = devices.find(d => d.deviceId === deviceId);
+      const device = devices.audioInputs.find(d => d.deviceId === deviceId);
       if (!device) {
         throw new Error(`Device with id ${deviceId} not found`);
       }
-      this.wavRecorder.begin({
-        deviceId: device.deviceId,
-      });
+      this.recorder.config.deviceId = device.deviceId;
+      this.startRecord();
+      this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     }
-    this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
   }
-  interrupt() {
-    console.debug('[chat] interrupt');
 
+  /**
+   * en: Interrupt the conversation
+   * zh: 打断对话
+   */
+  interrupt() {
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL,
@@ -381,63 +190,48 @@ class WsChatClient {
     this.emit(WsChatEventNames.INTERRUPTED, undefined);
   }
 
-  async clear() {
-    console.debug('[chat] clear');
-
-    this.audioDeltaList.length = 0;
-    await this.wavStreamPlayer.interrupt();
-    this.trackId = `my-track-id-${uuid()}`;
-  }
-
-  isPlaying() {
-    return this.wavStreamPlayer.isPlaying();
-  }
-
-  on(event: string, callback: (data: CreateChatWsRes | undefined) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set());
+  /**
+   * en: Set the denoiser enabled
+   * zh: 设置是否启用降噪
+   * @param enabled - The enabled to set
+   */
+  setDenoiserEnabled(enabled: boolean) {
+    this.recorder.setDenoiserEnabled(enabled);
+    if (enabled) {
+      this.emit(WsChatEventNames.DENOISER_ENABLED, undefined);
+    } else {
+      this.emit(WsChatEventNames.DENOISER_DISABLED, undefined);
     }
-    this.listeners.get(event)?.add(callback);
   }
 
-  off(event: string, callback: (data: CreateChatWsRes | undefined) => void) {
-    this.listeners.get(event)?.delete(callback);
+  /**
+   * en: Set the denoiser level
+   * zh: 设置降噪等级
+   * @param level - The level to set
+   */
+  setDenoiserLevel(level: AIDenoiserProcessorLevel) {
+    this.log('setDenoiserLevel', level);
+    this.recorder.setDenoiserLevel(level);
   }
 
-  private closeWs() {
-    if (this.ws?.readyState === 1) {
-      this.ws?.close();
-    }
-    this.ws = null;
+  /**
+   * en: Set the denoiser mode
+   * zh: 设置降噪模式
+   * @param mode - The mode to set
+   */
+  setDenoiserMode(mode: AIDenoiserProcessorMode) {
+    this.log('setDenoiserMode', mode);
+    this.recorder.setDenoiserMode(mode);
   }
 
-  private emit(event: string, data: CreateChatWsRes | undefined) {
-    this.listeners.get(event)?.forEach(callback => callback(data));
-    this.listeners
-      .get(WsChatEventNames.ALL)
-      ?.forEach(callback => callback(data));
+  /**
+   * en: Check if the denoiser is supported
+   * zh: 检查是否支持降噪
+   * @returns - The support status
+   */
+  checkDenoiserSupport() {
+    return this.recorder.checkDenoiserSupport();
   }
-
-  private handleAudioMessage = async () => {
-    const message = this.audioDeltaList[0];
-    const decodedContent = atob(message);
-    const arrayBuffer = new ArrayBuffer(decodedContent.length);
-    const view = new Uint8Array(arrayBuffer);
-    for (let i = 0; i < decodedContent.length; i++) {
-      view[i] = decodedContent.charCodeAt(i);
-    }
-
-    try {
-      await this.wavStreamPlayer.add16BitPCM(arrayBuffer, this.trackId);
-
-      this.audioDeltaList.shift();
-      if (this.audioDeltaList.length > 0) {
-        this.handleAudioMessage();
-      }
-    } catch (error) {
-      console.warn('[chat] wavStreamPlayer error', error);
-    }
-  };
 }
 
 export default WsChatClient;

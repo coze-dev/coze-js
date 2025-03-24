@@ -1,42 +1,43 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
-import { RealtimeUtils } from '@coze/realtime-api';
-import { Button, Space, List, message, Modal, Input, Select } from 'antd';
-import {
-  ConversationAudioTranscriptUpdateEvent,
-  CreateChatWsRes,
-  WebsocketsEventType,
-} from '@coze/api';
+import { Button, message, Select, Modal, Layout, Row, Col } from 'antd';
 import { useTokenWithPat } from '../../hooks';
 import getConfig from '../../utils/config';
-import Settings from '../../components/settings';
-import { WsChatClient, WsChatEventNames } from '@coze/api/ws-tools';
+import {
+  WsChatClient,
+  WsChatEventNames,
+  WsToolsUtils,
+} from '@coze/api/ws-tools';
+import SendMessage from './send-message';
+import ReceiveMessage from './receive-message';
+import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
+import Operation from './operation';
+import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
+import { CustomTrackHandle } from './custom-track';
+import Header from './header';
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
-const { TextArea } = Input;
 
 function WS() {
-  const clientRef = useRef<WsChatClient | null>(null);
-  // 实时语音回复消息列表
-  const [messageList, setMessageList] = useState<string[]>([]);
+  const clientRef = useRef<WsChatClient>();
+  const audioConfigRef = useRef<AudioConfigRef>(null);
+  const customTrackRef = useRef<CustomTrackHandle>(null);
   // 是否正在连接
   const [isConnecting, setIsConnecting] = useState(false);
   // 是否已连接
   const [isConnected, setIsConnected] = useState(false);
-  // 是否开启麦克风
-  const [audioEnabled, setAudioEnabled] = useState(true);
   const [transcript, setTranscript] = useState('');
   const { getToken } = useTokenWithPat(localStorageKey);
-  const isRecordingRef = useRef(false);
-  const [audioBuffer, setAudioBuffer] = useState<string[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [inputText, setInputText] = useState('');
+
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
 
+  // 添加控制弹窗显示的状态
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+
   useEffect(() => {
     const getDevices = async () => {
-      const devices = await RealtimeUtils.getAudioDevices();
+      const devices = await WsToolsUtils.getAudioDevices();
       setInputDevices(devices.audioInputs);
       if (devices.audioInputs.length > 0) {
         setSelectedInputDevice(devices.audioInputs[0].deviceId);
@@ -47,19 +48,50 @@ function WS() {
   }, []);
 
   async function initClient() {
-    const permission = await RealtimeUtils.checkDevicePermission();
+    const permission = await WsToolsUtils.checkDevicePermission();
     if (!permission.audio) {
       throw new Error('需要麦克风访问权限');
     }
+
+    const audioConfig = audioConfigRef.current?.getSettings();
+    console.log('audioConfig', audioConfig);
+    // const audioElement = customTrackRef.current?.getAudioElement();
+    // // 从 audio 元素获取 MediaStreamTrack
+    // const stream = (audioElement as any)?.captureStream();
+    // const audioTrack = stream?.getAudioTracks()[0];
 
     const client = new WsChatClient({
       token: getToken,
       baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
       botId: config.getBotId(),
-      debug: false,
+      debug: audioConfig?.debug,
       voiceId: config.getVoiceId(),
+      workflowId: config.getWorkflowId() || undefined,
+      // mediaStreamTrack: audioTrack,
+      aiDenoisingConfig: !audioConfig?.noiseSuppression
+        ? {
+            mode: audioConfig?.denoiseMode,
+            level: audioConfig?.denoiseLevel,
+            assetsPath:
+              'https://lf3-static.bytednsdoc.com/obj/eden-cn/613eh7lpqvhpeuloz/websocket',
+          }
+        : undefined,
+      audioCaptureConfig: {
+        echoCancellation: audioConfig?.echoCancellation,
+        noiseSuppression: audioConfig?.noiseSuppression,
+        autoGainControl: audioConfig?.autoGainControl,
+      },
+      wavRecordConfig: {
+        enableSourceRecord: false,
+        enableDenoiseRecord: false,
+      },
+      deviceId: selectedInputDevice || undefined,
     });
+
+    if (!client.checkDenoiserSupport()) {
+      message.info('当前浏览器不支持降噪');
+    }
 
     clientRef.current = client;
 
@@ -67,71 +99,15 @@ function WS() {
   }
 
   const handleMessageEvent = async () => {
-    let lastEvent: any;
-
     clientRef.current?.on(
-      WsChatEventNames.ALL,
-      (event: CreateChatWsRes | undefined) => {
-        console.log('[chat] event_type', event?.event_type);
-
-        if (!event) {
-          return;
-        }
-
-        if (
-          event.event_type !== WebsocketsEventType.CONVERSATION_MESSAGE_DELTA &&
-          event.event_type !==
-            WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED
-        ) {
-          return;
-        }
-        const content = event.data.content;
-        setMessageList(prev => {
-          // 如果上一个事件是增量更新，则附加到最后一条消息
-          if (
-            lastEvent?.event_type ===
-            WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
-          ) {
-            return [...prev.slice(0, -1), prev[prev.length - 1] + content];
-          }
-          // 否则添加新消息
-          if (
-            event.event_type === WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
-          ) {
-            return [...prev, content];
-          }
-          return prev;
-        });
-        lastEvent = event;
-      },
-    );
-
-    clientRef.current?.on(
-      WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED,
-      () => {
-        // clientRef.current?.clear();
-      },
-    );
-    clientRef.current?.on(
-      WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED,
-      () => {
-        // clientRef.current?.clear();
-      },
-    );
-    clientRef.current?.on(
-      WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE,
-      (event: unknown) => {
+      WsChatEventNames.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE,
+      (eventName: string, event: unknown) => {
         console.log('[chat] transcript update', event);
         setTranscript(
           (event as ConversationAudioTranscriptUpdateEvent).data.content,
         );
       },
     );
-
-    clientRef.current?.on('completed', () => {
-      console.log('[chat] completed');
-      // clientRef.current?.setAudioEnable(true);
-    });
   };
 
   const handleConnect = async () => {
@@ -139,72 +115,12 @@ function WS() {
       if (!clientRef.current) {
         await initClient();
       }
-      await clientRef.current?.connect({
-        onAudioBufferAppend: data => {
-          if (isRecordingRef.current) {
-            setAudioBuffer(prev => [...prev, data.data.delta]);
-          }
-        },
-      });
+      await clientRef.current?.connect();
       setIsConnected(true);
     } catch (error) {
       console.error(error);
       message.error('连接错误：' + (error as Error).message);
     }
-  };
-
-  const handleInterrupt = () => {
-    try {
-      clientRef.current?.interrupt();
-    } catch (error) {
-      message.error('打断失败：' + error);
-    }
-  };
-
-  const handleDisconnect = () => {
-    try {
-      clientRef.current?.disconnect();
-      clientRef.current = null;
-      setIsConnected(false);
-    } catch (error) {
-      message.error('断开失败：' + error);
-    }
-  };
-
-  const toggleMicrophone = async () => {
-    try {
-      await clientRef.current?.setAudioEnable(!audioEnabled);
-      setAudioEnabled(!audioEnabled);
-    } catch (error) {
-      message.error('切换麦克风状态失败：' + error);
-    }
-  };
-
-  const handleSendText = (text: string) => {
-    // 打印当前时间
-    console.log('[chat] current time', new Date().toLocaleString(), text);
-
-    clientRef.current?.sendTextMessage(text);
-  };
-
-  const handleSendAudio = async () => {
-    if (audioBuffer.length === 0) {
-      message.error('请先录制音频');
-      return;
-    }
-    console.log('[chat] handleSendAudio start');
-    for (let i = 0; i < audioBuffer.length; i++) {
-      const audio = audioBuffer[i];
-      await new Promise(resolve => setTimeout(resolve, 50));
-      clientRef.current?.sendMessage({
-        id: 'event_id',
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-        data: {
-          delta: audio,
-        },
-      });
-    }
-    console.log('[chat] handleSendAudio end');
   };
 
   const handleSetAudioInputDevice = async (deviceId: string) => {
@@ -218,154 +134,95 @@ function WS() {
 
   // 添加设置变更处理函数
   const handleSettingsChange = () => {
-    // 重新初始化客户端或刷新配置
-    if (isConnected) {
-      handleDisconnect();
-    }
-  };
-
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleOk = () => {
-    if (inputText.trim()) {
-      handleSendText(inputText);
-      setInputText('');
-      setIsModalVisible(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setInputText('');
+    window.location.reload();
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-        <Settings
-          onSettingsChange={handleSettingsChange}
-          localStorageKey={localStorageKey}
-        />
-      </div>
-      <Space style={{ padding: '10px' }}>
-        <Button
-          type="primary"
-          disabled={isConnected || isConnecting}
-          onClick={() => {
-            setIsConnecting(true);
-            handleConnect().finally(() => {
-              setIsConnecting(false);
-            });
-          }}
-        >
-          连接
-        </Button>
-        <Button disabled={!isConnected} onClick={handleInterrupt}>
-          打断
-        </Button>
-        <Button danger disabled={!isConnected} onClick={handleDisconnect}>
-          断开
-        </Button>
-        {audioEnabled ? (
-          <Button disabled={!isConnected} onClick={toggleMicrophone}>
-            静音
-          </Button>
-        ) : (
-          <Button disabled={!isConnected} onClick={toggleMicrophone}>
-            取消静音
-          </Button>
-        )}
-      </Space>
-      <br />
-      <Space>
-        <Select
-          style={{ width: 200 }}
-          placeholder="选择输入设备"
-          value={selectedInputDevice}
-          onChange={handleSetAudioInputDevice}
-        >
-          {inputDevices.map(device => (
-            <Select.Option key={device.deviceId} value={device.deviceId}>
-              {device.label || `麦克风 ${device.deviceId.slice(0, 8)}...`}
-            </Select.Option>
-          ))}
-        </Select>
-        <Button disabled={!isConnected} onClick={showModal} block>
-          发送文本
-        </Button>
-        {!isRecordingRef.current ? (
-          <Button
-            disabled={!isConnected}
-            onClick={() => {
-              setAudioBuffer([]);
-              isRecordingRef.current = true;
-            }}
-            block
-          >
-            音频录制
-          </Button>
-        ) : (
-          <Button
-            disabled={!isConnected}
-            onClick={() => {
-              isRecordingRef.current = false;
-            }}
-            block
-          >
-            停止录制
-          </Button>
-        )}
-        <Button disabled={!isConnected} onClick={handleSendAudio} block>
-          音频发送
-        </Button>
-      </Space>
-      <br />
-      <Space style={{ padding: '20px' }} align="start">
-        <div style={{ width: '400px', textAlign: 'left' }}>
-          语音识别结果：{transcript}
-        </div>
-      </Space>
-      <br />
-      <Space direction="vertical">
-        <Space>
-          <div
+    <Layout>
+      <Header
+        onSettingsChange={handleSettingsChange}
+        localStorageKey={localStorageKey}
+      />
+      <Layout.Content>
+        <Row style={{ marginTop: '10px' }} justify="center">
+          <Col
+            span={24}
             style={{
-              marginTop: '20px',
-              padding: '20px',
-              maxHeight: '600px',
-              width: '400px',
-              overflowY: 'auto',
-              border: '1px solid #ccc',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '8px', // 添加按钮之间的间距
             }}
           >
-            <h3>实时语音回复</h3>
-            <List
-              dataSource={messageList}
-              renderItem={(message, index) => (
-                <List.Item key={index} style={{ textAlign: 'left' }}>
-                  {message}
-                </List.Item>
-              )}
-            />
-          </div>
-        </Space>
-      </Space>
-      <Modal
-        title="发送文本消息"
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <TextArea
-          value={inputText}
-          onChange={e => setInputText(e.target.value)}
-          placeholder="请输入要发送的文本"
-          rows={4}
-        />
-      </Modal>
-    </div>
+            <Button onClick={() => setIsConfigModalOpen(true)}>配置</Button>
+            {!isConnected && (
+              <Button
+                danger
+                disabled={isConnected || isConnecting}
+                onClick={() => {
+                  setIsConnecting(true);
+                  handleConnect().finally(() => {
+                    setIsConnecting(false);
+                  });
+                }}
+              >
+                连接
+              </Button>
+            )}
+            {isConnected && (
+              <Operation
+                isConnected={isConnected}
+                clientRef={clientRef}
+                setIsConnected={setIsConnected}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row style={{ marginTop: '10px' }}>
+          <Col
+            span={24}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '8px', // 添加按钮之间的间距
+            }}
+          >
+            <Select
+              style={{ width: '200px' }}
+              placeholder="选择输入设备"
+              value={selectedInputDevice}
+              onChange={handleSetAudioInputDevice}
+            >
+              {inputDevices.map(device => (
+                <Select.Option key={device.deviceId} value={device.deviceId}>
+                  {device.label || `麦克风 ${device.deviceId.slice(0, 8)}...`}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+        <SendMessage isConnected={isConnected} clientRef={clientRef} />
+
+        <Row style={{ margin: '16px' }}>
+          <Col span={24} style={{ textAlign: 'left' }}>
+            语音识别结果：{transcript}
+          </Col>
+        </Row>
+
+        <ReceiveMessage clientRef={clientRef} />
+
+        {/* 配置弹窗 */}
+        <Modal
+          title="音频配置"
+          open={isConfigModalOpen}
+          onCancel={() => setIsConfigModalOpen(false)}
+          footer={null}
+          destroyOnClose={false}
+          forceRender
+        >
+          <AudioConfig clientRef={clientRef} ref={audioConfigRef} />
+        </Modal>
+      </Layout.Content>
+    </Layout>
   );
 }
 

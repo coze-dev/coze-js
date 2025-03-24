@@ -23,13 +23,14 @@ const Settings = ({
     const botId = config.getBotId();
     const baseWsUrl = config.getBaseWsUrl();
     const voiceId = config.getVoiceId();
-
+    const workflowId = config.getWorkflowId();
     form.setFieldsValue({
       base_url: baseUrl,
       base_ws_url: baseWsUrl,
       pat,
       bot_id: botId,
       voice_id: voiceId,
+      workflow_id: workflowId,
     });
   }, [form]);
 
@@ -90,6 +91,13 @@ const Settings = ({
             name="voice_id"
             label="Voice ID"
             rules={[{ message: 'Please input Voice ID!' }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="workflow_id"
+            label="Workflow ID"
+            rules={[{ message: 'Please input Workflow ID!' }]}
           >
             <Input />
           </Form.Item>

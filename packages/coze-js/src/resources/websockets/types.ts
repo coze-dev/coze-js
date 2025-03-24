@@ -162,6 +162,8 @@ export enum WebsocketsEventType {
   CONVERSATION_AUDIO_TRANSCRIPT_UPDATE = 'conversation.audio_transcript.update',
   /** Audio transcript completed */
   CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED = 'conversation.audio_transcript.completed',
+  /** Audio dump */
+  DUMP_AUDIO = 'dump.audio',
 }
 
 export interface EventDetail {
@@ -459,6 +461,13 @@ export interface InputAudioBufferClearEvent extends BaseEvent {
 
 export interface InputAudioBufferCompleteEvents extends BaseEvent {
   event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE;
+}
+
+export interface AudioDumpEvent extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.DUMP_AUDIO;
+  data: {
+    url: string;
+  };
 }
 
 interface OutputAudio {

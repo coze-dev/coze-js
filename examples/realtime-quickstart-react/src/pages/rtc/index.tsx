@@ -52,7 +52,7 @@ function Rtc() {
   }
 
   async function initClient() {
-    const permission = await RealtimeUtils.checkDevicePermission(true);
+    const permission = await RealtimeUtils.checkDevicePermission();
     if (!permission.audio) {
       throw new Error('需要麦克风访问权限');
     }
@@ -69,11 +69,11 @@ function Rtc() {
       voiceId: voices.length > 0 ? voices[0].voice_id : undefined,
       allowPersonalAccessTokenInBrowser: true, // 可选：允许在浏览器中使用个人访问令牌
       debug: true,
-      videoConfig: permission.video
-        ? {
-            renderDom: 'local-player',
-          }
-        : undefined,
+      // videoConfig: permission.video
+      //   ? {
+      //       renderDom: 'local-player',
+      //     }
+      //   : undefined,
     });
 
     clientRef.current = client;

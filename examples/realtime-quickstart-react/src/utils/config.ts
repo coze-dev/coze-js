@@ -7,6 +7,7 @@ const getConfig = (prefix: string) => {
     getPat: () => localStorage.getItem(`${prefix}_pat`) || '',
     getBotId: () => localStorage.getItem(`${prefix}_bot_id`) || '',
     getVoiceId: () => localStorage.getItem(`${prefix}_voice_id`) || '',
+    getWorkflowId: () => localStorage.getItem(`${prefix}_workflow_id`) || '',
   };
   return config;
 };

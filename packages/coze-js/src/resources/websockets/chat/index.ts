@@ -26,18 +26,25 @@ import {
   type ConversationChatCanceledEvent,
   type ConversationAudioTranscriptUpdateEvent,
   type ConversationAudioTranscriptCompletedEvent,
+  type AudioDumpEvent,
 } from '../types';
 import { APIResource } from '../../resource';
+import { buildWebsocketUrl } from '../../../utils';
 import { type WebsocketOptions } from '../../../core';
 
 export class Chat extends APIResource {
-  async create(botId: string, options?: WebsocketOptions) {
-    const apiUrl = `/v1/chat?bot_id=${botId}`;
+  async create(req: CreateChatReq, options?: WebsocketOptions) {
+    const apiUrl = buildWebsocketUrl('/v1/chat', req);
     return await this._client.makeWebsocket<CreateChatWsReq, CreateChatWsRes>(
       apiUrl,
       options,
     );
   }
+}
+
+export interface CreateChatReq {
+  bot_id: string;
+  workflow_id?: string;
 }
 
 export type CreateChatWsReq =
@@ -69,4 +76,5 @@ export type CreateChatWsRes =
   | InputAudioBufferSpeechStoppedEvent
   | ConversationChatCanceledEvent
   | ConversationAudioTranscriptUpdateEvent
-  | ConversationAudioTranscriptCompletedEvent;
+  | ConversationAudioTranscriptCompletedEvent
+  | AudioDumpEvent;
