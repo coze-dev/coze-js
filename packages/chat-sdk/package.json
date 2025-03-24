@@ -63,7 +63,7 @@
     "ios >= 8"
   ],
   "dependencies": {
-    "@coze/api": "workspace:*",
+    "@coze/api": "^1.0.17",
     "classnames": "^2.3.2",
     "extendable-media-recorder": "^9.2.19",
     "mdast": "^3.0.0-alpha.6",
