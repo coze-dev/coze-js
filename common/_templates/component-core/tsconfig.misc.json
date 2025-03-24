@@ -1,0 +1,15 @@
+{
+  "extends": "@flow-infra/ts-config/tsconfig.web.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist"
+  },
+  "include": ["__tests__/**/*", "vitest.config.ts"],
+  "exclude": ["./dist"],
+  "references": [
+    {
+      "path": "./tsconfig.build.json"
+    }
+  ]
+}

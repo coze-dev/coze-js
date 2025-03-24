@@ -74,6 +74,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -90,6 +91,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+dist_dev
 
 # Gatsby files
 .cache/
@@ -103,12 +105,6 @@ dist
 # vuepress v2.x temp and cache directory
 .temp
 .cache
-
-# vitepress build output
-**/.vitepress/dist
-
-# vitepress cache directory
-**/.vitepress/cache
 
 # Docusaurus cache and generated files
 .docusaurus
@@ -134,3 +130,43 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Temp file
+*.xlsx
+
+
+node_modules
+
+.eslintcache
+
+common/temp
+
+# OS X temporary files
+.DS_Store
+
+# IntelliJ IDEA project files; if you want to commit IntelliJ settings, this recipe may be helpful:
+# https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+.idea/
+*.iml
+
+common/autoinstallers/*/.npmrc
+
+**/.rush/temp/
+*.lock
+
+# Heft temporary files
+.cache
+.heft
+
+.vercel/output
+rush-logs
+dist
+
+*.tsbuildinfo
+
+# Temp file
+examples/coze-js-node/tmp/
+examples/coze-js-node/src/config/config.ts
+
+!examples/coze-js-web/src/lib/wavtools/dist
+packages/chat-sdk/.env.development
