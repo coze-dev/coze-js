@@ -49,6 +49,7 @@ export class AsyncSendMessage extends MultiSendMessage {
     this._checkTimeout();
     try {
       for await (const eventData of this.chatStream) {
+        logger.debug('asyncChat pollAnswer awaiting start2', eventData);
         this._checkTimeout();
         if (!this.isAbort) {
           const { event, data } = eventData;
@@ -142,6 +143,7 @@ export class AsyncSendMessage extends MultiSendMessage {
                 code: number;
                 msg: string;
               };
+              this.chatService.handleErrorCode(messageError.code || -1);
               this.sendErrorEvent(
                 new MiniChatError(
                   messageError.code || -1,

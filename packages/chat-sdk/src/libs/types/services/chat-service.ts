@@ -65,6 +65,7 @@ export interface IChatService {
     params: CreateFileReq,
     options?: RequestOptions,
   ) => Promise<FileObject>;
+  handleErrorCode: (code: number) => Promise<string>;
   audioSpeech: (params: {
     input: string;
     voice_id: string;

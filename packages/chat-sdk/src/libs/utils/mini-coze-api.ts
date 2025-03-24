@@ -96,7 +96,7 @@ export class MiniCozeApi extends CozeAPI {
       },
     );
   }
-  private isAuthErrorCode(code: number) {
+  isAuthErrorCode(code: number) {
     return [
       ApiAuthError.ERROR_FORBIDDEN,
       ApiAuthError.ERROR_INVALID_TOKEN,
@@ -107,13 +107,13 @@ export class MiniCozeApi extends CozeAPI {
   getTokenFromHeaderAuth(authorization: string) {
     return authorization.replace(/^\s*Bearer\s*/, '').replace(/\s+$/, '');
   }
-  async refreshToken(oldToken: string) {
+  async refreshToken(oldToken: string): Promise<string> {
     if (this.refreshTokenPromise) {
       return this.refreshTokenPromise;
     }
     if (oldToken !== this.token) {
       // 同时并发的接口已经获取过token，直接返回
-      return this.token;
+      return this.token as string;
     }
     this.refreshTokenPromise = this.onRefreshToken?.(this.token);
     const token = await this.refreshTokenPromise;
@@ -153,7 +153,11 @@ export class MiniCozeApi extends CozeAPI {
     options?: RequestOptions,
   ): Promise<Rsp> {
     if (isWeb || !isStream) {
-      return super.makeRequest(apiUrl, method, body, isStream, options);
+      try {
+        return super.makeRequest(apiUrl, method, body, isStream, options);
+      } catch (err) {
+        console.log('makeRequestError:', err);
+      }
     }
     return this.requestMiniSse({
       apiUrl,
