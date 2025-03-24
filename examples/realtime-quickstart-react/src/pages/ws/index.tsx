@@ -31,6 +31,9 @@ function WS() {
   const [audioBuffer, setAudioBuffer] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [isSignalModalVisible, setIsSignalModalVisible] = useState(false);
+  const [signalText, setSignalText] = useState('');
+  const [signalError, setSignalError] = useState('');
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
 
@@ -59,6 +62,11 @@ function WS() {
       botId: config.getBotId(),
       debug: false,
       voiceId: config.getVoiceId(),
+      audioTrackConfig: {
+        AEC: true,
+        AGC: true,
+        ANS: true,
+      },
     });
 
     clientRef.current = client;
@@ -228,6 +236,12 @@ function WS() {
     setIsModalVisible(true);
   };
 
+  const showSignalModal = () => {
+    setIsSignalModalVisible(true);
+    setSignalText('');
+    setSignalError('');
+  };
+
   const handleOk = () => {
     if (inputText.trim()) {
       handleSendText(inputText);
@@ -236,9 +250,31 @@ function WS() {
     }
   };
 
+  const handleSignalOk = () => {
+    if (signalText.trim()) {
+      try {
+        // Validate JSON
+        const jsonData = JSON.parse(signalText);
+        // Send signal
+        clientRef.current?.sendMessage(jsonData);
+        setSignalText('');
+        setSignalError('');
+        setIsSignalModalVisible(false);
+      } catch (error) {
+        setSignalError('无效的JSON格式');
+      }
+    }
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
     setInputText('');
+  };
+
+  const handleSignalCancel = () => {
+    setIsSignalModalVisible(false);
+    setSignalText('');
+    setSignalError('');
   };
 
   return (
@@ -294,6 +330,9 @@ function WS() {
         </Select>
         <Button disabled={!isConnected} onClick={showModal} block>
           发送文本
+        </Button>
+        <Button disabled={!isConnected} onClick={showSignalModal} block>
+          发送事件
         </Button>
         {!isRecordingRef.current ? (
           <Button
@@ -364,6 +403,26 @@ function WS() {
           placeholder="请输入要发送的文本"
           rows={4}
         />
+      </Modal>
+      <Modal
+        title="发送事件"
+        open={isSignalModalVisible}
+        onOk={handleSignalOk}
+        onCancel={handleSignalCancel}
+      >
+        <TextArea
+          value={signalText}
+          onChange={e => {
+            setSignalText(e.target.value);
+            setSignalError('');
+          }}
+          placeholder="请输入JSON格式的信令"
+          rows={6}
+          status={signalError ? 'error' : ''}
+        />
+        {signalError && (
+          <div style={{ color: 'red', marginTop: '8px' }}>{signalError}</div>
+        )}
       </Modal>
     </div>
   );

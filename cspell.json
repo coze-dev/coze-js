@@ -11,7 +11,9 @@
     "preinstall",
     "undici",
     "Websockets",
-    "chatflow"
+    "chatflow",
+    "AIDenoiserExtension",
+    "denoiser"
   ],
   "ignoreWords": [],
   "import": []

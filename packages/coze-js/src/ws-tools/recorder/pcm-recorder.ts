@@ -2,6 +2,44 @@ import {
   createMicrophoneAudioTrack,
   type IMicrophoneAudioTrack,
 } from 'agora-rtc-sdk-ng/esm';
+import AgoraRTC from 'agora-rtc-sdk-ng';
+import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
+
+import CustomAudioProcessor from './custom-audio-processor';
+
+/**
+ * Configurations for the audio track of screen sharing.
+ */
+export interface AudioTrackConfig {
+  /**
+   * Whether to enable AI denoiser:
+   * - `NSNG`: Enable non-stationary noise suppression.
+   * - `STATIONARY_NS`: Enable stationary noise suppression.
+   */
+  aiDenoiserMode?: 'NSNG' | 'STATIONARY_NS';
+  /**
+   * The path to the AI denoiser assets.
+   */
+  assetsPath?: string;
+  /**
+   * Whether to enable acoustic echo cancellation:
+   * - `true`: Enable acoustic echo cancellation.
+   * - `false`: Do not enable acoustic echo cancellation.
+   */
+  AEC?: boolean;
+  /**
+   * Whether to enable audio gain control:
+   * - `true`: Enable audio gain control.
+   * - `false`: Do not enable audio gain control.
+   */
+  AGC?: boolean;
+  /**
+   * Whether to enable automatic noise suppression:
+   * - `true`: Enable automatic noise suppression.
+   * - `false`: Do not automatic noise suppression.
+   */
+  ANS?: boolean;
+}
 
 class PcmRecorder {
   private audioTrack: IMicrophoneAudioTrack | undefined;
@@ -11,17 +49,58 @@ class PcmRecorder {
   private sourceNode: MediaStreamAudioSourceNode | undefined;
   private processorNode: ScriptProcessorNode | undefined;
   private analyserNode: AnalyserNode | undefined;
+  private workletNode: AudioWorkletNode | undefined;
+  private audioTrackConfig: AudioTrackConfig | undefined;
+  private static denoiser: AIDenoiserExtension | undefined;
 
   constructor() {
     this.audioContext = new AudioContext();
   }
 
-  async begin({ deviceId }: { deviceId?: string | undefined }) {
+  private isSupportAIDenoiser() {
+    return (
+      this.audioTrackConfig?.aiDenoiserMode &&
+      PcmRecorder.denoiser !== undefined
+    );
+  }
+
+  async begin({
+    deviceId,
+    audioTrackConfig,
+  }: {
+    deviceId?: string | undefined;
+    audioTrackConfig?: AudioTrackConfig;
+  }) {
+    this.audioTrackConfig = audioTrackConfig;
+
+    if (audioTrackConfig?.aiDenoiserMode && !PcmRecorder.denoiser) {
+      // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
+      const external = new AIDenoiserExtension({
+        assetsPath: audioTrackConfig?.assetsPath ?? '/external',
+      });
+
+      external.onloaderror = e => {
+        // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
+        console.error('Denoiser load error', e);
+      };
+
+      // 检查兼容性
+      if (!external.checkCompatibility()) {
+        // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
+        console.error('Does not support AI Denoiser!');
+      } else {
+        // 注册插件
+        AgoraRTC.registerExtensions([external]);
+        PcmRecorder.denoiser = external;
+      }
+    }
+
     // Get microphone audio track
+    // See:https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/microphoneaudiotrackinitconfig.html
     this.audioTrack = await createMicrophoneAudioTrack({
-      AEC: true,
-      ANS: true,
-      AGC: true,
+      AEC: audioTrackConfig?.AEC ?? true, // 是否开启回声消除
+      ANS: audioTrackConfig?.ANS ?? false, // 是否开启音频增益控制
+      AGC: audioTrackConfig?.AGC ?? false, // 是否开启自动噪声抑制
       microphoneId: deviceId,
     });
 
@@ -51,11 +130,16 @@ class PcmRecorder {
       this.analyserNode.disconnect();
       this.analyserNode = undefined;
     }
+
+    if (this.workletNode) {
+      this.workletNode.disconnect();
+      this.workletNode = undefined;
+    }
   }
 
   async record(
     chunkProcessor?: (data: { raw: ArrayBuffer }) => void,
-    bufferSize = 4096,
+    bufferSize = 2048,
   ) {
     if (!this.audioTrack || !this.stream) {
       throw new Error('audioTrack is not initialized');
@@ -66,44 +150,24 @@ class PcmRecorder {
       await this.audioContext.resume();
     }
 
-    // Create audio source node
-    this.sourceNode = this.audioContext.createMediaStreamSource(this.stream);
-
-    // Create analyzer node for audio data
-    this.analyserNode = this.audioContext.createAnalyser();
-    this.analyserNode.fftSize = 2048;
-
-    // Create processor node
-    // Note: ScriptProcessorNode is deprecated, but still a practical choice until AudioWorklet is widely supported
-    this.processorNode = this.audioContext.createScriptProcessor(
-      bufferSize,
-      1, // Mono input
-      1, // Mono output
-    );
-
-    // Connect nodes
-    this.sourceNode.connect(this.analyserNode);
-    this.analyserNode.connect(this.processorNode);
-    this.processorNode.connect(this.audioContext.destination);
-
-    // Set up audio processing callback
-    this.processorNode.onaudioprocess = audioProcessingEvent => {
-      if (!this.recording) {
-        return;
-      }
-
-      // Get input buffer
-      const { inputBuffer } = audioProcessingEvent;
-
-      // Get left channel data (mono recording)
-      const inputData = inputBuffer.getChannelData(0);
-
-      // Convert to 16-bit PCM
-      const pcmData = this.floatTo16BitPCM(inputData);
-
-      // Send data
+    const customAudioProcessor = new CustomAudioProcessor(data => {
+      const pcmData = this.floatTo16BitPCM(data);
       chunkProcessor?.({ raw: pcmData });
-    };
+    });
+
+    if (this.isSupportAIDenoiser() && PcmRecorder.denoiser) {
+      const processor = PcmRecorder.denoiser?.createProcessor();
+      await processor.enable();
+
+      this.audioTrack
+        .pipe(processor)
+        .pipe(customAudioProcessor)
+        .pipe(this.audioTrack.processorDestination);
+    } else {
+      this.audioTrack
+        .pipe(customAudioProcessor)
+        .pipe(this.audioTrack.processorDestination);
+    }
 
     this.recording = true;
   }
@@ -141,6 +205,10 @@ class PcmRecorder {
     } else {
       return 'recording';
     }
+  }
+
+  getSampleRate() {
+    return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
   }
 
   async requestPermission() {

@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid';
 
 import { WavRecorder, WavStreamPlayer } from '../wavtools';
+// import PcmRecorder from '../recorder/pcm-recorder';
+import { type AudioTrackConfig } from '../recorder/pcm-recorder';
 import {
   APIError,
   type ChatUpdateEvent,
@@ -18,6 +20,7 @@ import { type WsToolsOptions } from '..';
 export interface WsChatClientOptions extends WsToolsOptions {
   botId: string; //
   voiceId?: string;
+  audioTrackConfig?: AudioTrackConfig;
 }
 
 export enum WsChatEventNames {
@@ -111,8 +114,7 @@ class WsChatClient {
       ...config,
     });
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
-    this.wavRecorder = new WavRecorder();
-    // this.wavRecorder = new PcmRecorder();
+    this.wavRecorder = new WavRecorder({ sampleRate: 48000 });
     this.config = config;
   }
 
@@ -225,7 +227,9 @@ class WsChatClient {
   private async startRecord(
     onAudioBufferAppend?: (data: InputAudioBufferAppendEvent) => void,
   ) {
-    await this.wavRecorder.begin({});
+    await this.wavRecorder.begin({
+      audioTrackConfig: this.config.audioTrackConfig,
+    });
 
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
@@ -273,6 +277,12 @@ class WsChatClient {
     chatUpdate?: ChatUpdateEvent;
   } = {}) {
     await this.init();
+
+    // const sampleRate2 = await this.wavRecorder.getSampleRate();
+    // console.log('[chat] sampleRate', sampleRate2);
+
+    await this.startRecord(onAudioBufferAppend);
+
     const sampleRate = await this.wavRecorder.getSampleRate();
     console.log('[chat] sampleRate', sampleRate);
 
@@ -299,7 +309,7 @@ class WsChatClient {
         ...chatUpdate?.data,
       },
     });
-    await this.startRecord(onAudioBufferAppend);
+
     this.emit(WsChatEventNames.CONNECTED, undefined);
   }
 

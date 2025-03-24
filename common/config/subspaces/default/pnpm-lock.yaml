@@ -1810,6 +1810,9 @@ importers:
       agora-rtc-sdk-ng:
         specifier: ^4.23.2
         version: 4.23.2
+      agora-rte-extension:
+        specifier: ^1.2.4
+        version: 1.2.4
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
