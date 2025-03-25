@@ -7,7 +7,7 @@ import { publish } from './action';
 
 export const installAction: InstallAction = (program: Command) => {
   program
-    .command('publish')
+    .command('pub')
     .description('Generate new version and create release branch.')
     .option('-v, --version <string>', 'Specify publish version')
     .option('-d, --dry-run', 'Enable dry run mode', false)

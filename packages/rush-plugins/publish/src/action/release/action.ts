@@ -1,6 +1,5 @@
-import { logger } from '@coze-infra/rush-logger';
-
-import { getCurrentBranchName } from '../../utils/git-command';
+import { logger } from '../../utils/logger';
+import { getCurrentBranchName } from '../../utils/git';
 import { exec } from '../../utils/exec';
 import { type ReleaseOptions } from './types';
 import { releasePackages } from './release';
@@ -14,7 +13,7 @@ export async function release(options: ReleaseOptions): Promise<void> {
   // 1. 获取需要发布的包列表
   const packagesToPublish = await getPackagesToPublish(commit);
   if (packagesToPublish.length === 0) {
-    logger.warning('No packages to publish');
+    logger.warn('No packages to publish');
     return;
   }
 

@@ -1,6 +1,6 @@
 import { type RushConfigurationProject } from '@rushstack/rush-sdk';
-import { logger } from '@coze-infra/rush-logger';
 
+import { logger } from '../../utils/logger';
 import { exec } from '../../utils/exec';
 import { type ReleaseOptions, type ReleaseManifest } from './types';
 import { applyPublishConfig } from './package';

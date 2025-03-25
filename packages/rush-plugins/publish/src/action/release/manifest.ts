@@ -1,4 +1,4 @@
-import { getRushConfiguration } from '../../utils/project-analyzer';
+import { getRushConfiguration } from '../../utils/get-rush-config';
 import { type ReleaseManifest, type PackageToPublish } from './types';
 
 /**

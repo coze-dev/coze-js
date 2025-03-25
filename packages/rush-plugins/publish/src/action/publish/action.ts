@@ -55,7 +55,7 @@ export const publish = async (options: PublishOptions) => {
 
   const continuePublish = await confirmForPublish(
     publishManifests,
-    options.dryRun,
+    !!options.dryRun,
   );
 
   if (!continuePublish) {
@@ -74,12 +74,12 @@ export const publish = async (options: PublishOptions) => {
   // 4. 创建并推送发布分支
   await pushToRemote({
     publishManifests,
-    bumpPolicy,
+    bumpPolicy: bumpPolicy as BumpType,
     sessionId,
     changedFiles,
     cwd: rushFolder,
-    skipCommit: options.skipCommit,
-    skipPush: options.skipPush,
+    skipCommit: !!options.skipCommit,
+    skipPush: !!options.skipPush,
   });
   logger.success('Publish success.');
 };

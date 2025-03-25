@@ -1,6 +1,6 @@
 import { type Command } from 'commander';
-import { logger } from '@coze-infra/rush-logger';
 
+import { logger } from '../../utils/logger';
 import { type InstallAction } from '../../types';
 import { type ReleaseOptions } from './types';
 import { release } from './action';

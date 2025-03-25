@@ -1,9 +1,9 @@
 import path from 'path';
 
 import { type RushConfigurationProject } from '@rushstack/rush-sdk';
-import { readJsonFile, writeJsonFile } from '@coze-infra/fs-enhance';
 
-import { getRushConfiguration } from '../../utils/project-analyzer';
+import { getRushConfiguration } from '../../utils/get-rush-config';
+import { readJsonFile, writeJsonFile } from '../../utils/fs';
 
 type PackageJson = Record<string, unknown> & {
   cozePublishConfig?: Record<string, unknown>;

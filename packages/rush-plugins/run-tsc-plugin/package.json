@@ -5,6 +5,11 @@
   "license": "ISC",
   "author": "tecvan.fe@gmail.com",
   "maintainers": [],
+  "main": "./command-line.json",
+  "files": [
+    "./command-line.json",
+    "./rush-plugin-manifest.json"
+  ],
   "devDependencies": {
     "@coze-infra/ts-config": "workspace:*"
   }

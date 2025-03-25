@@ -109,14 +109,14 @@ export const generatePublishManifest = async (
   options: VersionOptions,
 ): Promise<{
   manifests: PublishManifest[];
-  bumpPolicy: BumpType | string;
+  bumpPolicy: BumpType | string | undefined;
 }> => {
   const manifests: PublishManifest[] = [];
   const { version, bumpType } = options;
   if (version && !semver.valid(version)) {
     throw new Error(`Invalid version specified: ${version}`);
   } else if (!bumpType) {
-    const newBumpType = await requstBumpType();
+    const newBumpType = await requestBumpType();
     if (!newBumpType) {
       throw new Error('Version selection was cancelled!');
     }
