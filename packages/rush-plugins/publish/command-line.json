@@ -2,6 +2,13 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
   "commands": [
     {
+      "name": "pub",
+      "commandKind": "global",
+      "summary": "⭐️️ Publish packages to npm",
+      "shellCommand": "rush-x publish",
+      "safeForSimultaneousRushProcesses": true
+    },
+    {
       "name": "change-x",
       "commandKind": "global",
       "summary": "⭐️️ generate change log",
@@ -10,6 +17,88 @@
     }
   ],
   "parameters": [
+    {
+      "parameterKind": "string",
+      "description": "Enable dry run mode",
+      "shortName": "-d",
+      "longName": "--dry-run",
+      "argumentName": "DRY_RUN",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "string",
+      "shortName": "-t",
+      "longName": "--to",
+      "description": "Publish specified packages and their downstream dependencies",
+      "argumentName": "TO",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "string",
+      "shortName": "-f",
+      "longName": "--from",
+      "description": "Publish specified packages and their upstream/downstream dependencies",
+      "argumentName": "FROM",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "string",
+      "shortName": "-o",
+      "longName": "--only",
+      "description": "Only publish specified packages",
+      "argumentName": "ONLY",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "flag",
+      "shortName": "-s",
+      "longName": "--skip-commit",
+      "description": "Skip git commit",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "flag",
+      "shortName": "-p",
+      "longName": "--skip-push",
+      "description": "Skip git push",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
+    {
+      "parameterKind": "choice",
+      "alternatives": [
+        {
+          "name": "alpha",
+          "description": "Alpha version"
+        },
+        {
+          "name": "beta",
+          "description": "Beta version"
+        },
+        {
+          "name": "patch",
+          "description": "Patch version"
+        },
+        {
+          "name": "minor",
+          "description": "Minor version"
+        },
+        {
+          "name": "major",
+          "description": "Major version"
+        }
+      ],
+      "shortName": "-b",
+      "longName": "--bump-type",
+      "description": "Version bump type (alpha/beta/patch/minor/major)",
+      "associatedCommands": ["pub"],
+      "required": false
+    },
     {
       "parameterKind": "flag",
       "longName": "--amend-commit",
