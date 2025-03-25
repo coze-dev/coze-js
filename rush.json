@@ -167,14 +167,12 @@
     //   "[^@]+@users\\.noreply\\.github\\.com",
     //   "rush-bot@example\\.org"
     // ],
-
     /**
      * When Rush reports that the address is malformed, the notice can include an example
      * of a recommended email.  Make sure it conforms to one of the allowedEmailRegExps
      * expressions.
      */
     // "sampleEmail": "example@users.noreply.github.com",
-
     /**
      * The commit message to use when committing changes during 'rush publish'.
      *
@@ -183,7 +181,6 @@
      * in the commit message, and then customize Rush's message to contain that string.
      */
     // "versionBumpCommitMessage": "Bump versions [skip ci]",
-
     /**
      * The commit message to use when committing changes during 'rush version'.
      *
@@ -192,13 +189,12 @@
      * in the commit message, and then customize Rush's message to contain that string.
      */
     // "changeLogUpdateCommitMessage": "Update changelogs [skip ci]",
-
     /**
      * The commit message to use when committing changefiles during 'rush change --commit'
      *
      * If no commit message is set it will default to 'Rush change'
      */
-     // "changefilesCommitMessage": "Rush change"
+    // "changefilesCommitMessage": "Rush change"
   },
 
   "repository": {
@@ -218,13 +214,11 @@
      * to retrieve the latest activity for the remote main branch.
      */
     // "url": "https://github.com/microsoft/rush-example",
-
     /**
      * The default branch name. This tells "rush change" which remote branch to compare against.
      * The default value is "main"
      */
     // "defaultBranch": "main",
-
     /**
      * The default remote. This tells "rush change" which remote to compare against if the remote URL is
      * not set or if a remote matching the provided remote URL is not found.
@@ -286,7 +280,7 @@
    *
    * For more details and instructions, see this article:  https://rushjs.io/pages/advanced/installation_variants/
    */
-   "variants": [
+  "variants": [
     // {
     //   /**
     //    * The folder name for this variant.
@@ -443,17 +437,22 @@
     {
       "packageName": "@coze-infra/eslint-config",
       "projectFolder": "config/eslint-config",
-      "tags": [ "config" ]
+      "tags": ["config"]
     },
     {
       "packageName": "@coze-infra/ts-config",
       "projectFolder": "config/ts-config",
-      "tags": [ "config" ]
+      "tags": ["config"]
     },
     {
       "packageName": "@coze-infra/vitest-config",
       "projectFolder": "config/vitest-config",
-      "tags": [ "config" ]
+      "tags": ["config"]
+    },
+    {
+      "packageName": "@coze-infra/npm-mcp-server",
+      "projectFolder": "mcp/npm",
+      "tags": ["mcp"]
     }
   ]
 }

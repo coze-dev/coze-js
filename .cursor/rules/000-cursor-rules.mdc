@@ -1,0 +1,105 @@
+---
+description: Use ALWAYS when asked to CREATE A RULE or UPDATE A RULE or taught a lesson from the user that should be retained as a new rule for Cursor
+globs: .cursor/rules/*.mdc
+alwaysApply: false
+---
+# Cursor Rules Format
+## Template Structure for Rules Files
+
+```mdc
+---
+description: ACTION when TRIGGER to OUTCOME
+globs: .cursor/rules/**/*.mdc
+alwaysApply: {true or false}
+---
+
+# Rule Title
+
+## Context
+- When to apply this rule
+- Prerequisites or conditions
+
+## Requirements
+- Concise, actionable items
+- Each requirement must be testable
+
+## Examples
+<example>
+Good concise example with explanation
+</example>
+
+<example type="invalid">
+Invalid concise example with explanation
+</example>
+
+## Critical Rules
+  - Always do X
+  - NEVER do Y
+```
+
+## File Organization
+
+### Location
+- Path: `.cursor/rules/`
+- Extension: `.mdc`
+
+### Naming Convention
+PREFIX-name.mdc where PREFIX is:
+- 0XX: Core standards
+- 1XX: Tool configs
+- 3XX: Testing standards
+- 1XXX: Language rules
+- 2XXX: Framework rules
+- 8XX: Workflows
+- 9XX: Templates
+- _name.mdc: Private rules
+
+### Glob Pattern Examples
+Common glob patterns for different rule types:
+- Core standards: .cursor/rules/*.mdc
+- Language rules: src/**/*.{js,ts}
+- Testing standards: **/*.test.{js,ts}
+- React components: src/components/**/*.tsx
+- Documentation: docs/**/*.md
+- Configuration files: *.config.{js,json}
+- Build artifacts: dist/**/*
+- Multiple extensions: src/**/*.{js,jsx,ts,tsx}
+- Multiple files: dist/**/*, docs/**/*.md
+
+## Required Fields
+
+### Frontmatter
+- description: ACTION TRIGGER OUTCOME format
+- globs: `glob pattern for files and folders`
+- alwaysApply: {true or false} - when true will be attached to every conversation (but front matter still is important for it to be used!)
+
+### Body
+- context: Usage conditions
+- requirements: Actionable items
+- examples: Both valid and invalid
+- critical-rules: summary of short rule bullets that are the most critical to abide by
+
+## Formatting Guidelines
+
+- Use Concise Markdown primarily
+- Use some XML tags limited to:
+  - <example>
+  - <danger>
+  - <required>
+- Always indent content within XML or nested XML tags by 2 spaces
+- Emojies and Mermaid diagrams are allowed if it is not redundant and better explains the rule for the AI comprehension.
+
+
+## Critical Rules
+  - Keep frontmatter description under 120 characters (or less) while maintaining clear intent for rule selection by AI Agent
+  - Keep the rule DRY - do not repeate or be redundant or overly explanetory.
+  - Use susinct markdown the agent can easily understand.
+  - the front matter MUST ALWAYS have description, globs, and alwaysApply, even if the value is null
+  - Use standard glob patterns without quotes (e.g., *.js, src/**/*.ts)
+  - TRY to keep the total rule line count under 50, better under 25, lines (unless there are diagrams or longer required examples, as that will increase the overall line count)
+  - Always include a valid and invalid example
+  - Quotes are not needed around glob patterns
+  - ALWAYS write rules in English only - never use other languages when creating or updating rules
+  - When users use the `/rules` command, read this file and generate new development standard documentation based on the rules
+
+

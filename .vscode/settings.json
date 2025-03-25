@@ -5,6 +5,9 @@
       "mode": "auto"
     }
   ],
+  "workbench.editorAssociations": {
+    "*.mdc": "default"
+  },
   "prettier.prettierPath": "config/eslint-config/node_modules/prettier",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,

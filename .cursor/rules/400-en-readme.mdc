@@ -1,0 +1,123 @@
+---
+description: Create standard English README documentation, ensure complete project information and correct formatting
+globs: README.md
+alwaysApply: true
+---
+
+# English Project README Documentation Specification
+
+## Context
+- When creating README.md documents for new projects
+- When updating README.md documents for existing projects
+- When converting English README documents to English versions
+
+## Requirements
+- README must be written entirely in English, with no mixed use of English
+- Must include standardized structure, including project introduction, quick start, usage instructions, roadmap, contribution guidelines, license, and acknowledgments
+- Documentation must be clear and concise, while providing sufficiently detailed information
+- Use appropriate Markdown formatting to enhance readability
+- Must include proper heading hierarchy structure
+
+## Examples
+<example>
+# Project Name
+
+![License](https://img.shields.io/badge/License-MIT-blue.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-brightgreen.svg)
+
+## About The Project
+
+Brief description of the project, explaining its main functions and purpose. Include a screenshot or logo if available.
+
+### Tech Stack
+
+* Frontend Framework - React.js
+* Backend Framework - Node.js
+* Database - MongoDB
+* Other important dependencies
+
+## Getting Started
+
+### Prerequisites
+
+* Node.js 14.0+
+* MongoDB 4.4+
+
+### Installation
+
+1. Clone the repository
+   ```sh
+   git clone https://github.com/username/project-name.git
+   ```
+2. Install NPM packages
+   ```sh
+   npm install
+   ```
+3. Start the development server
+   ```sh
+   npm run dev
+   ```
+
+## Usage
+
+Detailed explanation of how to use the main features of the project. Include code examples and screenshots.
+
+## Roadmap
+
+- [x] Basic functionality implemented
+- [x] User authentication added
+- [ ] Internationalization support
+- [ ] Mobile responsiveness
+
+## Contributing
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/amazing-feature`)
+3. Commit your Changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the Branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` file for more information.
+
+## Acknowledgments
+
+* [Example Library 1](https://github.com/example/repo1)
+* [Example Documentation 2](https://example.com/docs)
+</example>
+
+<example type="invalid">
+# Project Name
+
+![许可证](https://img.shields.io/badge/许可证-MIT-blue.svg)
+![版本](https://img.shields.io/badge/版本-1.0.0-brightgreen.svg)
+
+## About The Project
+
+This README is invalid because it mixes English and English languages.
+
+### Built With
+
+* React.js
+* Node.js
+* MongoDB
+
+## Getting Started
+
+### Prerequisites
+
+* Node.js 14.0+
+* MongoDB 4.4+
+
+The README is incomplete and inconsistently uses mixed languages
+</example>
+
+## Critical Rules
+  - README documents must be written entirely in English, with no use of English
+  - Must include the following seven core sections: About The Project, Getting Started, Usage, Roadmap, Contributing, License, and Acknowledgments
+  - The project introduction must clearly describe the purpose and main features of the project
+  - The Getting Started section must include prerequisites and detailed installation steps
+  - Code examples must use Markdown code block format with specified language
+  - Use emojis moderately, with a maximum of one per major section
+  - Documentation requires appropriate heading hierarchy, with main sections using level two headings (##) and subsections using level three headings (###)

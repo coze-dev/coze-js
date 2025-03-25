@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@coze-infra/ts-config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["__tests__", "vitest.config.ts", "__e2e__"],
+  "exclude": ["./dist"],
+  "references": [
+    {
+      "path": "./tsconfig.build.json"
+    }
+  ]
+}

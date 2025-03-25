@@ -70,7 +70,7 @@
   "devDependencies": {
     "@coze-infra/ts-config": "workspace:*",
     "@types/eslint": "~9.6.1",
-    "@types/node": "^20",
+    "@types/node": "^22.13.13",
     "typescript": "^5.8.2"
   }
 }
