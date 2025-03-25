@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node common/scripts/install-run-rush.js change-x -a || exit 1

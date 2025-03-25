@@ -34,4 +34,6 @@ else
   node common/scripts/install-run-rush.js -q commitlint \
     --config common/autoinstallers/rush-commitlint/commitlint.config.js \
     --edit "$1" || exit 1
+
+  node common/scripts/install-run-rush.js change-x || exit 1
 fi

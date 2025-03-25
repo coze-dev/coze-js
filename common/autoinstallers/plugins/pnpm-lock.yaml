@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@coze-infra/rush-publish-plugin':
+        specifier: ../../../packages/rush-plugins/publish
+        version: link:../../../packages/rush-plugins/publish
       '@coze-infra/rush-run-tsc-plugin':
         specifier: ../../../packages/rush-plugins/run-tsc-plugin
         version: link:../../../packages/rush-plugins/run-tsc-plugin

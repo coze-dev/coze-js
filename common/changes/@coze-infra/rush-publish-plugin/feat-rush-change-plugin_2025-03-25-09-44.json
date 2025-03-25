@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze-infra/rush-publish-plugin",
+      "comment": "use rush change in pre-commit hook",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze-infra/rush-publish-plugin",
+  "email": "tecvan.fe@gmail.com"
+}

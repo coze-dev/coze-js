@@ -6,8 +6,11 @@
   "author": "tecvan.fe@gmail.com",
   "maintainers": [],
   "main": "src/index.ts",
+  "bin": {
+    "rush-publish": "./src/run.js"
+  },
   "scripts": {
-    "build": "exit 0",
+    "build": "tsc -b tsconfig.build.json",
     "lint": "eslint ./ --cache",
     "test": "vitest --run --passWithNoTests",
     "test:cov": "npm run test -- --coverage"
@@ -30,6 +33,7 @@
     "@types/shelljs": "^0.8.15",
     "@vitest/coverage-v8": "^3.0.9",
     "commander": "^13.1.0",
+    "sucrase": "^3.32.0",
     "tsx": "^4.19.3",
     "vitest": "^3.0.9"
   },
