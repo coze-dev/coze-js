@@ -2,7 +2,7 @@ import path from 'path';
 
 import { type RushConfiguration } from '@rushstack/rush-sdk';
 
-import { getChangedFilesFromCached } from '../../utils/git-staged';
+import { getChangedFilesFromCached } from '../../utils/git';
 import { getRushConfiguration } from '../../utils/get-rush-config';
 import { exec } from '../../utils/exec';
 

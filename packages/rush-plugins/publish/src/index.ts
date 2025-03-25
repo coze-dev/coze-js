@@ -3,6 +3,8 @@ import fs from 'fs';
 
 import { Command } from 'commander';
 
+import { installAction as releaseAction } from './action/release';
+import { installAction as publishAction } from './action/publish';
 import { installAction as generateChangeAction } from './action/change';
 
 const main = () => {
@@ -18,7 +20,9 @@ const main = () => {
     .showSuggestionAfterError(true)
     .showHelpAfterError(true);
 
-  [generateChangeAction].forEach(a => {
+  const actions = [generateChangeAction, releaseAction, publishAction];
+
+  actions.forEach(a => {
     a(program);
   });
 

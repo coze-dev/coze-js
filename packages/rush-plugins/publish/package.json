@@ -16,10 +16,13 @@
     "test:cov": "npm run test -- --coverage"
   },
   "dependencies": {
+    "@inquirer/prompts": "^3.2.0",
     "@rushstack/rush-sdk": "^5.150.0",
+    "chalk": "^4.1.2",
     "conventional-changelog-angular": "^5.0.13",
     "conventional-commits-parser": "^3.2.4",
     "dayjs": "^1.11.13",
+    "open": "~10.1.0",
     "semver": "^7.7.1",
     "shelljs": "^0.9.2"
   },
