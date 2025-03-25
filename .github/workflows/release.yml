@@ -1,0 +1,74 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - '**/*'
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        include:
+          - NodeVersion: 20.14.x
+            NodeVersionDisplayName: 20
+            OS: ubuntu-latest
+    name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
+    runs-on: ${{ matrix.OS }}
+    if: github.repository == 'coze-dev/rush-arch'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Release Tag
+        id: check_tag
+        run: |
+          HAS_VALID_TAG=$(git tag --points-at HEAD | grep -E "^v/.+/.+$" || true)
+          if [ ! -z "$HAS_VALID_TAG" ]; then
+            echo "has_valid_tag=true" >> $GITHUB_OUTPUT
+            echo "Found valid tag: $HAS_VALID_TAG"
+          else
+            echo "has_valid_tag=false" >> $GITHUB_OUTPUT
+            echo "No valid tag found"
+          fi
+
+      - name: Config Git User
+        if: steps.check_tag.outputs.has_valid_tag == 'true'
+        run: |
+          git config --local user.name "tecvan"
+          git config --local user.email "tecvan.fe@gmail.com"
+
+      - uses: actions/setup-node@v3
+        if: steps.check_tag.outputs.has_valid_tag == 'true'
+        with:
+          node-version: ${{ matrix.NodeVersion }}
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
+
+      - name: Cache
+        if: steps.check_tag.outputs.has_valid_tag == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            common/temp/pnpm-local
+            common/temp/pnpm-store
+            common/temp/install-run
+          key: ${{ runner.os }}-rush-store-${{ hashFiles('common/config/subspaces/**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-store-main
+            ${{ runner.os }}-rush-store
+
+      - name: Install Dependencies
+        if: steps.check_tag.outputs.has_valid_tag == 'true'
+        run: |
+          npm i -g @microsoft/rush@5.150.0
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
+          node common/scripts/install-run-rush.js install
+
+      - name: Run Release
+        if: steps.check_tag.outputs.has_valid_tag == 'true'
+        run: node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
