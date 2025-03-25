@@ -9,7 +9,7 @@ import type {
   CozeAPI,
 } from '@coze/api';
 
-import { logger, MiniChatError } from '@/libs/utils';
+import { logger, MiniChatError, MiniCozeApi } from '@/libs/utils';
 import { SuggestPromoteInfo } from '@/libs/types/base/chat';
 import { IChatService, ChatServiceProps } from '@/libs/types';
 import type { ChatInfo, ChatType } from '@/libs/types';
@@ -154,5 +154,12 @@ export class ChatService implements IChatService {
     sample_rate?: number;
   }) {
     return await this.apiClient.audio.speech.create(params);
+  }
+  async handleErrorCode(code: number) {
+    const apiClient = this.apiClient as MiniCozeApi;
+    if (apiClient.isAuthErrorCode(code)) {
+      return await apiClient.refreshToken(apiClient.token as string);
+    }
+    return '';
   }
 }

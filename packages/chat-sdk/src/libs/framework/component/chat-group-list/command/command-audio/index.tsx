@@ -60,7 +60,6 @@ export const CommandAudio: FC<{
         if (!refPlayAudio.current) {
           refPlayAudio.current = new PlayAudio();
         }
-        await refPlayAudio.current.playText(text, audioSpeech);
         refPlayAudio.current.on(AudioPlayEvent.STOP, res => {
           logger.debug('CommandAudio Stop Audio Play', res);
           if ((res as { isError?: boolean }).isError) {
@@ -68,6 +67,7 @@ export const CommandAudio: FC<{
           }
           setIsPlaying(false);
         });
+        await refPlayAudio.current.playText(text, audioSpeech);
       } catch (error) {
         //如果失败
         handleError();

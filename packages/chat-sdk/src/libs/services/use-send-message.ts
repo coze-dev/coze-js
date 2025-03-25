@@ -51,8 +51,11 @@ export const useSendMessage = () => {
   const onRequiresAction = useChatPropsStore(
     store => store.eventCallbacks?.message?.onRequiresAction,
   );
+  const checkCanSendMessage = useChatPropsStore(
+    store => store.ui?.chatSlot?.input?.checkCanSendMessage,
+  );
   const sendMessage = usePersistCallback(
-    (rawMessage: RawMessage, historyMessages?: EnterMessage[]) => {
+    async (rawMessage: RawMessage, historyMessages?: EnterMessage[]) => {
       const { clearMessage: disableState } = getOpDisabledState();
       if (disableState) {
         return;
@@ -60,6 +63,12 @@ export const useSendMessage = () => {
       if (!botId || !conversationId) {
         return;
       }
+      if (checkCanSendMessage) {
+        if ((await checkCanSendMessage(rawMessage)) === false) {
+          return false;
+        }
+      }
+
       // Clear task message after message sended
       setTaskList({ taskList: [] });
       setIsDeleting(true);
@@ -104,38 +113,35 @@ export const useSendMessage = () => {
   );
 
   const sendTextMessage = useCallback(
-    (content: string) => {
-      sendMessage({
+    async (content: string) =>
+      await sendMessage({
         type: RawMessageType.TEXT,
         data: content,
-      });
-    },
+      }),
     [sendMessage],
   );
   const sendFileMessage = useCallback(
-    (files: ChooseFileInfo[]) => {
-      sendMessage({
+    async (files: ChooseFileInfo[]) =>
+      await sendMessage({
         type: RawMessageType.FILE,
         data: files,
-      });
-    },
+      }),
     [sendMessage],
   );
 
   const sendAudioMessage = useCallback(
-    (audio: AudioRaw) => {
-      sendMessage({
+    async (audio: AudioRaw) =>
+      await sendMessage({
         type: RawMessageType.AUDIO,
         data: audio,
-      });
-    },
+      }),
     [sendMessage],
   );
 
-  const reSendLastErrorMessage = useCallback(() => {
+  const reSendLastErrorMessage = useCallback(async () => {
     const chatMessageGroup = popLastErrorChatGroup();
     if (chatMessageGroup?.query?.rawMessage) {
-      sendMessage(chatMessageGroup?.query?.rawMessage);
+      return await sendMessage(chatMessageGroup?.query?.rawMessage);
     }
   }, [sendMessage]);
 

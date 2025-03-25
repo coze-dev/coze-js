@@ -58,7 +58,7 @@ export const useTextInputHandle = (
     }
   }, [defaultValue]);
 
-  const onSendTextMessage = usePersistCallback(() => {
+  const onSendTextMessage = usePersistCallback(async () => {
     logger.debug('useTextInputHandle onSendTextMessage:', {
       inputValue,
       toSendInputValue,
@@ -66,7 +66,9 @@ export const useTextInputHandle = (
     });
 
     if (toSendInputValue && !disabled) {
-      onSendTextMessageOnly?.(toSendInputValue);
+      if ((await onSendTextMessageOnly?.(toSendInputValue)) === false) {
+        return;
+      }
 
       clearInput(!isWeb);
     }

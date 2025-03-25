@@ -42,16 +42,31 @@ export async function* requestSSE(
   });
   eventSource.sendMessage();
   genNextPromise();
+  let hsSendData = false;
   do {
     await yieldPromise;
+    let hasDataToResolve = false;
     const messageListNow = messageList.splice(0);
     genNextPromise();
     for (const eventData of messageListNow) {
       if (eventData) {
+        hsSendData = true;
+        hasDataToResolve = true;
         yield eventData;
       }
     }
-    // eslint-disable-next-line  no-unmodified-loop-condition
+
+    if (isDone && !hasDataToResolve) {
+      if (hsSendData) {
+        yield {
+          data: '[DONE]',
+          event: 'done',
+        };
+      } else {
+        throw new Error('EventSourceRequest has been closed');
+      }
+    }
+    // eslint-disable-next-line
   } while (!isDone);
 
   function genNextPromise() {

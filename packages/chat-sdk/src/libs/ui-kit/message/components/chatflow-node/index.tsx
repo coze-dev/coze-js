@@ -113,11 +113,7 @@ const SwitchNode: FC<{
               sendTextMessage?.(item.name);
             }}
           >
-            <Text
-              className={styles['switch-node-switch-item-text']}
-              numberOfLines={1}
-              overflow="ellipsis"
-            >
+            <Text className={styles['switch-node-switch-item-text']}>
               {item.name}
             </Text>
           </View>

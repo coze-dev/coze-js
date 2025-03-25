@@ -16,7 +16,7 @@ export class PlayAudio {
   private audioContext?: InnerAudioContext;
   private event: InstanceType<TaroStatic['Events']> = new Events();
   private audioPrm: Promise<ArrayBuffer> | null = null;
-
+  private filePath = '';
   static stopNow() {
     PlayAudio.instance?.stop();
   }
@@ -31,6 +31,7 @@ export class PlayAudio {
       this.audioPrm = audioSpeechFunc(text);
     }
     this.isStop = false;
+    PlayAudio.instance = this;
     try {
       const audioData = await this.audioPrm;
       if (this.isStop) {
@@ -52,18 +53,13 @@ export class PlayAudio {
       tempFile = URL.createObjectURL(blobData);
     } else {
       tempFile = `${Taro.env.USER_DATA_PATH}/tempFile${playNo++}.wav`;
+      this.filePath = tempFile;
       Taro.getFileSystemManager().writeFileSync(tempFile, data, 'binary');
     }
     logger.debug('playData:', tempFile);
     this.play(tempFile);
   }
   async play(audioSrc: string) {
-    if (!PlayAudio.instance?.isStop) {
-      PlayAudio.instance?.stop();
-    }
-
-    this.isStop = false;
-
     PlayAudio.instance = this;
     this.audioContext = Taro.createInnerAudioContext();
     this.audioContext.src = audioSrc;
@@ -113,6 +109,16 @@ export class PlayAudio {
       this.isStop = true;
     } catch (_err) {
       this.emitStopEvent(true);
+    }
+    this.removeAudio();
+  }
+  removeAudio() {
+    try {
+      if (!isWeb) {
+        Taro.getFileSystemManager().unlinkSync(this.filePath || '');
+      }
+    } catch (err) {
+      logger.error('removeAudio error', err);
     }
   }
   on(event: AudioPlayEvent, callback: (params: unknown) => void) {
