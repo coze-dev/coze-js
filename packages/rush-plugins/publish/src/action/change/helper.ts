@@ -6,13 +6,13 @@ import {
   type RushConfigurationProject,
   type RushConfiguration,
 } from '@rushstack/rush-sdk';
-import { logger } from '@coze-infra/rush-logger';
 import type { Commit, Parser, ParserOptions } from '@commitlint/types';
 
-import { getRushConfiguration } from '../../utils/project-analyzer';
-import { getChangedFilesFromCached } from '../../utils/git-command';
+import { whoAmI } from '../../utils/whoami';
+import { logger } from '../../utils/logger';
+import { getChangedFilesFromCached } from '../../utils/git-staged';
+import { getRushConfiguration } from '../../utils/get-rush-config';
 import { exec } from '../../utils/exec';
-import { whoAmI } from '../../utils/env';
 
 // 这两个包没有 module 导出
 // eslint-disable-next-line @typescript-eslint/no-require-imports

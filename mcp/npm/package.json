@@ -40,7 +40,6 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@commitlint/types": "^17.4.0",
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",

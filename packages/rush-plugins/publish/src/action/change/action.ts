@@ -2,9 +2,9 @@ import path from 'path';
 import fs from 'fs/promises';
 
 import { type RushConfiguration } from '@rushstack/rush-sdk';
-import { logger } from '@coze-infra/rush-logger';
 
-import { getRushConfiguration } from '../../utils/project-analyzer';
+import { logger } from '../../utils/logger';
+import { getRushConfiguration } from '../../utils/get-rush-config';
 import { type ChangeOptions } from './types';
 import { generateAllChangesFile, analysisCommitMsg } from './helper';
 import { amendCommit } from './amend-commit';
@@ -30,7 +30,7 @@ export const generateChangeFiles = async (options: ChangeOptions) => {
 
     const { content, type } = await analysisCommitMsg(commitMsg);
     if (!content) {
-      logger.warning('Invalid subject');
+      logger.warn('Invalid subject');
       return;
     }
     generateAllChangesFile(content, type);

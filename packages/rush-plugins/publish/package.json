@@ -1,7 +1,7 @@
 {
-  "name": "@coze-infra/rush-change-plugin",
+  "name": "@coze-infra/rush-publish-plugin",
   "version": "0.0.1",
-  "description": "rush plugin to generate change log ",
+  "description": "rush plugin to generate change log and publish packages",
   "license": "ISC",
   "author": "tecvan.fe@gmail.com",
   "maintainers": [],
@@ -12,14 +12,28 @@
     "test": "vitest --run --passWithNoTests",
     "test:cov": "npm run test -- --coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@rushstack/rush-sdk": "^5.150.0",
+    "conventional-changelog-angular": "^5.0.13",
+    "conventional-commits-parser": "^3.2.4",
+    "dayjs": "^1.11.13",
+    "semver": "^7.7.1",
+    "shelljs": "^0.9.2"
+  },
   "devDependencies": {
+    "@commitlint/types": "^19.8.0",
     "@coze-infra/eslint-config": "workspace:*",
     "@coze-infra/ts-config": "workspace:*",
     "@coze-infra/vitest-config": "workspace:*",
     "@types/node": "^22.13.13",
+    "@types/semver": "^7.5.8",
+    "@types/shelljs": "^0.8.15",
     "@vitest/coverage-v8": "^3.0.9",
+    "commander": "^13.1.0",
     "tsx": "^4.19.3",
     "vitest": "^3.0.9"
+  },
+  "peerDependencies": {
+    "commander": "^13.1.0"
   }
 }

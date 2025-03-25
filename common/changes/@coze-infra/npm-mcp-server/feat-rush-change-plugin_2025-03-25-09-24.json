@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze-infra/npm-mcp-server",
+      "comment": "rush plugin for generate change logs",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze-infra/npm-mcp-server",
+  "email": "tecvan.fe@gmail.com"
+}

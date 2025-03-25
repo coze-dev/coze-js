@@ -452,16 +452,19 @@
     {
       "packageName": "@coze-infra/npm-mcp-server",
       "projectFolder": "mcp/npm",
+      "shouldPublish": true,
       "tags": ["mcp"]
     },
     {
       "packageName": "@coze-infra/rush-run-tsc-plugin",
       "projectFolder": "packages/rush-plugins/run-tsc-plugin",
+      "shouldPublish": true,
       "tags": ["level-3"]
     },
     {
-      "packageName": "@coze-infra/rush-change-plugin",
-      "projectFolder": "packages/rush-plugins/change",
+      "packageName": "@coze-infra/rush-publish-plugin",
+      "projectFolder": "packages/rush-plugins/publish",
+      "shouldPublish": true,
       "tags": ["level-3"]
     }
   ]

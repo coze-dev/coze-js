@@ -2,8 +2,8 @@ import path from 'path';
 
 import { type RushConfiguration } from '@rushstack/rush-sdk';
 
-import { getRushConfiguration } from '../../utils/project-analyzer';
-import { getChangedFilesFromCached } from '../../utils/git-command';
+import { getChangedFilesFromCached } from '../../utils/git-staged';
+import { getRushConfiguration } from '../../utils/get-rush-config';
 import { exec } from '../../utils/exec';
 
 export const amendCommit = async (): Promise<void> => {

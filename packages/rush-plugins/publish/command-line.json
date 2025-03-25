@@ -1,0 +1,10 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
+  "commands": [
+    {
+      "shellCommand": "change",
+      "description": "Generate changes in a simple way."
+    }
+  ],
+  "parameters": []
+}
