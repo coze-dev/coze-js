@@ -5,7 +5,7 @@
       "name": "pub",
       "commandKind": "global",
       "summary": "⭐️️ Publish packages to npm",
-      "shellCommand": "rush-x publish",
+      "shellCommand": "rush-publish publish",
       "safeForSimultaneousRushProcesses": true
     },
     {
