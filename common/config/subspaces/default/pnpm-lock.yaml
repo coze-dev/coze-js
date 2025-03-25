@@ -289,6 +289,30 @@ importers:
         specifier: ^3.0.9
         version: 3.0.9(@types/node@22.13.13)(happy-dom@17.4.4)
 
+  ../../../packages/rush-plugins/change:
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../../config/eslint-config
+      '@coze-infra/ts-config':
+        specifier: workspace:*
+        version: link:../../../config/ts-config
+      '@coze-infra/vitest-config':
+        specifier: workspace:*
+        version: link:../../../config/vitest-config
+      '@types/node':
+        specifier: ^22.13.13
+        version: 22.13.13
+      '@vitest/coverage-v8':
+        specifier: ^3.0.9
+        version: 3.0.9(vitest@3.0.9(@types/node@22.13.13)(happy-dom@17.4.4))
+      tsx:
+        specifier: ^4.19.3
+        version: 4.19.3
+      vitest:
+        specifier: ^3.0.9
+        version: 3.0.9(@types/node@22.13.13)(happy-dom@17.4.4)
+
   ../../../packages/rush-plugins/run-tsc-plugin:
     devDependencies:
       '@coze-infra/ts-config':

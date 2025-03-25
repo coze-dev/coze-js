@@ -458,6 +458,11 @@
       "packageName": "@coze-infra/rush-run-tsc-plugin",
       "projectFolder": "packages/rush-plugins/run-tsc-plugin",
       "tags": ["level-3"]
+    },
+    {
+      "packageName": "@coze-infra/rush-change-plugin",
+      "projectFolder": "packages/rush-plugins/change",
+      "tags": ["level-3"]
     }
   ]
 }

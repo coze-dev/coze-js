@@ -1,9 +1,9 @@
 {
-  "name": "{{ packageName }}",
+  "name": "@coze-infra/rush-change-plugin",
   "version": "0.0.1",
-  "description": "{{ description }}",
+  "description": "rush plugin to generate change log ",
   "license": "ISC",
-  "author": "{{ authorName }}",
+  "author": "tecvan.fe@gmail.com",
   "maintainers": [],
   "main": "src/index.ts",
   "scripts": {
