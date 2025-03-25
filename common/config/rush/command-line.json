@@ -231,6 +231,14 @@
       "safeForSimultaneousRushProcesses": true,
       "autoinstallerName": "rush-lint-staged",
       "shellCommand": "lint-staged --config common/autoinstallers/rush-lint-staged/.lintstagedrc.js --shell '/bin/bash'"
+    },
+    {
+      "name": "sensitive-check",
+      "commandKind": "global",
+      "summary": "⭐️️ Use to run sensitive check",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "sensitive-check",
+      "shellCommand": "sucrase-node common/autoinstallers/sensitive-check/tool.ts"
     }
   ],
 

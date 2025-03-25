@@ -1,0 +1,13 @@
+{
+  "name": "sensitive-check",
+  "version": "1.0.0",
+  "private": true,
+  "author": "chenjiawei.inizio@bytedance.com",
+  "resolutions": {},
+  "devDependencies": {
+    "@types/node": "^22.13.13",
+    "commander": "^11.0.0",
+    "sucrase": "^3.32.0",
+    "typescript": "^5.8.2"
+  }
+}
