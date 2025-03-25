@@ -1,0 +1,11 @@
+{
+  "name": "@coze-infra/rush-run-tsc-plugin",
+  "version": "0.0.1",
+  "description": "rush plugin to run tsc ",
+  "license": "ISC",
+  "author": "tecvan.fe@gmail.com",
+  "maintainers": [],
+  "devDependencies": {
+    "@coze-infra/ts-config": "workspace:*"
+  }
+}

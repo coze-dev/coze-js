@@ -25,5 +25,15 @@
     //    */
     //   "autoinstallerName": "rush-plugins"
     // }
+    {
+      "packageName": "rush-init-project-plugin",
+      "pluginName": "rush-init-project-plugin",
+      "autoinstallerName": "plugins"
+    },
+    {
+      "packageName": "@coze-infra/rush-run-tsc-plugin",
+      "pluginName": "@coze-infra/rush-run-tsc-plugin",
+      "autoinstallerName": "plugins"
+    }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "./",
+    "resolveJsonModule": true
+  },
+  "include": ["./command-line.json"]
+}

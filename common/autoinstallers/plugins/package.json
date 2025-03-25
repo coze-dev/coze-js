@@ -7,6 +7,7 @@
     "fanwenjie.fe@bytedance.com"
   ],
   "dependencies": {
+    "@coze-infra/rush-run-tsc-plugin": "../../../packages/rush-plugins/run-tsc-plugin",
     "json5": "^2.2.3",
     "rush-init-project-plugin": "^0.11.0",
     "typescript": "~5.7.2"

@@ -21,7 +21,8 @@ export default class SetDefaultAuthorPlugin implements IPlugin {
             return userEmail;
           },
           validate(author: string) {
-            return /@bytedance\.com$/.test(author);
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailRegex.test(author) || '请输入有效的电子邮箱地址';
           }
         });
 

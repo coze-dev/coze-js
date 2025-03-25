@@ -95,8 +95,8 @@
    * To remove these restrictions, you could set projectFolderMinDepth=1
    * and set projectFolderMaxDepth to a large number.
    */
-  // "projectFolderMinDepth": 2,
-  // "projectFolderMaxDepth": 2,
+  "projectFolderMinDepth": 2,
+  "projectFolderMaxDepth": 3,
 
   /**
    * Today the npmjs.com registry enforces fairly strict naming rules for packages, but in the early
@@ -453,6 +453,11 @@
       "packageName": "@coze-infra/npm-mcp-server",
       "projectFolder": "mcp/npm",
       "tags": ["mcp"]
+    },
+    {
+      "packageName": "@coze-infra/rush-run-tsc-plugin",
+      "projectFolder": "packages/rush-plugins/run-tsc-plugin",
+      "tags": ["level-3"]
     }
   ]
 }
