@@ -1398,7 +1398,7 @@ importers:
         specifier: ^2.3.2
         version: 2.5.1
       extendable-media-recorder:
-        specifier: ^9.2.19
+        specifier: 9.2.19
         version: 9.2.19
       mdast:
         specifier: ^3.0.0-alpha.6
