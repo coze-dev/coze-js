@@ -21,7 +21,6 @@
   },
   "license": "MIT",
   "author": "Leeight <leeight@gmail.com>",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./ws-tools": "./src/ws-tools/index.ts"

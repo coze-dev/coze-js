@@ -115,7 +115,7 @@ export enum EventNames {
    * en: Audio speech stopped
    * zh: 停止说话
    */
-  AUDIO_SPEECH_STOPPED = 'server.audio.speech_stopped',
+  AUDIO_AGENT_SPEECH_STOPPED = 'server.audio.agent.speech_stopped',
   /**
    * en: Server error
    * zh: 服务端错误
