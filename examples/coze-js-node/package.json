@@ -4,7 +4,7 @@
   "description": "coze-api node example",
   "license": "ISC",
   "author": "",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "postinstall": "node scripts/postinstall.cjs",
     "lint": "eslint ./ --cache --quiet",
