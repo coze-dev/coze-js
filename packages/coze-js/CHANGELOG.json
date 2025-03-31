@@ -2,6 +2,71 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.1.1",
+      "tag": "HEAD",
+      "date": "2025-03-31T02:31:36.411Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add playback timing and state management"
+          },
+          {
+            "comment": "update README.md"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "add screen sharing support and video device persistence"
+          },
+          {
+            "comment": "add WebSocket speech and transcription clients"
+          },
+          {
+            "comment": "ws-tools rslib config"
+          },
+          {
+            "comment": "Update readme"
+          },
+          {
+            "comment": "feat: add async workflow execution and history tracking"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Hard code test_app_id for Debug"
+          },
+          {
+            "comment": "CR bug"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "Websocket bug"
+          },
+          {
+            "comment": "Add shortcut command support and update file object types"
+          },
+          {
+            "comment": "Add unit test"
+          },
+          {
+            "comment": "Remove type: module from package.json files"
+          },
+          {
+            "comment": "file path error"
+          },
+          {
+            "comment": "fix speech bug"
+          },
+          {
+            "comment": "Publish fix/speech"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.21",
       "tag": "HEAD",
       "date": "2025-02-24T12:07:56.836Z",
