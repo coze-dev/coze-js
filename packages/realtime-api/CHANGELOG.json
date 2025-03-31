@@ -2,6 +2,41 @@
   "name": "@coze/realtime-api",
   "entries": [
     {
+      "version": "1.1.1",
+      "tag": "HEAD",
+      "date": "2025-03-31T02:31:36.414Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "add mobile support and network error handling"
+          },
+          {
+            "comment": "add getRoomInfo customization option to RealtimeClient"
+          },
+          {
+            "comment": "add screen sharing support and video device persistence"
+          },
+          {
+            "comment": "Add test code"
+          },
+          {
+            "comment": "add unit test"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "Hard code test_app_id for Debug"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "Remove type: module from package.json files"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.0.5",
       "tag": "HEAD",
       "date": "2025-02-12T08:07:08.387Z",

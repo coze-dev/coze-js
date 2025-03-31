@@ -1,5 +1,22 @@
 # @coze/realtime-api
 
+## 1.1.1 - 2025-03-31
+
+### New Features
+
+- add mobile support and network error handling
+- add getRoomInfo customization option to RealtimeClient
+- add screen sharing support and video device persistence
+- Add test code
+- add unit test
+
+### Bug Fixes
+
+- Hard code test_app_id for Debug
+- add unit test
+- Remove type: module from package.json files
+
+
 ## 1.0.5 - 2025-02-12
 
 ### New Features
