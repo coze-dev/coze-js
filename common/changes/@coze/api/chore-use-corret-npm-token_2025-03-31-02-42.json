@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "setup publish env",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "fanwenjie.fe@bytedance.com"
+}
