@@ -50,7 +50,7 @@ export class CozeAPI extends InnerCozeAPI {
     }
 
     const taroAdapter: AxiosAdapter = config => {
-      const { url, method, data, headers } = config;
+      const { url, method, data, headers, timeout } = config;
       const header =
         typeof headers.toJSON === 'function' ? headers.toJSON() : headers;
       header['Content-Type'] = header['Content-Type'] || 'application/json';
@@ -61,6 +61,7 @@ export class CozeAPI extends InnerCozeAPI {
           method: (method ?? 'GET').toUpperCase(),
           data,
           header,
+          timeout,
           success: res => {
             // Request failed
             if (res.statusCode !== 200 || res.data?.code) {
