@@ -185,9 +185,16 @@ class RealtimeClient extends RealtimeEventHandler {
     }
 
     if (this._config.suppressNonStationaryNoise) {
-      await this._client.initAIAnsExtension();
-      this._client.changeAIAnsExtension(true);
-      this.dispatch(EventNames.SUPPRESS_NON_STATIONARY_NOISE, {});
+      try {
+        await this._client.initAIAnsExtension();
+        this._client.changeAIAnsExtension(true);
+        this.dispatch(EventNames.SUPPRESS_NON_STATIONARY_NOISE, {});
+      } catch (error) {
+        console.warn(
+          'Config suppressNonStationaryNoise is not supported',
+          error,
+        );
+      }
     }
 
     // Step4 join room
