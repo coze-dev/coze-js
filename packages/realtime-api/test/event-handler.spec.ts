@@ -1,4 +1,5 @@
-import { RealtimeEventHandler, EventNames } from '../src/event-handler';
+import { EventNames } from '../src/event-names';
+import { RealtimeEventHandler } from '../src/event-handler';
 import { RealtimeAPIError } from '../src/error';
 
 describe('RealtimeEventHandler', () => {

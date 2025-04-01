@@ -3,7 +3,7 @@ import type { Mock } from 'vitest';
 import VERTC, { MediaType, StreamIndex } from '@volcengine/rtc';
 
 import * as utils from '../src/utils';
-import { EventNames } from '../src/event-handler';
+import { EventNames } from '../src/event-names';
 import { RealtimeAPIError } from '../src/error';
 import { EngineClient } from '../src/client';
 

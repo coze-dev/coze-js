@@ -7,7 +7,8 @@ import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
 import { isScreenShareDevice } from './utils';
-import { RealtimeEventHandler, EventNames } from './event-handler';
+import { EventNames } from './event-names';
+import { RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { EngineClient } from './client';
 
