@@ -88,17 +88,17 @@
     "exports": {
       ".": {
         "require": "./dist/cjs/index.js",
-        "import": "./dist/esm/index.js",
+        "import": "./dist/esm/index.mjs",
         "types": "./dist/types/index.d.ts"
       },
       "./ws-tools": {
         "require": "./dist/cjs/ws-tools/index.js",
-        "import": "./dist/esm/ws-tools/index.js",
+        "import": "./dist/esm/ws-tools/index.mjs",
         "types": "./dist/types/ws-tools/ws-tools/index.d.ts"
       }
     },
     "main": "dist/cjs/index.js",
-    "module": "dist/esm/index.js",
+    "module": "dist/esm/index.mjs",
     "types": "dist/types/index.d.ts"
   }
 }
