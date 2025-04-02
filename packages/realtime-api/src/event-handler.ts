@@ -1,4 +1,4 @@
-import { EventNames } from './event-names';
+import EventNames from './event-names';
 import { RealtimeError, RealtimeAPIError } from './error';
 export type EventCallback = (eventName: string, event: unknown) => void;
 

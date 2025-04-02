@@ -1,4 +1,4 @@
-import { EventNames } from '../src/event-names';
+import EventNames from '../src/event-names';
 import { RealtimeEventHandler } from '../src/event-handler';
 import { RealtimeAPIError } from '../src/error';
 

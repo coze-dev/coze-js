@@ -12,7 +12,7 @@ import VERTC, {
 } from '@volcengine/rtc';
 
 import { getAudioDevices, isScreenShareDevice } from './utils';
-import { EventNames } from './event-names';
+import EventNames from './event-names';
 import { RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
 import { type VideoConfig } from '.';

@@ -1,4 +1,4 @@
-export enum EventNames {
+enum EventNames {
   /**
    * en: All events
    * zh: 所有事件
@@ -140,3 +140,5 @@ export enum EventNames {
    */
   SESSION_UPDATE = 'server.session.update',
 }
+
+export default EventNames;

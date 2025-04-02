@@ -1,6 +1,6 @@
 {
   "name": "@coze/realtime-api",
-  "version": "1.1.1-beta.2",
+  "version": "1.1.1-beta.3",
   "description": "A powerful real-time communication SDK for voice interactions with Coze AI bots | 扣子官方实时通信 SDK，用于与 Coze AI bots 进行语音交互",
   "keywords": [
     "coze",
@@ -21,7 +21,6 @@
   },
   "license": "MIT",
   "author": "jackshen <jackshen310@gmail.com>",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./event-names": "./src/event-names.ts"
@@ -73,7 +72,7 @@
       "./event-names": {
         "require": "./dist/cjs/event-names/index.cjs",
         "import": "./dist/esm/event-names/index.js",
-        "types": "./dist/types/event-names/index.d.ts"
+        "types": "./dist/types/event-names/event-names.d.ts"
       }
     },
     "main": "dist/cjs/index.cjs",
