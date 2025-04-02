@@ -10,6 +10,24 @@ import { ChatMessage } from '@/libs/types';
 
 import { MultiSendMessage } from './multi-send-message';
 
+const errorCodeListToShowInMessage = [
+  '788788102',
+  '788788103',
+  '788788104',
+  '788788105',
+  '788788201',
+  '788788202',
+  '788788205',
+  '788788106',
+  '788788206',
+  '788788107',
+  '788788108',
+  '788788109',
+  '788788110',
+  '788788203',
+  '788788204',
+  '788788207',
+];
 export class AsyncSendMessage extends MultiSendMessage {
   private chatStream?: AsyncIterable<StreamChatData>;
 
@@ -144,22 +162,20 @@ export class AsyncSendMessage extends MultiSendMessage {
                 msg: string;
               };
               this.chatService.handleErrorCode(messageError.code || -1);
-              this.sendErrorEvent(
-                new MiniChatError(
-                  messageError.code || -1,
-                  messageError.msg || this.i18n.t('sendFailed'),
-                ),
+
+              this.sendHandledErrorEvent(
+                messageError.code,
+                messageError.msg,
+                messageList,
               );
               return;
             }
             case ChatEventType.CONVERSATION_CHAT_FAILED: {
               const messageError = safeJSONParse(data) as CreateChatData;
-
-              this.sendErrorEvent(
-                new MiniChatError(
-                  messageError.last_error?.code || -1,
-                  messageError.last_error?.msg || this.i18n.t('sendFailed'),
-                ),
+              this.sendHandledErrorEvent(
+                messageError.last_error?.code || -1,
+                messageError.last_error?.msg || '',
+                messageList,
               );
               return;
             }
@@ -179,6 +195,27 @@ export class AsyncSendMessage extends MultiSendMessage {
       logger.error('asyncChat pollAnswer error', error);
       this.sendErrorEvent(new MiniChatError(-1, this.i18n.t('sendFailed')));
       return;
+    }
+  }
+  private sendHandledErrorEvent(
+    errorCode: number,
+    errorMsg: string,
+    messageList: ChatMessage[],
+  ) {
+    if (
+      errorCodeListToShowInMessage.includes(errorCode.toString()) &&
+      errorMsg
+    ) {
+      this.messageList = [this.messageSended, ...(messageList || [])];
+      this.messageList.push(this.createAnswerTextMessage(errorMsg));
+      this.sendCompleteEvent();
+    } else {
+      this.sendErrorEvent(
+        new MiniChatError(
+          errorCode || -1,
+          errorMsg || this.i18n.t('sendFailed'),
+        ),
+      );
     }
   }
 }
