@@ -65,17 +65,17 @@
   "cozePublishConfig": {
     "exports": {
       ".": {
-        "require": "./dist/cjs/index.cjs",
+        "require": "./dist/cjs/index.js",
         "import": "./dist/esm/index.js",
         "types": "./dist/types/index.d.ts"
       },
       "./event-names": {
-        "require": "./dist/cjs/event-names/index.cjs",
+        "require": "./dist/cjs/event-names/index.js",
         "import": "./dist/esm/event-names/index.js",
         "types": "./dist/types/event-names/event-names.d.ts"
       }
     },
-    "main": "dist/cjs/index.cjs",
+    "main": "dist/cjs/index.js",
     "module": "dist/esm/index.js",
     "typings": "dist/types/index.d.ts"
   }

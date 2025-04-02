@@ -2,9 +2,11 @@ import { defineConfig, type LibConfig } from '@rslib/core';
 
 function getLibShared(format: LibConfig['format'], dts = false, subpath = '') {
   const shared: LibConfig = {
+    autoExtension: false,
     output: {
       distPath: {
-        root: `./dist/${format}/${subpath}`,
+        root: `./dist/${format}`,
+        js: `${subpath}`,
       },
     },
     format,
