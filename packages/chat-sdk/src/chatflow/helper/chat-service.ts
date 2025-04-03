@@ -261,6 +261,7 @@ export class ChatFlowService extends ChatService {
     bodyData.connector_id = getConnectorId(this.chatFlowProps);
     bodyData.ext = {
       _caller: this.chatFlowProps?.project?.caller,
+      user_id: params.user_id,
     };
     bodyData.suggest_reply_info = params.suggestPromoteInfo
       ? {

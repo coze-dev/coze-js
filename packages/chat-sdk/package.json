@@ -1,6 +1,6 @@
 {
   "name": "@coze/chat-sdk",
-  "version": "0.1.11",
+  "version": "0.1.11-beta.4",
   "description": "Coze chat components for taro",
   "author": "gaoding.devingao@bytedance.com",
   "exports": {
@@ -65,7 +65,7 @@
   "dependencies": {
     "@coze/api": "^1.0.17",
     "classnames": "^2.3.2",
-    "extendable-media-recorder": "^9.2.19",
+    "extendable-media-recorder": "9.2.19",
     "mdast": "^3.0.0-alpha.6",
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-gfm-strikethrough": "^2.0.0",
