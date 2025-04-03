@@ -1,6 +1,6 @@
 {
   "name": "@coze/api",
-  "version": "1.1.1",
+  "version": "1.1.1-beta.1",
   "description": "Official Coze Node.js SDK for seamless AI integration into your applications | 扣子官方 Node.js SDK，助您轻松集成 AI 能力到应用中",
   "keywords": [
     "coze",
@@ -88,17 +88,17 @@
     "exports": {
       ".": {
         "require": "./dist/cjs/index.js",
-        "import": "./dist/esm/index.js",
+        "import": "./dist/esm/index.mjs",
         "types": "./dist/types/index.d.ts"
       },
       "./ws-tools": {
         "require": "./dist/cjs/ws-tools/index.js",
-        "import": "./dist/esm/ws-tools/index.js",
+        "import": "./dist/esm/ws-tools/index.mjs",
         "types": "./dist/types/ws-tools/ws-tools/index.d.ts"
       }
     },
     "main": "dist/cjs/index.js",
-    "module": "dist/esm/index.js",
+    "module": "dist/esm/index.mjs",
     "types": "dist/types/index.d.ts"
   }
 }
