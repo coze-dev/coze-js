@@ -107,16 +107,23 @@ export const AudioConfig = forwardRef<
       <Row gutter={[0, 16]}>
         {/* 开发模式 */}
         <Col span={24}>
-          <Checkbox
-            checked={debug}
-            disabled={isRecording}
-            onChange={e => setDebug(e.target.checked)}
-          >
-            开发模式
-            <Tooltip title="启用开发模式，控制台会输出更多日志">
-              <InfoCircleOutlined style={{ marginLeft: 4, color: '#999' }} />
-            </Tooltip>
-          </Checkbox>
+          <Row align="middle">
+            <Col flex="90px">开发模式：</Col>
+            <Col>
+              <Checkbox
+                checked={debug}
+                disabled={isRecording}
+                onChange={e => setDebug(e.target.checked)}
+              >
+                启用
+                <Tooltip title="启用开发模式，控制台会输出更多日志">
+                  <InfoCircleOutlined
+                    style={{ marginLeft: 4, color: '#999' }}
+                  />
+                </Tooltip>
+              </Checkbox>
+            </Col>
+          </Row>
         </Col>
 
         {/* 音频配置 */}

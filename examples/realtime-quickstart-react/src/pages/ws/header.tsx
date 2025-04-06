@@ -3,6 +3,7 @@ import { Layout, Button } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import './header.css';
 import Settings from '../../components/settings';
+import logo from '../../logo.svg';
 
 const { Header } = Layout;
 export type AppHeaderProps = {
@@ -15,7 +16,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   return (
     <Header className="header">
-      <div className="logo">Coze - WsChatClient</div>
+      <div className="logo">
+        <img src={logo} alt="logo" />
+        &nbsp;WsChatClient
+      </div>
       <div className="rightContent">
         <Settings
           onSettingsChange={onSettingsChange}

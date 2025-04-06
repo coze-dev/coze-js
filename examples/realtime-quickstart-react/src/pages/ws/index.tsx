@@ -15,6 +15,7 @@ import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { CustomTrackHandle } from './custom-track';
 import Header from './header';
+import { ConsoleLog } from './console-log';
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
 
@@ -209,6 +210,7 @@ function WS() {
         </Row>
 
         <ReceiveMessage clientRef={clientRef} />
+        <ConsoleLog />
 
         {/* 配置弹窗 */}
         <Modal

@@ -58,9 +58,11 @@ function WS() {
       noiseSuppression,
       echoCancellation,
       autoGainControl,
+      debug,
     } = settingsRef.current?.getSettings() || {};
     clientRef.current = new PcmRecorder({
       mediaStreamTrack: audioTrack,
+      debug,
       audioCaptureConfig: {
         noiseSuppression,
         echoCancellation,
@@ -107,7 +109,7 @@ function WS() {
 
   const handleStop = () => {
     try {
-      clientRef.current?.destroy();
+      clientRef.current?.pause();
       setIsRecording(false);
       // 停止播放音频
       audioElement.current?.pause();
@@ -133,7 +135,7 @@ function WS() {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
+    <div style={{ padding: '20px' }}>
       <AudioConfig clientRef={clientRef} ref={settingsRef} />
       <br />
       <Space style={{ padding: '10px' }}>
