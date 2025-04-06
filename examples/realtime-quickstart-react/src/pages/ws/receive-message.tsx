@@ -3,7 +3,6 @@ import {
   WsChatClient,
   WsChatEventNames,
   WsChatEventData,
-  AudioRecordEvent,
 } from '@coze/api/ws-tools';
 import { Col, List, Row, Space } from 'antd';
 import { MutableRefObject, useEffect, useState } from 'react';
@@ -100,10 +99,6 @@ const ReceiveMessage = ({
     <Row
       style={{
         margin: '16px',
-        // padding: '20px',
-        // maxHeight: '600px',
-        // width: '400px',
-        // overflowY: 'auto',
         border: '1px solid #ccc',
       }}
     >

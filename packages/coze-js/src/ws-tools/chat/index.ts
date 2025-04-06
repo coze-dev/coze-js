@@ -223,15 +223,6 @@ class WsChatClient extends BaseWsChatClient {
     this.log('setDenoiserMode', mode);
     this.recorder.setDenoiserMode(mode);
   }
-
-  /**
-   * en: Check if the denoiser is supported
-   * zh: 检查是否支持降噪
-   * @returns - The support status
-   */
-  checkDenoiserSupport() {
-    return this.recorder.checkDenoiserSupport();
-  }
 }
 
 export default WsChatClient;

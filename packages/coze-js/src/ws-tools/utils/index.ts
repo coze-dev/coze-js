@@ -1,3 +1,12 @@
+declare global {
+  interface Window {
+    __denoiser: AIDenoiserExtension;
+  }
+}
+
+import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
+import AgoraRTC from 'agora-rtc-sdk-ng';
+
 /**
  * 检查语音设备权限
  * @returns {Promise<{audio: boolean}>} 是否具有语音设备权限
@@ -98,4 +107,50 @@ export const floatTo16BitPCM = (float32Array: Float32Array) => {
     view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
   }
   return buffer;
+};
+
+/**
+ * 检查是否是移动设备
+ * @returns {boolean} 是否是移动设备
+ */
+export const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  );
+};
+
+/**
+ * 检查是否支持 AI 降噪
+ * @param assetsPath - 降噪插件的公共路径
+ * @returns {boolean} 是否支持 AI 降噪
+ */
+export const checkDenoiserSupport = (assetsPath?: string) => {
+  if (!window.__denoiser) {
+    // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
+    const external = new AIDenoiserExtension({
+      assetsPath:
+        assetsPath ??
+        'https://lf3-static.bytednsdoc.com/obj/eden-cn/613eh7lpqvhpeuloz/websocket',
+    });
+    // @ts-ignore
+    window.__denoiser = external;
+
+    external.onloaderror = e => {
+      // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
+      console.error('Denoiser load error', e);
+    };
+
+    // 检查兼容性
+    if (!external.checkCompatibility()) {
+      // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
+      console.error('Does not support AI Denoiser!');
+      return false;
+    } else {
+      // 注册插件
+      // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
+      AgoraRTC.registerExtensions([external]);
+      return true;
+    }
+  }
+  return window.__denoiser.checkCompatibility();
 };

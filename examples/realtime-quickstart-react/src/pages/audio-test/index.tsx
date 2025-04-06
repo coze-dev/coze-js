@@ -1,18 +1,8 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
 import { RealtimeUtils } from '@coze/realtime-api';
-import {
-  Button,
-  Space,
-  message,
-  Select,
-  List,
-  Tooltip,
-  Radio,
-  Checkbox,
-} from 'antd';
+import { Button, Space, message, Select, List } from 'antd';
 import { PcmRecorder } from '@coze/api/ws-tools';
-import { InfoCircleOutlined } from '@ant-design/icons';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 
 function WS() {
@@ -20,10 +10,7 @@ function WS() {
   // 是否已连接
   const [isRecording, setIsRecording] = useState(false);
 
-  const [transcript, setTranscript] = useState('');
-
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
-  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
   const [audioList, setAudioList] = useState<
     {
@@ -41,17 +28,40 @@ function WS() {
       if (devices.audioInputs.length > 0) {
         setSelectedInputDevice(devices.audioInputs[0].deviceId);
       }
-      setOutputDevices(devices.audioOutputs);
       console.log(devices.audioOutputs);
     };
 
     getDevices();
   }, []);
 
-  function initClient() {
+  const getAudioTrack = async (
+    audioElement: HTMLAudioElement,
+  ): Promise<MediaStreamTrack> => {
+    const audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
+
+    // 创建音频源
+    const source = audioContext.createMediaElementSource(audioElement);
+
+    // 创建 MediaStreamDestination
+    const destination = audioContext.createMediaStreamDestination();
+
+    // 连接节点
+    source.connect(destination);
+    source.connect(audioContext.destination); // 保持原有播放功能
+
+    // 获取 AudioMediaTrack
+    const audioTrack = destination.stream.getAudioTracks()[0];
+
+    return audioTrack;
+  };
+
+  async function initClient() {
     // 从 audio 元素获取 MediaStreamTrack
-    const stream = (audioElement.current as any)?.captureStream();
-    const audioTrack = stream?.getAudioTracks()[0];
+    // const stream = (audioElement.current as any)?.captureStream();
+    const audioTrack = await getAudioTrack(audioElement.current as any);
+
+    // const audioTrack = stream?.getAudioTracks()[0];
     const {
       denoiseMode,
       denoiseLevel,
@@ -157,7 +167,7 @@ function WS() {
       </Space>
       <br />
       <Space style={{ padding: '10px' }}>
-        <audio ref={audioElement} src={'/babble_15dB.opus'} controls />
+        <audio ref={audioElement} src={'/test.wav'} controls />
       </Space>
       <br />
       <Space>
@@ -174,12 +184,6 @@ function WS() {
           ))}
         </Select>
       </Space>
-      <br />
-      {/* <Space style={{ padding: '20px' }} align="start">
-        <div style={{ width: '400px', textAlign: 'left' }}>
-          语音识别结果：{transcript}
-        </div>
-      </Space> */}
       <br />
       <Space direction="vertical">
         <Space>

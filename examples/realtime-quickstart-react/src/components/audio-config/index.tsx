@@ -12,6 +12,7 @@ import {
   AIDenoiserProcessorMode,
   PcmRecorder,
   WsChatClient,
+  WsToolsUtils,
 } from '@coze/api/ws-tools';
 
 // 定义 ref 暴露的方法和状态接口
@@ -40,7 +41,9 @@ export const AudioConfig = forwardRef<
   const [denoiseLevel, setDenoiseLevel] = useState<'SOFT' | 'AGGRESSIVE'>(
     'SOFT',
   );
-  const [noiseSuppression, setNoiseSuppression] = useState(false);
+  const isDenoiserSupported = WsToolsUtils.checkDenoiserSupport();
+  const [noiseSuppression, setNoiseSuppression] =
+    useState(!isDenoiserSupported);
   const [echoCancellation, setEchoCancellation] = useState(true);
   const [autoGainControl, setAutoGainControl] = useState(true);
   const [debug, setDebug] = useState(true);
@@ -102,6 +105,8 @@ export const AudioConfig = forwardRef<
     }
   };
 
+  const disabled = !isDenoiserSupported || isRecording;
+
   return (
     <>
       <Row gutter={[0, 16]}>
@@ -133,7 +138,7 @@ export const AudioConfig = forwardRef<
             <Col>
               <Checkbox
                 checked={noiseSuppression}
-                disabled={isRecording}
+                disabled={disabled}
                 onChange={e => setNoiseSuppression(e.target.checked)}
               >
                 噪声抑制

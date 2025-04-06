@@ -17,6 +17,7 @@ import {
 } from '../chat/types';
 import WavAudioProcessor from './processor/wav-audio-processor';
 import { IAudioProcessor } from 'agora-rte-extension';
+import { checkDenoiserSupport } from '../utils';
 
 export enum AIDenoiserProcessorMode {
   NSNG = 'NSNG',
@@ -57,40 +58,16 @@ class PcmRecorder {
     this.config = config;
     const { audioCaptureConfig, aiDenoisingConfig } = config;
 
-    if (aiDenoisingConfig?.mode && !PcmRecorder.denoiser) {
-      this.log('aiDenoisingConfig', aiDenoisingConfig);
-      // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
-      const external = new AIDenoiserExtension({
-        assetsPath: aiDenoisingConfig?.assetsPath ?? '/external',
-      });
-
-      external.onloaderror = e => {
-        // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
-        console.error('Denoiser load error', e);
-      };
-
-      // 检查兼容性
-      if (!external.checkCompatibility()) {
-        // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
-        console.error('Does not support AI Denoiser!');
-      } else {
-        // 注册插件
-        // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
-        AgoraRTC.registerExtensions([external]);
-        PcmRecorder.denoiser = external;
-        PcmRecorder.aiDenoiserSupport = true;
-      }
-
-      if (aiDenoisingConfig?.mode && PcmRecorder.denoiser) {
-        // 同时使用两种降噪方案时，则强制开启音频增益控制和禁用自动噪声抑制
-        audioCaptureConfig.autoGainControl = true;
-        audioCaptureConfig.noiseSuppression = false;
-      }
+    if (checkDenoiserSupport(config.aiDenoisingConfig?.assetsPath)) {
+      PcmRecorder.aiDenoiserSupport = true;
+      PcmRecorder.denoiser = window.__denoiser;
     }
-  }
 
-  checkDenoiserSupport() {
-    return PcmRecorder.aiDenoiserSupport;
+    if (aiDenoisingConfig?.mode && PcmRecorder.aiDenoiserSupport) {
+      // 同时使用两种降噪方案时，则强制开启音频增益控制和禁用自动噪声抑制
+      audioCaptureConfig.autoGainControl = true;
+      audioCaptureConfig.noiseSuppression = false;
+    }
   }
 
   async start() {

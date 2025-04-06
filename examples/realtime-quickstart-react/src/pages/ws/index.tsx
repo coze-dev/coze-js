@@ -35,6 +35,7 @@ function WS() {
 
   // 添加控制弹窗显示的状态
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const isMobile = WsToolsUtils.isMobile();
 
   useEffect(() => {
     const getDevices = async () => {
@@ -90,7 +91,10 @@ function WS() {
       deviceId: selectedInputDevice || undefined,
     });
 
-    if (!client.checkDenoiserSupport()) {
+    if (
+      !audioConfig?.noiseSuppression &&
+      !WsToolsUtils.checkDenoiserSupport()
+    ) {
       message.info('当前浏览器不支持降噪');
     }
 
@@ -210,7 +214,7 @@ function WS() {
         </Row>
 
         <ReceiveMessage clientRef={clientRef} />
-        <ConsoleLog />
+        {isMobile && <ConsoleLog />}
 
         {/* 配置弹窗 */}
         <Modal
