@@ -14,7 +14,7 @@ import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { CustomTrackHandle } from './custom-track';
-import Header from './header';
+import Header from '../../components/header/header';
 import { ConsoleLog } from './console-log';
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
@@ -147,6 +147,7 @@ function WS() {
       <Header
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
+        title="WsChatClient"
       />
       <Layout.Content>
         <Row style={{ marginTop: '10px' }} justify="center">

@@ -1,118 +1,23 @@
 import { v4 as uuid } from 'uuid';
 
-import { WavRecorder } from '../wavtools';
+import { WebsocketsEventType } from '../..';
+import BaseWsTranscriptionClient from './base';
+import { WsTranscriptionClientOptions } from '../types';
 import {
-  APIError,
-  CozeAPI,
-  type CreateTranscriptionsWsReq,
-  type CreateTranscriptionsWsRes,
-  type ErrorRes,
-  type WebSocketAPI,
-  WebsocketsEventType,
-} from '../..';
-import { type WsToolsOptions } from '..';
+  AIDenoiserProcessorLevel,
+  AIDenoiserProcessorMode,
+} from '../recorder/pcm-recorder';
 
-class WsTranscriptionClient {
-  public ws: WebSocketAPI<
-    CreateTranscriptionsWsReq,
-    CreateTranscriptionsWsRes
-  > | null = null;
-  private listeners: Map<
-    string,
-    Set<(data: CreateTranscriptionsWsRes) => void>
-  > = new Map();
-  private wavRecorder: WavRecorder;
-
-  private api: CozeAPI;
-  constructor(config: WsToolsOptions) {
-    this.api = new CozeAPI({
-      ...config,
-    });
-    this.wavRecorder = new WavRecorder({ sampleRate: 24000 });
+class WsTranscriptionClient extends BaseWsTranscriptionClient {
+  private isRecording = false;
+  constructor(config: WsTranscriptionClientOptions) {
+    super(config);
   }
 
-  async init() {
-    if (this.ws) {
-      return this.ws;
-    }
-    const ws = await this.api.websockets.audio.transcriptions.create();
-    let isResolved = false;
-
-    return new Promise<
-      WebSocketAPI<CreateTranscriptionsWsReq, CreateTranscriptionsWsRes>
-    >((resolve, reject) => {
-      ws.onopen = () => {
-        console.debug('[transcription] ws open');
-      };
-
-      ws.onmessage = (data, event) => {
-        // Trigger all registered event listeners
-        this.emit('data', data);
-        this.emit(data.event_type, data);
-
-        if (data.event_type === WebsocketsEventType.ERROR) {
-          this.closeWs();
-          if (isResolved) {
-            return;
-          }
-          isResolved = true;
-          reject(
-            new APIError(
-              data.data.code,
-              {
-                code: data.data.code,
-                msg: data.data.msg,
-                detail: data.detail,
-              },
-              data.data.msg,
-              undefined,
-            ),
-          );
-          return;
-        } else if (
-          data.event_type === WebsocketsEventType.TRANSCRIPTIONS_CREATED
-        ) {
-          resolve(ws);
-          isResolved = true;
-        } else if (
-          data.event_type ===
-          WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_COMPLETED
-        ) {
-          this.closeWs();
-        }
-      };
-
-      ws.onerror = (error, event) => {
-        console.error('[transcription] WebSocket error', error, event);
-
-        this.emit('data', error);
-        this.emit(WebsocketsEventType.ERROR, error);
-
-        this.closeWs();
-        if (isResolved) {
-          return;
-        }
-        isResolved = true;
-        reject(
-          new APIError(
-            error.data.code,
-            error as unknown as ErrorRes,
-            error.data.msg,
-            undefined,
-          ),
-        );
-      };
-
-      ws.onclose = () => {
-        console.debug('[transcription] ws close');
-      };
-
-      this.ws = ws;
-    });
-  }
-
-  async connect() {
+  private async connect() {
     await this.init();
+    await this.recorder.start();
+    const sampleRate = this.recorder.getSampleRate();
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.TRANSCRIPTIONS_UPDATE,
@@ -120,7 +25,7 @@ class WsTranscriptionClient {
         input_audio: {
           format: 'pcm',
           codec: 'pcm',
-          sample_rate: 24000,
+          sample_rate: sampleRate,
           channel: 1,
           bit_depth: 16,
         },
@@ -128,89 +33,99 @@ class WsTranscriptionClient {
     });
   }
 
-  async disconnect() {
-    await this.wavRecorder.quit();
+  async destroy() {
+    this.recorder.destroy();
     this.listeners.clear();
     this.closeWs();
   }
 
-  getDeviceList() {
-    return this.wavRecorder.listDevices();
-  }
-
   getStatus() {
-    return this.wavRecorder.getStatus();
+    if (this.isRecording) {
+      if (this.recorder.getStatus() === 'ended') {
+        return 'paused';
+      }
+      return 'recording';
+    }
+    return 'ended';
   }
 
-  async record() {
+  async start() {
     if (this.getStatus() === 'recording') {
+      console.warn('Recording is already started');
       return;
     }
+    await this.connect();
+    await this.recorder.record({
+      pcmAudioCallback: data => {
+        const { raw } = data;
 
-    if (this.getStatus() === 'ended') {
-      const deviceList = await this.getDeviceList();
-      await this.wavRecorder.begin({
-        deviceId: deviceList[0]?.deviceId,
-      });
-    }
+        // Convert ArrayBuffer to base64 string
+        const base64String = btoa(
+          Array.from(new Uint8Array(raw))
+            .map(byte => String.fromCharCode(byte))
+            .join(''),
+        );
 
-    await this.wavRecorder.record(data => {
-      const { raw } = data;
-
-      // Convert ArrayBuffer to base64 string
-      const base64String = btoa(
-        Array.from(new Uint8Array(raw))
-          .map(byte => String.fromCharCode(byte))
-          .join(''),
-      );
-
-      // send audio to ws
-      this.ws?.send({
-        id: uuid(),
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-        data: {
-          delta: base64String,
-        },
-      });
+        // send audio to ws
+        this.ws?.send({
+          id: uuid(),
+          event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
+          data: {
+            delta: base64String,
+          },
+        });
+      },
     });
+    this.isRecording = true;
   }
 
-  async end() {
+  /**
+   * 停止录音，提交结果
+   */
+  async stop() {
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
     });
-
-    await this.wavRecorder.pause();
-    const finalAudio = await this.wavRecorder.end();
-    return finalAudio;
+    this.recorder.destroy();
+    this.closeWs();
+    this.isRecording = false;
   }
 
+  /**
+   * 暂停录音（保留上下文）
+   */
   pause() {
-    return this.wavRecorder.pause();
-  }
-
-  on(event: string, callback: (data: CreateTranscriptionsWsRes) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set());
+    if (this.getStatus() !== 'recording') {
+      throw new Error('Recording is not started');
     }
-    this.listeners.get(event)?.add(callback);
+    return this.recorder.pause();
   }
 
-  off(event: string, callback: (data: CreateTranscriptionsWsRes) => void) {
-    this.listeners.get(event)?.delete(callback);
-  }
-
-  private closeWs() {
-    if (this.ws?.readyState === 1) {
-      this.ws?.close();
+  /**
+   * 恢复录音
+   */
+  resume() {
+    if (this.getStatus() !== 'paused') {
+      throw new Error('Recording is not paused');
     }
-    this.ws = null;
+    return this.recorder.resume();
   }
 
-  private emit(event: string, data: CreateTranscriptionsWsRes) {
-    this.listeners.get(event)?.forEach(callback => callback(data));
+  getDenoiserEnabled() {
+    return this.recorder.getDenoiserEnabled();
+  }
+
+  setDenoiserEnabled(enabled: boolean) {
+    return this.recorder.setDenoiserEnabled(enabled);
+  }
+
+  setDenoiserMode(mode: AIDenoiserProcessorMode) {
+    return this.recorder.setDenoiserMode(mode);
+  }
+
+  setDenoiserLevel(level: AIDenoiserProcessorLevel) {
+    return this.recorder.setDenoiserLevel(level);
   }
 }
-
 export default WsTranscriptionClient;

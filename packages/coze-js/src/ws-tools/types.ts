@@ -1,5 +1,21 @@
-import { CreateChatWsRes } from '../../..';
-import { type WsToolsOptions } from '..';
+import { type CreateChatWsRes } from '..';
+import { type GetToken } from '..';
+import { WebsocketOptions } from '../core';
+
+export interface WsToolsOptions {
+  /** Personal Access Token (PAT) or OAuth2.0 token, or a function to get token */
+  token: GetToken;
+  /** Whether to enable debug mode */
+  debug?: boolean;
+  /** Custom headers */
+  headers?: Headers | Record<string, unknown>;
+  /** Whether Personal Access Tokens (PAT) are allowed in browser environments */
+  allowPersonalAccessTokenInBrowser?: boolean;
+  /** base websocket URL, default is wss://ws.coze.cn */
+  baseWsURL?: string;
+  /** websocket options */
+  websocketOptions?: WebsocketOptions;
+}
 
 export type AudioRecordEvent = {
   event_type: 'audio.input.dump';
@@ -286,4 +302,32 @@ export enum WsChatEventNames {
    * zh: 音频 dump
    */
   DUMP_AUDIO = 'server.dump.audio',
+}
+
+export interface WsTranscriptionClientOptions extends WsToolsOptions {
+  /**
+   * en: Audio input device id
+   * zh: 音频输入设备 ID
+   */
+  deviceId?: string;
+  /**
+   * en: Audio capture config
+   * zh: 音频采集配置
+   */
+  audioCaptureConfig?: AudioCaptureConfig;
+  /**
+   * en: AI denoising config
+   * zh: AI 降噪配置
+   */
+  aiDenoisingConfig?: AIDenoisingConfig;
+  /**
+   * en: Custom media stream track
+   * zh: 自定义音频流
+   */
+  mediaStreamTrack?: MediaStreamTrack;
+  /**
+   * en: Audio record config, only effective when debug = true
+   * zh: 音频录制配置，仅在 debug = true 时有效
+   */
+  wavRecordConfig?: WavRecordConfig;
 }

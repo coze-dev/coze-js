@@ -5,7 +5,7 @@ import PcmRecorder, {
   AIDenoiserProcessorMode,
 } from '../recorder/pcm-recorder';
 import { type ChatUpdateEvent, WebsocketsEventType } from '../..';
-import { type WsChatClientOptions, WsChatEventNames } from './types';
+import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import BaseWsChatClient from './base';
 import { getAudioDevices } from '../utils';
 export { WsChatEventNames };

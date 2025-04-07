@@ -72,6 +72,8 @@ export enum WebsocketsEventType {
   CLIENT_ERROR = 'client_error',
   /** Connection closed */
   CLOSED = 'closed',
+  /** All events */
+  ALL = 'all',
 
   // Error
   /** Received error event */

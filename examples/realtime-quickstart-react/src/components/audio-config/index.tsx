@@ -13,6 +13,7 @@ import {
   PcmRecorder,
   WsChatClient,
   WsToolsUtils,
+  WsTranscriptionClient,
 } from '@coze/api/ws-tools';
 
 // 定义 ref 暴露的方法和状态接口
@@ -32,7 +33,8 @@ export const AudioConfig = forwardRef<
   {
     clientRef:
       | MutableRefObject<PcmRecorder | undefined>
-      | MutableRefObject<WsChatClient | undefined>;
+      | MutableRefObject<WsChatClient | undefined>
+      | MutableRefObject<WsTranscriptionClient | undefined>;
   }
 >(({ clientRef }, ref) => {
   const [denoiseMode, setDenoiseMode] = useState<'NSNG' | 'STATIONARY_NS'>(

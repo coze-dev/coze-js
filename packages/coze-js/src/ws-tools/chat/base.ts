@@ -14,7 +14,7 @@ import {
   WsChatEventNames,
   WsChatCallbackHandler,
   WsChatEventData,
-} from './types';
+} from '../types';
 import { v4 as uuid } from 'uuid';
 
 class BaseWsChatClient {

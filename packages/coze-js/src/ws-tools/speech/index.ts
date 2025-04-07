@@ -10,7 +10,7 @@ import {
   type WebSocketAPI,
   WebsocketsEventType,
 } from '../..';
-import { type WsToolsOptions } from '..';
+import { type WsToolsOptions } from '../types';
 
 class WsSpeechClient {
   public ws: WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes> | null = null;

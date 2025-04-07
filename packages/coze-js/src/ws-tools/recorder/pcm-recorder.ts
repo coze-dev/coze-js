@@ -3,7 +3,6 @@ import {
   type ILocalAudioTrack,
   createCustomAudioTrack,
 } from 'agora-rtc-sdk-ng/esm';
-import AgoraRTC from 'agora-rtc-sdk-ng';
 import {
   AIDenoiserExtension,
   AIDenoiserProcessor,
@@ -14,7 +13,7 @@ import {
   type AIDenoisingConfig,
   type AudioCaptureConfig,
   type WavRecordConfig,
-} from '../chat/types';
+} from '../types';
 import WavAudioProcessor from './processor/wav-audio-processor';
 import { IAudioProcessor } from 'agora-rte-extension';
 import { checkDenoiserSupport } from '../utils';
