@@ -63,13 +63,14 @@ export const checkDevicePermission = async (): Promise<{
  */
 export const getAudioDevices = async () => {
   try {
-    // 先请求麦克风权限，这样可以获取到完整的设备信息
+    // request microphone permission first, so we can get the complete device information
     const { audio: audioPermission } = await checkDevicePermission();
+
     if (!audioPermission) {
       throw new Error('Microphone permission denied');
     }
 
-    // 获取所有媒体设备
+    // get all media devices
     const devices = await navigator.mediaDevices.enumerateDevices();
 
     if (!devices?.length) {
