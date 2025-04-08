@@ -1,0 +1,109 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Coze JS 测试代码规范
+
+## 文件结构与命名
+
+- 测试文件使用 `[模块名].spec.ts` 格式命名
+- 测试文件应与源文件结构保持一致
+
+## 框架与基础设施
+
+- 使用 Vitest 作为测试框架
+- 使用 TypeScript 编写所有测试
+- 覆盖率报告使用 V8 提供者
+- 支持环境: Node.js 和浏览器
+
+## 测试组织
+
+- 使用嵌套的 `describe` 块组织相关测试
+- 测试描述应清晰表达测试意图
+- 复杂功能按子功能或场景分组
+- 主要测试套件:
+  ```typescript
+  describe('模块名', () => {
+    describe('子功能或方法', () => {
+      it('应该有特定行为', () => {
+        // 测试代码
+      });
+    });
+  });
+  ```
+
+## 测试风格
+
+- 每个测试专注于单一功能点或行为
+- 明确区分正向测试和异常测试
+- 使用 async/await 测试异步代码
+- 使用标准的 AAA (Arrange-Act-Assert) 模式组织测试内容
+
+## Mock与测试隔离
+
+- 外部依赖应被模拟 (`vi.mock()`)
+- 使用 `vi.fn()` 创建模拟函数
+- 使用 `vi.spyOn()` 监视函数调用
+- 内部模块可模拟以隔离测试单元
+- 示例:
+  ```typescript
+  vi.mock('../src/fetcher');
+  vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+  ```
+
+## 测试生命周期
+
+- 使用 `beforeEach` 重置模拟和创建新实例
+- 使用 `afterEach` 清理资源和重置状态
+- 使用 `vi.clearAllMocks()` 和 `vi.resetAllMocks()` 确保测试隔离
+- 示例:
+  ```typescript
+  beforeEach(() => {
+    client = new APIClient(mockConfig);
+    vi.clearAllMocks();
+  });
+  ```
+
+## 断言风格
+
+- 使用 Jest 风格断言 API
+- 对异步操作使用 await 配合 expect
+- 对异常使用 `expect().rejects.toThrow()`
+- 对模拟函数检查调用使用 `expect().toHaveBeenCalled()`
+- 示例:
+  ```typescript
+  expect(result).toEqual({ access_token: 'test-token' });
+  await expect(promise).rejects.toThrow('Error message');
+  ```
+
+## 错误测试
+
+- 确保测试覆盖各种错误场景
+- 测试边缘情况
+- 验证错误消息和错误类型
+- 测试错误处理和恢复机制
+
+## 环境适配
+
+- 使用环境检测进行条件测试
+- 针对不同环境(Node/浏览器)提供不同实现
+- 模拟全局对象以测试环境特定代码
+- 示例:
+  ```typescript
+  vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+  ```
+
+## 持续集成
+
+- 测试应在 CI 环境中静默运行
+- 确保 100% 覆盖率或在忽略列表中声明例外
+- 保持测试稳定性，避免偶发性失败
+
+## 并发和超时
+
+- 默认测试超时为 100 秒
+- 使用 forks 池并设置 `singleFork: true`
+- 长时间测试应明确设置更长的超时时间
+

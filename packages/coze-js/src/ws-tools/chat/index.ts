@@ -1,17 +1,18 @@
 import { v4 as uuid } from 'uuid';
 
-import PcmRecorder, {
+import {
+  PcmRecorder,
   AIDenoiserProcessorLevel,
   AIDenoiserProcessorMode,
-} from '../recorder/pcm-recorder';
-import { type ChatUpdateEvent, WebsocketsEventType } from '../..';
+} from '../index';
+import { type ChatUpdateEvent, WebsocketsEventType } from '../../index';
 import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import BaseWsChatClient from './base';
 import { getAudioDevices } from '../utils';
 export { WsChatEventNames };
 
 class WsChatClient extends BaseWsChatClient {
-  public readonly recorder: PcmRecorder;
+  public recorder: PcmRecorder;
 
   constructor(config: WsChatClientOptions) {
     super(config);
@@ -23,7 +24,6 @@ class WsChatClient extends BaseWsChatClient {
       debug: config.debug,
       deviceId: config.deviceId,
     });
-    this.config = config;
   }
 
   private async startRecord() {
@@ -86,12 +86,13 @@ class WsChatClient extends BaseWsChatClient {
   }: {
     chatUpdate?: ChatUpdateEvent;
   } = {}) {
-    await this.init();
+    const ws = await this.init();
+    this.ws = ws;
 
     await this.startRecord();
     const sampleRate = await this.recorder?.getSampleRate();
 
-    this.ws?.send({
+    this.ws.send({
       id: chatUpdate?.id || uuid(),
       event_type: WebsocketsEventType.CHAT_UPDATE,
       data: {
@@ -164,7 +165,7 @@ class WsChatClient extends BaseWsChatClient {
     const devices = await getAudioDevices();
     if (deviceId === 'default') {
       this.recorder.config.deviceId = undefined;
-      this.startRecord();
+      await this.startRecord();
       this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     } else {
       const device = devices.audioInputs.find(d => d.deviceId === deviceId);
@@ -172,7 +173,7 @@ class WsChatClient extends BaseWsChatClient {
         throw new Error(`Device with id ${deviceId} not found`);
       }
       this.recorder.config.deviceId = device.deviceId;
-      this.startRecord();
+      await this.startRecord();
       this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     }
   }

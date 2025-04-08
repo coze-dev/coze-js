@@ -7,7 +7,7 @@ import {
   RoleType,
   WebSocketAPI,
   WebsocketsEventType,
-} from '../..';
+} from '../../index';
 import { WavStreamPlayer } from '../wavtools';
 import {
   WsChatClientOptions,

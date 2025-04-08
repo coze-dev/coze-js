@@ -249,7 +249,7 @@ describe('APIClient', () => {
       expect(websocket).toBeDefined();
 
       expect(WebSocketAPI).toHaveBeenCalledWith(
-        'wss://ws.coze.com/test',
+        'wss://ws.coze.cn/test',
         expect.objectContaining({
           debug: true,
           headers: {

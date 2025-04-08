@@ -30,7 +30,7 @@ export enum AIDenoiserProcessorLevel {
 export interface PcmRecorderConfig {
   audioCaptureConfig?: AudioCaptureConfig;
   aiDenoisingConfig?: AIDenoisingConfig;
-  mediaStreamTrack?: MediaStreamTrack;
+  mediaStreamTrack?: globalThis.MediaStreamTrack;
   wavRecordConfig?: WavRecordConfig;
   deviceId?: string;
   debug?: boolean;
@@ -95,7 +95,9 @@ class PcmRecorder {
       });
     }
 
-    this.stream = new MediaStream([this.audioTrack.getMediaStreamTrack()]);
+    this.stream = new window.MediaStream([
+      this.audioTrack.getMediaStreamTrack(),
+    ]);
 
     // 降噪前音频
     if (debug && wavRecordConfig?.enableSourceRecord) {

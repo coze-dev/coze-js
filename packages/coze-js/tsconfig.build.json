@@ -11,7 +11,12 @@
     "types": ["node"],
     "target": "es2022",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ws-tools/*": ["src/ws-tools/*"],
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src"]
 }

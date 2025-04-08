@@ -20,7 +20,10 @@ class WavAudioProcessor extends AudioProcessor {
     const audioContext = context.getAudioContext();
     await audioContext.audioWorklet.addModule(WavProcessorSrc);
 
-    this.workletNode = new AudioWorkletNode(audioContext, 'wav-processor');
+    this.workletNode = new window.AudioWorkletNode(
+      audioContext,
+      'wav-processor',
+    );
     node?.connect(this.workletNode);
 
     this.workletNode.port.onmessage = event => {
