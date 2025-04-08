@@ -1,13 +1,15 @@
 import React, { useRef, useState } from 'react';
+
 import { Button, Layout, message, Modal, Row } from 'antd';
-import { AudioOutlined } from '@ant-design/icons';
 import { WsToolsUtils, WsTranscriptionClient } from '@coze/api/ws-tools';
-import getConfig from '../../utils/config';
 import {
   type CommonErrorEvent,
   type TranscriptionsMessageUpdateEvent,
   WebsocketsEventType,
 } from '@coze/api';
+import { AudioOutlined } from '@ant-design/icons';
+
+import getConfig from '../../utils/config';
 import Header from '../../components/header/header';
 import {
   AudioConfig,
@@ -106,7 +108,7 @@ const Transcription: React.FC = () => {
         setIsPaused(false);
       }
     } catch (error) {
-      message.error('操作失败：' + error);
+      message.error(`操作失败：${error}`);
       console.error(error);
       setIsRecording(false);
     } finally {

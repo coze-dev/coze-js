@@ -1,6 +1,7 @@
-import { type WsChatClient } from '@coze/api/ws-tools';
-import { Button, message, Space } from 'antd';
 import { type MutableRefObject, useState } from 'react';
+
+import { Button, message, Space } from 'antd';
+import { type WsChatClient } from '@coze/api/ws-tools';
 
 const Operation = ({
   isConnected,
@@ -18,7 +19,7 @@ const Operation = ({
     try {
       clientRef.current?.interrupt();
     } catch (error) {
-      message.error('打断失败：' + error);
+      message.error(`打断失败：${error}`);
     }
   };
 
@@ -27,7 +28,7 @@ const Operation = ({
       await clientRef.current?.setAudioEnable(!audioEnabled);
       setAudioEnabled(!audioEnabled);
     } catch (error) {
-      message.error('切换麦克风状态失败：' + error);
+      message.error(`切换麦克风状态失败：${error}`);
     }
   };
 
@@ -37,7 +38,7 @@ const Operation = ({
       clientRef.current = undefined;
       setIsConnected(false);
     } catch (error) {
-      message.error('断开失败：' + error);
+      message.error(`断开失败：${error}`);
     }
   };
 

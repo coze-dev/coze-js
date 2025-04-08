@@ -1,8 +1,11 @@
 import React from 'react';
+
 import { Layout } from 'antd';
+
 import './header.css';
-import Settings from '../../components/settings';
 import logo from '../../logo.svg';
+import Settings from '../../components/settings';
+// @ts-expect-error-error xx
 
 const { Header } = Layout;
 export interface AppHeaderProps {

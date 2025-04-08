@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
+
+import TextArea from 'antd/es/input/TextArea';
 import { Button, Layout, message, Row } from 'antd';
 import { WsSpeechClient } from '@coze/api/ws-tools';
+
 import getConfig from '../../utils/config';
 import Header from '../../components/header/header';
-import TextArea from 'antd/es/input/TextArea';
 const localStorageKey = 'realtime-quickstart-transcription';
 const config = getConfig(localStorageKey);
 
@@ -24,7 +26,7 @@ const Speech: React.FC = () => {
     });
 
     // 语音合成完成事件（含中断）
-    client.on('completed', (event: unknown) => {
+    client.on('completed', () => {
       setIsCompleted(true);
       setIsPaused(false);
     });
@@ -51,7 +53,7 @@ const Speech: React.FC = () => {
       // 开始语音合成
       clientRef.current?.appendAndComplete(transcriptionText);
     } catch (error) {
-      message.error('操作失败：' + error);
+      message.error(`操作失败：${error}`);
       console.error(error);
     } finally {
       setDisabled(false);

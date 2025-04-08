@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
-import { RealtimeUtils } from '@coze/realtime-api';
+import { WsToolsUtils } from '@coze/api/ws-tools';
 import { Button, Space, message, Select, List } from 'antd';
 import { PcmRecorder } from '@coze/api/ws-tools';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
@@ -23,7 +23,7 @@ function WS() {
 
   useEffect(() => {
     const getDevices = async () => {
-      const devices = await RealtimeUtils.getAudioDevices();
+      const devices = await WsToolsUtils.getAudioDevices();
       setInputDevices(devices.audioInputs);
       if (devices.audioInputs.length > 0) {
         setSelectedInputDevice(devices.audioInputs[0].deviceId);

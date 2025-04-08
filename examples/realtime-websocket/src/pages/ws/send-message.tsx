@@ -1,6 +1,7 @@
-import { type WsChatClient } from '@coze/api/ws-tools';
-import { Button, Col, Input, Modal, Row } from 'antd';
 import { type MutableRefObject, useState } from 'react';
+
+import { Button, Col, Input, Modal, Row } from 'antd';
+import { type WsChatClient } from '@coze/api/ws-tools';
 
 const SendMessage = ({
   isConnected,

@@ -13,7 +13,6 @@ import ReceiveMessage from './receive-message';
 import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
-import { CustomTrackHandle } from './custom-track';
 import Header from '../../components/header/header';
 import { ConsoleLog } from './console-log';
 const localStorageKey = 'realtime-quickstart-ws';
@@ -22,7 +21,6 @@ const config = getConfig(localStorageKey);
 function WS() {
   const clientRef = useRef<WsChatClient>();
   const audioConfigRef = useRef<AudioConfigRef>(null);
-  const customTrackRef = useRef<CustomTrackHandle>(null);
   // 是否正在连接
   const [isConnecting, setIsConnecting] = useState(false);
   // 是否已连接
@@ -106,7 +104,7 @@ function WS() {
   const handleMessageEvent = async () => {
     clientRef.current?.on(
       WsChatEventNames.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE,
-      (eventName: string, event: unknown) => {
+      (_: string, event: unknown) => {
         console.log('[chat] transcript update', event);
         setTranscript(
           (event as ConversationAudioTranscriptUpdateEvent).data.content,

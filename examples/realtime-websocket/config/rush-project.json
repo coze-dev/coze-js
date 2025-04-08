@@ -1,0 +1,8 @@
+{
+  "operationSettings": [
+    {
+      "operationName": "dist",
+      "outputFolderNames": ["dist"]
+    }
+  ]
+}

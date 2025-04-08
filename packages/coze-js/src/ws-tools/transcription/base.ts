@@ -1,3 +1,5 @@
+import { type WsTranscriptionClientOptions } from '../types';
+import PcmRecorder from '../recorder/pcm-recorder';
 import {
   APIError,
   CozeAPI,
@@ -7,8 +9,6 @@ import {
   type WebSocketAPI,
   WebsocketsEventType,
 } from '../..';
-import { type WsTranscriptionClientOptions } from '../types';
-import PcmRecorder from '../recorder/pcm-recorder';
 
 class BaseWsTranscriptionClient {
   public ws: WebSocketAPI<
@@ -56,7 +56,7 @@ class BaseWsTranscriptionClient {
         console.debug('[transcription] ws open');
       };
 
-      ws.onmessage = (data, event) => {
+      ws.onmessage = data => {
         // Trigger all registered event listeners
         this.emit(WebsocketsEventType.ALL, data);
         this.emit(data.event_type, data);

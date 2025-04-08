@@ -424,6 +424,10 @@
       "projectFolder": "examples/realtime-quickstart-react"
     },
     {
+      "packageName": "@coze/realtime-websocket",
+      "projectFolder": "examples/realtime-websocket"
+    },
+    {
       "packageName": "@coze/realtime-api",
       "projectFolder": "packages/realtime-api",
       "shouldPublish": true

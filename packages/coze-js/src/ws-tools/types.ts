@@ -1,5 +1,9 @@
-import { type CreateChatWsRes, type GetToken } from '..';
+import {
+  type AIDenoiserProcessorLevel,
+  type AIDenoiserProcessorMode,
+} from './recorder/pcm-recorder';
 import { type WebsocketOptions } from '../core';
+import { type CreateChatWsRes, type GetToken } from '..';
 
 export interface WsToolsOptions {
   /** Personal Access Token (PAT) or OAuth2.0 token, or a function to get token */
@@ -55,7 +59,7 @@ export interface AIDenoisingConfig {
    * - `NSNG`: 启用非平稳噪声抑制
    * - `STATIONARY_NS`: 启用平稳噪声抑制
    */
-  mode?: 'NSNG' | 'STATIONARY_NS';
+  mode?: AIDenoiserProcessorMode;
   /**
    * en: AI denoiser level
    * - `SOFT`: (Recommended) Soft mode
@@ -64,7 +68,7 @@ export interface AIDenoisingConfig {
    * - `SOFT`: （推荐）舒缓降噪
    * - `AGGRESSIVE`: 激进降噪。将降噪强度提高到激进降噪会增大损伤人声的概率。
    */
-  level?: 'SOFT' | 'AGGRESSIVE';
+  level?: AIDenoiserProcessorLevel;
   /**
    * en: The path to the AI denoiser assets, default is `/external`
    * zh: AI 降噪 wasm 文件路径，默认是 `/external`

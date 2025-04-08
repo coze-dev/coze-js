@@ -1,5 +1,6 @@
-import { Button, Space, Modal, Input, Checkbox } from 'antd';
 import { useRef, useState, useImperativeHandle, forwardRef } from 'react';
+
+import { Button, Space, Modal, Input, Checkbox } from 'antd';
 
 // 定义暴露给父组件的方法接口
 export interface CustomTrackHandle {
@@ -8,7 +9,7 @@ export interface CustomTrackHandle {
   getAudioElement: () => HTMLAudioElement | null;
 }
 
-const CustomTrack = forwardRef<CustomTrackHandle>((props, ref) => {
+const CustomTrack = forwardRef<CustomTrackHandle>((_, ref) => {
   const audioElement = useRef<HTMLAudioElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [audioUrl, setAudioUrl] = useState('/test.wav');

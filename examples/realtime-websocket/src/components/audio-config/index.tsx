@@ -1,5 +1,3 @@
-import { Radio, Tooltip, Checkbox, Row, Col } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   type MutableRefObject,
   forwardRef,
@@ -7,14 +5,17 @@ import {
   useImperativeHandle,
   useState,
 } from 'react';
+
+import { Radio, Tooltip, Checkbox, Row, Col } from 'antd';
 import {
-  type AIDenoiserProcessorLevel,
-  type AIDenoiserProcessorMode,
+  AIDenoiserProcessorLevel,
+  AIDenoiserProcessorMode,
   PcmRecorder,
   type WsChatClient,
   WsToolsUtils,
   type WsTranscriptionClient,
 } from '@coze/api/ws-tools';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 // 定义 ref 暴露的方法和状态接口
 export interface AudioConfigRef {
@@ -37,11 +38,11 @@ export const AudioConfig = forwardRef<
       | MutableRefObject<WsTranscriptionClient | undefined>;
   }
 >(({ clientRef }, ref) => {
-  const [denoiseMode, setDenoiseMode] = useState<'NSNG' | 'STATIONARY_NS'>(
-    'NSNG',
+  const [denoiseMode, setDenoiseMode] = useState<AIDenoiserProcessorMode>(
+    AIDenoiserProcessorMode.NSNG,
   );
-  const [denoiseLevel, setDenoiseLevel] = useState<'SOFT' | 'AGGRESSIVE'>(
-    'SOFT',
+  const [denoiseLevel, setDenoiseLevel] = useState<AIDenoiserProcessorLevel>(
+    AIDenoiserProcessorLevel.SOFT,
   );
   const isDenoiserSupported = WsToolsUtils.checkDenoiserSupport();
   const [noiseSuppression, setNoiseSuppression] =

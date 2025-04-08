@@ -1,3 +1,12 @@
+import { v4 as uuid } from 'uuid';
+
+import { WavStreamPlayer } from '../wavtools';
+import {
+  type WsChatClientOptions,
+  WsChatEventNames,
+  type WsChatCallbackHandler,
+  type WsChatEventData,
+} from '../types';
 import {
   APIError,
   CozeAPI,
@@ -8,14 +17,6 @@ import {
   type WebSocketAPI,
   WebsocketsEventType,
 } from '../../index';
-import { WavStreamPlayer } from '../wavtools';
-import {
-  type WsChatClientOptions,
-  WsChatEventNames,
-  type WsChatCallbackHandler,
-  type WsChatEventData,
-} from '../types';
-import { v4 as uuid } from 'uuid';
 
 class BaseWsChatClient {
   public ws: WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null = null;
@@ -60,9 +61,9 @@ class BaseWsChatClient {
           this.log('ws open');
         };
 
-        ws.onmessage = (data, event) => {
+        ws.onmessage = data => {
           // Trigger all registered event listeners
-          this.emit('server.' + data.event_type, data);
+          this.emit(`server.${data.event_type}`, data);
 
           switch (data.event_type) {
             case WebsocketsEventType.ERROR:
@@ -121,7 +122,7 @@ class BaseWsChatClient {
         ws.onerror = (error, event) => {
           this.warn('ws error', error, event);
 
-          this.emit('server.' + WebsocketsEventType.ERROR, error);
+          this.emit(`server.${WebsocketsEventType.ERROR}`, error);
 
           this.closeWs();
           if (isResolved) {
