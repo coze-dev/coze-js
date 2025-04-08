@@ -1,15 +1,24 @@
 import { defineConfig, type LibConfig } from '@rslib/core';
 
-function getLibShared(format: LibConfig['format']) {
+function getLibShared(format: LibConfig['format'], dts = false, subpath = '') {
   const shared: LibConfig = {
+    autoExtension: false,
     output: {
       distPath: {
         root: `./dist/${format}`,
+        js: `${subpath}`,
       },
     },
     format,
+    dts: dts
+      ? {
+          distPath: `./dist/types/${subpath}`,
+        }
+      : false,
     syntax: 'es6',
-    autoExternal: false,
+    source: {
+      entry: { index: subpath ? `./src/${subpath}` : './src' },
+    },
   };
   return shared;
 }
@@ -23,15 +32,12 @@ export default defineConfig({
   },
   lib: [
     {
-      ...getLibShared('esm'),
-      dts: {
-        distPath: './dist/types',
-      },
-    },
-    {
       ...getLibShared('umd'),
       umdName: 'CozeRealtimeApi',
     },
-    getLibShared('cjs'),
+    getLibShared('cjs', true),
+    getLibShared('esm', false),
+    getLibShared('cjs', true, 'event-names'),
+    getLibShared('esm', false, 'event-names'),
   ],
 });
