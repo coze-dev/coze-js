@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 // @vitest-environment jsdom
-
+/* eslint-disable */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import WsChatClient from '@ws-tools/chat';
 import { APIError, RoleType, WebSocketAPI, WebsocketsEventType } from '@/index';

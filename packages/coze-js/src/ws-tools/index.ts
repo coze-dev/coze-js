@@ -1,5 +1,3 @@
-import { type WebsocketOptions } from '../core';
-import { type GetToken } from '..';
 import * as WsToolsUtils from './utils';
 
 export { default as WsSpeechClient } from './speech';

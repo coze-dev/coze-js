@@ -1,5 +1,4 @@
-import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import React from 'react';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Ws from './pages/ws';
 import Rtc from './pages/rtc';

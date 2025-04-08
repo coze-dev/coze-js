@@ -1,6 +1,5 @@
-import { type CreateChatWsRes } from '..';
-import { type GetToken } from '..';
-import { WebsocketOptions } from '../core';
+import { type CreateChatWsRes, type GetToken } from '..';
+import { type WebsocketOptions } from '../core';
 
 export interface WsToolsOptions {
   /** Personal Access Token (PAT) or OAuth2.0 token, or a function to get token */
@@ -17,13 +16,13 @@ export interface WsToolsOptions {
   websocketOptions?: WebsocketOptions;
 }
 
-export type AudioRecordEvent = {
+export interface AudioRecordEvent {
   event_type: 'audio.input.dump';
   data: {
     name: string;
     wav: Blob;
   };
-};
+}
 export type WsChatEventData = CreateChatWsRes | AudioRecordEvent | undefined;
 export type WsChatCallbackHandler = (
   eventName: string,

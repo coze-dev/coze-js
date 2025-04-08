@@ -1,12 +1,12 @@
 import { v4 as uuid } from 'uuid';
 
+import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import {
   PcmRecorder,
-  AIDenoiserProcessorLevel,
-  AIDenoiserProcessorMode,
+  type AIDenoiserProcessorLevel,
+  type AIDenoiserProcessorMode,
 } from '../index';
 import { type ChatUpdateEvent, WebsocketsEventType } from '../../index';
-import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import BaseWsChatClient from './base';
 import { getAudioDevices } from '../utils';
 export { WsChatEventNames };
@@ -33,7 +33,7 @@ class WsChatClient extends BaseWsChatClient {
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
 
-    let startTime = performance.now();
+    // let startTime = performance.now();
     // 2. recording
     await this.recorder.record({
       pcmAudioCallback: data => {
@@ -56,7 +56,7 @@ class WsChatClient extends BaseWsChatClient {
         });
 
         // this.log('input_audio_buffer_append', performance.now() - startTime);
-        startTime = performance.now();
+        // startTime = performance.now();
       },
       wavAudioCallback: (blob, name) => {
         const event = {

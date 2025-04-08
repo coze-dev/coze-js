@@ -1,11 +1,15 @@
-import { AudioDumpEvent, WebsocketsEventType } from '@coze/api';
 import {
-  WsChatClient,
+  type AudioDumpEvent,
+  type ConversationMessageDeltaEvent,
+  WebsocketsEventType,
+} from '@coze/api';
+import {
+  type WsChatClient,
   WsChatEventNames,
-  WsChatEventData,
+  type WsChatEventData,
 } from '@coze/api/ws-tools';
 import { Col, List, Row, Space } from 'antd';
-import { MutableRefObject, useEffect, useState } from 'react';
+import { type MutableRefObject, useEffect, useState } from 'react';
 
 const ReceiveMessage = ({
   clientRef,
@@ -53,13 +57,12 @@ const ReceiveMessage = ({
           });
           break;
         case WebsocketsEventType.CONVERSATION_MESSAGE_DELTA:
-        case WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED:
+        case WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED: {
           if (event.data.type === 'question') {
             break;
           }
           // 处理语音文本消息
-          const content = event.data.content;
-          console.log('content', content);
+          const content = (event as ConversationMessageDeltaEvent).data.content;
           setMessageList(prev => {
             // 如果上一个事件是增量更新，则附加到最后一条消息
             if (
@@ -83,6 +86,7 @@ const ReceiveMessage = ({
           });
 
           break;
+        }
         default:
           break;
       }

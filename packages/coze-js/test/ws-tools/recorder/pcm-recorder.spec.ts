@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 // @vitest-environment jsdom
+/* eslint-disable */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import PcmRecorder, {
   AIDenoiserProcessorMode,
@@ -176,9 +177,9 @@ describe('PcmRecorder', () => {
     });
 
     it('should throw error if audioTrack is not initialized', async () => {
-      await expect(recorder.record()).rejects.toThrow(
-        'audioTrack is not initialized',
-      );
+      await expect(async () => {
+        await recorder.record();
+      }).rejects.toThrow('audioTrack is not initialized');
     });
   });
 

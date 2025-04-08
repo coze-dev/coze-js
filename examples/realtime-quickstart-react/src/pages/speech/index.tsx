@@ -15,7 +15,7 @@ const Speech: React.FC = () => {
   const [isCompleted, setIsCompleted] = useState(true); // 是否完成语音合成
   const [isPaused, setIsPaused] = useState(false); // 是否暂停语音合成
 
-  const initClient = async () => {
+  const initClient = () => {
     const client = new WsSpeechClient({
       token: config.getPat(),
       baseWsURL: config.getBaseWsUrl(),
@@ -93,11 +93,12 @@ const Speech: React.FC = () => {
     window.location.reload();
   };
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       clientRef.current?.disconnect();
-    };
-  }, []);
+    },
+    [],
+  );
 
   return (
     <Layout>

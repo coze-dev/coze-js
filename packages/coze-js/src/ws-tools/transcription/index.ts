@@ -2,17 +2,13 @@ import { v4 as uuid } from 'uuid';
 
 import { WebsocketsEventType } from '../..';
 import BaseWsTranscriptionClient from './base';
-import { WsTranscriptionClientOptions } from '../types';
 import {
-  AIDenoiserProcessorLevel,
-  AIDenoiserProcessorMode,
+  type AIDenoiserProcessorLevel,
+  type AIDenoiserProcessorMode,
 } from '../recorder/pcm-recorder';
 
 class WsTranscriptionClient extends BaseWsTranscriptionClient {
   private isRecording = false;
-  constructor(config: WsTranscriptionClientOptions) {
-    super(config);
-  }
 
   private async connect() {
     await this.init();
@@ -33,7 +29,7 @@ class WsTranscriptionClient extends BaseWsTranscriptionClient {
     });
   }
 
-  async destroy() {
+  destroy() {
     this.recorder.destroy();
     this.listeners.clear();
     this.closeWs();
@@ -82,7 +78,7 @@ class WsTranscriptionClient extends BaseWsTranscriptionClient {
   /**
    * 停止录音，提交结果
    */
-  async stop() {
+  stop() {
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,

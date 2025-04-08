@@ -4,8 +4,8 @@ import {
   createCustomAudioTrack,
 } from 'agora-rtc-sdk-ng/esm';
 import {
-  AIDenoiserExtension,
-  AIDenoiserProcessor,
+  type AIDenoiserExtension,
+  type AIDenoiserProcessor,
 } from 'agora-extension-ai-denoiser';
 
 import PcmAudioProcessor from './processor/pcm-audio-processor';
@@ -15,7 +15,7 @@ import {
   type WavRecordConfig,
 } from '../types';
 import WavAudioProcessor from './processor/wav-audio-processor';
-import { IAudioProcessor } from 'agora-rte-extension';
+import { type IAudioProcessor } from 'agora-rte-extension';
 import { checkDenoiserSupport } from '../utils';
 
 export enum AIDenoiserProcessorMode {
@@ -48,9 +48,9 @@ class PcmRecorder {
   private pcmAudioCallback: ((data: { raw: ArrayBuffer }) => void) | undefined;
   private wavAudioCallback: ((blob: Blob, name: string) => void) | undefined;
   private dumpAudioCallback: ((blob: Blob, name: string) => void) | undefined;
-  private static aiDenoiserSupport: boolean = false;
+  private static aiDenoiserSupport = false;
 
-  public config: PcmRecorderConfig;
+  config: PcmRecorderConfig;
   constructor(config: PcmRecorderConfig) {
     config.audioCaptureConfig = config.audioCaptureConfig ?? {};
     config.aiDenoisingConfig = config.aiDenoisingConfig ?? {};
@@ -120,8 +120,12 @@ class PcmRecorder {
 
     let audioProcessor: IAudioProcessor | undefined;
     if (this.isSupportAIDenoiser()) {
+      if (!PcmRecorder.denoiser) {
+        return;
+      }
       this.log('support ai denoiser');
-      this.processor = PcmRecorder.denoiser!.createProcessor();
+
+      this.processor = PcmRecorder.denoiser.createProcessor();
 
       if (this.wavAudioProcessor) {
         audioProcessor = this.audioTrack
@@ -149,7 +153,7 @@ class PcmRecorder {
     }
   }
 
-  async record({
+  record({
     pcmAudioCallback,
     wavAudioCallback,
     dumpAudioCallback,
@@ -342,12 +346,14 @@ class PcmRecorder {
     // return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private log(...args: any[]) {
     if (this.config.debug) {
       console.log(...args);
     }
     return true;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private warn(...args: any[]) {
     if (this.config.debug) {
       console.warn(...args);

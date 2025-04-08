@@ -1,26 +1,26 @@
-import { Radio, Space, Tooltip, Checkbox, Row, Col } from 'antd';
+import { Radio, Tooltip, Checkbox, Row, Col } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
-  MutableRefObject,
+  type MutableRefObject,
   forwardRef,
   useEffect,
   useImperativeHandle,
   useState,
 } from 'react';
 import {
-  AIDenoiserProcessorLevel,
-  AIDenoiserProcessorMode,
+  type AIDenoiserProcessorLevel,
+  type AIDenoiserProcessorMode,
   PcmRecorder,
-  WsChatClient,
+  type WsChatClient,
   WsToolsUtils,
-  WsTranscriptionClient,
+  type WsTranscriptionClient,
 } from '@coze/api/ws-tools';
 
 // 定义 ref 暴露的方法和状态接口
 export interface AudioConfigRef {
   getSettings: () => {
-    denoiseMode: 'NSNG' | 'STATIONARY_NS';
-    denoiseLevel: 'SOFT' | 'AGGRESSIVE';
+    denoiseMode: AIDenoiserProcessorMode;
+    denoiseLevel: AIDenoiserProcessorLevel;
     noiseSuppression: boolean;
     echoCancellation: boolean;
     autoGainControl: boolean;
@@ -63,16 +63,19 @@ export const AudioConfig = forwardRef<
       setDenoiseLevel(level);
     }
 
-    const { noiseSuppression, echoCancellation, autoGainControl } =
-      clientRef.current.config.audioCaptureConfig || {};
-    if (noiseSuppression !== undefined) {
-      setNoiseSuppression(noiseSuppression);
+    const {
+      noiseSuppression: noiseSuppression2,
+      echoCancellation: echoCancellation2,
+      autoGainControl: autoGainControl2,
+    } = clientRef.current.config.audioCaptureConfig || {};
+    if (noiseSuppression2 !== undefined) {
+      setNoiseSuppression(noiseSuppression2);
     }
-    if (echoCancellation !== undefined) {
-      setEchoCancellation(echoCancellation);
+    if (echoCancellation2 !== undefined) {
+      setEchoCancellation(echoCancellation2);
     }
-    if (autoGainControl !== undefined) {
-      setAutoGainControl(autoGainControl);
+    if (autoGainControl2 !== undefined) {
+      setAutoGainControl(autoGainControl2);
     }
   }, [clientRef.current]);
 

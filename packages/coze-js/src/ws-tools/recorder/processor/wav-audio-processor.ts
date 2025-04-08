@@ -4,10 +4,11 @@ import {
 } from 'agora-rte-extension';
 
 import { WavProcessorSrc } from './wav-worklet-processor';
+import { floatTo16BitPCM } from '../../utils';
 
 class WavAudioProcessor extends AudioProcessor {
   name: 'WavAudioProcessor';
-  private onAudioData: (data: { wav: Blob }) => void;
+  private onAudioData?: (data: { wav: Blob }) => void;
   private workletNode?: AudioWorkletNode;
 
   constructor(onAudioData: (data: { wav: Blob }) => void) {
@@ -31,7 +32,7 @@ class WavAudioProcessor extends AudioProcessor {
         const { audioData, sampleRate, numChannels } = event.data;
         const wavBlob = this.createWavFile(audioData, sampleRate, numChannels);
         console.log('[wav-audio-processor] onAudioData', event.data);
-        this.onAudioData({
+        this.onAudioData?.({
           wav: wavBlob,
         });
       }
@@ -50,32 +51,21 @@ class WavAudioProcessor extends AudioProcessor {
     this.workletNode?.port.postMessage({ type: 'stop' });
   }
 
-  private floatTo16BitPCM(float32Array: Float32Array): ArrayBuffer {
-    const buffer = new ArrayBuffer(float32Array.length * 2);
-    const view2 = new DataView(buffer);
-    let offset = 0;
-    for (let i = 0; i < float32Array.length; i++, offset += 2) {
-      const s = Math.max(-1, Math.min(1, float32Array[i]));
-      view2.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
-    }
-    return buffer;
-  }
-
   private createWavFile(
     audioData: Float32Array,
     sampleRate: number,
     numChannels: number,
   ): Blob {
-    const buffer = this.floatTo16BitPCM(audioData);
+    const buffer = floatTo16BitPCM(audioData);
     // const dataView = new DataView(buffer);
 
     const wavBuffer = new ArrayBuffer(44 + buffer.byteLength);
     const view = new DataView(wavBuffer);
 
     // Write WAV header
-    const writeString = (view: DataView, offset: number, string: string) => {
+    const writeString = (view2: DataView, offset: number, string: string) => {
       for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
+        view2.setUint8(offset + i, string.charCodeAt(i));
       }
     };
 
@@ -139,7 +129,7 @@ class WavAudioProcessor extends AudioProcessor {
     }
 
     // 5. 清理回调函数
-    this.onAudioData = () => {};
+    this.onAudioData = undefined;
   }
 }
 

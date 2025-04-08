@@ -1,19 +1,19 @@
 import {
   APIError,
   CozeAPI,
-  CreateChatWsReq,
-  CreateChatWsRes,
-  ErrorRes,
+  type CreateChatWsReq,
+  type CreateChatWsRes,
+  type ErrorRes,
   RoleType,
-  WebSocketAPI,
+  type WebSocketAPI,
   WebsocketsEventType,
 } from '../../index';
 import { WavStreamPlayer } from '../wavtools';
 import {
-  WsChatClientOptions,
+  type WsChatClientOptions,
   WsChatEventNames,
-  WsChatCallbackHandler,
-  WsChatEventData,
+  type WsChatCallbackHandler,
+  type WsChatEventData,
 } from '../types';
 import { v4 as uuid } from 'uuid';
 
@@ -249,12 +249,14 @@ class BaseWsChatClient {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected log(...args: any[]) {
     if (this.config.debug) {
       console.log('[WsChatClient]', ...args);
     }
     return true;
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected warn(...args: any[]) {
     if (this.config.debug) {
       console.warn('[WsChatClient]', ...args);

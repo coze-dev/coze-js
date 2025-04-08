@@ -53,9 +53,8 @@ export const checkDevicePermission = async (): Promise<{
     // 用户拒绝授权或其他错误
     console.error('Failed to get audio permission:', error);
     result.audio = false;
-  } finally {
-    return result;
   }
+  return result;
 };
 
 /**
@@ -113,11 +112,10 @@ export const floatTo16BitPCM = (float32Array: Float32Array) => {
  * 检查是否是移动设备
  * @returns {boolean} 是否是移动设备
  */
-export const isMobile = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+export const isMobile = () =>
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent,
   );
-};
 
 /**
  * 检查是否支持 AI 降噪
@@ -132,7 +130,7 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
         assetsPath ??
         'https://lf3-static.bytednsdoc.com/obj/eden-cn/613eh7lpqvhpeuloz/websocket',
     });
-    // @ts-ignore
+
     window.__denoiser = external;
 
     external.onloaderror = e => {

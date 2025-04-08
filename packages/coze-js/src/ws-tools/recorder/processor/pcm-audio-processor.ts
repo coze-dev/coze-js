@@ -8,7 +8,7 @@ import { floatTo16BitPCM } from '../../utils';
 
 class PcmAudioProcessor extends AudioProcessor {
   name: 'PcmAudioProcessor';
-  private chunkProcessor: (data: ArrayBuffer) => void;
+  private chunkProcessor?: (data: ArrayBuffer) => void;
   private workletNode?: AudioWorkletNode;
 
   constructor(chunkProcessor: (data: ArrayBuffer) => void) {
@@ -69,7 +69,7 @@ class PcmAudioProcessor extends AudioProcessor {
     }
 
     // 5. 清理回调函数
-    this.chunkProcessor = () => {};
+    this.chunkProcessor = undefined;
   }
 }
 

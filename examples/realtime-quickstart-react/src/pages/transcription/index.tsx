@@ -4,12 +4,15 @@ import { AudioOutlined } from '@ant-design/icons';
 import { WsToolsUtils, WsTranscriptionClient } from '@coze/api/ws-tools';
 import getConfig from '../../utils/config';
 import {
-  CommonErrorEvent,
-  TranscriptionsMessageUpdateEvent,
+  type CommonErrorEvent,
+  type TranscriptionsMessageUpdateEvent,
   WebsocketsEventType,
 } from '@coze/api';
 import Header from '../../components/header/header';
-import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
+import {
+  AudioConfig,
+  type AudioConfigRef,
+} from '../../components/audio-config';
 const localStorageKey = 'realtime-quickstart-transcription';
 const config = getConfig(localStorageKey);
 
@@ -62,15 +65,17 @@ const Transcription: React.FC = () => {
     // 语音识别结果
     client.on(
       WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE,
-      (event: TranscriptionsMessageUpdateEvent) => {
-        setTranscriptionText(event.data.content);
+      (event: unknown) => {
+        setTranscriptionText(
+          (event as TranscriptionsMessageUpdateEvent).data.content,
+        );
       },
     );
 
     // 错误事件
-    client.on(WebsocketsEventType.ERROR, (error: CommonErrorEvent) => {
+    client.on(WebsocketsEventType.ERROR, (error: unknown) => {
       console.error(error);
-      message.error(error.data.msg);
+      message.error((error as CommonErrorEvent).data.msg);
     });
 
     // 注册所有事件
@@ -109,13 +114,17 @@ const Transcription: React.FC = () => {
     }
   };
 
-  const handlePauseAndResume = async () => {
-    if (clientRef.current?.getStatus() === 'paused') {
-      clientRef.current?.resume();
-      setIsPaused(false);
-    } else {
-      clientRef.current?.pause();
-      setIsPaused(true);
+  const handlePauseAndResume = () => {
+    try {
+      if (clientRef.current?.getStatus() === 'paused') {
+        clientRef.current?.resume();
+        setIsPaused(false);
+      } else {
+        clientRef.current?.pause();
+        setIsPaused(true);
+      }
+    } catch (error) {
+      message.error(`Failed to toggle pause/resume: ${error}`);
     }
   };
 
