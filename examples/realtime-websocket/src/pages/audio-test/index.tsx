@@ -37,6 +37,10 @@ function WS() {
   const getAudioTrack = async (
     audioElement: HTMLAudioElement,
   ): Promise<MediaStreamTrack> => {
+    // Check for AudioContext support
+    if (!window.AudioContext && !(window as any).webkitAudioContext) {
+      throw new Error('AudioContext is not supported in this browser');
+    }
     const audioContext = new (window.AudioContext ||
       (window as any).webkitAudioContext)();
 
