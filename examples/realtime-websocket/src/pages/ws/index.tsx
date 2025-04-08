@@ -1,7 +1,6 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
 import { Button, message, Select, Modal, Layout, Row, Col } from 'antd';
-import { useTokenWithPat } from '../../hooks';
 import getConfig from '../../utils/config';
 import {
   WsChatClient,
@@ -26,7 +25,6 @@ function WS() {
   // 是否已连接
   const [isConnected, setIsConnected] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const { getToken } = useTokenWithPat(localStorageKey);
 
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
@@ -55,13 +53,9 @@ function WS() {
 
     const audioConfig = audioConfigRef.current?.getSettings();
     console.log('audioConfig', audioConfig);
-    // const audioElement = customTrackRef.current?.getAudioElement();
-    // // 从 audio 元素获取 MediaStreamTrack
-    // const stream = (audioElement as any)?.captureStream();
-    // const audioTrack = stream?.getAudioTracks()[0];
 
     const client = new WsChatClient({
-      token: getToken,
+      token: config.getPat(),
       baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
       botId: config.getBotId(),

@@ -171,7 +171,11 @@ function WS() {
       </Space>
       <br />
       <Space style={{ padding: '10px' }}>
-        <audio ref={audioElement} src={'/test.wav'} controls />
+        <audio
+          ref={audioElement}
+          src={process.env.PUBLIC_URL + '/test.wav'}
+          controls
+        />
       </Space>
       <br />
       <Space>

@@ -59,9 +59,9 @@ const useWsAPI = (
       if (!clientRef.current) {
         return;
       }
-      const ws = await clientRef.current.websockets.chat.create(
-        config.getBotId(),
-      );
+      const ws = await clientRef.current.websockets.chat.create({
+        bot_id: config.getBotId(),
+      });
       return new Promise<WebSocketAPI<CreateChatWsReq, CreateChatWsRes>>(
         (resolve, reject) => {
           ws.onopen = () => {
@@ -227,17 +227,17 @@ const useWsAPI = (
     });
 
     try {
-      await transcriptionClient.connect();
+      await transcriptionClient.start();
       console.log('[transcriptions] ws connect success');
     } catch (error) {
       console.error('[transcriptions] ws connect error', error);
     }
 
-    transcriptionClient.record();
+    // transcriptionClient.record();
   }, []);
 
   const stopTranscriptions = useCallback(async () => {
-    const finalAudio = await transcriptionClientRef.current?.end();
+    const finalAudio = await transcriptionClientRef.current?.stop();
     console.log('[transcriptions] finalAudio:', finalAudio);
   }, []);
 

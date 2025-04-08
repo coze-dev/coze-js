@@ -4,12 +4,12 @@ declare global {
   }
 }
 
-import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
 
 /**
- * 检查语音设备权限
- * @returns {Promise<{audio: boolean}>} 是否具有语音设备权限
+ * Check audio device permissions
+ * @returns {Promise<{audio: boolean}>} Whether audio device permission is granted
  */
 export const checkDevicePermission = async (): Promise<{
   audio: boolean;
@@ -18,13 +18,13 @@ export const checkDevicePermission = async (): Promise<{
     audio: true,
   };
   try {
-    // 检查浏览器是否支持 mediaDevices API
+    // Check if browser supports mediaDevices API
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       console.error('Browser does not support mediaDevices API');
       result.audio = false;
     }
 
-    // 先通过 permissions API 查询权限状态
+    // Check permission status first through permissions API
     const permissionStatus = await navigator.permissions.query({
       name: 'microphone' as PermissionName,
     });
@@ -35,7 +35,7 @@ export const checkDevicePermission = async (): Promise<{
       result.audio = false;
     }
 
-    // 如果权限状态是 prompt 或 granted，尝试获取设备
+    // If permission status is prompt or granted, try to get device
     if (
       permissionStatus.state === 'prompt' ||
       permissionStatus.state === 'granted'
@@ -58,8 +58,8 @@ export const checkDevicePermission = async (): Promise<{
 };
 
 /**
- * 获取音频设备列表
- * @returns {Promise<{audioInputs: MediaDeviceInfo[], audioOutputs: MediaDeviceInfo[]}>} 音频设备
+ * Get list of audio devices
+ * @returns {Promise<{audioInputs: MediaDeviceInfo[], audioOutputs: MediaDeviceInfo[]}>} Audio devices
  */
 export const getAudioDevices = async () => {
   try {
@@ -93,9 +93,9 @@ export const getAudioDevices = async () => {
 };
 
 /**
- * 将浮点数转换为16位PCM
- * @param float32Array - 浮点数数组
- * @returns {ArrayBuffer} 16位PCM
+ * Convert floating point numbers to 16-bit PCM
+ * @param float32Array - Array of floating point numbers
+ * @returns {ArrayBuffer} 16-bit PCM
  */
 export const floatTo16BitPCM = (float32Array: Float32Array) => {
   const buffer = new ArrayBuffer(float32Array.length * 2);
@@ -109,8 +109,8 @@ export const floatTo16BitPCM = (float32Array: Float32Array) => {
 };
 
 /**
- * 检查是否是移动设备
- * @returns {boolean} 是否是移动设备
+ * Check if device is mobile
+ * @returns {boolean} Whether device is mobile
  */
 export const isMobile = () =>
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -118,9 +118,9 @@ export const isMobile = () =>
   );
 
 /**
- * 检查是否支持 AI 降噪
- * @param assetsPath - 降噪插件的公共路径
- * @returns {boolean} 是否支持 AI 降噪
+ * Check if AI denoising is supported
+ * @param assetsPath - Public path for denoising plugin
+ * @returns {boolean} Whether AI denoising is supported
  */
 export const checkDenoiserSupport = (assetsPath?: string) => {
   if (!window.__denoiser) {
