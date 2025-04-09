@@ -10,7 +10,6 @@ import {
   checkDenoiserSupport,
 } from '../../src/ws-tools/utils';
 import AgoraRTC from 'agora-rtc-sdk-ng';
-import AIDenoiserExtension from 'agora-extension-ai-denoiser';
 
 vi.mock('agora-rtc-sdk-ng', () => ({
   default: {
@@ -35,6 +34,7 @@ describe('WS Tools Utils', () => {
       // Mock navigator APIs
       global.navigator.mediaDevices = {
         getUserMedia: mockGetUserMedia,
+        enumerateDevices: vi.fn().mockResolvedValue([]),
       } as any;
       global.navigator.permissions = {
         query: mockQuery,
@@ -55,19 +55,52 @@ describe('WS Tools Utils', () => {
       };
       mockQuery.mockResolvedValue({ state: 'granted' });
       mockGetUserMedia.mockResolvedValue(mockStream);
+      const mockDevices = [
+        {
+          groupId: 'test-group-id',
+          deviceId: 'test-device-id',
+          kind: 'audioinput',
+          label: 'test-device-label',
+        },
+        {
+          groupId: 'test-group-id',
+          deviceId: 'test-device-id',
+          kind: 'audiooutput',
+          label: 'test-device-label',
+        },
+      ];
+
+      vi.spyOn(navigator.mediaDevices, 'enumerateDevices').mockResolvedValue(
+        mockDevices as any,
+      );
 
       const result = await checkDevicePermission();
+
       const result2 = await getAudioDevices();
       expect(result).toEqual({ audio: true });
       expect(result2).toEqual({
-        audioInputs: [],
-        audioOutputs: [],
+        audioInputs: mockDevices.filter(device => device.kind === 'audioinput'),
+        audioOutputs: mockDevices.filter(
+          device => device.kind === 'audiooutput',
+        ),
       });
     });
 
     it('should return false when permissions are denied', async () => {
       mockQuery.mockResolvedValue({ state: 'denied' });
 
+      const result = await checkDevicePermission();
+      expect(result).toEqual({ audio: false });
+    });
+
+    it('should return false when mediaDevices is not supported', async () => {
+      global.navigator.mediaDevices = undefined;
+      const result = await checkDevicePermission();
+      expect(result).toEqual({ audio: false });
+    });
+
+    it('should return false when throw error', async () => {
+      mockGetUserMedia.mockRejectedValue(new Error('test'));
       const result = await checkDevicePermission();
       expect(result).toEqual({ audio: false });
     });

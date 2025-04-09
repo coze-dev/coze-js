@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Mock } from 'vitest';
-import VERTC, { MediaType, StreamIndex } from '@volcengine/rtc';
+import VERTC, { MediaType, NetworkQuality, StreamIndex } from '@volcengine/rtc';
 
 import * as utils from '../src/utils';
 import EventNames from '../src/event-names';
@@ -59,6 +59,9 @@ vi.mock('@volcengine/rtc', () => ({
   },
   VideoSourceType: {
     VIDEO_SOURCE_TYPE_INTERNAL: 'internal',
+  },
+  NetworkQuality: {
+    EXCELLENT: 0,
   },
 }));
 
@@ -397,6 +400,41 @@ describe('EngineClient', () => {
         'handleRemoteAudioPropertiesReport',
         event,
       );
+    });
+    it('should handle event error', () => {
+      const event = { type: 'test-event' };
+      const dispatchSpy = vi.spyOn(client as any, 'dispatch');
+
+      client.handleEventError(event);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.ERROR, event);
+    });
+    it('should handle network quality', () => {
+      const dispatchSpy = vi.spyOn(client as any, 'dispatch');
+
+      client.handleNetworkQuality(
+        NetworkQuality.EXCELLENT,
+        NetworkQuality.EXCELLENT,
+      );
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.NETWORK_QUALITY, {
+        uplinkNetworkQuality: NetworkQuality.EXCELLENT,
+        downlinkNetworkQuality: NetworkQuality.EXCELLENT,
+      });
+    });
+
+    it('should handle user joined', () => {
+      const event = { userInfo: { userId: 'test-user-id' } };
+      const dispatchSpy = vi.spyOn(client as any, 'dispatch');
+
+      client.handleUserJoin(event as any);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_JOIN, event);
+    });
+
+    it('should handle user leave', () => {
+      const event = { userInfo: { userId: 'test-user-id' } };
+      const dispatchSpy = vi.spyOn(client as any, 'dispatch');
+
+      client.handleUserLeave(event as any);
+      expect(dispatchSpy).toHaveBeenCalledWith(EventNames.BOT_LEAVE, event);
     });
   });
 
