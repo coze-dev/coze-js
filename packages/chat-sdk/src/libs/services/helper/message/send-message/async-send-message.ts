@@ -8,26 +8,10 @@ import {
 import { logger, MiniChatError, safeJSONParse } from '@/libs/utils';
 import { ChatMessage } from '@/libs/types';
 
+import { Language } from '../../../../../../dist/lib-source/src/exports';
 import { MultiSendMessage } from './multi-send-message';
 
-const errorCodeListToShowInMessage = [
-  '788788102',
-  '788788103',
-  '788788104',
-  '788788105',
-  '788788201',
-  '788788202',
-  '788788205',
-  '788788106',
-  '788788206',
-  '788788107',
-  '788788108',
-  '788788109',
-  '788788110',
-  '788788203',
-  '788788204',
-  '788788207',
-];
+const errorCodeListToShowInMessage = ['4033', '4028', '4027', '4013'];
 export class AsyncSendMessage extends MultiSendMessage {
   private chatStream?: AsyncIterable<StreamChatData>;
 
@@ -35,14 +19,22 @@ export class AsyncSendMessage extends MultiSendMessage {
     try {
       logger.debug('asyncChat start sendMessage: ', message);
       this._checkTimeout();
-      const chatStream = await this.chatService.asyncChat({
-        bot_id: this.botId,
-        user_id: this.userId,
-        additional_messages: [...(historyMessages || []), message],
-        conversation_id: this.conversationId,
-        connector_id: this.connectorId,
-        suggestPromoteInfo: this.chatInfo?.suggestPromoteInfo,
-      });
+      const chatStream = await this.chatService.asyncChat(
+        {
+          bot_id: this.botId,
+          user_id: this.userId,
+          additional_messages: [...(historyMessages || []), message],
+          conversation_id: this.conversationId,
+          connector_id: this.connectorId,
+          suggestPromoteInfo: this.chatInfo?.suggestPromoteInfo,
+        },
+        {
+          headers: {
+            'Accept-Language':
+              this.i18n.language === Language.ZH_CN ? 'zh' : 'en',
+          },
+        },
+      );
       logger.debug('asyncChat sendMessage stream: ', chatStream);
       this.chatStream = chatStream;
       this.pollAnswer();
