@@ -14,9 +14,30 @@ import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import Header from '../../components/header/header';
 import { ConsoleLog } from './console-log';
+import EventInput from './event-input';
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
 
+const chatUpdate = {
+  data: {
+    input_audio: {
+      format: 'pcm',
+      codec: 'pcm',
+      sample_rate: 44100,
+    },
+    output_audio: {
+      codec: 'pcm',
+      pcm_config: {
+        sample_rate: 24000,
+      },
+      voice_id: config.getVoiceId(),
+    },
+    turn_detection: {
+      type: 'server_vad',
+    },
+    need_play_prologue: true,
+  },
+};
 function WS() {
   const clientRef = useRef<WsChatClient>();
   const audioConfigRef = useRef<AudioConfigRef>(null);
@@ -112,7 +133,11 @@ function WS() {
       if (!clientRef.current) {
         await initClient();
       }
-      await clientRef.current?.connect();
+      const chatUpdate = JSON.parse(localStorage.getItem('chatUpdate') || '{}');
+      if (chatUpdate?.data?.output_audio?.voice_id === '') {
+        delete chatUpdate.data.output_audio.voice_id;
+      }
+      await clientRef.current?.connect({ chatUpdate });
       setIsConnected(true);
     } catch (error) {
       console.error(error);
@@ -135,7 +160,7 @@ function WS() {
   };
 
   return (
-    <Layout>
+    <Layout style={{ background: '#fff' }}>
       <Header
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
@@ -219,6 +244,12 @@ function WS() {
           forceRender
         >
           <AudioConfig clientRef={clientRef} ref={audioConfigRef} />
+          <EventInput
+            defaultValue={
+              localStorage.getItem('chatUpdate') ||
+              JSON.stringify(chatUpdate, null, 2)
+            }
+          />
         </Modal>
       </Layout.Content>
     </Layout>

@@ -60,7 +60,7 @@ const ReceiveMessage = ({
         case WebsocketsEventType.CONVERSATION_MESSAGE_DELTA:
         case WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED: {
           if (event.data.type === 'question') {
-            break;
+            return;
           }
           // 处理语音文本消息
           const { content } = (event as ConversationMessageDeltaEvent).data;
@@ -72,7 +72,9 @@ const ReceiveMessage = ({
               event.event_type ===
                 WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
             ) {
-              return [...prev.slice(0, -1), prev[prev.length - 1] + content];
+              return prev
+                .slice(0, -1)
+                .concat([(prev[prev.length - 1] || '') + content]);
             }
             lastEventName = event.event_type;
             // 否则添加新消息
@@ -80,8 +82,7 @@ const ReceiveMessage = ({
               event.event_type ===
               WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
             ) {
-              console.log('content2', prev, content);
-              return [...prev, content];
+              return prev.concat([content]);
             }
             return prev;
           });
