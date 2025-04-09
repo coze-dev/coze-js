@@ -6,9 +6,8 @@ import {
 } from '@coze/api';
 
 import { logger, MiniChatError, safeJSONParse } from '@/libs/utils';
-import { ChatMessage } from '@/libs/types';
+import { ChatMessage, Language } from '@/libs/types';
 
-import { Language } from '../../../../../../dist/lib-source/src/exports';
 import { MultiSendMessage } from './multi-send-message';
 
 const errorCodeListToShowInMessage = ['4033', '4028', '4027', '4013'];
