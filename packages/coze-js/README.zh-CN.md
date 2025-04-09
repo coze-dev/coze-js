@@ -232,7 +232,7 @@ const client = new CozeAPI({
 [查看代理示例 →](../../examples/coze-js-node/src/proxy/)
 
 ### 语音合成 SDK
-在线 Demo: https://wwww.coze.cn/open-platform/realtime/websocket#speech
+在线 Demo: https://www.coze.cn/open-platform/realtime/websocket#speech
 ```javascript
 import { WebsocketsEventType } from '@coze/api';
 import { WsSpeechClient } from '@coze/api/ws-tools';
