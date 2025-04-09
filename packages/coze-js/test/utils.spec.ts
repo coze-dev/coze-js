@@ -17,9 +17,9 @@ describe('safeJsonParse', () => {
 describe('sleep', () => {
   it('should return a promise that resolves after the specified time', async () => {
     const startTime = Date.now();
-    await sleep(1000);
+    await sleep(100);
     const endTime = Date.now();
-    expect(endTime - startTime).toBeGreaterThanOrEqual(1000);
+    expect(endTime - startTime).toBeGreaterThanOrEqual(100);
   });
 });
 

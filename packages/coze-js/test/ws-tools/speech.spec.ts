@@ -1,4 +1,6 @@
 /* eslint-disable */
+/// <reference types="vitest" />
+// @vitest-environment jsdom
 import { vi } from 'vitest';
 import WsSpeechClient from '../../src/ws-tools/speech';
 import { WebSocketAPI } from '../../src/websocket-api';

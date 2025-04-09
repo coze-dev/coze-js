@@ -142,14 +142,6 @@ export class WavRecorder {
   }
 
   /**
-   * Retrieves the current sampleRate for the recorder
-   * @returns {number}
-   */
-  getSampleRate() {
-    return this.sampleRate;
-  }
-
-  /**
    * Retrieves the current status of the recording
    * @returns {"ended"|"paused"|"recording"}
    */
@@ -258,6 +250,12 @@ export class WavRecorder {
     return true;
   }
 
+  async getSampleRate() {
+    return this.sampleRate;
+    // console.log('[wav_recorder] getSampleRate', this.stream.getAudioTracks());
+    // return this.stream.getAudioTracks()[0].getSettings().sampleRate;
+  }
+
   /**
    * List all eligible devices for recording, will request permission to use microphone
    * @returns {Promise<Array<MediaDeviceInfo & {default: boolean}>>}
@@ -298,7 +296,7 @@ export class WavRecorder {
    * @param {string} [deviceId] if no device provided, default device will be used
    * @returns {Promise<true>}
    */
-  async begin(deviceId) {
+  async begin({ deviceId, audioTrackConfig }) {
     if (this.processor) {
       throw new Error(
         `Already connected: please call .end() to start a new session`,
@@ -312,10 +310,18 @@ export class WavRecorder {
       throw new Error('Could not request user media');
     }
     try {
-      const config = { audio: true };
+      const audioConstraints = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        // sampleRate: this.sampleRate,
+      };
+
       if (deviceId) {
-        config.audio = { deviceId: { exact: deviceId } };
+        audioConstraints.deviceId = { exact: deviceId };
       }
+
+      const config = { audio: audioConstraints };
       this.stream = await navigator.mediaDevices.getUserMedia(config);
     } catch (err) {
       throw new Error('Could not start media stream');
@@ -323,6 +329,7 @@ export class WavRecorder {
 
     const context = new AudioContext({ sampleRate: this.sampleRate });
     const source = context.createMediaStreamSource(this.stream);
+
     // Load and execute the module script.
     try {
       await context.audioWorklet.addModule(this.scriptSrc);

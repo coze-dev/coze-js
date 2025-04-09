@@ -97,7 +97,7 @@ export class WavRecorder {
      * @param {string} [deviceId] if no device provided, default device will be used
      * @returns {Promise<true>}
      */
-    begin(deviceId?: string): Promise<true>;
+    begin({ deviceId, audioTrackConfig }: { deviceId?: string; audioTrackConfig?: AudioTrackConfig }): Promise<true>;
     analyser: any;
     /**
      * Gets the current frequency domain data from the recording track

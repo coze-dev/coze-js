@@ -169,6 +169,59 @@ async function wsChat() {
 }
 ```
 
+### Websocket Chat SDK
+if you want to use the realtime chat sdk in web, you can use the following code:
+```typescript
+import { WsChatClient, WsChatEventNames } from '@coze/api/ws-tools';
+import { COZE_CN_BASE_WS_URL, RoleType } from '@coze/api';
+
+try {
+  // Initialize
+  const client = new WsChatClient({
+    botId: 'your_bot_id',
+    token: 'your_auth_token',
+    voiceId: 'your_voice_id', // optional
+    baseWsURL: COZE_CN_BASE_WS_URL, // optional default is COZE_CN_BASE_WS_URL
+    allowPersonalAccessTokenInBrowser: true, // optional default is false
+    debug: false, // optional default is false
+  });
+
+  await client.connect();
+} catch (error) {
+  console.error('error', error);
+}
+
+// listen for all events
+client.on(WsChatEventNames.ALL, (event: CreateChatWsRes | undefined) => {
+  console.log(event);
+});
+
+// send user message
+client.sendMessage({
+  id: 'event_id',
+  event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
+  data: {
+    role: RoleType.User,
+    content: 'Hello!',
+    content_type: 'text',
+  },
+});
+
+// interrupt chat
+client.interrupt();
+
+// disconnect
+await client.disconnect();
+
+// set audio enable
+await client.setAudioEnable(false);
+
+// set audio input device
+await client.setAudioInputDevice('your_device_id');
+
+```
+
+
 ### Proxy Example
 ```ts
 const client = new CozeAPI({

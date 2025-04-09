@@ -72,6 +72,8 @@ export enum WebsocketsEventType {
   CLIENT_ERROR = 'client_error',
   /** Connection closed */
   CLOSED = 'closed',
+  /** All events */
+  ALL = 'all',
 
   // Error
   /** Received error event */
@@ -150,6 +152,20 @@ export enum WebsocketsEventType {
   CONVERSATION_CHAT_FAILED = 'conversation.chat.failed', // TODO add
   /** Received `conversation.cleared` event */
   CONVERSATION_CLEARED = 'conversation.cleared', // TODO add
+  /** Speech started */
+  INPUT_AUDIO_BUFFER_SPEECH_STARTED = 'input_audio_buffer.speech_started',
+  /** Speech stopped */
+  INPUT_AUDIO_BUFFER_SPEECH_STOPPED = 'input_audio_buffer.speech_stopped',
+  /** Chat interrupted by client */
+  CONVERSATION_CHAT_CANCEL = 'conversation.chat.cancel',
+  /** Chat canceled */
+  CONVERSATION_CHAT_CANCELED = 'conversation.chat.canceled',
+  /** Audio transcript update */
+  CONVERSATION_AUDIO_TRANSCRIPT_UPDATE = 'conversation.audio_transcript.update',
+  /** Audio transcript completed */
+  CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED = 'conversation.audio_transcript.completed',
+  /** Audio dump */
+  DUMP_AUDIO = 'dump.audio',
 }
 
 export interface EventDetail {
@@ -202,6 +218,11 @@ export interface ChatUpdateEvent extends BaseEvent {
     chat_config?: ChatConfig;
     input_audio?: AudioConfig;
     output_audio?: OutputAudio;
+    turn_detection?: TurnDetection;
+    /** Need to subscribe to the event type list of the downstream event. If not set or set to an empty array, all downstream events are subscribed. */
+    event_subscriptions?: string[];
+    /** Whether to play the prologue, default is false. */
+    need_play_prologue?: boolean;
   };
 }
 
@@ -376,6 +397,36 @@ export interface ConversationClearedEvent extends BaseEventWithDetail {
   event_type: WebsocketsEventType.CONVERSATION_CLEARED;
 }
 
+export interface InputAudioBufferSpeechStartedEvent extends BaseEvent {
+  event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STARTED;
+}
+
+export interface InputAudioBufferSpeechStoppedEvent extends BaseEvent {
+  event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED;
+}
+
+export interface ConversationChatCancelEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL;
+}
+
+export interface ConversationChatCanceledEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCELED;
+}
+
+export interface ConversationAudioTranscriptUpdateEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE;
+  data: {
+    content: string;
+  };
+}
+
+export interface ConversationAudioTranscriptCompletedEvent extends BaseEvent {
+  event_type: WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED;
+  data: {
+    content: string;
+  };
+}
+
 export interface ChatCreatedEvent extends BaseEventWithDetail {
   event_type: WebsocketsEventType.CHAT_CREATED;
 }
@@ -414,6 +465,13 @@ export interface InputAudioBufferCompleteEvents extends BaseEvent {
   event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE;
 }
 
+export interface AudioDumpEvent extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.DUMP_AUDIO;
+  data: {
+    url: string;
+  };
+}
+
 interface OutputAudio {
   /** Output audio codec */
   codec?: 'pcm' | 'opus';
@@ -422,4 +480,13 @@ interface OutputAudio {
   };
   speech_rate?: number;
   voice_id?: string;
+}
+
+interface TurnDetection {
+  /** 判停类型, client_vad/server_vad, 默认为 client_vad */
+  type?: 'client_vad' | 'server_vad';
+  /** server_vad模式下，VAD检测到语音之前要包含的音频量，单位ms，默认600ms */
+  prefix_padding_ms?: number;
+  /** server_vad模式下，检测语音停止的静音持续时间，单位ms，默认500ms */
+  silence_duration_ms?: number;
 }

@@ -1,8 +1,14 @@
 import { defineConfig } from '@coze-infra/vitest-config';
-
+import path from 'path';
 export default defineConfig({
   dirname: __dirname,
   preset: 'node',
+  resolve: {
+    alias: {
+      '@ws-tools': path.resolve(__dirname, './src/ws-tools'),
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     testTimeout: 100000,
     coverage: {
@@ -10,6 +16,7 @@ export default defineConfig({
         'rslib.config.ts',
         'src/resources/knowledge/index.ts',
         'src/ws-tools/wavtools',
+        'src/ws-tools/recorder/processor',
       ],
     },
   },

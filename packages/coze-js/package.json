@@ -58,6 +58,9 @@
     "test:cov": "vitest --coverage --run"
   },
   "dependencies": {
+    "agora-extension-ai-denoiser": "^1.0.0",
+    "agora-rtc-sdk-ng": "^4.23.2",
+    "agora-rte-extension": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.x",
     "reconnecting-websocket": "^4.4.0",

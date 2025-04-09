@@ -1,9 +1,25 @@
 /* eslint-disable */
+/// <reference types="vitest" />
+// @vitest-environment jsdom
 import { vi } from 'vitest';
 import WsTranscriptionClient from '../../src/ws-tools/transcription';
-import { WebSocketAPI } from '../../src/websocket-api';
-import { WavRecorder } from '../../src/ws-tools/wavtools';
+import PcmRecorder from '../../src/ws-tools/recorder/pcm-recorder';
 import { APIError, WebsocketsEventType } from '../../src';
+
+// Mock window.__denoiser
+const mockDenoiser = {
+  createProcessor: vi.fn().mockReturnValue({
+    enable: vi.fn().mockResolvedValue(undefined),
+    disable: vi.fn().mockResolvedValue(undefined),
+    setMode: vi.fn().mockResolvedValue(undefined),
+    setLevel: vi.fn().mockResolvedValue(undefined),
+    dump: vi.fn(),
+    on: vi.fn(),
+    removeAllListeners: vi.fn(),
+    pipe: vi.fn().mockReturnThis(),
+    enabled: true,
+  }),
+};
 
 // Mock WebSocketAPI
 vi.mock('../../src/websocket-api', () => ({
@@ -28,16 +44,60 @@ vi.mock('../../src/websocket-api', () => ({
 }));
 
 // Mock WavRecorder
-vi.mock('../../src/ws-tools/wavtools', () => ({
-  WavRecorder: vi.fn().mockImplementation(() => ({
-    listDevices: vi.fn().mockResolvedValue([{ deviceId: 'test-device' }]),
+vi.mock('../../src/ws-tools/recorder/pcm-recorder', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    destroy: vi.fn(),
     getStatus: vi.fn(),
-    begin: vi.fn(),
-    record: vi.fn(),
     pause: vi.fn(),
-    end: vi.fn(),
-    quit: vi.fn(),
+    resume: vi.fn(),
+    record: vi.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    getSampleRate: vi.fn().mockReturnValue(24000),
   })),
+}));
+
+// Mock agora-rtc-sdk-ng/esm
+vi.mock('agora-rtc-sdk-ng/esm', () => ({
+  createMicrophoneAudioTrack: vi.fn().mockResolvedValue({
+    pipe: vi.fn().mockReturnThis(),
+    processorDestination: {},
+    close: vi.fn(),
+    getMediaStreamTrack: vi.fn().mockReturnValue({
+      enabled: true,
+      stop: vi.fn(),
+    }),
+  }),
+  createCustomAudioTrack: vi.fn().mockResolvedValue({
+    pipe: vi.fn().mockReturnThis(),
+    processorDestination: {},
+    close: vi.fn(),
+    getMediaStreamTrack: vi.fn().mockReturnValue({
+      enabled: true,
+      stop: vi.fn(),
+    }),
+  }),
+}));
+
+// Mock agora-extension-ai-denoiser
+vi.mock('agora-extension-ai-denoiser', () => ({
+  AIDenoiserExtension: class {
+    static instance = mockDenoiser;
+    createProcessor() {
+      return mockDenoiser.createProcessor();
+    }
+  },
+  AIDenoiserProcessor: class {},
+}));
+
+// Mock agora-rte-extension
+vi.mock('agora-rte-extension', () => ({
+  IAudioProcessor: class {},
+  AudioProcessor: class {},
+}));
+
+vi.mock('../../src/ws-tools/utils', () => ({
+  checkDenoiserSupport: vi.fn().mockReturnValue(true),
 }));
 
 describe('WsTranscriptionClient', () => {
@@ -55,7 +115,7 @@ describe('WsTranscriptionClient', () => {
   describe('constructor', () => {
     it('should initialize with correct configuration', () => {
       expect(client.ws).toBeNull();
-      expect(WavRecorder).toHaveBeenCalledWith({ sampleRate: 24000 });
+      expect(PcmRecorder).toHaveBeenCalled();
     });
   });
 
@@ -145,48 +205,28 @@ describe('WsTranscriptionClient', () => {
     });
 
     it('should connect', async () => {
-      await client.connect();
+      await client['connect']();
       expect(client.ws).toBeDefined();
     });
 
     it('should not connect if already connected', async () => {
-      await client.connect();
+      await client['connect']();
       expect(client.ws).toBeDefined();
 
-      await client.connect();
+      await client['connect']();
       expect(client.ws).toBeDefined();
     });
 
     it('should pause', async () => {
+      client['isRecording'] = true;
       await client.pause();
-      expect(client['wavRecorder'].pause).toHaveBeenCalled();
-    });
-
-    it('should get device list', async () => {
-      await client.getDeviceList();
-      expect(client['wavRecorder'].listDevices).toHaveBeenCalled();
+      expect(client['recorder'].pause).toHaveBeenCalled();
     });
 
     it('should get status', () => {
+      client['isRecording'] = true;
       client.getStatus();
-      expect(client['wavRecorder'].getStatus).toHaveBeenCalled();
-    });
-
-    it('should start recording', async () => {
-      vi.mocked(client['wavRecorder'].getStatus).mockReturnValue('ended');
-      await client.record();
-      expect(client['wavRecorder'].begin).toHaveBeenCalled();
-      expect(client['wavRecorder'].record).toHaveBeenCalled();
-    });
-
-    it('should end recording', async () => {
-      await client.end();
-      expect(client.ws?.send).toHaveBeenCalledWith({
-        id: expect.any(String),
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-      });
-      expect(client['wavRecorder'].pause).toHaveBeenCalled();
-      expect(client['wavRecorder'].end).toHaveBeenCalled();
+      expect(client['recorder'].getStatus).toHaveBeenCalled();
     });
   });
 
@@ -203,8 +243,7 @@ describe('WsTranscriptionClient', () => {
 
   describe('disconnect', () => {
     it('should properly clean up resources', async () => {
-      await client.disconnect();
-      expect(client['wavRecorder'].quit).toHaveBeenCalled();
+      await client.destroy();
       expect(client.ws).toBeNull();
       expect(client['listeners'].size).toBe(0);
     });

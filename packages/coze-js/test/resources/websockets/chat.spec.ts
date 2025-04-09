@@ -22,7 +22,7 @@ describe('Chat', () => {
   describe('create', () => {
     it('should create a websocket connection for chat', async () => {
       const options = { connectionTimeout: 5000 };
-      const result = await chat.create('bot-id', options);
+      const result = await chat.create({ bot_id: 'bot-id' }, options);
 
       expect(client.makeWebsocket).toHaveBeenCalledWith(
         '/v1/chat?bot_id=bot-id',

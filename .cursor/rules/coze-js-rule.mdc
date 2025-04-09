@@ -1,0 +1,107 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Coze JS Testing Code Standards
+
+## File Structure and Naming
+
+- Test files should be named in the format `[module-name].spec.ts`
+- Test files should maintain the same structure as source files
+
+## Framework and Infrastructure
+
+- Use Vitest as the testing framework
+- Write all tests in TypeScript
+- Use V8 provider for coverage reports
+- Supported environments: Node.js and browser
+
+## Test Organization
+
+- Use nested `describe` blocks to organize related tests
+- Test descriptions should clearly express test intentions
+- Complex functionality should be grouped by sub-features or scenarios
+- Main test suite structure:
+  ```typescript
+  describe('ModuleName', () => {
+    describe('SubFeature or Method', () => {
+      it('should have specific behavior', () => {
+        // test code
+      });
+    });
+  });
+  ```
+
+## Test Style
+
+- Each test should focus on a single functionality point or behavior
+- Clearly distinguish between positive tests and exception tests
+- Use async/await for testing asynchronous code
+- Use standard AAA (Arrange-Act-Assert) pattern to organize test content
+
+## Mocking and Test Isolation
+
+- External dependencies should be mocked (`vi.mock()`)
+- Use `vi.fn()` to create mock functions
+- Use `vi.spyOn()` to monitor function calls
+- Internal modules can be mocked to isolate test units
+- Example:
+  ```typescript
+  vi.mock('../src/fetcher');
+  vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+  ```
+
+## Test Lifecycle
+
+- Use `beforeEach` to reset mocks and create new instances
+- Use `afterEach` to clean up resources and reset state
+- Use `vi.clearAllMocks()` and `vi.resetAllMocks()` to ensure test isolation
+- Example:
+  ```typescript
+  beforeEach(() => {
+    client = new APIClient(mockConfig);
+    vi.clearAllMocks();
+  });
+  ```
+
+## Assertion Style
+
+- Use Jest-style assertion API
+- Use await with expect for async operations
+- Use `expect().rejects.toThrow()` for exceptions
+- Use `expect().toHaveBeenCalled()` for checking mock function calls
+- Example:
+  ```typescript
+  expect(result).toEqual({ access_token: 'test-token' });
+  await expect(promise).rejects.toThrow('Error message');
+  ```
+
+## Error Testing
+
+- Ensure tests cover various error scenarios
+- Test edge cases
+- Verify error messages and error types
+- Test error handling and recovery mechanisms
+
+## Environment Adaptation
+
+- Use environment detection for conditional testing
+- Provide different implementations for different environments (Node/browser)
+- Mock global objects to test environment-specific code
+- Example:
+  ```typescript
+  vi.spyOn(utils, 'isBrowser').mockReturnValue(true);
+  ```
+
+## Continuous Integration
+
+- Tests should run silently in CI environment
+- Ensure 100% coverage or declare exceptions in ignore list
+- Maintain test stability, avoid intermittent failures
+
+## Concurrency and Timeouts
+
+- Default test timeout is 100 seconds
+- Use forks pool and set `singleFork: true`
+- Long-running tests should explicitly set longer timeout periods

@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { WavStreamPlayer } from '../wavtools';
+import { type WsToolsOptions } from '../types';
 import {
   APIError,
   CozeAPI,
@@ -10,7 +11,6 @@ import {
   type WebSocketAPI,
   WebsocketsEventType,
 } from '../..';
-import { type WsToolsOptions } from '..';
 
 class WsSpeechClient {
   public ws: WebSocketAPI<CreateSpeechWsReq, CreateSpeechWsRes> | null = null;
@@ -57,7 +57,7 @@ class WsSpeechClient {
           console.debug('[speech] ws open');
         };
 
-        ws.onmessage = (data, event) => {
+        ws.onmessage = data => {
           // Trigger all registered event listeners
           this.emit('data', data);
           this.emit(data.event_type, data);
@@ -71,7 +71,11 @@ class WsSpeechClient {
             reject(
               new APIError(
                 data.data.code,
-                data as unknown as ErrorRes,
+                {
+                  code: data.data.code,
+                  msg: data.data.msg,
+                  detail: data.detail,
+                },
                 data.data.msg,
                 undefined,
               ),

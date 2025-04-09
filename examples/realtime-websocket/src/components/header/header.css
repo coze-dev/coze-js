@@ -1,0 +1,36 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  height: 48px;
+  line-height: 48px;
+  background-color: #fff;
+}
+
+.logo {
+  height: 32px;
+  margin-right: 24px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  color: #000;
+}
+
+.logoImage {
+  height: 32px;
+}
+
+.rightContent {
+  display: flex;
+  /* align-items: center; */
+}
+
+.settingsButton {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.settingsButton:hover {
+  color: #1890ff;
+}

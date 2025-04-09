@@ -15,7 +15,7 @@ import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils';
 import { type FetchAPIOptions, fetchAPI } from './fetcher';
 import { APIError, type ErrorRes } from './error';
 import * as Errors from './error';
-import { COZE_COM_BASE_URL, COZE_COM_BASE_WS_URL } from './constant';
+import { COZE_COM_BASE_URL, COZE_CN_BASE_WS_URL } from './constant';
 
 export type RequestOptions = Omit<
   AxiosRequestConfig,
@@ -75,7 +75,7 @@ export class APIClient {
   constructor(config: ClientOptions) {
     this._config = config;
     this.baseURL = config.baseURL || COZE_COM_BASE_URL;
-    this.baseWsURL = config.baseWsURL || COZE_COM_BASE_WS_URL;
+    this.baseWsURL = config.baseWsURL || COZE_CN_BASE_WS_URL;
     this.token = config.token;
     this.axiosOptions = config.axiosOptions || {};
     this.axiosInstance = config.axiosInstance;

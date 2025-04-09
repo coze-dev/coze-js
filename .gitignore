@@ -161,6 +161,7 @@ common/autoinstallers/*/.npmrc
 .vercel/output
 rush-logs
 dist
+build
 
 *.tsbuildinfo
 

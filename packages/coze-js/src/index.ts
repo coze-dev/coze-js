@@ -17,11 +17,7 @@ export class CozeAPI extends APIClient {
   templates: API.Templates = new API.Templates(this);
   websockets: API.Websockets = new API.Websockets(this);
 }
-export {
-  type ClientOptions,
-  type RequestOptions,
-  type GetToken,
-} from './core.js';
+export { type ClientOptions, type RequestOptions, type GetToken } from './core';
 export * from './auth';
 export * from './resources/index';
 export * from './fetcher';
