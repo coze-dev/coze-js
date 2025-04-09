@@ -131,6 +131,11 @@ describe('PcmRecorder', () => {
         noiseSuppression: true,
         autoGainControl: true,
       },
+      aiDenoisingConfig: {
+        mode: AIDenoiserProcessorMode.NSNG,
+        level: AIDenoiserProcessorLevel.SOFT,
+      },
+      debug: true,
     });
   });
 
@@ -225,7 +230,7 @@ describe('PcmRecorder', () => {
     });
 
     it('should get denoiser status', () => {
-      expect(recorder.getDenoiserEnabled()).toBe(undefined);
+      expect(recorder.getDenoiserEnabled()).toBe(true);
     });
 
     it('should set denoiser enabled state', async () => {

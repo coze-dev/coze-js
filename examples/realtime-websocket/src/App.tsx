@@ -1,8 +1,8 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 
-import Ws from './pages/ws';
 import Transcription from './pages/transcription';
 import Speech from './pages/speech';
+import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
         </nav> */}
 
         <Routes>
-          <Route path="/" element={<Ws />} />
+          <Route path="/" element={<Chat />} />
           <Route path="/audio-test" element={<AudioTest />} />
           <Route path="/transcription" element={<Transcription />} />
           <Route path="/speech" element={<Speech />} />

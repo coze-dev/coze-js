@@ -38,7 +38,7 @@ const chatUpdate = {
     need_play_prologue: true,
   },
 };
-function WS() {
+function Chat() {
   const clientRef = useRef<WsChatClient>();
   const audioConfigRef = useRef<AudioConfigRef>(null);
   // 是否正在连接
@@ -256,4 +256,4 @@ function WS() {
   );
 }
 
-export default WS;
+export default Chat;
