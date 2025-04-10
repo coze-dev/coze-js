@@ -5,12 +5,84 @@ import { SettingOutlined } from '@ant-design/icons';
 
 import getConfig from '../../utils/config';
 
+// 定义配置项接口
+interface FormConfig {
+  name: string;
+  label: string;
+  required?: boolean;
+  message?: string;
+}
+
+// 定义所有配置项
+const formConfigs: FormConfig[] = [
+  {
+    name: 'base_url',
+    label: 'Base URL',
+    required: true,
+    message: 'Please input Base URL!',
+  },
+  {
+    name: 'base_ws_url',
+    label: 'Base WS URL',
+    required: true,
+    message: 'Please input Base WS URL!',
+  },
+  {
+    name: 'pat',
+    label: 'PAT',
+    required: true,
+    message: 'Please input PAT!',
+  },
+  {
+    name: 'bot_id',
+    label: 'Bot ID',
+    required: true,
+    message: 'Please input Bot ID!',
+  },
+  {
+    name: 'voice_id',
+    label: 'Voice ID',
+    required: false,
+    message: 'Please input Voice ID!',
+  },
+  {
+    name: 'workflow_id',
+    label: 'Workflow ID',
+    required: false,
+    message: 'Please input Workflow ID!',
+  },
+];
+
+// 渲染表单项组件
+const renderFormItems = (fields?: string[]) =>
+  formConfigs
+    .filter(config => !fields || fields.includes(config.name)) // 只保留 fields 中指定的配置项
+    .map(config => (
+      <Form.Item
+        key={config.name}
+        name={config.name}
+        label={config.label}
+        rules={[
+          {
+            required: config.required,
+            message: config.message,
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+    ));
+
 const Settings = ({
   onSettingsChange,
   localStorageKey,
+  fields,
+  style,
 }: {
   onSettingsChange: () => void;
   localStorageKey: string;
+  fields?: string[];
+  style?: React.CSSProperties;
 }) => {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [form] = Form.useForm();
@@ -48,7 +120,9 @@ const Settings = ({
     <>
       <Button
         icon={<SettingOutlined />}
+        type="primary"
         onClick={() => setIsSettingsVisible(true)}
+        style={style}
       >
         Settings
       </Button>
@@ -59,48 +133,7 @@ const Settings = ({
         onOk={() => form.submit()}
       >
         <Form form={form} onFinish={handleSettingsSave} layout="vertical">
-          <Form.Item
-            name="base_url"
-            label="Base URL"
-            rules={[{ required: true, message: 'Please input Base URL!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="base_ws_url"
-            label="Base WS URL"
-            rules={[{ required: true, message: 'Please input Base WS URL!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="pat"
-            label="PAT"
-            rules={[{ required: true, message: 'Please input PAT!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="bot_id"
-            label="Bot ID"
-            rules={[{ required: true, message: 'Please input Bot ID!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="voice_id"
-            label="Voice ID"
-            rules={[{ message: 'Please input Voice ID!' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="workflow_id"
-            label="Workflow ID"
-            rules={[{ message: 'Please input Workflow ID!' }]}
-          >
-            <Input />
-          </Form.Item>
+          {renderFormItems(fields)}
         </Form>
       </Modal>
     </>

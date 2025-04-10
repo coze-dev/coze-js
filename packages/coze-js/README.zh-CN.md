@@ -170,9 +170,10 @@ async function wsChat() {
 
 ### 流式对话 SDK
 基于Websocket的实时语音对话SDK，如果你使用 Web，推荐使用此 SDK
+在线 Demo: https://www.coze.cn/open-platform/realtime/websocket
 ```typescript
 import { WsChatClient, WsChatEventNames } from '@coze/api/ws-tools';
-import { COZE_CN_BASE_WS_URL, RoleType } from '@coze/api';
+import { RoleType } from '@coze/api';
 
 try {
   // 初始化
@@ -180,7 +181,6 @@ try {
     botId: 'your_bot_id',
     token: 'your_auth_token',
     voiceId: 'your_voice_id', // 可选
-    baseWsURL: COZE_CN_BASE_WS_URL, // 可选，默认是 COZE_CN_BASE_WS_URL
     allowPersonalAccessTokenInBrowser: true, // 可选，默认是 false
     debug: false, // 可选，默认是 false
   });
@@ -191,7 +191,7 @@ try {
 }
 
 // 监听所有事件
-client.on(WsChatEventNames.ALL, (event: CreateChatWsRes | undefined) => {
+client.on(WsChatEventNames.ALL, (eventName: string, event: WsChatEventData) => {
   console.log(event);
 });
 
@@ -201,7 +201,7 @@ client.sendMessage({
   event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
   data: {
     role: RoleType.User,
-    content: 'Hello!',
+    content: 'Hello World',
     content_type: 'text',
   },
 });
@@ -231,15 +231,15 @@ const client = new CozeAPI({
 
 [查看代理示例 →](../../examples/coze-js-node/src/proxy/)
 
-### 语音合成
+### 语音合成 SDK
+在线 Demo: https://www.coze.cn/open-platform/realtime/websocket#speech
 ```javascript
-import { COZE_CN_BASE_WS_URL, WebsocketsEventType } from '@coze/api';
+import { WebsocketsEventType } from '@coze/api';
 import { WsSpeechClient } from '@coze/api/ws-tools';
 
 // 初始化
 const client = new WsSpeechClient({
   token: 'your_pat_token',
-  baseWsURL: COZE_CN_BASE_WS_URL,
   allowPersonalAccessTokenInBrowser: true, // optional
 });
 
@@ -294,6 +294,54 @@ client.append('你好，');
 client.append(' Coze!');
 // 结束发送文本
 client.complete();
+```
+
+### 语音识别 SDK
+在线 Demo: https://www.coze.cn/open-platform/realtime/websocket#transcription
+```javascript
+import { WsTranscriptionClient } from '@coze/api/ws-tools';
+import { WebsocketsEventType } from '@coze/api';
+// 初始化
+const client = new WsTranscriptionClient({
+  token: 'your_pat_token',
+  allowPersonalAccessTokenInBrowser: true, // 可选
+});
+
+// 监听所有下行事件（包括错误）
+client.on(WebsocketsEventType.ALL, data => {
+  console.log('[transcription] ws data', data);
+});
+
+// 或者，监听单个事件
+client.on(WebsocketsEventType.ERROR, data => {
+  console.error('[transcription] ws error', data);
+});
+
+// 监听语音识别更新结果
+client.on(WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE, (event) => {
+  console.log('[transcription] result', event.data.content);
+});
+
+// 开始识别
+try {
+  await client.start();
+} catch (error) {
+  console.error('[transcription] error', error);
+}
+
+// 停止语音识别
+client.stop();
+
+
+// 暂停语音识别
+client.pause();
+
+// 恢复语音识别
+client.resume();
+
+
+// 销毁实例
+client.destroy();
 ```
 
 ## 更多示例

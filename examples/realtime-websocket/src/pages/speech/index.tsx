@@ -5,7 +5,7 @@ import { Button, Layout, message, Row } from 'antd';
 import { WsSpeechClient } from '@coze/api/ws-tools';
 
 import getConfig from '../../utils/config';
-import Header from '../../components/header/header';
+import Settings from '../../components/settings';
 const localStorageKey = 'realtime-quickstart-transcription';
 const config = getConfig(localStorageKey);
 
@@ -103,14 +103,20 @@ const Speech: React.FC = () => {
   );
 
   return (
-    <Layout>
-      <Header
+    <Layout style={{ height: '100%' }}>
+      <Settings
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
-        title="WsSpeechClient"
+        fields={['base_ws_url', 'pat', 'voice_id']}
+        style={{
+          position: 'absolute',
+          right: 100,
+          top: 15,
+          zIndex: 10,
+        }}
       />
-      <Layout.Content>
-        <Row justify="center" style={{ marginTop: '10px', gap: 10 }}>
+      <Layout.Content style={{ background: '#fff' }}>
+        <Row justify="center" style={{ margin: '16px', gap: 10 }}>
           <TextArea
             rows={4}
             value={transcriptionText}

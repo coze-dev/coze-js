@@ -3,7 +3,6 @@ import React from 'react';
 import { Layout } from 'antd';
 
 import './header.css';
-// @ts-expect-error-error xx
 import logo from '../../logo.svg';
 import Settings from '../../components/settings';
 

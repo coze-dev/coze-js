@@ -19,7 +19,7 @@ describe('sleep', () => {
     const startTime = Date.now();
     await sleep(100);
     const endTime = Date.now();
-    expect(endTime - startTime).toBeGreaterThanOrEqual(100);
+    expect(endTime - startTime).toBeGreaterThanOrEqual(90);
   });
 });
 

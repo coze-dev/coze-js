@@ -171,9 +171,10 @@ async function wsChat() {
 
 ### Websocket Chat SDK
 if you want to use the realtime chat sdk in web, you can use the following code:
+Online Demo: URL_ADDRESS.coze.cn/open-platform/realtime/websocket
 ```typescript
-import { WsChatClient, WsChatEventNames } from '@coze/api/ws-tools';
-import { COZE_CN_BASE_WS_URL, RoleType } from '@coze/api';
+import { WsChatClient, WsChatEventNames, type WsChatEventData } from '@coze/api/ws-tools';
+import { WebsocketsEventType, RoleType } from '@coze/api';
 
 try {
   // Initialize
@@ -181,7 +182,6 @@ try {
     botId: 'your_bot_id',
     token: 'your_auth_token',
     voiceId: 'your_voice_id', // optional
-    baseWsURL: COZE_CN_BASE_WS_URL, // optional default is COZE_CN_BASE_WS_URL
     allowPersonalAccessTokenInBrowser: true, // optional default is false
     debug: false, // optional default is false
   });
@@ -192,7 +192,7 @@ try {
 }
 
 // listen for all events
-client.on(WsChatEventNames.ALL, (event: CreateChatWsRes | undefined) => {
+client.on(WsChatEventNames.ALL, (eventName: string, event: WsChatEventData) => {
   console.log(event);
 });
 
@@ -202,7 +202,7 @@ client.sendMessage({
   event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
   data: {
     role: RoleType.User,
-    content: 'Hello!',
+    content: 'Hello World',
     content_type: 'text',
   },
 });
@@ -232,10 +232,11 @@ const client = new CozeAPI({
 [View proxy example →](../../examples/coze-js-node/src/proxy/)
 
 
-### Websocket Speech
+### Websocket Speech SDK
+Online Demo: Online Demo: URL_ADDRESS.coze.cn/open-platform/realtime/websocket#speech
 ```javascript
-import { WsSpeechClient, WebsocketsEventType } from '@coze/api/ws-tools';
-
+import { WsSpeechClient } from '@coze/api/ws-tools';
+import { WebsocketsEventType } from '@coze/api';
 // Initialize
 const client = new WsSpeechClient({
   token: 'your_pat_token',
@@ -294,6 +295,55 @@ client.append('Hello,');
 client.append(' Coze!');
 // End sending text
 client.complete();
+
+```
+
+### Websocket Transcriptions SDK
+Online Demo: https://www.coze.cn/open-platform/realtime/websocket#transcription
+```javascript
+import { WsTranscriptionClient } from '@coze/api/ws-tools';
+import { WebsocketsEventType } from '@coze/api';
+// Initialize
+const client = new WsTranscriptionClient({
+  token: 'your_pat_token',
+  allowPersonalAccessTokenInBrowser: true, // optional
+});
+
+// Listen for all downstream events (including error)
+client.on(WebsocketsEventType.ALL, data => {
+  console.log('[transcription] ws data', data);
+});
+
+// Or, listen for a single event
+client.on(WebsocketsEventType.ERROR, data => {
+  console.error('[transcription] ws error', data);
+});
+
+// Listen for transcription update result
+client.on(WebsocketsEventType.TRANSCRIPTIONS_MESSAGE_UPDATE, (event) => {
+  console.log('[transcription] result', event.data.content);
+});
+
+// Connect
+try {
+  await client.start();
+} catch (error) {
+  console.error('[transcription] error', error);
+}
+
+// Stop transcription
+client.stop();
+
+
+// Pause transcription
+client.pause();
+
+// Resume transcription
+client.resume();
+
+
+// destroy instance
+client.destroy();
 
 ```
 

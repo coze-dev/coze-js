@@ -3,7 +3,10 @@
 // @vitest-environment jsdom
 import { vi } from 'vitest';
 import WsTranscriptionClient from '../../src/ws-tools/transcription';
-import PcmRecorder from '../../src/ws-tools/recorder/pcm-recorder';
+import PcmRecorder, {
+  AIDenoiserProcessorLevel,
+  AIDenoiserProcessorMode,
+} from '../../src/ws-tools/recorder/pcm-recorder';
 import { APIError, WebsocketsEventType } from '../../src';
 
 // Mock window.__denoiser
@@ -54,7 +57,17 @@ vi.mock('../../src/ws-tools/recorder/pcm-recorder', () => ({
     start: vi.fn(),
     stop: vi.fn(),
     getSampleRate: vi.fn().mockReturnValue(24000),
+    getDenoiserEnabled: vi.fn().mockReturnValue(true),
+    setDenoiserEnabled: vi.fn(),
+    setDenoiserMode: vi.fn(),
+    setDenoiserLevel: vi.fn(),
   })),
+  AIDenoiserProcessorMode: {
+    NSNG: 'NSNG',
+  },
+  AIDenoiserProcessorLevel: {
+    AGGRESSIVE: 'AGGRESSIVE',
+  },
 }));
 
 // Mock agora-rtc-sdk-ng/esm
@@ -246,6 +259,68 @@ describe('WsTranscriptionClient', () => {
       await client.destroy();
       expect(client.ws).toBeNull();
       expect(client['listeners'].size).toBe(0);
+    });
+  });
+
+  describe('getDenoiserEnabled', () => {
+    it('should return true when denoiser is enabled', () => {
+      const result = client.getDenoiserEnabled();
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('setDenoiserEnabled', () => {
+    it('should set denoiser enabled', () => {
+      client.setDenoiserEnabled(true);
+      expect(client['recorder'].setDenoiserEnabled).toHaveBeenCalledWith(true);
+    });
+  });
+
+  describe('setDenoiserMode', () => {
+    it('should set denoiser mode', () => {
+      client.setDenoiserMode(AIDenoiserProcessorMode.NSNG);
+      expect(client['recorder'].setDenoiserMode).toHaveBeenCalledWith(
+        AIDenoiserProcessorMode.NSNG,
+      );
+    });
+  });
+
+  describe('setDenoiserLevel', () => {
+    it('should set denoiser level', () => {
+      client.setDenoiserLevel(AIDenoiserProcessorLevel.AGGRESSIVE);
+      expect(client['recorder'].setDenoiserLevel).toHaveBeenCalledWith(
+        AIDenoiserProcessorLevel.AGGRESSIVE,
+      );
+    });
+  });
+
+  describe('pause', () => {
+    it('should pause recording', async () => {
+      client['isRecording'] = true;
+      await client.pause();
+      expect(client['recorder'].pause).toHaveBeenCalled();
+    });
+
+    it('should throw error when not recording', () => {
+      client['isRecording'] = false;
+      expect(() => client.pause()).toThrow('Recording is not started');
+    });
+  });
+
+  describe('resume', () => {
+    it('should throw error when not paused', () => {
+      client['isRecording'] = true;
+      expect(() => client.resume()).toThrow('Recording is not paused');
+    });
+  });
+
+  describe('start', () => {
+    it('should start recording', async () => {
+      client['isRecording'] = false;
+      vi.spyOn(client, 'connect').mockResolvedValue(undefined);
+
+      await client.start();
+      expect(client['isRecording']).toBe(true);
     });
   });
 });

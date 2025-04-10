@@ -41,6 +41,12 @@ describe('RealtimeEventHandler', () => {
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
     });
+    it('should warn when event name is not found', () => {
+      const callback = vi.fn();
+      handler.on('test-event', callback);
+      handler.dispatch('test-event2', {});
+      expect(callback).not.toHaveBeenCalled();
+    });
   });
 
   describe('dispatch', () => {

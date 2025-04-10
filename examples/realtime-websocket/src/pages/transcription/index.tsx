@@ -10,7 +10,7 @@ import {
 import { AudioOutlined } from '@ant-design/icons';
 
 import getConfig from '../../utils/config';
-import Header from '../../components/header/header';
+import Settings from '../../components/settings';
 import {
   AudioConfig,
   type AudioConfigRef,
@@ -135,14 +135,20 @@ const Transcription: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <Header
+    <Layout style={{ height: '100%' }}>
+      <Settings
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
-        title="WsTranscriptionClient"
+        fields={['base_ws_url', 'pat']}
+        style={{
+          position: 'absolute',
+          right: 100,
+          top: 15,
+          zIndex: 10,
+        }}
       />
-      <Layout.Content>
-        <Row justify="center" style={{ marginTop: '10px', gap: 10 }}>
+      <Layout.Content style={{ background: '#fff' }}>
+        <Row justify="center" style={{ marginTop: '16px', gap: 10 }}>
           <Button onClick={() => setIsConfigModalOpen(true)}>配置</Button>
           <Button
             type="primary"
