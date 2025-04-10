@@ -104,7 +104,7 @@ const ReceiveMessage = ({
   return (
     <Row
       style={{
-        margin: '16px',
+        margin: '16px 0',
         border: '1px solid #ccc',
       }}
     >

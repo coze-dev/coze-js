@@ -12,9 +12,9 @@ import ReceiveMessage from './receive-message';
 import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
-import Header from '../../components/header/header';
 import { ConsoleLog } from './console-log';
 import EventInput from './event-input';
+import Settings from '../../components/settings';
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
 
@@ -160,14 +160,20 @@ function Chat() {
   };
 
   return (
-    <Layout style={{ background: '#fff' }}>
-      <Header
+    <Layout style={{ height: '100%' }}>
+      <Settings
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
-        title="WsChatClient"
+        fields={['base_ws_url', 'bot_id', 'pat', 'voice_id', 'workflow_id']}
+        style={{
+          position: 'absolute',
+          right: 100,
+          top: 15,
+          zIndex: 10,
+        }}
       />
-      <Layout.Content>
-        <Row style={{ marginTop: '10px' }} justify="center">
+      <Layout.Content style={{ padding: '16px', background: '#fff' }}>
+        <Row justify="center">
           <Col
             span={24}
             style={{
@@ -225,7 +231,7 @@ function Chat() {
         </Row>
         <SendMessage isConnected={isConnected} clientRef={clientRef} />
 
-        <Row style={{ margin: '16px' }}>
+        <Row style={{ margin: '16px 0' }}>
           <Col span={24} style={{ textAlign: 'left' }}>
             语音识别结果：{transcript}
           </Col>

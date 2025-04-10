@@ -173,7 +173,7 @@ function WS() {
       <Space style={{ padding: '10px' }}>
         <audio
           ref={audioElement}
-          src={process.env.PUBLIC_URL + '/test.wav'}
+          src={import.meta.env.VITE_PUBLIC_URL + '/test.wav'}
           controls
         />
       </Space>

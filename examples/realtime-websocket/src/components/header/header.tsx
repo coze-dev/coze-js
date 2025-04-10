@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Layout, Button } from 'antd';
-import { GithubOutlined } from '@ant-design/icons';
+import { Layout } from 'antd';
 
 import './header.css';
 // @ts-expect-error-error xx
@@ -29,14 +28,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
         onSettingsChange={onSettingsChange}
         localStorageKey={localStorageKey}
       />
-      <Button
-        type="link"
-        icon={<GithubOutlined />}
-        href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-websocket"
-        target="_blank"
-      >
-        Github
-      </Button>
     </div>
   </Header>
 );
