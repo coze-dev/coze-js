@@ -2,6 +2,12 @@ import { type MutableRefObject, useState } from 'react';
 
 import { Button, message, Space } from 'antd';
 import { type WsChatClient } from '@coze/api/ws-tools';
+import {
+  AudioOutlined,
+  PauseOutlined,
+  PlayCircleOutlined,
+  StopOutlined,
+} from '@ant-design/icons';
 
 const Operation = ({
   isConnected,
@@ -44,21 +50,32 @@ const Operation = ({
 
   return (
     <Space>
-      <Button disabled={!isConnected} onClick={handleInterrupt}>
-        打断
-      </Button>
-      <Button danger disabled={!isConnected} onClick={handleDisconnect}>
+      <Button
+        type="primary"
+        size="large"
+        icon={<AudioOutlined />}
+        danger
+        disabled={!isConnected}
+        onClick={handleDisconnect}
+      >
         断开
       </Button>
-      {audioEnabled ? (
-        <Button disabled={!isConnected} onClick={toggleMicrophone}>
-          静音
-        </Button>
-      ) : (
-        <Button disabled={!isConnected} onClick={toggleMicrophone}>
-          取消静音
-        </Button>
-      )}
+      <Button
+        icon={<StopOutlined />}
+        size="large"
+        disabled={!isConnected}
+        onClick={handleInterrupt}
+      >
+        打断对话
+      </Button>
+
+      <Button
+        icon={audioEnabled ? <PauseOutlined /> : <PlayCircleOutlined />}
+        onClick={toggleMicrophone}
+        size="large"
+      >
+        {audioEnabled ? '静音' : '取消静音'}
+      </Button>
     </Space>
   );
 };

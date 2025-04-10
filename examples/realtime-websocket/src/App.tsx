@@ -7,9 +7,8 @@ import {
 } from 'react-router-dom';
 import { useState } from 'react';
 
-import { Layout, Menu, theme, Button } from 'antd';
+import { Layout, Menu, theme, Button, Space } from 'antd';
 import {
-  AudioOutlined,
   MessageOutlined,
   CustomerServiceOutlined,
   ExperimentOutlined,
@@ -30,23 +29,26 @@ const menuItems = [
   {
     key: '/',
     icon: <MessageOutlined />,
-    label: '实时语音',
+    label: '实时语音对话',
+    title: '实时语音对话 (Chat) 演示',
   },
   {
     key: '/transcription',
     icon: <CustomerServiceOutlined />,
     label: '语音识别',
+    title: '语音识别 (ASR) 演示',
   },
   {
     key: '/speech',
     icon: <ExperimentOutlined />,
     label: '语音合成',
+    title: '语音合成 (TTS) 演示',
   },
-  {
-    key: '/audio-test',
-    icon: <AudioOutlined />,
-    label: '音频测试',
-  },
+  // {
+  //   key: '/audio-test',
+  //   icon: <AudioOutlined />,
+  //   label: '音频测试',
+  // },
 ];
 
 function MainLayout() {
@@ -56,6 +58,12 @@ function MainLayout() {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  // 获取当前路由对应的菜单项的title
+  const currentMenuItem = menuItems.find(
+    item => item.key === location.pathname,
+  );
+  const currentTitle = currentMenuItem?.title || '扣子实时语音对话';
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -123,16 +131,28 @@ function MainLayout() {
             alignItems: 'center',
           }}
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
+          <Space align="center" style={{ gap: '2px' }}>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: '16px',
+                width: 40,
+                height: 64,
+              }}
+            />
+            <h3
+              style={{
+                fontSize: '16px',
+                marginBottom: '0',
+                lineHeight: '64px',
+              }}
+            >
+              {currentTitle}
+            </h3>
+          </Space>
+
           <Button
             type="link"
             icon={<GithubOutlined />}

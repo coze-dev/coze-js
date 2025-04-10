@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
-import { Button, message, Select, Modal, Layout, Row, Col } from 'antd';
+import { Button, message, Select, Modal, Layout, Row, Col, Card } from 'antd';
 import getConfig from '../../utils/config';
 import {
   WsChatClient,
@@ -15,6 +15,9 @@ import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { ConsoleLog } from './console-log';
 import EventInput from './event-input';
 import Settings from '../../components/settings';
+import { AudioOutlined } from '@ant-design/icons';
+import { Typography } from 'antd';
+const { Paragraph } = Typography;
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
 
@@ -190,10 +193,16 @@ function Chat() {
               gap: '8px', // 添加按钮之间的间距
             }}
           >
-            <Button onClick={() => setIsConfigModalOpen(true)}>配置</Button>
+            <Button size="large" onClick={() => setIsConfigModalOpen(true)}>
+              配置
+            </Button>
             {!isConnected && (
               <Button
-                danger
+                type="primary"
+                size="large"
+                icon={<AudioOutlined />}
+                danger={isConnected}
+                loading={isConnecting}
                 disabled={isConnected || isConnecting}
                 onClick={() => {
                   setIsConnecting(true);
@@ -202,7 +211,7 @@ function Chat() {
                   });
                 }}
               >
-                连接
+                开始对话
               </Button>
             )}
             {isConnected && (
@@ -225,6 +234,7 @@ function Chat() {
           >
             <Select
               style={{ width: '200px' }}
+              size="large"
               placeholder="选择输入设备"
               value={selectedInputDevice}
               onChange={handleSetAudioInputDevice}
@@ -265,6 +275,20 @@ function Chat() {
             }
           />
         </Modal>
+        <Card title="使用说明" style={{ marginTop: '20px' }}>
+          <Paragraph>
+            <ol>
+              <li>确保授予浏览器麦克风访问权限</li>
+              <li>在右上角 Settings 中配置个人访问令牌 (PAT) 和智能体 ID</li>
+              <li>点击"开始对话"按钮建立与智能体的语音连接</li>
+              <li>开始对话 - 您的语音将实时转录，智能体会自动回复</li>
+              <li>您可以随时使用"打断对话"按钮中断智能体的回复</li>
+              <li>使用"静音"按钮可以暂时关闭麦克风输入</li>
+              <li>您也可以通过文本框发送文本消息与智能体交流</li>
+              <li>完成后点击"断开连接"按钮结束会话</li>
+            </ol>
+          </Paragraph>
+        </Card>
       </Layout.Content>
     </Layout>
   );

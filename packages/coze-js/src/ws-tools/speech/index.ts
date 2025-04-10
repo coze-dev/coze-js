@@ -185,8 +185,7 @@ class WsSpeechClient {
   }
 
   async interrupt() {
-    await this.wavStreamPlayer.interrupt();
-    this.trackId = `my-track-id-${uuid()}`;
+    await this.disconnect();
     this.emit('completed', undefined);
     console.debug('[speech] playback completed', this.totalDuration);
   }

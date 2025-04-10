@@ -26,6 +26,7 @@
     "./ws-tools": "./src/ws-tools/index.ts"
   },
   "main": "src/index.ts",
+  "unpkg": "dist/umd/index.js",
   "module": "src/index.ts",
   "browser": {
     "crypto": false,

@@ -69,10 +69,11 @@ const SendMessage = ({
     <>
       <Row justify="center" style={{ marginTop: '10px' }}>
         <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button disabled={!isConnected} onClick={showModal}>
+          <Button size="large" disabled={!isConnected} onClick={showModal}>
             发送文本
           </Button>
           <Button
+            size="large"
             disabled={!isConnected}
             onClick={showSignalModal}
             style={{ marginLeft: '10px' }}
