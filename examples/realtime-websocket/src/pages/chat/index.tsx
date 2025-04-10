@@ -72,6 +72,14 @@ function Chat() {
       throw new Error('需要麦克风访问权限');
     }
 
+    if (!config.getPat()) {
+      throw new Error('请先配置个人访问令牌 -> 右上角 Settings');
+    }
+
+    if (!config.getBotId()) {
+      throw new Error('请先配置智能体ID -> 右上角 Settings');
+    }
+
     const audioConfig = audioConfigRef.current?.getSettings();
     console.log('audioConfig', audioConfig);
 

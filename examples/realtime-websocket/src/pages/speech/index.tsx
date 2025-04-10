@@ -18,6 +18,10 @@ const Speech: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false); // 是否暂停语音合成
 
   const initClient = () => {
+    if (!config.getPat()) {
+      throw new Error('请先配置个人访问令牌 -> 右上角 Settings');
+    }
+
     const client = new WsSpeechClient({
       token: config.getPat(),
       baseWsURL: config.getBaseWsUrl(),

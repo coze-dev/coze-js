@@ -30,8 +30,11 @@ const Transcription: React.FC = () => {
   const initClient = async () => {
     const permission = await WsToolsUtils.checkDevicePermission();
     if (!permission.audio) {
-      message.error('麦克风权限未开启');
-      return;
+      throw new Error('麦克风权限未开启');
+    }
+
+    if (!config.getPat()) {
+      throw new Error('请先配置个人访问令牌 -> 右上角 Settings');
     }
 
     const audioConfig = audioConfigRef.current?.getSettings();
