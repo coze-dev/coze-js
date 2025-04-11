@@ -89,10 +89,27 @@ export abstract class RawSendMessage implements ISendMessage {
   abstract sendRawMessage(
     _rawMessage: RawMessage,
     _historyMessages?: EnterMessage[],
-  );
+  ): Promise<unknown>;
 
   sendMessage(_message: EnterMessage, _historyMessages?: EnterMessage[]) {
     throw new Error('Un implement sendMessage');
+  }
+  createAnswerTextMessage(message: string): ChatMessage {
+    return {
+      id: '',
+      role: RoleType.User,
+      conversation_id: this.conversationId,
+      section_id: this.sectionId,
+      bot_id: this.botId,
+      chat_id: this.messageSended.chat_id,
+      localId: nanoid(),
+      meta_data: {},
+      content: message,
+      content_type: 'text',
+      created_at: Date.now(),
+      updated_at: Date.now(),
+      type: 'answer',
+    };
   }
 
   on(

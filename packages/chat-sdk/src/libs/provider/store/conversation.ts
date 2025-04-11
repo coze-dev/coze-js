@@ -16,6 +16,7 @@ import { useChatPropsContext } from '../context';
 
 const packMessageToGroup = (
   newMessageList: ChatMessage[],
+  isForceGroup?: boolean,
 ): ChatMessageGroup[] => {
   const groups: ChatMessageGroup[] = [];
 
@@ -27,8 +28,8 @@ const packMessageToGroup = (
       const lastGroup = groups[groups.length - 1];
       const { chatId: lastChatId } = lastGroup;
 
-      if (type !== 'question' && lastChatId) {
-        if (lastChatId === curChatId) {
+      if (type !== 'question') {
+        if (isForceGroup || (lastChatId && lastChatId === curChatId)) {
           // 同一个对话中的消息放到一起。
           lastGroup.respMessages.push(item);
           return;
@@ -235,7 +236,7 @@ const createConversationStore = ({ eventCallbacks }: ChatFrameworkProps) => {
           if (messages.length === 1 && error) {
             messageList = [{ ...messages[0], error }];
           }
-          const newGroup = packMessageToGroup(messageList)[0];
+          const newGroup = packMessageToGroup(messageList, true)[0];
           newGroup.id = groupLocalId;
           newGroup.sectionId;
           if (newGroup.sectionId) {
