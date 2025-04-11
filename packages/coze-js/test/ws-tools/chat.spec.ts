@@ -153,6 +153,7 @@ describe('WebSocket Chat Tools', () => {
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
       vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
       vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
+      client['recorder'].audioTrack = {} as any;
 
       // act
       await client.connect();
@@ -160,6 +161,20 @@ describe('WebSocket Chat Tools', () => {
 
       // assert
       expect(client.recorder?.resume).toHaveBeenCalled();
+    });
+
+    it('should set the audio enable2', async () => {
+      // mock
+      const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
+      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
+
+      // act
+      await client.connect();
+      await client.setAudioEnable(true);
+
+      // assert
+      expect(client.recorder?.start).toHaveBeenCalled();
     });
 
     it('should set the audio enable to false', async () => {

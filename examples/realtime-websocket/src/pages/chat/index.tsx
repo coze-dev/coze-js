@@ -113,6 +113,7 @@ function Chat() {
         enableDenoiseRecord: false,
       },
       deviceId: selectedInputDevice || undefined,
+      audioMutedDefault: audioConfig?.audioMutedDefault,
     });
 
     if (
@@ -170,6 +171,14 @@ function Chat() {
     window.location.reload();
   };
 
+  useEffect(() => {
+    return () => {
+      if (clientRef.current) {
+        clientRef.current.disconnect();
+      }
+    };
+  }, []);
+
   return (
     <Layout style={{ height: '100%' }}>
       <Settings
@@ -214,6 +223,10 @@ function Chat() {
                 isConnected={isConnected}
                 clientRef={clientRef}
                 setIsConnected={setIsConnected}
+                audioMutedDefault={
+                  audioConfigRef.current?.getSettings()?.audioMutedDefault ??
+                  false
+                }
               />
             )}
           </Col>

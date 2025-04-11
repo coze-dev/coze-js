@@ -26,6 +26,7 @@ export interface AudioConfigRef {
     echoCancellation: boolean;
     autoGainControl: boolean;
     debug: boolean;
+    audioMutedDefault: boolean;
   };
 }
 
@@ -50,6 +51,7 @@ export const AudioConfig = forwardRef<
   const [echoCancellation, setEchoCancellation] = useState(true);
   const [autoGainControl, setAutoGainControl] = useState(true);
   const [debug, setDebug] = useState(true);
+  const [audioMutedDefault, setAudioMutedDefault] = useState(false);
 
   useEffect(() => {
     if (!clientRef.current) {
@@ -89,6 +91,7 @@ export const AudioConfig = forwardRef<
       echoCancellation,
       autoGainControl,
       debug,
+      audioMutedDefault,
     }),
   }));
 
@@ -119,15 +122,28 @@ export const AudioConfig = forwardRef<
         {/* 开发模式 */}
         <Col span={24}>
           <Row align="middle">
-            <Col flex="90px">开发模式：</Col>
             <Col>
               <Checkbox
                 checked={debug}
                 disabled={isRecording}
                 onChange={e => setDebug(e.target.checked)}
               >
-                启用
+                开发模式
                 <Tooltip title="启用开发模式，控制台会输出更多日志">
+                  <InfoCircleOutlined
+                    style={{ marginLeft: 4, color: '#999' }}
+                  />
+                </Tooltip>
+              </Checkbox>
+            </Col>
+            <Col>
+              <Checkbox
+                checked={audioMutedDefault}
+                disabled={isRecording}
+                onChange={e => setAudioMutedDefault(e.target.checked)}
+              >
+                默认静音
+                <Tooltip title="启用默认静音">
                   <InfoCircleOutlined
                     style={{ marginLeft: 4, color: '#999' }}
                   />

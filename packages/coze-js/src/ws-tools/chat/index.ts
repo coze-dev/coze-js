@@ -13,6 +13,7 @@ export { WsChatEventNames };
 
 class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
+  private isMuted = false;
 
   constructor(config: WsChatClientOptions) {
     super(config);
@@ -24,6 +25,7 @@ class WsChatClient extends BaseWsChatClient {
       debug: config.debug,
       deviceId: config.deviceId,
     });
+    this.isMuted = config.audioMutedDefault ?? false;
   }
 
   private async startRecord() {
@@ -89,10 +91,12 @@ class WsChatClient extends BaseWsChatClient {
     const ws = await this.init();
     this.ws = ws;
 
-    await this.startRecord();
+    if (!this.isMuted) {
+      await this.startRecord();
+    }
     const sampleRate = await this.recorder?.getSampleRate();
 
-    this.ws.send({
+    const event: ChatUpdateEvent = {
       id: chatUpdate?.id || uuid(),
       event_type: WebsocketsEventType.CHAT_UPDATE,
       data: {
@@ -114,9 +118,11 @@ class WsChatClient extends BaseWsChatClient {
         need_play_prologue: true,
         ...chatUpdate?.data,
       },
-    });
+    };
 
-    this.emit(WsChatEventNames.CONNECTED, undefined);
+    this.ws.send(event);
+
+    this.emit(WsChatEventNames.CONNECTED, event);
   }
 
   async disconnect() {
@@ -138,7 +144,12 @@ class WsChatClient extends BaseWsChatClient {
     const status = await this.recorder?.getStatus();
     if (enable) {
       if (status === 'ended') {
-        await this.recorder?.resume();
+        if (this.recorder.audioTrack) {
+          await this.recorder?.resume();
+        } else {
+          this.startRecord();
+        }
+        this.isMuted = false;
         this.emit(WsChatEventNames.AUDIO_UNMUTED, undefined);
       } else {
         this.warn('recorder is not ended with status', status);
@@ -146,6 +157,7 @@ class WsChatClient extends BaseWsChatClient {
     } else {
       if (status === 'recording') {
         await this.recorder.pause();
+        this.isMuted = true;
         this.emit(WsChatEventNames.AUDIO_MUTED, undefined);
       } else {
         this.warn('recorder is not recording with status', status);
@@ -165,7 +177,9 @@ class WsChatClient extends BaseWsChatClient {
     const devices = await getAudioDevices();
     if (deviceId === 'default') {
       this.recorder.config.deviceId = undefined;
-      await this.startRecord();
+      if (!this.isMuted) {
+        await this.startRecord();
+      }
       this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     } else {
       const device = devices.audioInputs.find(d => d.deviceId === deviceId);
@@ -173,7 +187,9 @@ class WsChatClient extends BaseWsChatClient {
         throw new Error(`Device with id ${deviceId} not found`);
       }
       this.recorder.config.deviceId = device.deviceId;
-      await this.startRecord();
+      if (!this.isMuted) {
+        await this.startRecord();
+      }
       this.emit(WsChatEventNames.AUDIO_INPUT_DEVICE_CHANGED, undefined);
     }
   }

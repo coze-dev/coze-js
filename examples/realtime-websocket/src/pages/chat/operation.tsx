@@ -13,13 +13,15 @@ const Operation = ({
   isConnected,
   clientRef,
   setIsConnected,
+  audioMutedDefault,
 }: {
   isConnected: boolean;
   clientRef: MutableRefObject<WsChatClient | undefined>;
   setIsConnected: (isConnected: boolean) => void;
+  audioMutedDefault: boolean;
 }) => {
   // 是否开启麦克风
-  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(!audioMutedDefault);
 
   const handleInterrupt = () => {
     try {
