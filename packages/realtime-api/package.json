@@ -26,6 +26,7 @@
     "./event-names": "./src/event-names.ts"
   },
   "main": "src/index.ts",
+  "unpkg": "dist/umd/index.js",
   "module": "src/index.ts",
   "types": "./src/index.ts",
   "files": [

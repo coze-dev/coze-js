@@ -3,7 +3,7 @@ import {
   type AIDenoiserProcessorMode,
 } from './recorder/pcm-recorder';
 import { type WebsocketOptions } from '../core';
-import { type CreateChatWsRes, type GetToken } from '..';
+import { type ChatUpdateEvent, type CreateChatWsRes, type GetToken } from '..';
 
 export interface WsToolsOptions {
   /** Personal Access Token (PAT) or OAuth2.0 token, or a function to get token */
@@ -27,7 +27,11 @@ export interface AudioRecordEvent {
     wav: Blob;
   };
 }
-export type WsChatEventData = CreateChatWsRes | AudioRecordEvent | undefined;
+export type WsChatEventData =
+  | CreateChatWsRes
+  | AudioRecordEvent
+  | undefined
+  | ChatUpdateEvent;
 export type WsChatCallbackHandler = (
   eventName: string,
   event: WsChatEventData,
@@ -110,6 +114,11 @@ export interface WsChatClientOptions extends WsToolsOptions {
    * zh: 音频输入设备 ID
    */
   deviceId?: string;
+  /**
+   * en: Whether to mute by default
+   * zh: 是否默认静音
+   */
+  audioMutedDefault?: boolean;
   /**
    * en: Audio capture config
    * zh: 音频采集配置

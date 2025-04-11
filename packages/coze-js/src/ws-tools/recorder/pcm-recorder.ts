@@ -1,3 +1,4 @@
+import { type IAudioProcessor } from 'agora-rte-extension';
 import {
   createMicrophoneAudioTrack,
   type ILocalAudioTrack,
@@ -8,15 +9,14 @@ import {
   type AIDenoiserProcessor,
 } from 'agora-extension-ai-denoiser';
 
+import WavAudioProcessor from './processor/wav-audio-processor';
 import PcmAudioProcessor from './processor/pcm-audio-processor';
+import { checkDenoiserSupport } from '../utils';
 import {
   type AIDenoisingConfig,
   type AudioCaptureConfig,
   type WavRecordConfig,
 } from '../types';
-import WavAudioProcessor from './processor/wav-audio-processor';
-import { type IAudioProcessor } from 'agora-rte-extension';
-import { checkDenoiserSupport } from '../utils';
 
 export enum AIDenoiserProcessorMode {
   NSNG = 'NSNG',
@@ -33,11 +33,12 @@ export interface PcmRecorderConfig {
   mediaStreamTrack?: globalThis.MediaStreamTrack;
   wavRecordConfig?: WavRecordConfig;
   deviceId?: string;
+  audioMutedDefault?: boolean;
   debug?: boolean;
 }
 
 class PcmRecorder {
-  private audioTrack: ILocalAudioTrack | undefined;
+  audioTrack: ILocalAudioTrack | undefined;
   private stream: MediaStream | undefined;
   private recording = false;
   private static denoiser: AIDenoiserExtension | undefined;

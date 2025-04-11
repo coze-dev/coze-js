@@ -7,15 +7,15 @@ import {
 } from 'react-router-dom';
 import { useState } from 'react';
 
-import { Layout, Menu, theme, Button } from 'antd';
+import { Layout, Menu, theme, Button, Space } from 'antd';
 import {
-  AudioOutlined,
   MessageOutlined,
   CustomerServiceOutlined,
   ExperimentOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   GithubOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 
 import Transcription from './pages/transcription';
@@ -23,6 +23,7 @@ import Speech from './pages/speech';
 import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
 import logo from './logo.svg';
+import './App.css';
 
 const { Header, Content, Sider } = Layout;
 
@@ -30,23 +31,26 @@ const menuItems = [
   {
     key: '/',
     icon: <MessageOutlined />,
-    label: '实时语音',
+    label: '实时语音对话',
+    title: '实时语音对话 (Chat) 演示',
   },
   {
     key: '/transcription',
     icon: <CustomerServiceOutlined />,
     label: '语音识别',
+    title: '语音识别 (ASR) 演示',
   },
   {
     key: '/speech',
     icon: <ExperimentOutlined />,
     label: '语音合成',
+    title: '语音合成 (TTS) 演示',
   },
-  {
-    key: '/audio-test',
-    icon: <AudioOutlined />,
-    label: '音频测试',
-  },
+  // {
+  //   key: '/audio-test',
+  //   icon: <AudioOutlined />,
+  //   label: '音频测试',
+  // },
 ];
 
 function MainLayout() {
@@ -57,6 +61,12 @@ function MainLayout() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  // 获取当前路由对应的菜单项的title
+  const currentMenuItem = menuItems.find(
+    item => item.key === location.pathname,
+  );
+  const currentTitle = currentMenuItem?.title || '扣子实时语音对话';
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider
@@ -65,6 +75,7 @@ function MainLayout() {
         onCollapse={value => setCollapsed(value)}
         breakpoint="lg"
         collapsedWidth="0"
+        style={{ zIndex: 2 }}
         trigger={null}
       >
         <div
@@ -118,29 +129,56 @@ function MainLayout() {
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
           }}
+          className="responsive-header"
         >
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
-          />
-          <Button
-            type="link"
-            icon={<GithubOutlined />}
-            href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-websocket"
-            target="_blank"
-          >
-            GitHub
-          </Button>
+          <div className="header-content">
+            <div className="header-left">
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: '16px',
+                  width: 40,
+                  height: 64,
+                }}
+              />
+              <h3
+                style={{
+                  fontSize: '16px',
+                  marginBottom: '0',
+                  lineHeight: '64px',
+                }}
+              >
+                {currentTitle}
+              </h3>
+            </div>
+
+            <div className="header-right">
+              <Space size={2} style={{ display: 'flex' }}>
+                <Button
+                  type="link"
+                  icon={<FileTextOutlined />}
+                  href="https://github.com/coze-dev/coze-js/discussions"
+                  target="_blank"
+                  style={{ padding: '0 8px' }}
+                >
+                  文档
+                </Button>
+
+                <Button
+                  type="link"
+                  icon={<GithubOutlined />}
+                  href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-websocket"
+                  target="_blank"
+                  style={{ padding: '0 8px' }}
+                >
+                  GitHub
+                </Button>
+              </Space>
+            </div>
+          </div>
         </Header>
         <Content style={{ margin: '16px' }}>
           <div

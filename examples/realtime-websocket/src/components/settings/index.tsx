@@ -29,25 +29,25 @@ const formConfigs: FormConfig[] = [
   },
   {
     name: 'pat',
-    label: 'PAT',
+    label: '个人访问令牌',
     required: true,
     message: 'Please input PAT!',
   },
   {
     name: 'bot_id',
-    label: 'Bot ID',
+    label: '智能体ID',
     required: true,
     message: 'Please input Bot ID!',
   },
   {
     name: 'voice_id',
-    label: 'Voice ID',
+    label: '音色ID',
     required: false,
     message: 'Please input Voice ID!',
   },
   {
     name: 'workflow_id',
-    label: 'Workflow ID',
+    label: '工作流ID',
     required: false,
     message: 'Please input Workflow ID!',
   },
@@ -77,12 +77,12 @@ const Settings = ({
   onSettingsChange,
   localStorageKey,
   fields,
-  style,
+  className,
 }: {
   onSettingsChange: () => void;
   localStorageKey: string;
   fields?: string[];
-  style?: React.CSSProperties;
+  className?: string;
 }) => {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [form] = Form.useForm();
@@ -122,7 +122,7 @@ const Settings = ({
         icon={<SettingOutlined />}
         type="primary"
         onClick={() => setIsSettingsVisible(true)}
-        style={style}
+        className={className}
       >
         Settings
       </Button>
