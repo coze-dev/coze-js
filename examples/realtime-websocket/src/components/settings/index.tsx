@@ -77,12 +77,12 @@ const Settings = ({
   onSettingsChange,
   localStorageKey,
   fields,
-  style,
+  className,
 }: {
   onSettingsChange: () => void;
   localStorageKey: string;
   fields?: string[];
-  style?: React.CSSProperties;
+  className?: string;
 }) => {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [form] = Form.useForm();
@@ -122,7 +122,7 @@ const Settings = ({
         icon={<SettingOutlined />}
         type="primary"
         onClick={() => setIsSettingsVisible(true)}
-        style={style}
+        className={className}
       >
         Settings
       </Button>

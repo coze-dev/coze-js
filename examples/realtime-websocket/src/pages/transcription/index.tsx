@@ -183,12 +183,7 @@ const TranscriptionDemo: React.FC = () => {
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
         fields={['base_ws_url', 'pat']}
-        style={{
-          position: 'fixed',
-          right: 100,
-          top: 15,
-          zIndex: 10,
-        }}
+        className="settings-button"
       />
       <Layout.Content style={{ background: '#fff', padding: '20px' }}>
         {/* 前置条件检查 */}

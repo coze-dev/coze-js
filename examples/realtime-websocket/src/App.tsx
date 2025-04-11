@@ -15,6 +15,7 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   GithubOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 
 import Transcription from './pages/transcription';
@@ -22,6 +23,7 @@ import Speech from './pages/speech';
 import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
 import logo from './logo.svg';
+import './App.css';
 
 const { Header, Content, Sider } = Layout;
 
@@ -73,6 +75,7 @@ function MainLayout() {
         onCollapse={value => setCollapsed(value)}
         breakpoint="lg"
         collapsedWidth="0"
+        style={{ zIndex: 2 }}
         trigger={null}
       >
         <div
@@ -126,41 +129,56 @@ function MainLayout() {
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
           }}
+          className="responsive-header"
         >
-          <Space align="center" style={{ gap: '2px' }}>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: '16px',
-                width: 40,
-                height: 64,
-              }}
-            />
-            <h3
-              style={{
-                fontSize: '16px',
-                marginBottom: '0',
-                lineHeight: '64px',
-              }}
-            >
-              {currentTitle}
-            </h3>
-          </Space>
+          <div className="header-content">
+            <div className="header-left">
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: '16px',
+                  width: 40,
+                  height: 64,
+                }}
+              />
+              <h3
+                style={{
+                  fontSize: '16px',
+                  marginBottom: '0',
+                  lineHeight: '64px',
+                }}
+              >
+                {currentTitle}
+              </h3>
+            </div>
 
-          <Button
-            type="link"
-            icon={<GithubOutlined />}
-            href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-websocket"
-            target="_blank"
-          >
-            GitHub
-          </Button>
+            <div className="header-right">
+              <Space size={2} style={{ display: 'flex' }}>
+                <Button
+                  type="link"
+                  icon={<FileTextOutlined />}
+                  href="https://github.com/coze-dev/coze-js/discussions"
+                  target="_blank"
+                  style={{ padding: '0 8px' }}
+                >
+                  文档
+                </Button>
+
+                <Button
+                  type="link"
+                  icon={<GithubOutlined />}
+                  href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-websocket"
+                  target="_blank"
+                  style={{ padding: '0 8px' }}
+                >
+                  GitHub
+                </Button>
+              </Space>
+            </div>
+          </div>
         </Header>
         <Content style={{ margin: '16px' }}>
           <div

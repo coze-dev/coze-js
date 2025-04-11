@@ -176,12 +176,7 @@ function Chat() {
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
         fields={['base_ws_url', 'bot_id', 'pat', 'voice_id', 'workflow_id']}
-        style={{
-          position: 'absolute',
-          right: 100,
-          top: 15,
-          zIndex: 10,
-        }}
+        className="settings-button"
       />
       <Layout.Content style={{ padding: '16px', background: '#fff' }}>
         <Row justify="center">

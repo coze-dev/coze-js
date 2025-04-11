@@ -1,0 +1,65 @@
+/* 添加到您的CSS文件中，例如 App.css 或 index.css */
+.responsive-header {
+  width: 100%;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.settings-button {
+  position: fixed;
+  right: 160px;
+  top: 14px;
+  z-index: 1;
+}
+/* 移动端响应式设计 */
+@media screen and (max-width: 576px) {
+  .responsive-header {
+    height: 90px;
+  }
+  .settings-button {
+    position: fixed;
+    right: 160px;
+    top: 48px;
+    z-index: 1;
+  }
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 8px;
+  }
+
+  .header-left {
+    width: 100%;
+    height: 48px;
+  }
+
+  .header-left h3 {
+    line-height: 48px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: flex-end;
+    height: 40px;
+  }
+
+  /* 调整按钮和标题在移动端的样式 */
+  .header-left button {
+    height: 48px;
+  }
+}
