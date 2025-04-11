@@ -43,6 +43,7 @@ const TranscriptionDemo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [status, setStatus] = useState<string>('未开始');
+  const [denoiserSupported, setDenoiserSupported] = useState<boolean>(false);
 
   // 检查权限和令牌
   useEffect(() => {
@@ -54,16 +55,17 @@ const TranscriptionDemo: React.FC = () => {
       // 检查是否配置了PAT令牌
       const hasConfiguredToken = !!config.getPat();
       setHasToken(hasConfiguredToken);
+
+      // 检查是否支持AI降噪
+      const isDenoiserSupported = WsToolsUtils.checkDenoiserSupport();
+      setDenoiserSupported(isDenoiserSupported);
     };
 
     checkRequirements();
   }, []);
 
-  // 检查降噪支持
-  const denoiserSupported = WsToolsUtils.checkDenoiserSupport();
-
   // 初始化客户端
-  const initClient = () => {
+  const initClient = async () => {
     if (!hasPermission) {
       throw new Error('麦克风权限未授予');
     }
@@ -72,11 +74,15 @@ const TranscriptionDemo: React.FC = () => {
       throw new Error('请先配置个人访问令牌 -> 右上角 Settings');
     }
 
+    const devices = await WsToolsUtils.getAudioDevices();
+    const { deviceId } = devices.audioInputs[0];
+
     const client = new WsTranscriptionClient({
       token: config.getPat(),
       baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
       debug: true,
+      deviceId,
       // AI降噪配置 - 仅当浏览器支持并且选择使用时开启
       aiDenoisingConfig: denoiserSupported
         ? {
