@@ -349,6 +349,7 @@ client.destroy();
 | 功能 | 描述 | 示例 |
 |---------|-------------|----------|
 | 对话 | 文本对话 | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
+| 对话| 端插件| [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
 | Bot管理 | 创建和管理Bot | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
 | 数据集 | 文档管理 | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | 工作流 | 执行工作流 | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |

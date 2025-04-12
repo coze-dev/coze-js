@@ -309,6 +309,7 @@ export interface SubmitToolOutputsReq {
   conversation_id: string;
   chat_id: string;
   tool_outputs: ToolOutputType[];
+  auto_save_history?: boolean;
   stream: boolean;
 }
 
@@ -713,7 +714,7 @@ export interface ToolCallType {
     /**
      * The arguments of the function.
      */
-    argument: string;
+    arguments: string;
   };
 }
 

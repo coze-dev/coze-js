@@ -352,6 +352,7 @@ client.destroy();
 | Feature | Description | Example |
 |---------|-------------|----------|
 | Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
+| Chat | Chat With Local Plugin | [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
 | Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
 | Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
