@@ -14,7 +14,8 @@
     "chatflow",
     "AIDenoiserExtension",
     "denoiser",
-    "Denoising"
+    "Denoising",
+    "simult"
   ],
   "ignoreWords": [],
   "import": []

@@ -33,7 +33,7 @@ class BaseWsTranscriptionClient {
       aiDenoisingConfig: config.aiDenoisingConfig,
       mediaStreamTrack: config.mediaStreamTrack,
       wavRecordConfig: config.wavRecordConfig,
-      deviceId: config.deviceId || 'default',
+      deviceId: config.deviceId || undefined,
       debug: config.debug,
     });
 
