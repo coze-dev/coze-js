@@ -1,5 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+declare const uni: any;
 export function safeJsonParse(jsonString: string, defaultValue: any = '') {
   try {
     return JSON.parse(jsonString);
@@ -12,6 +14,10 @@ export function sleep(ms: number) {
   return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
+}
+
+export function isUniApp() {
+  return typeof uni !== 'undefined';
 }
 
 export function isBrowser() {

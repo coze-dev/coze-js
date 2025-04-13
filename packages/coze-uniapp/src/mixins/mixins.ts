@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- ignore */
-import Taro from '@tarojs/taro';
 import {
   type RunWorkflowReq,
   type RequestOptions,
@@ -144,6 +143,7 @@ export function getChatStreamMixin(api: CozeAPI) {
     }
 
     const { conversation_id, ...rest } = params;
+
     sendRequest(
       {
         url: `${api.options.baseURL ?? ''}/v3/chat${
@@ -235,7 +235,7 @@ export function getUploadFileMixin(api: CozeAPI) {
     await refreshToken(api, params, options);
 
     return new Promise<FileObject>((resolve, reject) => {
-      const task = Taro.uploadFile({
+      const task = uni.uploadFile({
         url: `${api.options.baseURL ?? ''}/v1/files/upload`,
         header: Object.assign(
           {
@@ -304,16 +304,20 @@ async function* handleStreamMessages(result: {
     }
     let message = result.messages.shift();
     while (message) {
-      if (message.event === ChatEventType.DONE) {
-        yield {
-          event: message.event,
-          data: '[DONE]',
-        };
-      } else {
-        yield {
-          event: message.event,
-          data: JSON.parse(message.data),
-        };
+      try {
+        if (message.event === ChatEventType.DONE) {
+          yield {
+            event: message.event,
+            data: '[DONE]',
+          };
+        } else {
+          yield {
+            event: message.event,
+            data: JSON.parse(message.data),
+          };
+        }
+      } catch (e) {
+        console.error('Failed to parse json data from event-stream', e);
       }
       message = result.messages.shift();
     }

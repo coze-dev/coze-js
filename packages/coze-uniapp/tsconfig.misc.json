@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/tsconfig",
+  "extends": "@coze-infra/ts-config/tsconfig.node.json",
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/tsconfig.misc.tsbuildinfo",
+    "moduleResolution": "node",
+    "module": "ES2022",
+    "lib": ["es2015", "dom"],
+    "types": ["node", "vitest/globals", "@dcloudio/types"],
+    "target": "es2022"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["src"],
+  "references": [{ "path": "./tsconfig.build.json" }]
+}
