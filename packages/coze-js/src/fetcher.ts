@@ -9,7 +9,7 @@ import axios, {
   type AxiosStatic,
 } from 'axios';
 
-import { isBrowser } from './utils';
+import { isBrowser, isUniApp } from './utils';
 import {
   APIError,
   TimeoutError,
@@ -65,7 +65,7 @@ export const adapterFetch = async (options: any): Promise<any> => {
 };
 
 const isSupportNativeFetch = () => {
-  if (isBrowser()) {
+  if (isBrowser() || isUniApp()) {
     return true;
   }
   // native fetch is supported in node 18.0.0 or higher

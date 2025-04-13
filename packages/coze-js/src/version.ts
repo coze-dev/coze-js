@@ -2,6 +2,8 @@ import os from 'os';
 
 import pkg from '../package.json';
 const { version } = pkg;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const uni: any;
 
 const getEnv = () => {
   const nodeVersion = process.version.slice(1); // Remove 'v' prefix
@@ -111,4 +113,78 @@ const getBrowserClientUserAgent = (): string => {
   return JSON.stringify(ua);
 };
 
-export { getUserAgent, getNodeClientUserAgent, getBrowserClientUserAgent };
+// 获取 UniApp 环境信息
+const getUniAppClientUserAgent = (): string => {
+  // 获取系统信息
+
+  const systemInfo = uni.getSystemInfoSync();
+
+  const platformInfo = {
+    name: 'unknown',
+    version: 'unknown',
+  };
+
+  const osInfo = {
+    name: 'unknown',
+    version: 'unknown',
+  };
+
+  // 处理操作系统信息
+  if (systemInfo.platform === 'android') {
+    osInfo.name = 'android';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'ios') {
+    osInfo.name = 'ios';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'windows') {
+    osInfo.name = 'windows';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'mac') {
+    osInfo.name = 'macos';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else {
+    // 其他平台直接使用平台名称
+    osInfo.name = systemInfo.platform;
+    osInfo.version = systemInfo.system || 'unknown';
+  }
+
+  // 处理应用/平台信息
+  if (systemInfo.AppPlatform) {
+    // App 环境
+    platformInfo.name = systemInfo.AppPlatform.toLowerCase();
+    platformInfo.version = systemInfo.appVersion || 'unknown';
+  } else if (systemInfo.uniPlatform) {
+    // UniApp 识别的平台
+    platformInfo.name = systemInfo.uniPlatform;
+    platformInfo.version = systemInfo.SDKVersion || 'unknown';
+  } else {
+    // 尝试从环境判断平台类型
+    const { appName, appVersion } = systemInfo;
+    if (appName) {
+      platformInfo.name = appName.toLowerCase();
+      platformInfo.version = appVersion || 'unknown';
+    }
+  }
+
+  const ua = {
+    version,
+    framework: 'uniapp',
+    platform: platformInfo.name,
+    platform_version: platformInfo.version,
+    os_name: osInfo.name,
+    os_version: osInfo.version,
+    screen_width: systemInfo.screenWidth,
+    screen_height: systemInfo.screenHeight,
+    device_model: systemInfo.model,
+    device_brand: systemInfo.brand,
+  };
+
+  return JSON.stringify(ua);
+};
+
+export {
+  getUserAgent,
+  getNodeClientUserAgent,
+  getBrowserClientUserAgent,
+  getUniAppClientUserAgent,
+};

@@ -74,6 +74,7 @@
     "typescript": ["^5.5.3", "^4.9.5"],
     "@tarojs/webpack5-runner": ["4.0.7", "3.6.35"],
     "babel-preset-taro": ["4.0.7", "3.6.35"],
-    "@coze/api": ["workspace:*", "^1.0.17"]
+    "@coze/api": ["workspace:*", "^1.0.17"],
+    "vite": ["5.2.8", "^4.2.0"]
   }
 }

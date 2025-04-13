@@ -2,7 +2,7 @@ import * as nodeCrypto from 'crypto';
 
 import jwt from 'jsonwebtoken';
 
-import { isBrowser, sleep } from './utils';
+import { isBrowser, isUniApp, sleep } from './utils';
 import { APIError } from './error';
 import { APIClient, type RequestOptions } from './core';
 import {
@@ -10,15 +10,32 @@ import {
   MAX_POLL_INTERVAL,
   POLL_INTERVAL,
 } from './constant';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const uni: any;
 
 const getCrypto = () => {
+  if (isUniApp()) {
+    return {
+      getRandomValues: uni.getRandomValues,
+      subtle: {
+        // TODO Currently not supporting uniapp, will provide support later if needed
+        digest: async () => {
+          console.error('digest is not supported in uniapp');
+          return {} as unknown as Promise<ArrayBuffer>;
+        },
+      },
+    };
+  }
   if (isBrowser()) {
     return window.crypto;
   }
+
+  // #ifndef MP
   return {
     getRandomValues: (array: Uint8Array) => nodeCrypto.randomFillSync(array),
     subtle: nodeCrypto.subtle,
   };
+  // #endif
 };
 
 const generateRandomString = () => {
