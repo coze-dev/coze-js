@@ -56,7 +56,6 @@ export function sendRequest<Message>(
       result.deferred?.resolve(msg);
     })
     .on(EventName.Fail, msg => {
-      console.log('sendRequest fail', msg);
       const data = (msg.data as Record<string, unknown>) || {};
       data.error = data.error || data.detail;
       const error = APIError.generate(

@@ -32,11 +32,9 @@ export class EventSource extends BaseEventSource {
       responseType: 'arraybuffer',
       timeout,
       fail: err => {
-        console.log('err', err);
         this.trigger(EventName.Fail, { errMsg: err.errMsg });
       },
       success: res => {
-        console.log('res', res);
         if (res.statusCode !== 200) {
           this.trigger(EventName.Fail, { errMsg: res.errMsg, data: res });
         } else {
