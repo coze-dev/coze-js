@@ -29,7 +29,11 @@ export interface ChatMessage {
   data: string;
 }
 
-const uuid = () => (Math.random() * new Date().getTime()).toString();
+const uuid = () => {
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return (array[0] * new Date().getTime()).toString();
+};
 
 export const handleAdditionalMessages = (
   additional_messages?: EnterMessage[],
