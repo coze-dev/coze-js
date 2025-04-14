@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 import os from 'os';
 
 import {
   getUserAgent,
   getNodeClientUserAgent,
   getBrowserClientUserAgent,
+  getUniAppClientUserAgent,
 } from '../src/version';
 
 // Mock process before all tests
@@ -21,6 +23,32 @@ vi.mock('../package.json', () => ({
     version: '1.0.0',
   },
 }));
+
+// Mock uni global object
+const mockUni = {
+  getSystemInfoSync: vi.fn(),
+};
+
+// @ts-expect-error: Mock uni global
+global.uni = mockUni;
+
+// Use actual implementation for version.ts but mock specific functions
+vi.mock('../src/version', async () => {
+  const mod =
+    await vi.importActual<typeof import('../src/version')>('../src/version');
+  return {
+    getUserAgent: vi.fn().mockImplementation(mod.getUserAgent),
+    getNodeClientUserAgent: vi
+      .fn()
+      .mockImplementation(mod.getNodeClientUserAgent),
+    getBrowserClientUserAgent: vi
+      .fn()
+      .mockImplementation(mod.getBrowserClientUserAgent),
+    getUniAppClientUserAgent: vi
+      .fn()
+      .mockImplementation(mod.getUniAppClientUserAgent),
+  };
+});
 
 describe('Version utilities', () => {
   beforeEach(() => {
@@ -156,6 +184,156 @@ describe('Version utilities', () => {
         browser_version: 'unknown',
         os_name: 'unknown',
         os_version: 'unknown',
+      });
+    });
+  });
+
+  describe('getUniAppClientUserAgent', () => {
+    beforeEach(() => {
+      // Reset mock for each test
+      vi.mocked(mockUni.getSystemInfoSync).mockReset();
+    });
+
+    it('should return correct JSON string for Android app', () => {
+      vi.mocked(mockUni.getSystemInfoSync).mockReturnValue({
+        platform: 'android',
+        system: 'Android 13',
+        AppPlatform: 'APP-PLUS',
+        appVersion: '1.2.3',
+        screenWidth: 1080,
+        screenHeight: 2400,
+        model: 'Pixel 6',
+        brand: 'Google',
+      });
+
+      const userAgent = getUniAppClientUserAgent();
+      const parsed = JSON.parse(userAgent);
+
+      expect(parsed).toEqual({
+        version: '1.0.0',
+        framework: 'uniapp',
+        platform: 'app-plus',
+        platform_version: '1.2.3',
+        os_name: 'android',
+        os_version: 'Android 13',
+        screen_width: 1080,
+        screen_height: 2400,
+        device_model: 'Pixel 6',
+        device_brand: 'Google',
+      });
+    });
+
+    it('should return correct JSON string for iOS app', () => {
+      vi.mocked(mockUni.getSystemInfoSync).mockReturnValue({
+        platform: 'ios',
+        system: 'iOS 17.2.1',
+        AppPlatform: 'APP-PLUS',
+        appVersion: '2.0.0',
+        screenWidth: 1170,
+        screenHeight: 2532,
+        model: 'iPhone 14 Pro',
+        brand: 'Apple',
+      });
+
+      const userAgent = getUniAppClientUserAgent();
+      const parsed = JSON.parse(userAgent);
+
+      expect(parsed).toEqual({
+        version: '1.0.0',
+        framework: 'uniapp',
+        platform: 'app-plus',
+        platform_version: '2.0.0',
+        os_name: 'ios',
+        os_version: 'iOS 17.2.1',
+        screen_width: 1170,
+        screen_height: 2532,
+        device_model: 'iPhone 14 Pro',
+        device_brand: 'Apple',
+      });
+    });
+
+    it('should return correct JSON string for WeChat Mini Program', () => {
+      vi.mocked(mockUni.getSystemInfoSync).mockReturnValue({
+        platform: 'ios',
+        system: 'iOS 17.2.1',
+        uniPlatform: 'mp-weixin',
+        SDKVersion: '3.0.0',
+        screenWidth: 375,
+        screenHeight: 812,
+        model: 'iPhone 14 Pro',
+        brand: 'Apple',
+      });
+
+      const userAgent = getUniAppClientUserAgent();
+      const parsed = JSON.parse(userAgent);
+
+      expect(parsed).toEqual({
+        version: '1.0.0',
+        framework: 'uniapp',
+        platform: 'mp-weixin',
+        platform_version: '3.0.0',
+        os_name: 'ios',
+        os_version: 'iOS 17.2.1',
+        screen_width: 375,
+        screen_height: 812,
+        device_model: 'iPhone 14 Pro',
+        device_brand: 'Apple',
+      });
+    });
+
+    it('should handle unknown platform with appName', () => {
+      vi.mocked(mockUni.getSystemInfoSync).mockReturnValue({
+        platform: 'unknown',
+        system: 'Unknown OS',
+        appName: 'CustomApp',
+        appVersion: '1.0.0',
+        screenWidth: 1024,
+        screenHeight: 768,
+        model: 'Unknown Model',
+        brand: 'Unknown Brand',
+      });
+
+      const userAgent = getUniAppClientUserAgent();
+      const parsed = JSON.parse(userAgent);
+
+      expect(parsed).toEqual({
+        version: '1.0.0',
+        framework: 'uniapp',
+        platform: 'customapp',
+        platform_version: '1.0.0',
+        os_name: 'unknown',
+        os_version: 'Unknown OS',
+        screen_width: 1024,
+        screen_height: 768,
+        device_model: 'Unknown Model',
+        device_brand: 'Unknown Brand',
+      });
+    });
+
+    it('should handle missing version information', () => {
+      vi.mocked(mockUni.getSystemInfoSync).mockReturnValue({
+        platform: 'android',
+        system: 'Android',
+        screenWidth: 1080,
+        screenHeight: 2400,
+        model: 'Test Model',
+        brand: 'Test Brand',
+      });
+
+      const userAgent = getUniAppClientUserAgent();
+      const parsed = JSON.parse(userAgent);
+
+      expect(parsed).toEqual({
+        version: '1.0.0',
+        framework: 'uniapp',
+        platform: 'unknown',
+        platform_version: 'unknown',
+        os_name: 'android',
+        os_version: 'Android',
+        screen_width: 1080,
+        screen_height: 2400,
+        device_model: 'Test Model',
+        device_brand: 'Test Brand',
       });
     });
   });

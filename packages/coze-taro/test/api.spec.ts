@@ -1,3 +1,5 @@
+import { RoleType } from '@coze/api';
+
 import { CozeAPI } from '../src/api';
 
 describe('CozeAPI - mini', () => {
@@ -111,7 +113,39 @@ describe('CozeAPI - mini', () => {
         onBeforeAPICall: () => ({}),
       });
       expect(cozeApi.token).toEqual('');
-      const chunks = cozeApi.chat.stream({ bot_id: 'xx' });
+      const chunks = cozeApi.chat.stream({
+        bot_id: 'xx',
+        additional_messages: [
+          {
+            role: RoleType.User,
+            content: 'Hello, world!',
+            content_type: 'text',
+          },
+          {
+            role: RoleType.Assistant,
+            content: [
+              {
+                type: 'text',
+                text: 'Hello, world!',
+              },
+            ],
+            content_type: 'object_string',
+          },
+        ],
+        shortcut_command: {
+          command_id: 'command_id',
+          parameters: {
+            key1: {
+              type: 'text',
+              text: 'value1',
+            },
+            key2: {
+              type: 'file',
+              file_id: 'file_id',
+            },
+          },
+        },
+      });
       vi.runAllTimersAsync();
 
       const caches = [];

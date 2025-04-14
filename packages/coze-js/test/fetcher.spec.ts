@@ -6,6 +6,10 @@ import { TimeoutError, APIUserAbortError, CozeError } from '../src/error';
 
 vi.mock('axios');
 vi.mock('node-fetch');
+vi.mock('../src/utils', () => ({
+  isBrowser: vi.fn().mockReturnValue(false),
+  isUniApp: vi.fn().mockReturnValue(false),
+}));
 
 const mockedAxios = vi.mocked(axios);
 const mockedFetch = vi.mocked(nodeFetch);
@@ -150,6 +154,7 @@ describe('fetchAPI', () => {
     };
     mockedAxios.mockResolvedValue({ data: mockStream });
 
+    // Mock Node.js version to be lower than 18.0.0 to force using adapterFetch
     Object.defineProperty(process, 'version', { value: 'v16.0.0' });
 
     const result = await fetchAPI('https://api.example.com/stream', {
