@@ -113,9 +113,9 @@ const getBrowserClientUserAgent = (): string => {
   return JSON.stringify(ua);
 };
 
-// 获取 UniApp 环境信息
+// Get UniApp client user agent
 const getUniAppClientUserAgent = (): string => {
-  // 获取系统信息
+  // Get system info
 
   const systemInfo = uni.getSystemInfoSync();
 
@@ -129,7 +129,7 @@ const getUniAppClientUserAgent = (): string => {
     version: 'unknown',
   };
 
-  // 处理操作系统信息
+  // Handle operating system info
   if (systemInfo.platform === 'android') {
     osInfo.name = 'android';
     osInfo.version = systemInfo.system || 'unknown';
@@ -143,22 +143,22 @@ const getUniAppClientUserAgent = (): string => {
     osInfo.name = 'macos';
     osInfo.version = systemInfo.system || 'unknown';
   } else {
-    // 其他平台直接使用平台名称
+    // Other platforms use platform name directly
     osInfo.name = systemInfo.platform;
     osInfo.version = systemInfo.system || 'unknown';
   }
 
-  // 处理应用/平台信息
+  // Handle app/platform info
   if (systemInfo.AppPlatform) {
-    // App 环境
+    // App environment
     platformInfo.name = systemInfo.AppPlatform.toLowerCase();
     platformInfo.version = systemInfo.appVersion || 'unknown';
   } else if (systemInfo.uniPlatform) {
-    // UniApp 识别的平台
+    // UniApp recognized platform
     platformInfo.name = systemInfo.uniPlatform;
     platformInfo.version = systemInfo.SDKVersion || 'unknown';
   } else {
-    // 尝试从环境判断平台类型
+    // Try to determine platform type from environment
     const { appName, appVersion } = systemInfo;
     if (appName) {
       platformInfo.name = appName.toLowerCase();

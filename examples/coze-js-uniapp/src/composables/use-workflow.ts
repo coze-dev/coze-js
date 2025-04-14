@@ -41,6 +41,7 @@ export function useWorkflow() {
 
       isResponsing.value = false;
     } catch (e) {
+      isResponsing.value = false;
       console.log('failed: ', e);
     }
   };
