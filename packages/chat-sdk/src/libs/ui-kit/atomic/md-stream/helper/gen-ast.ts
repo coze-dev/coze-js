@@ -2,10 +2,12 @@ import { radioListItem } from 'micromark-extension-misc-radio-list-item';
 import { gfmTaskListItem } from 'micromark-extension-gfm-task-list-item';
 import { gfmTable } from 'micromark-extension-gfm-table';
 import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough';
+import { gfmAutolinkLiteral } from 'micromark-extension-gfm-autolink-literal';
 import { radioListItemFromMarkdown } from 'mdast-util-radio-list-item';
 import { gfmTaskListItemFromMarkdown } from 'mdast-util-gfm-task-list-item';
 import { gfmTableFromMarkdown } from 'mdast-util-gfm-table';
 import { gfmStrikethroughFromMarkdown } from 'mdast-util-gfm-strikethrough';
+import { gfmAutolinkLiteralFromMarkdown } from 'mdast-util-gfm-autolink-literal';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import type { Root } from 'mdast';
 import { cloneDeep } from 'lodash-es';
@@ -17,13 +19,16 @@ const extensions = [
   gfmTable(),
   gfmTaskListItem(),
   radioListItem(),
+  gfmAutolinkLiteral(),
 ];
 const mdastExtensions = [
   gfmStrikethroughFromMarkdown(),
   gfmTableFromMarkdown(),
   gfmTaskListItemFromMarkdown(),
   radioListItemFromMarkdown(),
+  gfmAutolinkLiteralFromMarkdown(),
 ];
+// eslint-disable-next-line complexity
 export const genAst = ({
   oldMarkdown,
   newMarkdown,
