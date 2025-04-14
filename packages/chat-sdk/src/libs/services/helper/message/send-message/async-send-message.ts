@@ -6,10 +6,11 @@ import {
 } from '@coze/api';
 
 import { logger, MiniChatError, safeJSONParse } from '@/libs/utils';
-import { ChatMessage } from '@/libs/types';
+import { ChatMessage, Language } from '@/libs/types';
 
 import { MultiSendMessage } from './multi-send-message';
 
+const errorCodeListToShowInMessage = ['4033', '4028', '4027', '4013'];
 export class AsyncSendMessage extends MultiSendMessage {
   private chatStream?: AsyncIterable<StreamChatData>;
 
@@ -17,14 +18,22 @@ export class AsyncSendMessage extends MultiSendMessage {
     try {
       logger.debug('asyncChat start sendMessage: ', message);
       this._checkTimeout();
-      const chatStream = await this.chatService.asyncChat({
-        bot_id: this.botId,
-        user_id: this.userId,
-        additional_messages: [...(historyMessages || []), message],
-        conversation_id: this.conversationId,
-        connector_id: this.connectorId,
-        suggestPromoteInfo: this.chatInfo?.suggestPromoteInfo,
-      });
+      const chatStream = await this.chatService.asyncChat(
+        {
+          bot_id: this.botId,
+          user_id: this.userId,
+          additional_messages: [...(historyMessages || []), message],
+          conversation_id: this.conversationId,
+          connector_id: this.connectorId,
+          suggestPromoteInfo: this.chatInfo?.suggestPromoteInfo,
+        },
+        {
+          headers: {
+            'Accept-Language':
+              this.i18n.language === Language.ZH_CN ? 'zh' : 'en',
+          },
+        },
+      );
       logger.debug('asyncChat sendMessage stream: ', chatStream);
       this.chatStream = chatStream;
       this.pollAnswer();
@@ -144,22 +153,20 @@ export class AsyncSendMessage extends MultiSendMessage {
                 msg: string;
               };
               this.chatService.handleErrorCode(messageError.code || -1);
-              this.sendErrorEvent(
-                new MiniChatError(
-                  messageError.code || -1,
-                  messageError.msg || this.i18n.t('sendFailed'),
-                ),
+
+              this.sendHandledErrorEvent(
+                messageError.code,
+                messageError.msg,
+                messageList,
               );
               return;
             }
             case ChatEventType.CONVERSATION_CHAT_FAILED: {
               const messageError = safeJSONParse(data) as CreateChatData;
-
-              this.sendErrorEvent(
-                new MiniChatError(
-                  messageError.last_error?.code || -1,
-                  messageError.last_error?.msg || this.i18n.t('sendFailed'),
-                ),
+              this.sendHandledErrorEvent(
+                messageError.last_error?.code || -1,
+                messageError.last_error?.msg || '',
+                messageList,
               );
               return;
             }
@@ -179,6 +186,27 @@ export class AsyncSendMessage extends MultiSendMessage {
       logger.error('asyncChat pollAnswer error', error);
       this.sendErrorEvent(new MiniChatError(-1, this.i18n.t('sendFailed')));
       return;
+    }
+  }
+  private sendHandledErrorEvent(
+    errorCode: number,
+    errorMsg: string,
+    messageList: ChatMessage[],
+  ) {
+    if (
+      errorCodeListToShowInMessage.includes(errorCode.toString()) &&
+      errorMsg
+    ) {
+      this.messageList = [this.messageSended, ...(messageList || [])];
+      this.messageList.push(this.createAnswerTextMessage(errorMsg));
+      this.sendCompleteEvent();
+    } else {
+      this.sendErrorEvent(
+        new MiniChatError(
+          errorCode || -1,
+          errorMsg || this.i18n.t('sendFailed'),
+        ),
+      );
     }
   }
 }
