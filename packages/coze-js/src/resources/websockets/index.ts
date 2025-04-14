@@ -8,13 +8,20 @@ export class Websockets extends APIResource {
 }
 
 export { type CreateChatWsReq, type CreateChatWsRes } from './chat/index';
+
 export {
   type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
 } from './audio/transcriptions/index';
+
 export {
   type CreateSpeechWsReq,
   type CreateSpeechWsRes,
 } from './audio/speech/index';
+
+export {
+  type CreateSimultInterpretationsWsReq,
+  type CreateSimultInterpretationsWsRes,
+} from './audio/simult-interpretation/index';
 
 export * from './types';

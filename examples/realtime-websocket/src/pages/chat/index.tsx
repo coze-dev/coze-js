@@ -12,7 +12,7 @@ import ReceiveMessage from './receive-message';
 import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
-import { ConsoleLog } from './console-log';
+import { ConsoleLog } from '../../components/console-log';
 import EventInput from './event-input';
 import Settings from '../../components/settings';
 import { AudioOutlined } from '@ant-design/icons';

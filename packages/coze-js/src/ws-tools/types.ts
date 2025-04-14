@@ -343,3 +343,5 @@ export interface WsTranscriptionClientOptions extends WsToolsOptions {
    */
   wavRecordConfig?: WavRecordConfig;
 }
+
+export type WsSimultInterpretationClientOptions = WsTranscriptionClientOptions;
