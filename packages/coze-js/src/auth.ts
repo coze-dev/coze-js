@@ -19,9 +19,9 @@ const getCrypto = () => {
       getRandomValues: uni.getRandomValues,
       subtle: {
         // TODO Currently not supporting uniapp, will provide support later if needed
-        digest: async () => {
+        digest: () => {
           console.error('digest is not supported in uniapp');
-          return {} as unknown as Promise<ArrayBuffer>;
+          throw new Error('digest is not supported in uniapp');
         },
       },
     };
