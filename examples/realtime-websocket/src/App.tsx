@@ -20,11 +20,11 @@ import {
 
 import Transcription from './pages/transcription';
 import Speech from './pages/speech';
+import SimultInterpretation from './pages/simult-interpretation';
 import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
 import logo from './logo.svg';
 import './App.css';
-
 const { Header, Content, Sider } = Layout;
 
 const menuItems = [
@@ -45,6 +45,12 @@ const menuItems = [
     icon: <ExperimentOutlined />,
     label: '语音合成',
     title: '语音合成 (TTS) 演示',
+  },
+  {
+    key: '/simult',
+    icon: <CustomerServiceOutlined />,
+    label: '同声传译',
+    title: '多语种实时翻译 (Simult) 演示',
   },
   // {
   //   key: '/audio-test',
@@ -195,6 +201,7 @@ function MainLayout() {
               <Route path="/audio-test" element={<AudioTest />} />
               <Route path="/transcription" element={<Transcription />} />
               <Route path="/speech" element={<Speech />} />
+              <Route path="/simult" element={<SimultInterpretation />} />
             </Routes>
           </div>
         </Content>
