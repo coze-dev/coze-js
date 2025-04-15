@@ -444,6 +444,11 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@coze/uniapp-api",
+      "projectFolder": "packages/coze-uniapp",
+      "shouldPublish": true
+    },
+    {
       "packageName": "@coze/realtime-api-example",
       "projectFolder": "examples/realtime-console"
     },
@@ -458,6 +463,10 @@
     {
       "packageName": "@coze/taro-api-example3",
       "projectFolder": "examples/coze-js-taro3"
+    },
+    {
+      "packageName": "@coze/coze-js-uniapp",
+      "projectFolder": "examples/coze-js-uniapp"
     }
   ]
 }

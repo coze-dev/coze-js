@@ -2,6 +2,8 @@ import os from 'os';
 
 import pkg from '../package.json';
 const { version } = pkg;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const uni: any;
 
 const getEnv = () => {
   const nodeVersion = process.version.slice(1); // Remove 'v' prefix
@@ -111,4 +113,78 @@ const getBrowserClientUserAgent = (): string => {
   return JSON.stringify(ua);
 };
 
-export { getUserAgent, getNodeClientUserAgent, getBrowserClientUserAgent };
+// Get UniApp client user agent
+const getUniAppClientUserAgent = (): string => {
+  // Get system info
+
+  const systemInfo = uni.getSystemInfoSync();
+
+  const platformInfo = {
+    name: 'unknown',
+    version: 'unknown',
+  };
+
+  const osInfo = {
+    name: 'unknown',
+    version: 'unknown',
+  };
+
+  // Handle operating system info
+  if (systemInfo.platform === 'android') {
+    osInfo.name = 'android';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'ios') {
+    osInfo.name = 'ios';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'windows') {
+    osInfo.name = 'windows';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else if (systemInfo.platform === 'mac') {
+    osInfo.name = 'macos';
+    osInfo.version = systemInfo.system || 'unknown';
+  } else {
+    // Other platforms use platform name directly
+    osInfo.name = systemInfo.platform;
+    osInfo.version = systemInfo.system || 'unknown';
+  }
+
+  // Handle app/platform info
+  if (systemInfo.AppPlatform) {
+    // App environment
+    platformInfo.name = systemInfo.AppPlatform.toLowerCase();
+    platformInfo.version = systemInfo.appVersion || 'unknown';
+  } else if (systemInfo.uniPlatform) {
+    // UniApp recognized platform
+    platformInfo.name = systemInfo.uniPlatform;
+    platformInfo.version = systemInfo.SDKVersion || 'unknown';
+  } else {
+    // Try to determine platform type from environment
+    const { appName, appVersion } = systemInfo;
+    if (appName) {
+      platformInfo.name = appName.toLowerCase();
+      platformInfo.version = appVersion || 'unknown';
+    }
+  }
+
+  const ua = {
+    version,
+    framework: 'uniapp',
+    platform: platformInfo.name,
+    platform_version: platformInfo.version,
+    os_name: osInfo.name,
+    os_version: osInfo.version,
+    screen_width: systemInfo.screenWidth,
+    screen_height: systemInfo.screenHeight,
+    device_model: systemInfo.model,
+    device_brand: systemInfo.brand,
+  };
+
+  return JSON.stringify(ua);
+};
+
+export {
+  getUserAgent,
+  getNodeClientUserAgent,
+  getBrowserClientUserAgent,
+  getUniAppClientUserAgent,
+};

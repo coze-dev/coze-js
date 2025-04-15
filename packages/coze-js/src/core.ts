@@ -9,9 +9,15 @@ import { WebSocketAPI } from './websocket-api';
 import {
   getBrowserClientUserAgent,
   getNodeClientUserAgent,
+  getUniAppClientUserAgent,
   getUserAgent,
 } from './version';
-import { isBrowser, isPersonalAccessToken, mergeConfig } from './utils';
+import {
+  isBrowser,
+  isPersonalAccessToken,
+  isUniApp,
+  mergeConfig,
+} from './utils';
 import { type FetchAPIOptions, fetchAPI } from './fetcher';
 import { APIError, type ErrorRes } from './error';
 import * as Errors from './error';
@@ -124,11 +130,13 @@ export class APIClient {
       authorization: `Bearer ${token}`,
     };
 
-    if (!isBrowser()) {
+    if (isUniApp()) {
+      headers['X-Coze-Client-User-Agent'] = getUniAppClientUserAgent();
+    } else if (isBrowser()) {
+      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
+    } else {
       headers['User-Agent'] = getUserAgent();
       headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
-    } else {
-      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     }
 
     const config = mergeConfig(

@@ -32,7 +32,8 @@
     "crypto": false,
     "os": false,
     "jsonwebtoken": false,
-    "node-fetch": false
+    "node-fetch": false,
+    "ws": false
   },
   "typesVersions": {
     "*": {

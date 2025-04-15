@@ -18,6 +18,7 @@ vi.mock('../src/version', () => ({
   getBrowserClientUserAgent: vi
     .fn()
     .mockReturnValue('mocked-browser-user-agent'),
+  getUniAppClientUserAgent: vi.fn().mockReturnValue('mocked-uniapp-user-agent'),
 }));
 
 describe('APIClient', () => {

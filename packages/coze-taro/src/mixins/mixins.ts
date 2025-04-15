@@ -11,6 +11,8 @@ import {
   type CreateFileReq,
   type ChatWorkflowReq,
   type FileObject,
+  type EnterMessage,
+  type ObjectStringItem,
 } from '@coze/api';
 
 import { type Deferred } from '../helpers/async';
@@ -27,6 +29,30 @@ export interface ChatMessage {
   event: ChatEventType;
   data: string;
 }
+
+const uuid = () => (Math.random() * new Date().getTime()).toString();
+
+export const handleAdditionalMessages = (
+  additional_messages?: EnterMessage[],
+) =>
+  additional_messages?.map(i => ({
+    ...i,
+    content:
+      typeof i.content === 'object' ? JSON.stringify(i.content) : i.content,
+  }));
+
+export const handleParameters = (
+  parameters?: Record<string, ObjectStringItem | string>,
+) => {
+  if (parameters) {
+    for (const [key, value] of Object.entries(parameters)) {
+      if (typeof value === 'object') {
+        parameters[key] = JSON.stringify(value);
+      }
+    }
+  }
+  return parameters;
+};
 
 // workflows.runs.stream
 export function getWorkflowStreamMixin(api: CozeAPI) {
@@ -113,6 +139,10 @@ export function getChatStreamMixin(api: CozeAPI) {
       error: null,
     };
 
+    if (!params.user_id) {
+      params.user_id = uuid();
+    }
+
     const { conversation_id, ...rest } = params;
     sendRequest(
       {
@@ -123,6 +153,17 @@ export function getChatStreamMixin(api: CozeAPI) {
         data: {
           stream: true,
           ...rest,
+          additional_messages: handleAdditionalMessages(
+            params.additional_messages,
+          ),
+          shortcut_command: params.shortcut_command
+            ? {
+                ...params.shortcut_command,
+                parameters: handleParameters(
+                  params.shortcut_command.parameters,
+                ),
+              }
+            : undefined,
         },
         headers: Object.assign(
           {
@@ -165,7 +206,12 @@ export function getWorkflowChatStreamMixin(api: CozeAPI) {
       {
         url: `${api.options.baseURL ?? ''}/v1/workflows/chat`,
         method: 'POST',
-        data: params,
+        data: {
+          ...params,
+          additional_messages: handleAdditionalMessages(
+            params.additional_messages,
+          ),
+        },
         headers: Object.assign(
           {
             Authorization: `Bearer ${api.options.token}`,

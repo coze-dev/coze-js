@@ -38,14 +38,16 @@ describe('Auth functions', () => {
   };
 
   let isBrowserSpy: vi.SpyInstance;
-
+  let isUniAppSpy: vi.SpyInstance;
   beforeEach(() => {
     vi.resetAllMocks();
     isBrowserSpy = vi.spyOn(utils, 'isBrowser');
+    isUniAppSpy = vi.spyOn(utils, 'isUniApp');
   });
 
   afterEach(() => {
     isBrowserSpy.mockRestore();
+    isUniAppSpy.mockRestore();
   });
 
   describe('Browser environment checks', () => {
@@ -317,6 +319,19 @@ describe('Auth functions', () => {
 
       // Clean up
       vi.unstubAllGlobals();
+    });
+
+    it('should throw an error in uniapp environment', async () => {
+      vi.spyOn(utils, 'isUniApp').mockReturnValue(true);
+      const mockUni = {
+        getRandomValues: vi.fn(),
+      };
+      // @ts-expect-error - Mocking global uni
+      vi.stubGlobal('uni', mockUni);
+
+      await expect(getPKCEAuthenticationUrl(mockConfig)).rejects.toThrow(
+        'digest is not supported in uniapp',
+      );
     });
   });
 
