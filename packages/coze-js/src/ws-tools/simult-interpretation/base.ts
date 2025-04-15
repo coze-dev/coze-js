@@ -8,6 +8,7 @@ import {
   type ErrorRes,
   type WebSocketAPI,
   WebsocketsEventType,
+  COZE_CN_BASE_WS_URL,
 } from '../..';
 
 class BaseWsSimultInterpretationClient {
@@ -25,6 +26,7 @@ class BaseWsSimultInterpretationClient {
   private api: CozeAPI;
   constructor(config: WsSimultInterpretationClientOptions) {
     this.api = new CozeAPI({
+      baseWsURL: COZE_CN_BASE_WS_URL,
       ...config,
       debug: false,
     });

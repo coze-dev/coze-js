@@ -9,6 +9,7 @@ import {
 } from '../types';
 import {
   APIError,
+  COZE_CN_BASE_WS_URL,
   CozeAPI,
   type CreateChatWsReq,
   type CreateChatWsRes,
@@ -29,6 +30,7 @@ class BaseWsChatClient {
 
   constructor(config: WsChatClientOptions) {
     this.api = new CozeAPI({
+      baseWsURL: COZE_CN_BASE_WS_URL,
       ...config,
       debug: false,
     });

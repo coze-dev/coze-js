@@ -1,3 +1,5 @@
+import { isBrowserExtension } from '../../utils';
+
 const WavProcessorWorklet = `
 class WavProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -78,8 +80,13 @@ class WavProcessor extends AudioWorkletProcessor {
 registerProcessor('wav-processor', WavProcessor);
 `;
 
-const script = new Blob([WavProcessorWorklet], {
-  type: 'application/javascript',
-});
-const src = URL.createObjectURL(script);
+let src = '';
+if (isBrowserExtension()) {
+  src = chrome.runtime.getURL('wav-worklet-processor.js');
+} else {
+  const script = new Blob([WavProcessorWorklet], {
+    type: 'application/javascript',
+  });
+  src = URL.createObjectURL(script);
+}
 export const WavProcessorSrc = src;

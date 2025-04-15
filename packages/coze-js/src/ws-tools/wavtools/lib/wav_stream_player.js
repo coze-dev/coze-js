@@ -105,7 +105,7 @@ export class WavStreamPlayer {
       await this.connect();
     }
 
-    const streamNode = new AudioWorkletNode(this.context, 'stream_processor');
+    const streamNode = new AudioWorkletNode(this.context, 'stream-processor');
     streamNode.connect(this.context.destination);
     streamNode.port.onmessage = (e) => {
       const { event } = e.data;

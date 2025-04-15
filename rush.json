@@ -467,6 +467,10 @@
     {
       "packageName": "@coze/coze-js-uniapp",
       "projectFolder": "examples/coze-js-uniapp"
+    },
+    {
+      "packageName": "@coze/simult-extension",
+      "projectFolder": "examples/simult-extension"
     }
   ]
 }

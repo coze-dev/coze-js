@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Simultaneous Interpretation Extension",
+  "version": "0.0.1",
+  "description": "A browser extension for simultaneous interpretation",
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "icons/icon16.svg",
+      "48": "icons/icon48.svg",
+      "128": "icons/icon128.svg"
+    }
+  },
+  "permissions": [
+    "webRequest",
+    "activeTab",
+    "storage",
+    "tabCapture",
+    "declarativeNetRequest"
+  ],
+  "background": {
+    "service_worker": "src/background/main.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.ts"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["pcm-worklet-processor.js", "stream-processor.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "host_permissions": ["wss://*/*", "https://*/*", "http://*/*", "<all_urls>"]
+}

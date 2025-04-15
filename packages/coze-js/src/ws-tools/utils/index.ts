@@ -159,3 +159,7 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
     return true;
   }
 };
+
+export const isBrowserExtension = (): boolean =>
+  // Check for Chrome extension API
+  typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;

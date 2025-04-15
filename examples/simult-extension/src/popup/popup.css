@@ -1,0 +1,107 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-width: 500px;
+  min-height: 500px;
+}
+
+.ant-layout {
+  background: #fff;
+}
+
+.popup-layout {
+  width: 500px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.popup-header {
+  background: #1677ff;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-icon {
+  color: white;
+  font-size: 20px;
+}
+
+.header-title {
+  color: white !important;
+  margin: 16px 0 !important;
+}
+
+.version-text {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.settings-icon,
+.reload-icon {
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.reload-icon:hover {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+.popup-content {
+  padding: 16px;
+  overflow: auto;
+}
+
+.token-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.control-row {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+}
+
+.action-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.text-card {
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.text-card .ant-card-head {
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.text-card .ant-card-head-title {
+  padding: 8px 0;
+  font-size: 14px;
+}

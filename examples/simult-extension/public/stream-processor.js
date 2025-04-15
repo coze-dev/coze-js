@@ -1,6 +1,3 @@
-import { isBrowserExtension } from '../../../utils';
-
-export const StreamProcessorWorklet = `
 class StreamProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
@@ -11,7 +8,7 @@ class StreamProcessor extends AudioWorkletProcessor {
     this.write = { buffer: new Float32Array(this.bufferLength), trackId: null };
     this.writeOffset = 0;
     this.trackSampleOffsets = {};
-    this.port.onmessage = (event) => {
+    this.port.onmessage = event => {
       if (event.data) {
         const payload = event.data;
         if (payload.event === 'write') {
@@ -25,8 +22,8 @@ class StreamProcessor extends AudioWorkletProcessor {
           payload.event === 'offset' ||
           payload.event === 'interrupt'
         ) {
-          const requestId = payload.requestId;
-          const trackId = this.write.trackId;
+          const { requestId } = payload;
+          const { trackId } = this.write;
           const offset = this.trackSampleOffsets[trackId] || 0;
           this.port.postMessage({
             event: 'offset',
@@ -38,7 +35,7 @@ class StreamProcessor extends AudioWorkletProcessor {
             this.hasInterrupted = true;
           }
         } else {
-          throw new Error(\`Unhandled event "\${payload.event}"\`);
+          throw new Error(`Unhandled event "${payload.event}"`);
         }
       }
     };
@@ -60,10 +57,10 @@ class StreamProcessor extends AudioWorkletProcessor {
     return true;
   }
 
-  process(inputs, outputs, parameters) {
+  process(inputs, outputs) {
     const output = outputs[0];
     const outputChannelData = output[0];
-    const outputBuffers = this.outputBuffers;
+    const { outputBuffers } = this;
     if (this.hasInterrupted) {
       this.port.postMessage({ event: 'stop' });
       return false;
@@ -89,15 +86,3 @@ class StreamProcessor extends AudioWorkletProcessor {
 }
 
 registerProcessor('stream-processor', StreamProcessor);
-`;
-
-let src = '';
-if (isBrowserExtension()) {
-  src = chrome.runtime.getURL('stream-processor.js');
-} else {
-  const script = new Blob([StreamProcessorWorklet], {
-    type: 'application/javascript',
-  });
-  src = URL.createObjectURL(script);
-}
-export const StreamProcessorSrc = src;

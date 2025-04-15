@@ -4,6 +4,7 @@ import { WavStreamPlayer } from '../wavtools';
 import { type WsToolsOptions } from '../types';
 import {
   APIError,
+  COZE_CN_BASE_WS_URL,
   CozeAPI,
   type CreateSpeechWsReq,
   type CreateSpeechWsRes,
@@ -29,6 +30,7 @@ class WsSpeechClient {
 
   constructor(config: WsToolsOptions) {
     this.api = new CozeAPI({
+      baseWsURL: COZE_CN_BASE_WS_URL,
       ...config,
     });
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });

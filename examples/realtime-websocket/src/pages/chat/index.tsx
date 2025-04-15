@@ -13,7 +13,7 @@ import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { ConsoleLog } from '../../components/console-log';
-import EventInput from './event-input';
+import EventInput from '../../components/event-input';
 import Settings from '../../components/settings';
 import { AudioOutlined } from '@ant-design/icons';
 import { Typography } from 'antd';

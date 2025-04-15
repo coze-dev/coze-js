@@ -4,16 +4,23 @@ import {
   type AIDenoiserProcessorLevel,
   type AIDenoiserProcessorMode,
 } from '../recorder/pcm-recorder';
-import { WebsocketsEventType } from '../..';
+import {
+  type SimultInterpretationUpdateEvent,
+  WebsocketsEventType,
+} from '../..';
 import BaseWsSimultInterpretationClient from './base';
 
 class WsSimultInterpretationClient extends BaseWsSimultInterpretationClient {
   private isRecording = false;
 
-  private async connect() {
+  private async connect(simultUpdate?: SimultInterpretationUpdateEvent) {
     await this.init();
     await this.recorder.start();
+
     const sampleRate = this.recorder.getSampleRate();
+    if (simultUpdate?.data?.output_audio?.voice_id === '') {
+      simultUpdate.data.output_audio.voice_id = undefined;
+    }
     this.ws?.send({
       id: uuid(),
       event_type: WebsocketsEventType.SIMULT_INTERPRETATION_UPDATE,
@@ -25,6 +32,13 @@ class WsSimultInterpretationClient extends BaseWsSimultInterpretationClient {
           channel: 1,
           bit_depth: 16,
         },
+        output_audio: {
+          codec: 'pcm',
+          pcm_config: {
+            sample_rate: 24000,
+          },
+        },
+        ...simultUpdate?.data,
       },
     });
   }
@@ -45,12 +59,12 @@ class WsSimultInterpretationClient extends BaseWsSimultInterpretationClient {
     return 'ended';
   }
 
-  async start() {
+  async start(chatUpdate?: SimultInterpretationUpdateEvent) {
     if (this.getStatus() === 'recording') {
       console.warn('Recording is already started');
       return;
     }
-    await this.connect();
+    await this.connect(chatUpdate);
     await this.recorder.record({
       pcmAudioCallback: data => {
         const { raw } = data;

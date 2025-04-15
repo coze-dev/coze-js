@@ -1,3 +1,5 @@
+import { isBrowserExtension } from '../../../utils';
+
 const AudioProcessorWorklet = `
 class AudioProcessor extends AudioWorkletProcessor {
 
@@ -207,8 +209,13 @@ class AudioProcessor extends AudioWorkletProcessor {
 registerProcessor('audio_processor', AudioProcessor);
 `;
 
-const script = new Blob([AudioProcessorWorklet], {
-  type: 'application/javascript',
-});
-const src = URL.createObjectURL(script);
+let src = '';
+if (isBrowserExtension()) {
+  src = chrome.runtime.getURL('audio_processor.js');
+} else {
+  const script = new Blob([AudioProcessorWorklet], {
+    type: 'application/javascript',
+  });
+  src = URL.createObjectURL(script);
+}
 export const AudioProcessorSrc = src;
