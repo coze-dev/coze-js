@@ -12,7 +12,7 @@ import {
 import { PcmPlayer } from '@coze/api/ws-tools';
 import { Layout, Row, Col, Card, Input, List, Button } from 'antd';
 import getConfig from '../../utils/config';
-import Transcription, { type TranscriptionDemoRef } from '../transcription';
+import Transcription, { type TranscriptionDemoRef } from './transcription';
 
 const { TextArea } = Input;
 const localStorageKey = 'realtime-transcription-demo';
@@ -166,7 +166,11 @@ const TTSWithTranscriptionDemo: React.FC = () => {
     <Layout style={{ height: '100%' }}>
       <Layout.Content>
         <Row align="stretch" justify="start" gutter={[16, 16]}>
-          <Col span={12} style={{ background: '#fff', padding: '20px 20px' }}>
+          <Col
+            xs={24}
+            md={12}
+            style={{ background: '#fff', padding: '20px 20px' }}
+          >
             <Card
               title="实时语音回复"
               style={{
@@ -231,7 +235,7 @@ const TTSWithTranscriptionDemo: React.FC = () => {
               </Button>
             </Card>
           </Col>
-          <Col span={12}>
+          <Col xs={24} md={12}>
             <Transcription
               ref={transcriptionRef}
               useByTTS={true}
