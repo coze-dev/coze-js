@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "Add coze uniapp api support",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
