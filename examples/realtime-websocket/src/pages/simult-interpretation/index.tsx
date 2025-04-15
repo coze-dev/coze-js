@@ -15,10 +15,13 @@ import {
   AIDenoiserProcessorMode,
   AIDenoiserProcessorLevel,
   WsSimultInterpretationClient,
+  PcmPlayer,
 } from '@coze/api/ws-tools';
 import {
   type CommonErrorEvent,
+  type SimultInterpretationAudioDeltaEvent,
   type SimultInterpretationTranscriptionDeltaEvent,
+  type SimultInterpretationTranslationDeltaEvent,
   WebsocketsEventType,
 } from '@coze/api';
 import {
@@ -43,6 +46,9 @@ const SimultInterpretationDemo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [status, setStatus] = useState<string>('未开始');
+  const pcmPlayerRef = useRef<PcmPlayer>();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [translationText, setTranslationText] = useState('');
 
   // 检查权限和令牌
   useEffect(() => {
@@ -123,7 +129,36 @@ const SimultInterpretationDemo: React.FC = () => {
       console.log('收到事件', event);
     });
 
+    // 监听翻译后音频数据
+    client.on(
+      WebsocketsEventType.SIMULT_INTERPRETATION_AUDIO_DELTA,
+      (event: unknown) => {
+        const { delta } = (event as SimultInterpretationAudioDeltaEvent).data;
+        pcmPlayerRef.current?.append(delta);
+      },
+    );
+
+    // 监听翻译后文本数据
+    client.on(
+      WebsocketsEventType.SIMULT_INTERPRETATION_TRANSLATION_DELTA,
+      (event: unknown) => {
+        const { delta } = (event as SimultInterpretationTranslationDeltaEvent)
+          .data;
+        setTranslationText(prev => prev + delta);
+      },
+    );
+
     clientRef.current = client;
+
+    // 初始化 PCM 播放器
+    pcmPlayerRef.current = new PcmPlayer({
+      onCompleted: () => {
+        console.log('播放完成');
+      },
+      isPauseDefault: true,
+    });
+
+    pcmPlayerRef.current.init();
   };
 
   // 开始/停止录音
@@ -139,6 +174,7 @@ const SimultInterpretationDemo: React.FC = () => {
         // 开始语音识别
         await clientRef.current?.start();
         setTranscriptionText('');
+        setTranslationText('');
         setIsRecording(true);
         setStatus('录音中');
       } else {
@@ -175,6 +211,15 @@ const SimultInterpretationDemo: React.FC = () => {
     }
   };
 
+  const handleResume = () => {
+    pcmPlayerRef.current?.resume();
+    setIsPlaying(true);
+  };
+
+  const handlePause = () => {
+    pcmPlayerRef.current?.pause();
+    setIsPlaying(false);
+  };
   // 设置变更处理
   const handleSettingsChange = () => {
     window.location.reload();
@@ -268,6 +313,25 @@ const SimultInterpretationDemo: React.FC = () => {
           <Paragraph>
             {transcriptionText || <Text type="secondary">等待识别结果...</Text>}
           </Paragraph>
+          <Paragraph>
+            {translationText || <Text type="secondary">等待翻译结果...</Text>}
+          </Paragraph>
+          <Row gutter={16} justify="start" align="middle">
+            <Col>
+              <Button
+                icon={isPlaying ? <PlayCircleOutlined /> : <PauseOutlined />}
+                onClick={isPlaying ? handlePause : handleResume}
+                size="large"
+              >
+                {isPlaying ? '暂停' : '播放'}
+              </Button>
+            </Col>
+            <Col>
+              <Text>
+                当前状态: <Text strong>{isPlaying ? '播放中' : '已暂停'}</Text>
+              </Text>
+            </Col>
+          </Row>
         </Card>
 
         {/* 使用说明 */}

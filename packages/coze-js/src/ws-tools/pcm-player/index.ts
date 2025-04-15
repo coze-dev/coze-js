@@ -11,11 +11,25 @@ class PcmPlayer {
   private playbackTimeout: NodeJS.Timeout | null = null;
   private elapsedBeforePause = 0;
   private onCompleted: () => void;
-  constructor({ onCompleted }: { onCompleted: () => void }) {
+  private isPauseDefault = false;
+  constructor({
+    onCompleted,
+    isPauseDefault = false,
+  }: {
+    onCompleted: () => void;
+    isPauseDefault?: boolean;
+  }) {
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
     this.onCompleted = onCompleted;
+    this.isPauseDefault = isPauseDefault;
   }
 
+  /**
+   * Initializes the PCM player with a new track ID. This method must be called before using append.
+   * After calling interrupt, init must be called again to reinitialize the player.
+   * @param {Object} options - Initialization options
+   * @param {boolean} [options.isPauseDefault=false] - Whether to start in paused state
+   */
   init() {
     this.trackId = `my-track-id-${uuid()}`;
     this.totalDuration = 0;
@@ -24,15 +38,27 @@ class PcmPlayer {
       this.playbackTimeout = null;
     }
     this.playbackStartTime = null;
+    this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
+    if (this.isPauseDefault) {
+      this.pause();
+    }
   }
 
-  async disconnect() {
+  /**
+   * Destroys the PCM player instance and cleans up resources.
+   * Should be called when the page is unloaded or when the instance is no longer needed.
+   */
+  async destroy() {
     if (this.playbackTimeout) {
       clearTimeout(this.playbackTimeout);
     }
     await this.wavStreamPlayer.interrupt();
   }
 
+  /**
+   * Completes the current playback and triggers the onCompleted callback after remaining duration.
+   * @private
+   */
   complete() {
     if (this.playbackStartTime) {
       // 剩余时间 = 总时间 - 已播放时间 - 已暂停时间
@@ -50,11 +76,19 @@ class PcmPlayer {
     }
   }
 
+  /**
+   * Interrupts the current playback. Any audio appended after interrupt will not play
+   * until init is called again to reinitialize the player.
+   */
   async interrupt() {
-    await this.disconnect();
+    await this.destroy();
     this.onCompleted();
   }
 
+  /**
+   * Pauses the current playback. The playback can be resumed from the paused position
+   * by calling resume.
+   */
   async pause() {
     if (this.playbackTimeout) {
       clearTimeout(this.playbackTimeout);
@@ -68,6 +102,9 @@ class PcmPlayer {
     await this.wavStreamPlayer.pause();
   }
 
+  /**
+   * Resumes playback from the last paused position.
+   */
   async resume() {
     if (this.playbackPauseTime) {
       this.playbackStartTime = Date.now();
@@ -88,6 +125,10 @@ class PcmPlayer {
     await this.wavStreamPlayer.resume();
   }
 
+  /**
+   * Toggles between play and pause states.
+   * If currently playing, it will pause; if paused, it will resume playback.
+   */
   async togglePlay() {
     if (this.isPlaying()) {
       await this.pause();
@@ -96,10 +137,19 @@ class PcmPlayer {
     }
   }
 
+  /**
+   * Checks if audio is currently playing.
+   * @returns {boolean} True if audio is playing, false otherwise
+   */
   isPlaying() {
     return this.wavStreamPlayer.isPlaying();
   }
 
+  /**
+   * Appends and plays a base64 encoded PCM audio chunk.
+   * Must call init before using this method.
+   * @param {string} message - Base64 encoded PCM audio data
+   */
   async append(message: string) {
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);

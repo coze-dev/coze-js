@@ -9,6 +9,7 @@ import {
   type SimultInterpretationMessageCompletedEvent,
   type InputAudioBufferCompleteEvent,
   type InputAudioBufferCompletedEvent,
+  type SimultInterpretationTranslationDeltaEvent,
 } from '../../types';
 import { APIResource } from '../../../resource';
 import { type WebsocketOptions } from '../../../../core';
@@ -35,4 +36,5 @@ export type CreateSimultInterpretationsWsRes =
   | SimultInterpretationTranscriptionDeltaEvent
   | InputAudioBufferCompletedEvent
   | SimultInterpretationMessageCompletedEvent
+  | SimultInterpretationTranslationDeltaEvent
   | CommonErrorEvent;
