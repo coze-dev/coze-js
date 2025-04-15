@@ -173,6 +173,7 @@ export enum WebsocketsEventType {
   SIMULT_INTERPRETATION_UPDATED = 'simult_interpretation.updated',
   SIMULT_INTERPRETATION_AUDIO_DELTA = 'simult_interpretation.audio.delta',
   SIMULT_INTERPRETATION_TRANSCRIPTION_DELTA = 'simult_interpretation.transcription.delta',
+  SIMULT_INTERPRETATION_TRANSLATION_DELTA = 'simult_interpretation.translation.delta',
   SIMULT_INTERPRETATION_MESSAGE_COMPLETED = 'simult_interpretation.message.completed',
 }
 
@@ -548,6 +549,13 @@ export interface SimultInterpretationTranscriptionDeltaEvent
   };
 }
 
+export interface SimultInterpretationTranslationDeltaEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_TRANSLATION_DELTA;
+  data: {
+    delta: string;
+  };
+}
 export interface SimultInterpretationMessageCompletedEvent
   extends BaseEventWithDetail {
   event_type: WebsocketsEventType.SIMULT_INTERPRETATION_MESSAGE_COMPLETED;
