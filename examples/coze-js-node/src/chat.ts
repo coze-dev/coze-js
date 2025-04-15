@@ -71,18 +71,6 @@ async function nonStreamingChat() {
   }
 }
 
-// TODO  test
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function submitToolOutputs() {
-  const v = await client.chat.submitToolOutputs({
-    conversation_id: '123',
-    chat_id: '123',
-    tool_outputs: [{ tool_call_id: '123', output: '123' }],
-    stream: false,
-  });
-  console.log('client.chat.submitToolOutputs', v);
-}
-
 function streamingCancel() {
   streamingChat(async v => {
     sleep(2000);
