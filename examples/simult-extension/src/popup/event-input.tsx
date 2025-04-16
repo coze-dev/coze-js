@@ -12,7 +12,7 @@ export interface EventInputProps {
 const EventInput = ({ defaultValue }: EventInputProps) => {
   const [inputValue, setInputValue] = useState(defaultValue || '');
   const [isValidJson, setIsValidJson] = useState(true);
-  const [ppe, setPpe] = useState(() => localStorage.getItem('ppe') || '');
+  const [ppe, setPpe] = useState(() => localStorage.getItem('simultPpe') || '');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;

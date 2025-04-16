@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   } else if (message.type === 'UPDATE_PPE') {
     currentPpe = message.value;
     // Save to storage for persistence
-    chrome.storage.local.set({ simultPpe: currentPpe });
+    // chrome.storage.local.set({ simultPpe: currentPpe });
     updatePpeRules(currentPpe);
     sendResponse({ status: 'PPE value updated', value: currentPpe });
   }
@@ -61,14 +61,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 // Load the initial PPE value from storage
-chrome.storage.local.get(['simultPpe'], result => {
-  if (result.simultPpe) {
-    currentPpe = result.simultPpe;
-    console.log('Loaded PPE value from storage:', currentPpe);
-  }
-  // Initialize with the loaded value or default
-  updatePpeRules(currentPpe);
-});
+// chrome.storage.local.get(['simultPpe'], result => {
+//   if (result.simultPpe) {
+//     currentPpe = result.simultPpe;
+//     console.log('Loaded PPE value from storage:', currentPpe);
+//   }
+//   // Initialize with the loaded value or default
+//   updatePpeRules(currentPpe);
+// });
 
 // Example of storing data in extension storage
 chrome.storage.local.set({ initialized: true }, () => {
