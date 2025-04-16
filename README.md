@@ -12,6 +12,7 @@ This monorepo contains the following packages:
 | [@coze/api](./packages/coze-js) | Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/api.svg)](https://www.npmjs.com/package/@coze/api) |
 | [@coze/realtime-api](./packages/realtime-api) | Realtime API SDK | [![npm](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api) |
 | [@coze/taro-api](./packages/coze-taro) | Taro Mini Program Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/taro-api.svg)](https://www.npmjs.com/package/@coze/taro-api) |
+| [@coze/uniapp-api](./packages/coze-uniapp) | UniApp Mini Program Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/uniapp-api.svg)](https://www.npmjs.com/package/@coze/uniapp-api) |
 
 
 ## 🎮 Examples
@@ -27,7 +28,8 @@ Find usage examples for each package in the [examples](./examples) directory:
 - [realtime-quickstart-react](./examples/realtime-quickstart-react) - Quickstart React Demo for @coze/realtime-api
 - [realtime-quickstart-vue](./examples/realtime-quickstart-vue) - Quickstart Vue Demo for @coze/realtime-api
 - [quickstart-oauth-server](./examples/quickstart-oauth-server) - Quickstart OAuth Server Demo for Coze SDK
-
+- [realtime-websocket](./examples/realtime-websocket) - Websocket realtime Demo for @coze/api/ws-tools
+- [simult-extendsion](./examples/simult-extendsion) - Simult interpretation Extension Demo for @coze/api/ws-tools
 
 ## 🚀 Getting Started
 
