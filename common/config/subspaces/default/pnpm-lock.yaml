@@ -1447,6 +1447,64 @@ importers:
         specifier: ^4.2.0
         version: 4.5.5(@types/node@20.16.15)(less@4.2.1)(lightningcss@1.28.2)(sass@1.82.0)(stylus@0.55.0)(terser@5.36.0)
 
+  ../../../examples/simult-extension:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ^5.5.1
+        version: 5.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@coze/api':
+        specifier: workspace:*
+        version: link:../../packages/coze-js
+      antd:
+        specifier: ^5.21.3
+        version: 5.21.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+      react-router-dom:
+        specifier: ~6.28.0
+        version: 6.28.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    devDependencies:
+      '@coze-infra/eslint-config':
+        specifier: workspace:*
+        version: link:../../config/eslint-config
+      '@types/chrome':
+        specifier: ^0.0.260
+        version: 0.0.260
+      '@types/react':
+        specifier: ^18.3.11
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.1
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.5.0
+        version: 8.11.0(@typescript-eslint/parser@8.11.0(eslint@9.14.0(jiti@2.4.2))(typescript@5.6.3))(eslint@9.14.0(jiti@2.4.2))(typescript@5.6.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.5.0
+        version: 8.11.0(eslint@9.14.0(jiti@2.4.2))(typescript@5.6.3)
+      '@vitejs/plugin-react':
+        specifier: ~4.3.3
+        version: 4.3.3(vite@4.5.5(@types/node@20.16.15)(less@4.2.1)(lightningcss@1.28.2)(sass@1.82.0)(stylus@0.55.0)(terser@5.36.0))
+      eslint:
+        specifier: 9.14.0
+        version: 9.14.0(jiti@2.4.2)
+      eslint-plugin-react-hooks:
+        specifier: 5.1.0-beta-26f2496093-20240514
+        version: 5.1.0-beta-26f2496093-20240514(eslint@9.14.0(jiti@2.4.2))
+      eslint-plugin-react-refresh:
+        specifier: ^0.4.5
+        version: 0.4.19(eslint@9.14.0(jiti@2.4.2))
+      typescript:
+        specifier: ^5.2.2
+        version: 5.6.3
+      vite:
+        specifier: ^4.2.0
+        version: 4.5.5(@types/node@20.16.15)(less@4.2.1)(lightningcss@1.28.2)(sass@1.82.0)(stylus@0.55.0)(terser@5.36.0)
+
   ../../../infra/actions/event-sync:
     dependencies:
       '@actions/core':
@@ -6674,6 +6732,9 @@ packages:
   '@types/bonjour@3.5.13':
     resolution: {integrity: sha512-z9fJ5Im06zvUL548KvYNecEVlA7cVDkGUi6kZusb04mpyEFKCIZJvloCcmpmLaIahDpOQGHaHmG6imtPMmPXGQ==}
 
+  '@types/chrome@0.0.260':
+    resolution: {integrity: sha512-lX6QpgfsZRTDpNcCJ+3vzfFnFXq9bScFRTlfhbK5oecSAjamsno+ejFTCbNtc5O/TPnVK9Tja/PyecvWQe0F2w==}
+
   '@types/connect-history-api-fallback@1.5.4':
     resolution: {integrity: sha512-n6Cr2xS1h4uAulPRdlw6Jl6s1oG8KrVilPN2yUITEs+K48EzMJJ3W1xy8K5eWuFvjp3R74AOIGSmp2UfBJ8HFw==}
 
@@ -6707,6 +6768,12 @@ packages:
   '@types/express@5.0.0':
     resolution: {integrity: sha512-DvZriSMehGHL1ZNLzi6MidnsDhUZM/x2pRdDIKdwbUNqqwHxMlRdkxtn6/EPKyqKpHqTl/4nRZsRNLpZxZRpPQ==}
 
+  '@types/filesystem@0.0.36':
+    resolution: {integrity: sha512-vPDXOZuannb9FZdxgHnqSwAG/jvdGM8Wq+6N4D/d80z+D4HWH+bItqsZaVRQykAn6WEVeEkLm2oQigyHtgb0RA==}
+
+  '@types/filewriter@0.0.33':
+    resolution: {integrity: sha512-xFU8ZXTw4gd358lb2jw25nxY9QAgqn2+bKKjKOYfNCzN4DKCFetK7sPtrlpg66Ywe3vWY9FNxprZawAh9wfJ3g==}
+
   '@types/fs-extra@8.1.5':
     resolution: {integrity: sha512-0dzKcwO+S8s2kuF5Z9oUWatQJj5Uq/iqphEtE3GQJVRRYm/tD1LglU2UnXi2A8jLq5umkGouOXOR9y0n613ZwQ==}
 
@@ -6715,6 +6782,9 @@ packages:
 
   '@types/graceful-fs@4.1.9':
     resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
+
+  '@types/har-format@1.2.16':
+    resolution: {integrity: sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A==}
 
   '@types/history@4.7.11':
     resolution: {integrity: sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==}
@@ -22804,6 +22874,11 @@ snapshots:
     dependencies:
       '@types/node': 20.16.15
 
+  '@types/chrome@0.0.260':
+    dependencies:
+      '@types/filesystem': 0.0.36
+      '@types/har-format': 1.2.16
+
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
       '@types/express-serve-static-core': 5.0.1
@@ -22859,6 +22934,12 @@ snapshots:
       '@types/qs': 6.9.16
       '@types/serve-static': 1.15.7
 
+  '@types/filesystem@0.0.36':
+    dependencies:
+      '@types/filewriter': 0.0.33
+
+  '@types/filewriter@0.0.33': {}
+
   '@types/fs-extra@8.1.5':
     dependencies:
       '@types/node': 20.16.15
@@ -22871,6 +22952,8 @@ snapshots:
   '@types/graceful-fs@4.1.9':
     dependencies:
       '@types/node': 20.16.15
+
+  '@types/har-format@1.2.16': {}
 
   '@types/history@4.7.11': {}
 
