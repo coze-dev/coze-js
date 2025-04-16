@@ -1,0 +1,20 @@
+{
+  "name": "@coze/uniapp-api",
+  "entries": [
+    {
+      "version": "0.2.0",
+      "tag": "HEAD",
+      "date": "2025-04-16T08:04:59.910Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add coze uniapp api support"
+          },
+          {
+            "comment": "add composables and file upload functionality to uniapp example"
+          }
+        ]
+      }
+    }
+  ]
+}

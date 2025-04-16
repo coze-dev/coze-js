@@ -2,6 +2,38 @@
   "name": "@coze/realtime-api",
   "entries": [
     {
+      "version": "1.2.0",
+      "tag": "HEAD",
+      "date": "2025-04-16T08:04:59.914Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "add test code"
+          },
+          {
+            "comment": "move EventNames enum to separate file"
+          },
+          {
+            "comment": "Publish fix/module-error"
+          },
+          {
+            "comment": "normalize file extensions in package config"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "UI/UX improvements to realtime-websocket example"
+          },
+          {
+            "comment": "add error handling for non-stationary noise suppression"
+          },
+          {
+            "comment": "add event-names subpath export"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.1.1",
       "tag": "HEAD",
       "date": "2025-03-31T02:31:36.414Z",
