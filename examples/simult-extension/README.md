@@ -25,7 +25,10 @@ cd examples/realtime-websocket/simult-extension
 npm install
 
 # Start development server
-npm run dev
+npm run start
+
+# Build for production
+npm run build
 ```
 
 ### Loading the extension in Chrome
@@ -41,7 +44,6 @@ npm run dev
 - `src/popup`: Extension popup UI
 - `src/background`: Background script
 - `src/content`: Content script that runs on web pages
-- `src/components`: Shared React components
 - `src/utils`: Utility functions and helpers
 
 ## License

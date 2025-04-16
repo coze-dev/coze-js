@@ -1,5 +1,6 @@
-import { defineConfig } from '@coze-infra/vitest-config';
 import path from 'path';
+
+import { defineConfig } from '@coze-infra/vitest-config';
 export default defineConfig({
   dirname: __dirname,
   preset: 'node',
@@ -17,6 +18,7 @@ export default defineConfig({
         'src/resources/knowledge/index.ts',
         'src/ws-tools/wavtools',
         'src/ws-tools/recorder/processor',
+        'src/ws-tools/simult-interpretation',
       ],
     },
   },
