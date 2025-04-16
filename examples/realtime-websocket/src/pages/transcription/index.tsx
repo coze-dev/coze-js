@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   Card,
+  Select,
 } from 'antd';
 import {
   WsToolsUtils,
@@ -43,6 +44,9 @@ const TranscriptionDemo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [status, setStatus] = useState<string>('未开始');
+  const [denoiserSupported, setDenoiserSupported] = useState<boolean>(false);
+  const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
 
   // 检查权限和令牌
   useEffect(() => {
@@ -54,13 +58,26 @@ const TranscriptionDemo: React.FC = () => {
       // 检查是否配置了PAT令牌
       const hasConfiguredToken = !!config.getPat();
       setHasToken(hasConfiguredToken);
+
+      // 检查是否支持AI降噪
+      const isDenoiserSupported = WsToolsUtils.checkDenoiserSupport();
+      setDenoiserSupported(isDenoiserSupported);
     };
 
     checkRequirements();
   }, []);
 
-  // 检查降噪支持
-  const denoiserSupported = WsToolsUtils.checkDenoiserSupport();
+  useEffect(() => {
+    const getDevices = async () => {
+      const devices = await WsToolsUtils.getAudioDevices();
+      setInputDevices(devices.audioInputs);
+      if (devices.audioInputs.length > 0) {
+        setSelectedInputDevice(devices.audioInputs[0].deviceId);
+      }
+    };
+
+    getDevices();
+  }, []);
 
   // 初始化客户端
   const initClient = () => {
@@ -77,6 +94,7 @@ const TranscriptionDemo: React.FC = () => {
       baseWsURL: config.getBaseWsUrl(),
       allowPersonalAccessTokenInBrowser: true,
       debug: true,
+      deviceId: selectedInputDevice,
       // AI降噪配置 - 仅当浏览器支持并且选择使用时开启
       aiDenoisingConfig: denoiserSupported
         ? {
@@ -234,6 +252,24 @@ const TranscriptionDemo: React.FC = () => {
             </Col>
           </Row>
           <Row gutter={16}>
+            <Col>
+              <Select
+                style={{ width: '200px' }}
+                size="large"
+                placeholder="选择输入设备"
+                value={selectedInputDevice}
+                disabled={isRecording}
+                onChange={value => {
+                  setSelectedInputDevice(value);
+                }}
+              >
+                {inputDevices.map(device => (
+                  <Select.Option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `麦克风 ${device.deviceId.slice(0, 8)}...`}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Col>
             <Col>
               <Button
                 type="primary"

@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
   interface Window {
     __denoiser: AIDenoiserExtension;
+    __denoiserSupported: boolean;
   }
 }
+declare const chrome: any;
 
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
@@ -124,32 +127,40 @@ export const isMobile = () =>
  * @returns {boolean} Whether AI denoising is supported
  */
 export const checkDenoiserSupport = (assetsPath?: string) => {
-  if (!window.__denoiser) {
-    // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
-    const external = new AIDenoiserExtension({
+  if (window.__denoiserSupported !== undefined) {
+    return window.__denoiserSupported;
+  }
+  // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
+  const external =
+    window.__denoiser ||
+    new AIDenoiserExtension({
       assetsPath:
         assetsPath ??
         'https://lf3-static.bytednsdoc.com/obj/eden-cn/613eh7lpqvhpeuloz/websocket',
     });
 
-    window.__denoiser = external;
+  window.__denoiser = external;
 
-    external.onloaderror = e => {
-      // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
-      console.error('Denoiser load error', e);
-    };
+  external.onloaderror = e => {
+    // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
+    console.error('Denoiser load error', e);
+    window.__denoiserSupported = false;
+  };
 
-    // 检查兼容性
-    if (!external.checkCompatibility()) {
-      // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
-      console.error('Does not support AI Denoiser!');
-      return false;
-    } else {
-      // 注册插件
-      // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
-      AgoraRTC.registerExtensions([external]);
-      return true;
-    }
+  // 检查兼容性
+  if (!external.checkCompatibility()) {
+    // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
+    console.error('Does not support AI Denoiser!');
+    window.__denoiserSupported = false;
+    return false;
+  } else {
+    // 注册插件
+    // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
+    AgoraRTC.registerExtensions([external]);
+    window.__denoiserSupported = true;
+    return true;
   }
-  return window.__denoiser.checkCompatibility();
 };
+
+export const isBrowserExtension = (): boolean =>
+  typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;

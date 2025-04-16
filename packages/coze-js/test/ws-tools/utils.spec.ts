@@ -144,6 +144,7 @@ describe('WS Tools Utils', () => {
     beforeEach(() => {
       // Reset window.__denoiser before each test
       window.__denoiser = undefined;
+      window.__denoiserSupported = undefined;
     });
 
     afterEach(() => {

@@ -30,7 +30,9 @@ export enum AIDenoiserProcessorLevel {
 export interface PcmRecorderConfig {
   audioCaptureConfig?: AudioCaptureConfig;
   aiDenoisingConfig?: AIDenoisingConfig;
-  mediaStreamTrack?: globalThis.MediaStreamTrack;
+  mediaStreamTrack?:
+    | globalThis.MediaStreamTrack
+    | (() => Promise<globalThis.MediaStreamTrack>);
   wavRecordConfig?: WavRecordConfig;
   deviceId?: string;
   audioMutedDefault?: boolean;
@@ -79,9 +81,15 @@ class PcmRecorder {
       debug,
     } = this.config;
     if (mediaStreamTrack) {
-      this.audioTrack = await createCustomAudioTrack({
-        mediaStreamTrack,
-      });
+      if (typeof mediaStreamTrack === 'function') {
+        this.audioTrack = await createCustomAudioTrack({
+          mediaStreamTrack: await mediaStreamTrack(),
+        });
+      } else {
+        this.audioTrack = await createCustomAudioTrack({
+          mediaStreamTrack,
+        });
+      }
     } else {
       // Get microphone audio track
       // See:https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/microphoneaudiotrackinitconfig.html

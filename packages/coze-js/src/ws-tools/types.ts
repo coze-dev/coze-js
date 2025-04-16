@@ -336,10 +336,12 @@ export interface WsTranscriptionClientOptions extends WsToolsOptions {
    * en: Custom media stream track
    * zh: 自定义音频流
    */
-  mediaStreamTrack?: MediaStreamTrack;
+  mediaStreamTrack?: MediaStreamTrack | (() => Promise<MediaStreamTrack>);
   /**
    * en: Audio record config, only effective when debug = true
    * zh: 音频录制配置，仅在 debug = true 时有效
    */
   wavRecordConfig?: WavRecordConfig;
 }
+
+export type WsSimultInterpretationClientOptions = WsTranscriptionClientOptions;

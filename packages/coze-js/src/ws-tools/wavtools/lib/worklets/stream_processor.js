@@ -1,3 +1,5 @@
+import { isBrowserExtension } from '../../../utils';
+
 export const StreamProcessorWorklet = `
 class StreamProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -86,11 +88,16 @@ class StreamProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('stream_processor', StreamProcessor);
+registerProcessor('stream-processor', StreamProcessor);
 `;
 
-const script = new Blob([StreamProcessorWorklet], {
-  type: 'application/javascript',
-});
-const src = URL.createObjectURL(script);
+let src = '';
+if (isBrowserExtension()) {
+  src = chrome.runtime.getURL('stream-processor.js');
+} else {
+  const script = new Blob([StreamProcessorWorklet], {
+    type: 'application/javascript',
+  });
+  src = URL.createObjectURL(script);
+}
 export const StreamProcessorSrc = src;

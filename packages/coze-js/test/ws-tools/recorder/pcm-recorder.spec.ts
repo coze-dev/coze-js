@@ -159,6 +159,16 @@ describe('PcmRecorder', () => {
       await customRecorder.start();
       expect(customRecorder['audioTrack']).toBeDefined();
     });
+
+    it('should use custom audio track when mediaStreamTrack is function ', async () => {
+      const mockMediaStreamTrack = new window.MediaStreamTrack();
+      const customRecorder = new PcmRecorder({
+        mediaStreamTrack: () => Promise.resolve(mockMediaStreamTrack),
+      });
+
+      await customRecorder.start();
+      expect(customRecorder['audioTrack']).toBeDefined();
+    });
   });
 
   describe('record', () => {

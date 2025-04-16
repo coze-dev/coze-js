@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/uniapp-api",
+      "comment": "Update documentation to reference new examples",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/uniapp-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}

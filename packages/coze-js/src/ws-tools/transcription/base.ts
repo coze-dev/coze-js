@@ -2,6 +2,7 @@ import { type WsTranscriptionClientOptions } from '../types';
 import PcmRecorder from '../recorder/pcm-recorder';
 import {
   APIError,
+  COZE_CN_BASE_WS_URL,
   CozeAPI,
   type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
@@ -25,6 +26,7 @@ class BaseWsTranscriptionClient {
   private api: CozeAPI;
   constructor(config: WsTranscriptionClientOptions) {
     this.api = new CozeAPI({
+      baseWsURL: COZE_CN_BASE_WS_URL,
       ...config,
       debug: false,
     });
@@ -33,7 +35,7 @@ class BaseWsTranscriptionClient {
       aiDenoisingConfig: config.aiDenoisingConfig,
       mediaStreamTrack: config.mediaStreamTrack,
       wavRecordConfig: config.wavRecordConfig,
-      deviceId: config.deviceId || 'default',
+      deviceId: config.deviceId || undefined,
       debug: config.debug,
     });
 

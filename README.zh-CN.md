@@ -12,7 +12,7 @@
 | [@coze/api](./packages/coze-js) | Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/api.svg)](https://www.npmjs.com/package/@coze/api) |
 | [@coze/realtime-api](./packages/realtime-api) | 实时语音 SDK | [![npm](https://img.shields.io/npm/v/@coze/realtime-api.svg)](https://www.npmjs.com/package/@coze/realtime-api) |
 | [@coze/taro-api](./packages/coze-taro) | 支持 Taro 小程序的 Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/taro-api.svg)](https://www.npmjs.com/package/@coze/taro-api) |
-
+| [@coze/uniapp-api](./packages/coze-uniapp) | 支持 UniApp 小程序的 Coze API SDK | [![npm](https://img.shields.io/npm/v/@coze/uniapp-api.svg)](https://www.npmjs.com/package/@coze/uniapp-api) |
 ## 🎮 示例
 
 在 [examples](./examples) 目录中查找每个包的使用示例：
@@ -26,6 +26,8 @@
 - [realtime-quickstart-react](./examples/realtime-quickstart-react) - @coze/realtime-api 快速入门 React 示例
 - [realtime-quickstart-vue](./examples/realtime-quickstart-vue) - @coze/realtime-api 快速入门 Vue 示例
 - [quickstart-oauth-server](./examples/quickstart-oauth-server) - Coze SDK OAuth 示例
+- [realtime-websocket](./examples/realtime-websocket) - @coze/api/ws-tools 的 Websocket 实时语音、语音合成、语音识别示例
+- [simult-extendsion](./examples/simult-extendsion) - @coze/api/ws-tools 的同声传译示例
 
 ## 🚀 快速开始
 

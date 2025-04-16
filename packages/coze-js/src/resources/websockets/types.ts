@@ -166,6 +166,15 @@ export enum WebsocketsEventType {
   CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED = 'conversation.audio_transcript.completed',
   /** Audio dump */
   DUMP_AUDIO = 'dump.audio',
+
+  // v1/audio/simult_interpretation
+  SIMULT_INTERPRETATION_UPDATE = 'simult_interpretation.update',
+  SIMULT_INTERPRETATION_CREATED = 'simult_interpretation.created',
+  SIMULT_INTERPRETATION_UPDATED = 'simult_interpretation.updated',
+  SIMULT_INTERPRETATION_AUDIO_DELTA = 'simult_interpretation.audio.delta',
+  SIMULT_INTERPRETATION_TRANSCRIPTION_DELTA = 'simult_interpretation.transcription.delta',
+  SIMULT_INTERPRETATION_TRANSLATION_DELTA = 'simult_interpretation.translation.delta',
+  SIMULT_INTERPRETATION_MESSAGE_COMPLETED = 'simult_interpretation.message.completed',
 }
 
 export interface EventDetail {
@@ -489,4 +498,65 @@ interface TurnDetection {
   prefix_padding_ms?: number;
   /** server_vad模式下，检测语音停止的静音持续时间，单位ms，默认500ms */
   silence_duration_ms?: number;
+}
+
+interface TranslateConfig {
+  hot_words?: string[]; // 热词
+  glossary?: {
+    // 示例
+    original: string;
+    translation: string;
+  }[];
+  from: string; // 现在只支持 en/zh
+  to: string; // 现在只支持 en/zh
+}
+
+export interface SimultInterpretationUpdateEvent extends BaseEvent {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_UPDATE;
+  data: {
+    input_audio?: AudioConfig;
+    output_audio?: OutputAudio;
+    translate_config?: TranslateConfig;
+  };
+}
+
+export interface SimultInterpretationCreatedEvent extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_CREATED;
+}
+
+export interface SimultInterpretationUpdatedEvent extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_UPDATED;
+  data: {
+    input_audio: Required<AudioConfig>;
+    output_audio: Required<OutputAudio>;
+    translate_config: Required<TranslateConfig>;
+  };
+}
+
+export interface SimultInterpretationAudioDeltaEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_AUDIO_DELTA;
+  data: {
+    delta: string;
+  };
+}
+
+export interface SimultInterpretationTranscriptionDeltaEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_TRANSCRIPTION_DELTA;
+  data: {
+    delta: string;
+  };
+}
+
+export interface SimultInterpretationTranslationDeltaEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_TRANSLATION_DELTA;
+  data: {
+    delta: string;
+  };
+}
+export interface SimultInterpretationMessageCompletedEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.SIMULT_INTERPRETATION_MESSAGE_COMPLETED;
 }
