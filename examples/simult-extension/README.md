@@ -19,7 +19,7 @@ A browser extension for simultaneous interpretation built with React, TypeScript
 
 ```bash
 # Navigate to the extension directory
-cd examples/realtime-websocket/simult-extension
+cd examples/simult-extension
 
 # Install dependencies
 npm install

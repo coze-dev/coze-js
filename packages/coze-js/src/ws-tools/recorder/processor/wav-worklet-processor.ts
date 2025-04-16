@@ -1,4 +1,6 @@
 import { isBrowserExtension } from '../../utils';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const chrome: any;
 
 const WavProcessorWorklet = `
 class WavProcessor extends AudioWorkletProcessor {

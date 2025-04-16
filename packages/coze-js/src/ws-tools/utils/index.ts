@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
   interface Window {
     __denoiser: AIDenoiserExtension;
     __denoiserSupported: boolean;
   }
 }
+declare const chrome: any;
 
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
@@ -161,5 +163,4 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
 };
 
 export const isBrowserExtension = (): boolean =>
-  // Check for Chrome extension API
   typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;

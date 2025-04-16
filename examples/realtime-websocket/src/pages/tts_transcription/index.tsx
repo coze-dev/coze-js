@@ -1,4 +1,7 @@
 import React, { useState, useRef } from 'react';
+
+import { Layout, Row, Col, Card, Input, List, Button } from 'antd';
+import { PcmPlayer } from '@coze/api/ws-tools';
 import {
   type CreateChatWsReq,
   type CreateChatWsRes,
@@ -9,8 +12,7 @@ import {
   COZE_CN_BASE_WS_URL,
   WebsocketsEventType,
 } from '@coze/api';
-import { PcmPlayer } from '@coze/api/ws-tools';
-import { Layout, Row, Col, Card, Input, List, Button } from 'antd';
+
 import getConfig from '../../utils/config';
 import Transcription, { type TranscriptionDemoRef } from './transcription';
 
@@ -28,7 +30,7 @@ const TTSWithTranscriptionDemo: React.FC = () => {
     CreateChatWsReq,
     CreateChatWsRes
   > | null>();
-  async function initClient() {
+  function initClient() {
     const client = new CozeAPI({
       token: config.getPat(),
       baseURL: COZE_CN_BASE_URL,
@@ -56,7 +58,10 @@ const TTSWithTranscriptionDemo: React.FC = () => {
     if (!clientRef.current) {
       await initClient();
     }
-    const ws = await clientRef.current!.websockets.chat.create({
+    if (!clientRef.current) {
+      return;
+    }
+    const ws = await clientRef.current.websockets.chat.create({
       bot_id: config.getBotId(),
       workflow_id: config.getWorkflowId(),
     });
@@ -82,8 +87,8 @@ const TTSWithTranscriptionDemo: React.FC = () => {
         },
       });
     };
-    let lastEventName: string = '';
-    ws.onmessage = (data: CreateChatWsRes, event) => {
+    let lastEventName = '';
+    ws.onmessage = (data: CreateChatWsRes) => {
       if (data.event_type === WebsocketsEventType.ERROR) {
         if (data.data.code === 4100) {
           console.error('[chat] Unauthorized Error', data);
@@ -126,7 +131,7 @@ const TTSWithTranscriptionDemo: React.FC = () => {
         return;
       }
       if (data.event_type === WebsocketsEventType.CONVERSATION_AUDIO_DELTA) {
-        pcmPlayerRef.current!.append(data.data.content);
+        pcmPlayerRef.current?.append(data.data.content);
       } else if (
         [
           WebsocketsEventType.CONVERSATION_CHAT_COMPLETED,
@@ -137,10 +142,9 @@ const TTSWithTranscriptionDemo: React.FC = () => {
         closeWsChatClient();
       }
     };
-    ws.onerror = (error, event) => {
+    ws.onerror = () => {
       ws.close();
     };
-    ws.onclose = () => {};
     ws.send({
       id: 'event_id',
       event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,

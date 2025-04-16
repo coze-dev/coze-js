@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isBrowserExtension } from '../../utils';
+declare const chrome: any;
 
 const AudioProcessorWorklet = `
 class PCMProcessor extends AudioWorkletProcessor {

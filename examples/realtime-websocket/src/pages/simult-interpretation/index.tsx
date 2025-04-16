@@ -65,6 +65,14 @@ const SimultInterpretationDemo: React.FC = () => {
     checkRequirements();
   }, []);
 
+  useEffect(
+    () => () => {
+      clientRef.current?.destroy();
+      pcmPlayerRef.current?.destroy();
+    },
+    [],
+  );
+
   // 检查降噪支持
   const denoiserSupported = WsToolsUtils.checkDenoiserSupport();
 
