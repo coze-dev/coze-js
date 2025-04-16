@@ -2,6 +2,80 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.2.0",
+      "tag": "HEAD",
+      "date": "2025-04-16T08:04:59.915Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "add local plugin example  for chat API"
+          },
+          {
+            "comment": "Add websocket realtime demo"
+          },
+          {
+            "comment": "add       echoCancellation support"
+          },
+          {
+            "comment": "add chat realtime demo"
+          },
+          {
+            "comment": "tmp"
+          },
+          {
+            "comment": "add transcription SDK and update documentation"
+          },
+          {
+            "comment": "UI/UX improvements to realtime-websocket example"
+          },
+          {
+            "comment": "add default audio mute option and improve audio handling"
+          },
+          {
+            "comment": "Add coze uniapp api support"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "replace MediaRecorder with Web Audio API for PCM recording"
+          },
+          {
+            "comment": "eslint"
+          },
+          {
+            "comment": "move new project"
+          },
+          {
+            "comment": "rush build error"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "add test code"
+          },
+          {
+            "comment": "renmae"
+          },
+          {
+            "comment": "unit test"
+          },
+          {
+            "comment": "remove unpkg"
+          },
+          {
+            "comment": "Publish feat/realtime-quickstart"
+          },
+          {
+            "comment": "CR bug"
+          },
+          {
+            "comment": "update ESM file extensions from .js to .mjs"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.1.1",
       "tag": "HEAD",
       "date": "2025-03-31T02:31:36.411Z",

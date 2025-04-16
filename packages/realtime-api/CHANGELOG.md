@@ -1,5 +1,21 @@
 # @coze/realtime-api
 
+## 1.2.0 - 2025-04-16
+
+### New Features
+
+- UI/UX improvements to realtime-websocket example
+- add error handling for non-stationary noise suppression
+- add event-names subpath export
+
+### Bug Fixes
+
+- add test code
+- move EventNames enum to separate file
+- Publish fix/module-error
+- normalize file extensions in package config
+
+
 ## 1.1.1 - 2025-03-31
 
 ### New Features

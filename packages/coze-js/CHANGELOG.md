@@ -1,5 +1,35 @@
 # @coze/api
 
+## 1.2.0 - 2025-04-16
+
+### New Features
+
+- add local plugin example  for chat API
+- Add websocket realtime demo
+- add       echoCancellation support
+- add chat realtime demo
+- tmp
+- add transcription SDK and update documentation
+- UI/UX improvements to realtime-websocket example
+- add default audio mute option and improve audio handling
+- Add coze uniapp api support
+
+### Bug Fixes
+
+- replace MediaRecorder with Web Audio API for PCM recording
+- eslint
+- move new project
+- rush build error
+- add unit test
+- add test code
+- renmae
+- unit test
+- remove unpkg
+- Publish feat/realtime-quickstart
+- CR bug
+- update ESM file extensions from .js to .mjs
+
+
 ## 1.1.1 - 2025-03-31
 
 ### New Features

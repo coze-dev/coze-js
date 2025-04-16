@@ -1,0 +1,76 @@
+{
+  "name": "@coze/taro-api",
+  "entries": [
+    {
+      "version": "0.1.0",
+      "tag": "HEAD",
+      "date": "2025-04-16T08:04:59.913Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "add Chinese translations for README files"
+          },
+          {
+            "comment": "update to dist dep"
+          },
+          {
+            "comment": "setup correct versions"
+          },
+          {
+            "comment": "update version"
+          },
+          {
+            "comment": "remove multiplatform"
+          },
+          {
+            "comment": "example"
+          },
+          {
+            "comment": "modify api"
+          },
+          {
+            "comment": "weapp"
+          },
+          {
+            "comment": "fix testcase"
+          },
+          {
+            "comment": "fix version"
+          },
+          {
+            "comment": "fix worksflow unit test"
+          },
+          {
+            "comment": "add unit test"
+          },
+          {
+            "comment": "add test code"
+          },
+          {
+            "comment": "taro adapter timeout"
+          },
+          {
+            "comment": "Add Windows-specific environment variable commands for CMD and PowerShell"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "add chat workflow support"
+          },
+          {
+            "comment": "taro dev source"
+          },
+          {
+            "comment": "expose response error"
+          },
+          {
+            "comment": "add timeout"
+          },
+          {
+            "comment": "Add coze uniapp api support"
+          }
+        ]
+      }
+    }
+  ]
+}
