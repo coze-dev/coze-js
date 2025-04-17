@@ -17,6 +17,7 @@ import {
   CozeError,
   APIUserAbortError,
 } from './error';
+import { COZE_CN_BASE_URL, COZE_COM_BASE_URL } from './constant';
 
 export interface FetchAPIOptions extends AxiosRequestConfig {
   // Custom axios instance
@@ -89,6 +90,19 @@ export async function fetchAPI<ResultType>(
     }
   }
 
+  // 检查是否 4101 鉴权错误
+  // 如果 BaseURL 是海外地址的，则给个 warning 提示，尝试设置为国内地址
+  const checkError = () => {
+    if (url.startsWith(COZE_COM_BASE_URL)) {
+      console.warn(`
+鉴权失败，如果您是国内用户，请将 baseURL 设置为 ${COZE_CN_BASE_URL} 示例：
+new CozeAPI({
+  // ...
+  baseURL: COZE_CN_BASE_URL
+})`);
+    }
+  };
+
   const response: AxiosResponse = await (axiosInstance as AxiosInstance)({
     url,
     responseType: options.isStreaming ? 'stream' : 'json',
@@ -99,6 +113,9 @@ export async function fetchAPI<ResultType>(
       : undefined,
     ...options,
   }).catch(error => {
+    if (error?.status === 401) {
+      checkError();
+    }
     throw handleError(error);
   });
 
@@ -121,6 +138,13 @@ export async function fetchAPI<ResultType>(
               // If the stream ends without a newline, it means an error occurred
               fieldValues.event = 'error';
               fieldValues.data = buffer;
+              try {
+                const error = JSON.parse(buffer);
+                if (error?.code === 4101) {
+                  checkError();
+                }
+                // eslint-disable-next-line no-empty
+              } catch (e) {}
               yield fieldValues as ResultType;
             }
             break;
