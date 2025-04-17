@@ -56,6 +56,23 @@ async function quickChat() {
 }
 ```
 
+## More Examples
+
+| Feature | Description | Example |
+|---------|-------------|----------|
+| Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
+| Chat | Chat With Local Plugin | [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
+| Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
+| Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
+| Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
+| Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
+| Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
+| Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
+| Speech（websocket） | Text to speech | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
+| Transcriptions（websocket） | Speech to text | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
+[View all examples →](../../examples/coze-js-node/src/)
+[Websocket Events →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
+
 ## Key Features
 
 - 🌐 **Full API Support**: Covers all [Coze Open Platform APIs](https://www.coze.com/docs/developer_guides/api_overview)
@@ -346,23 +363,6 @@ client.resume();
 client.destroy();
 
 ```
-
-## More Examples
-
-| Feature | Description | Example |
-|---------|-------------|----------|
-| Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
-| Chat | Chat With Local Plugin | [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
-| Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
-| Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
-| Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
-| Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
-| Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
-| Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
-| Speech（websocket） | Text to speech | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
-| Transcriptions（websocket） | Speech to text | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
-[View all examples →](../../examples/coze-js-node/src/)
-[Websocket Events →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
 
 ## Development
 

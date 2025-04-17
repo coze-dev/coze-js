@@ -54,6 +54,22 @@ async function quickChat() {
 }
 ```
 
+## 更多示例
+
+| 功能 | 描述 | 示例 |
+|---------|-------------|----------|
+| 对话 | 文本对话 | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
+| 对话| 端插件| [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
+| Bot管理 | 创建和管理Bot | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
+| 数据集 | 文档管理 | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
+| 工作流 | 执行工作流 | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
+| 语音 | 语音合成 | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
+| 流式对话（websocket） | 文本、语音对话 | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
+| 语音合成（websocket） | 文本转语音 | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
+| 语音识别（websocket） | 语音转文本 | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
+[查看所有示例 →](../../examples/coze-js-node/src/)
+[Websocket 事件 →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
+
 ## 主要特性
 
 - 🌐 **完整 API 支持**：覆盖所有 [Coze 开放平台 API](https://www.coze.cn/docs/developer_guides/api_overview)
@@ -344,21 +360,6 @@ client.resume();
 client.destroy();
 ```
 
-## 更多示例
-
-| 功能 | 描述 | 示例 |
-|---------|-------------|----------|
-| 对话 | 文本对话 | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
-| 对话| 端插件| [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
-| Bot管理 | 创建和管理Bot | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
-| 数据集 | 文档管理 | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
-| 工作流 | 执行工作流 | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
-| 语音 | 语音合成 | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
-| 流式对话（websocket） | 文本、语音对话 | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
-| 语音合成（websocket） | 文本转语音 | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
-| 语音识别（websocket） | 语音转文本 | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |
-[查看所有示例 →](../../examples/coze-js-node/src/)
-[Websocket 事件 →](https://bytedance.larkoffice.com/docx/Uv6Wd8GTjoEex3xyq4YcxDnRnkc)
 
 ## 开发
 
