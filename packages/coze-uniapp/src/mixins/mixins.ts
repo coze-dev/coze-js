@@ -30,9 +30,8 @@ export interface ChatMessage {
 }
 
 const uuid = () => {
-  const array = new Uint32Array(1);
-  uni.getRandomValues(array);
-  return (array[0] * new Date().getTime()).toString();
+  const a = Math.random();
+  return (a * new Date().getTime()).toString();
 };
 
 export const handleAdditionalMessages = (
