@@ -18,7 +18,6 @@ export default defineConfig({
         'src/resources/knowledge/index.ts',
         'src/ws-tools/wavtools',
         'src/ws-tools/recorder/processor',
-        'src/ws-tools/simult-interpretation',
       ],
     },
   },
