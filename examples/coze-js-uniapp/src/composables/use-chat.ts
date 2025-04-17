@@ -39,6 +39,7 @@ export function useChat() {
       );
 
       for await (const chunk of res) {
+        console.log('chunk', chunk);
         if (chunk.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
           streamingMessage.value += chunk.data.content;
         }
