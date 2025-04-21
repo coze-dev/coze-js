@@ -40,43 +40,47 @@ const privateKey = fs
   .readFileSync(join(__dirname, '../../tmp/private_key.pem'))
   .toString();
 
-let jwtToken = await getJWTToken({
-  baseURL,
-  appId,
-  aud,
-  keyid,
-  privateKey,
-  sessionName: 'test', // optional Isolate different sub-resources under the same jwt account
-});
-console.log('getJWTToken', jwtToken);
+async function main() {
+  let jwtToken = await getJWTToken({
+    baseURL,
+    appId,
+    aud,
+    keyid,
+    privateKey,
+    sessionName: 'test', // optional Isolate different sub-resources under the same jwt account
+  });
+  console.log('getJWTToken', jwtToken);
 
-// Initialize a new Coze API client using the obtained access token
-const client = new CozeAPI({
-  baseURL,
-  token: async () => {
-    // refresh token if expired
-    // 5 seconds buffer
-    if (jwtToken.expires_in * 1000 > Date.now() + 5000) {
+  // Initialize a new Coze API client using the obtained access token
+  const client = new CozeAPI({
+    baseURL,
+    token: async () => {
+      // refresh token if expired
+      // 5 seconds buffer
+      if (jwtToken.expires_in * 1000 > Date.now() + 5000) {
+        return jwtToken.access_token;
+      }
+
+      console.log('refresh token');
+      jwtToken = await getJWTToken({
+        baseURL,
+        appId,
+        aud,
+        keyid,
+        privateKey,
+        sessionName: 'test',
+      });
+
       return jwtToken.access_token;
-    }
+    },
+  });
 
-    console.log('refresh token');
-    jwtToken = await getJWTToken({
-      baseURL,
-      appId,
-      aud,
-      keyid,
-      privateKey,
-      sessionName: 'test',
-    });
+  // Example of how to use the client:
+  streamingChat({
+    client,
+    botId,
+    query: 'give me a joke',
+  });
+}
 
-    return jwtToken.access_token;
-  },
-});
-
-// Example of how to use the client:
-streamingChat({
-  client,
-  botId,
-  query: 'give me a joke',
-});
+main().catch(console.error);

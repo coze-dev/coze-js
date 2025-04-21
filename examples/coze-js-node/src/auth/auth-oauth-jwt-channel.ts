@@ -41,54 +41,58 @@ const privateKey = fs.readFileSync(
   join(__dirname, '../../tmp/private_key_channel.pem'),
 );
 
-const scope = {
-  account_permission: {
-    permission_list: ['Connector.botChat'],
-  },
-  attribute_constraint: {
-    connector_bot_chat_attribute: {
-      bot_id_list: botIdList,
+async function main() {
+  const scope = {
+    account_permission: {
+      permission_list: ['Connector.botChat'],
     },
-  },
-};
+    attribute_constraint: {
+      connector_bot_chat_attribute: {
+        bot_id_list: botIdList,
+      },
+    },
+  };
 
-console.log('getJWTToken', baseURL, appId, aud, keyid);
-let jwtToken = await getJWTToken({
-  baseURL,
-  appId,
-  aud,
-  keyid,
-  privateKey: privateKey.toString(),
-  scope,
-});
-console.log('getJWTToken', jwtToken);
+  console.log('getJWTToken', baseURL, appId, aud, keyid);
+  let jwtToken = await getJWTToken({
+    baseURL,
+    appId,
+    aud,
+    keyid,
+    privateKey: privateKey.toString(),
+    scope,
+  });
+  console.log('getJWTToken', jwtToken);
 
-// Initialize a new Coze API client using the obtained access token
-const client = new CozeAPI({
-  baseURL,
-  token: async () => {
-    // refresh token if expired
-    if (jwtToken.expires_in * 1000 > Date.now() + 5000) {
-      // add 5 seconds buffer
+  // Initialize a new Coze API client using the obtained access token
+  const client = new CozeAPI({
+    baseURL,
+    token: async () => {
+      // refresh token if expired
+      if (jwtToken.expires_in * 1000 > Date.now() + 5000) {
+        // add 5 seconds buffer
+        return jwtToken.access_token;
+      }
+
+      console.log('refresh token');
+      jwtToken = await getJWTToken({
+        baseURL,
+        appId,
+        aud,
+        keyid,
+        privateKey: privateKey.toString(),
+        scope,
+      });
       return jwtToken.access_token;
-    }
+    },
+  });
 
-    console.log('refresh token');
-    jwtToken = await getJWTToken({
-      baseURL,
-      appId,
-      aud,
-      keyid,
-      privateKey: privateKey.toString(),
-      scope,
-    });
-    return jwtToken.access_token;
-  },
-});
+  // Example of how to use the client for chat creation
+  streamingChat({
+    client,
+    botId,
+    query: 'give me a joke',
+  });
+}
 
-// Example of how to use the client for chat creation
-streamingChat({
-  client,
-  botId,
-  query: 'give me a joke',
-});
+main().catch(console.error);
