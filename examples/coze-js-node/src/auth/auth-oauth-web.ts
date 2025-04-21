@@ -30,76 +30,80 @@ const clientSecret = config[key].auth.oauth_web.COZE_CLIENT_SECRET;
 const redirectUrl = config[key].auth.oauth_web.COZE_REDIRECT_URL;
 const baseURL = config[key].COZE_BASE_URL;
 
-// Generate the authentication URL using the provided parameters
-const authUrl = getWebAuthenticationUrl({
-  clientId,
-  redirectUrl,
-  baseURL,
-  state: '123', // Set a state parameter for user data
-});
-
-console.log(
-  `please open ${authUrl} and authorize and then get the code from the redirect url`,
-);
-
 import readline from 'readline';
 
 import { streamingChat } from '../utils.js';
 import { botId } from '../client.js';
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-// Function to get the authorization code from user input
-const getCodeFromUser = () =>
-  new Promise(resolve => {
-    rl.question('Please enter the code from the redirect URL: ', code => {
-      rl.close();
-      resolve(code.trim());
-    });
+async function main() {
+  // Generate the authentication URL using the provided parameters
+  const authUrl = getWebAuthenticationUrl({
+    clientId,
+    redirectUrl,
+    baseURL,
+    state: '123', // Set a state parameter for user data
   });
 
-// Get the authorization code from user input
-const code = (await getCodeFromUser()) as string;
-console.log('Received code:', code);
+  console.log(
+    `please open ${authUrl} and authorize and then get the code from the redirect url`,
+  );
 
-// Exchange the authorization code for an OAuth token
-let oauthToken = await getWebOAuthToken({
-  clientId,
-  clientSecret,
-  redirectUrl,
-  baseURL,
-  code,
-});
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-console.log('getOAuthToken', oauthToken);
-
-// Initialize a new Coze API client using the obtained access token
-
-const client = new CozeAPI({
-  baseURL,
-  token: async () => {
-    // refresh token if expired
-    if (oauthToken.expires_in * 1000 > Date.now() + 5000) {
-      return oauthToken.access_token;
-    }
-    console.log('refresh token');
-    const refreshTokenResult = await refreshOAuthToken({
-      clientId,
-      refreshToken: oauthToken.refresh_token,
-      baseURL,
+  // Function to get the authorization code from user input
+  const getCodeFromUser = () =>
+    new Promise(resolve => {
+      rl.question('Please enter the code from the redirect URL: ', code => {
+        rl.close();
+        resolve(code.trim());
+      });
     });
-    oauthToken = refreshTokenResult;
-    return oauthToken.access_token;
-  },
-});
 
-// Example of how to use the client (commented out)
-// e.g. client.chat.stream(...);
-streamingChat({
-  client,
-  botId,
-  query: 'give me a joke',
-});
+  // Get the authorization code from user input
+  const code = (await getCodeFromUser()) as string;
+  console.log('Received code:', code);
+
+  // Exchange the authorization code for an OAuth token
+  let oauthToken = await getWebOAuthToken({
+    clientId,
+    clientSecret,
+    redirectUrl,
+    baseURL,
+    code,
+  });
+
+  console.log('getOAuthToken', oauthToken);
+
+  // Initialize a new Coze API client using the obtained access token
+
+  const client = new CozeAPI({
+    baseURL,
+    token: async () => {
+      // refresh token if expired
+      if (oauthToken.expires_in * 1000 > Date.now() + 5000) {
+        return oauthToken.access_token;
+      }
+      console.log('refresh token');
+      const refreshTokenResult = await refreshOAuthToken({
+        clientId,
+        refreshToken: oauthToken.refresh_token,
+        baseURL,
+      });
+      oauthToken = refreshTokenResult;
+      return oauthToken.access_token;
+    },
+  });
+
+  // Example of how to use the client (commented out)
+  // e.g. client.chat.stream(...);
+  streamingChat({
+    client,
+    botId,
+    query: 'give me a joke',
+  });
+}
+
+main().catch(console.error);
