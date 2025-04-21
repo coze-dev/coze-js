@@ -90,8 +90,8 @@ export async function fetchAPI<ResultType>(
     }
   }
 
-  // 检查是否 4101 鉴权错误
-  // 如果 BaseURL 是海外地址的，则给个 warning 提示，尝试设置为国内地址
+  // Check for 4101 authentication error
+  // If BaseURL is set to overseas address, provide a warning to try setting it to the domestic address
   const checkError = () => {
     if (url.startsWith(COZE_COM_BASE_URL)) {
       console.warn(`

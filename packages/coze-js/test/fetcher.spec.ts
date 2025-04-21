@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { fetchAPI, adapterFetch } from '../src/fetcher';
 import { TimeoutError, APIUserAbortError, CozeError } from '../src/error';
+import { COZE_CN_BASE_URL } from '../src/constant';
 
 vi.mock('axios');
 vi.mock('node-fetch');
@@ -95,6 +96,84 @@ describe('fetchAPI', () => {
     await expect(fetchAPI('https://api.example.com/data')).rejects.toThrow(
       APIUserAbortError,
     );
+  });
+
+  describe('checkError function tests', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('should show warning with correct base URL', async () => {
+      const url = 'https://api.coze.com/path';
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      // Access the checkError function from fetchAPI function scope
+      // We need to trigger it through the error handling flow
+      mockedAxios.mockRejectedValueOnce({
+        status: 401,
+        response: { status: 401 },
+      });
+
+      // This will call checkError internally
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      await fetchAPI(url).catch(() => {});
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `鉴权失败，如果您是国内用户，请将 baseURL 设置为 ${COZE_CN_BASE_URL}`,
+        ),
+      );
+    });
+
+    it('should not show warning with incorrect base URL', async () => {
+      const url = 'https://api.example.com/path';
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+
+      // Access the checkError function from fetchAPI function scope
+      // We need to trigger it through the error handling flow
+      mockedAxios.mockRejectedValueOnce({
+        status: 401,
+        response: { status: 401 },
+      });
+
+      // This will call checkError internally
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      await fetchAPI(url).catch(() => {});
+
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+    });
+
+    it('should show warning when streaming error with code 4101 occurs', async () => {
+      const url = 'https://api.coze.com/stream';
+      const consoleWarnSpy = vi.spyOn(console, 'warn');
+
+      // Mock a stream that will end with an error
+      const mockStream = {
+        [Symbol.asyncIterator]: vi.fn().mockImplementation(function* () {
+          // This will be the last chunk that causes an error
+          yield new TextEncoder().encode(
+            '{"code": 4101, "message": "Unauthorized"}',
+          );
+        }),
+      };
+
+      mockedAxios.mockResolvedValueOnce({ data: mockStream });
+
+      const result = await fetchAPI(url, { isStreaming: true });
+      const streamResult = result.stream();
+
+      // Consume the stream to trigger the error handling
+      // eslint-disable-next-line  @typescript-eslint/no-unused-vars,no-empty
+      for await (const _ of streamResult) {
+      }
+
+      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          `鉴权失败，如果您是国内用户，请将 baseURL 设置为 ${COZE_CN_BASE_URL}`,
+        ),
+      );
+    });
   });
 
   it('should handle API errors', async () => {
