@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "提供自动定位配置",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "gaoding.devingao@bytedance.com"
+}
