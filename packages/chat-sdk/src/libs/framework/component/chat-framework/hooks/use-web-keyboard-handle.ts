@@ -57,12 +57,13 @@ export const useWebKeyboardHandle = (chatFrameId: string) => {
             onFocus?.();
           }
         };
+
         el.addEventListener('keydown', onKeyDown);
         el.addEventListener('keyup', onKeyUp);
         el.addEventListener('focus', onFocus);
         el.addEventListener('blur', onBlur);
         frameTarget.on(UIEventType.TriggerFocus, triggerFocus);
-        el.setAttribute('tabindex', '1000');
+        el.setAttribute('tabindex', '-1');
         if (refIsFrameAutoFocus.current !== false) {
           setTimeout(() => {
             el.focus();
