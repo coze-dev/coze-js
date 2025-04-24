@@ -16,7 +16,7 @@
   "dependencies": {
     "@coze/api": "workspace:*",
     "@koa/cors": "^3.2.0",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^13.0.1",

@@ -35,7 +35,7 @@
     "@pnpm/lockfile-file": "^8.0.2",
     "@rushstack/node-core-library": "3.55.2",
     "@rushstack/rush-sdk": "5.100.2",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "chalk": "^4.1.2",
     "commander": "~12.1.0",
     "conventional-changelog-angular": "^5.0.13",

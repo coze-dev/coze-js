@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "Publish fix/bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "shenxiaojie.316@bytedance.com"
+}
