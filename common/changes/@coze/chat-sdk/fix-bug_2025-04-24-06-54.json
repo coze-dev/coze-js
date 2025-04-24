@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "update axios from 1.7.7 to 1.8.2[security]",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "shenxiaojie.316@bytedance.com"
+}
