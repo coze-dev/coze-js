@@ -59,7 +59,7 @@
     "@types/uuid": "^9.0.1",
     "@types/whatwg-fetch": "^0.0.33",
     "@vitest/coverage-v8": "~2.1.4",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "typescript": "^5.5.3",
     "vitest": "~2.1.4"
   },
