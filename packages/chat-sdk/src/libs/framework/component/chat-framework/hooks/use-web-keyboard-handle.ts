@@ -1,11 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { isWeb, logger } from '@/libs/utils';
 import { UIEventType } from '@/libs/types';
-import { useUiEventStore } from '@/libs/provider/context/chat-store-context';
+import {
+  useChatPropsStore,
+  useUiEventStore,
+} from '@/libs/provider/context/chat-store-context';
 
 export const useWebKeyboardHandle = (chatFrameId: string) => {
   const frameTarget = useUiEventStore(store => store.event);
+  const isFrameAutoFocus = useChatPropsStore(
+    store => store.ui?.chatSlot?.base?.isFrameAutoFocus,
+  );
+  const refIsFrameAutoFocus = useRef<boolean>(true);
+  refIsFrameAutoFocus.current = isFrameAutoFocus ?? true;
   useEffect(() => {
     if (isWeb && chatFrameId) {
       const el = document.getElementById(chatFrameId);
@@ -40,22 +48,27 @@ export const useWebKeyboardHandle = (chatFrameId: string) => {
           });
         };
         const triggerFocus = () => {
+          if (refIsFrameAutoFocus.current === false) {
+            return;
+          }
           el.focus();
           // 已经focus了，不会再次出发，因此需要手动触发focus事件
           if (isFocused) {
             onFocus?.();
           }
         };
+
         el.addEventListener('keydown', onKeyDown);
         el.addEventListener('keyup', onKeyUp);
         el.addEventListener('focus', onFocus);
         el.addEventListener('blur', onBlur);
         frameTarget.on(UIEventType.TriggerFocus, triggerFocus);
-
-        el.setAttribute('tabindex', '0');
-        setTimeout(() => {
-          el.focus();
-        }, 1000);
+        el.setAttribute('tabindex', '-1');
+        if (refIsFrameAutoFocus.current !== false) {
+          setTimeout(() => {
+            el.focus();
+          }, 1000);
+        }
 
         return () => {
           el.removeEventListener('keydown', onKeyDown);

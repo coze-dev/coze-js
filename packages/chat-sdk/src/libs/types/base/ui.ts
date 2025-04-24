@@ -86,6 +86,7 @@ export interface MessageWrapperConfig {
 export interface ChatSlotConfig {
   base?: {
     maxWidth?: number;
+    isFrameAutoFocus?: boolean;
   };
   input?: InputConfig;
   clearContext?: ClearContextConfig;

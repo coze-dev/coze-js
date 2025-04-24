@@ -59,6 +59,7 @@ export interface IChatFlowProps {
     isMiniCustomHeader?: boolean; // 默认为false
     isDisabled?: boolean; // 默认 false
     input?: InputConfig;
+    isFrameAutoFocus?: boolean;
     clearContext?: ClearContextConfig;
     clearMessage?: ClearMessageConfig;
     uploadBtn?: UploadBtnConfig;

@@ -70,6 +70,7 @@ export default function Index() {
     layout: 'pc',
     isDisabled: false,
     isMiniCustomHeader: false,
+    //isFrameAutoFocus: true,
     clearContext: {
       isNeed: true,
     },
@@ -92,8 +93,7 @@ export default function Index() {
       isNeed: true,
       isNeedTaskMessage: true,
       isNeedAudio: true,
-      defaultText:
-        'Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right Right Slot Right Slot Slot Right Slot Slot Right Slot Slot Right',
+      defaultText: '',
       renderChatInputTopSlot: () => <div> Input Top Slot</div>,
     },
     messageWrapper: {

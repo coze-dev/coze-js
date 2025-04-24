@@ -20,6 +20,7 @@ export const useInitChat = (props: IChatFlowProps) => {
   // The parameters will be changed immediately, so we don't code it in useEffect.
   refService.current?.updateChatFlowProps(props);
   const syncModifyChatProps: Omit<ChatFrameworkProps, 'auth'> = useMemo(
+    // eslint-disable-next-line complexity
     () => ({
       chat: {
         appId: projectInfo?.id,
@@ -52,6 +53,7 @@ export const useInitChat = (props: IChatFlowProps) => {
         chatSlot: {
           base: {
             maxWidth: 600,
+            isFrameAutoFocus: props?.areaUi?.isFrameAutoFocus,
           },
           input: props?.areaUi?.input,
           clearContext: props?.areaUi?.clearContext,

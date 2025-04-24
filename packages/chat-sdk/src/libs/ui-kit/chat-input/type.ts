@@ -23,6 +23,7 @@ export interface IChatInputProps {
   isNeedAudio?: boolean;
   frameEventTarget?: InstanceType<TaroStatic['Events']>;
   isPcMode?: boolean;
+  isFrameAutoFocus?: boolean;
   onKeyBoardHeightChange?: (height: number) => void;
   onSendTextMessage?: (text: string) => Promise<boolean | undefined>;
   onSendFileMessage?: (files: ChooseFileInfo[]) => Promise<boolean | undefined>;
