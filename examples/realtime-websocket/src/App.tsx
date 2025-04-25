@@ -18,16 +18,17 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 
+import TTSWithTranscription from './pages/tts_transcription';
 import Transcription from './pages/transcription';
 import Speech from './pages/speech';
 import SimultInterpretation from './pages/simult-interpretation';
 import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
-import TTSWithTranscription from './pages/tts_transcription';
 import logo from './logo.svg';
 import './App.css';
 const { Header, Content, Sider } = Layout;
 
+const isHidden = location.hostname === 'www.coze.cn';
 const menuItems = [
   {
     key: '/',
@@ -52,12 +53,14 @@ const menuItems = [
     icon: <CustomerServiceOutlined />,
     label: '同声传译',
     title: '多语种实时翻译 (Simult) 演示',
+    isHidden,
   },
   {
     key: '/tts_transcription',
     icon: <ExperimentOutlined />,
     label: '语音识别+实时语音对话',
     title: '语音识别 (ASR) +TTS',
+    isHidden,
   },
   // {
   //   key: '/audio-test',
@@ -130,7 +133,7 @@ function MainLayout() {
           theme="dark"
           selectedKeys={[location.pathname]}
           mode="inline"
-          items={menuItems}
+          items={menuItems.filter(item => !item.isHidden)}
           onClick={({ key }) => navigate(key)}
         />
       </Sider>

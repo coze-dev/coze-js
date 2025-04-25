@@ -93,10 +93,6 @@ class BaseWsChatClient {
               isResolved = true;
               break;
 
-            case WebsocketsEventType.INPUT_AUDIO_BUFFER_SPEECH_STOPPED:
-              this.complete();
-              break;
-
             case WebsocketsEventType.CONVERSATION_AUDIO_DELTA:
               this.audioDeltaList.push(data.data.content);
               if (this.audioDeltaList.length === 1) {
@@ -199,12 +195,12 @@ class BaseWsChatClient {
   //   return this.wavStreamPlayer.isPlaying();
   // }
 
-  protected complete() {
-    this.ws?.send({
-      id: uuid(),
-      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-    });
-  }
+  // protected complete() {
+  //   this.ws?.send({
+  //     id: uuid(),
+  //     event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
+  //   });
+  // }
 
   protected closeWs() {
     if (this.ws?.readyState === 1) {

@@ -365,24 +365,6 @@ describe('WebSocket Chat Tools', () => {
     });
   });
 
-  describe('complete', () => {
-    it('should complete the conversation', async () => {
-      // mock
-      const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      mockWebsocket.send = vi.fn();
-
-      // act
-      await client.connect();
-      await client['complete']();
-      // assert
-      expect(client.ws?.send).toHaveBeenCalledWith({
-        id: expect.any(String),
-        event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-      });
-    });
-  });
-
   describe('init', () => {
     it('should initialize websocket connection', async () => {
       const initPromise = client['init']();
@@ -420,17 +402,6 @@ describe('WebSocket Chat Tools', () => {
         undefined as unknown as MessageEvent,
       );
       await new Promise(resolve => setTimeout(resolve, 50));
-      client.ws?.onmessage?.(
-        {
-          event_type: WebsocketsEventType.CONVERSATION_AUDIO_COMPLETED,
-          id: 'test-id',
-          data: {},
-          detail: {
-            logid: 'test-logid',
-          },
-        },
-        undefined as unknown as MessageEvent,
-      );
 
       await initPromise;
 

@@ -3,12 +3,17 @@ import React, { useState } from 'react';
 import Link from 'antd/es/typography/Link';
 import { Layout, Button, Modal } from 'antd';
 import { type RealtimeClient } from '@coze/realtime-api';
-import { SettingOutlined, FileTextOutlined } from '@ant-design/icons';
+import {
+  SettingOutlined,
+  FileTextOutlined,
+  GithubOutlined,
+} from '@ant-design/icons';
 
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
 import { DOCS_URL } from '../../utils/constants';
 import logo from '../../logo.svg';
 import useNetworkError from '../../hooks/use-network-error';
+import useIsMobile from '../../hooks/use-is-mobile';
 import SettingForm from './setting-form';
 const { Header } = Layout;
 
@@ -23,6 +28,7 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings, clientRef }) => {
     !localManager.get(LocalStorageKey.BOT_ID),
   );
   const { connectStatus } = useNetworkError({ clientRef });
+  const isMobile = useIsMobile();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -101,15 +107,25 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings, clientRef }) => {
           >
             Status: {connectStatus}
           </div>
-          <Link href={DOCS_URL} target="_blank">
-            <Button type="primary" icon={<FileTextOutlined />}>
-              Document
-            </Button>
-          </Link>
+          {!isMobile && (
+            <Link href={DOCS_URL} target="_blank">
+              <Button type="primary" icon={<FileTextOutlined />}>
+                Document
+              </Button>
+            </Link>
+          )}
 
           <Button icon={<SettingOutlined />} onClick={showModal}>
             Settings
           </Button>
+          {!isMobile && (
+            <Link
+              href="https://github.com/coze-dev/coze-js/tree/main/examples/realtime-console"
+              target="_blank"
+            >
+              <Button icon={<GithubOutlined />}>GitHub</Button>
+            </Link>
+          )}
         </div>
       </Header>
 
