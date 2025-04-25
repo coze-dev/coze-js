@@ -2025,10 +2025,10 @@ importers:
     dependencies:
       agora-extension-ai-denoiser:
         specifier: ^1.0.0
-        version: 1.1.0(agora-rtc-sdk-ng@4.23.2)
+        version: 1.1.0(agora-rtc-sdk-ng@4.23.2-1)
       agora-rtc-sdk-ng:
-        specifier: ^4.23.2
-        version: 4.23.2
+        specifier: 4.23.2-1
+        version: 4.23.2-1
       agora-rte-extension:
         specifier: ^1.2.4
         version: 1.2.4
@@ -2235,14 +2235,14 @@ packages:
   '@adobe/css-tools@4.4.0':
     resolution: {integrity: sha512-Ff9+ksdQQB3rMncgqDK78uLznstjyfIf2Arnh22pW8kBpLs6rpKDwgnZT46hin5Hl1WzazzK64DOrhSwYpS7bQ==}
 
-  '@agora-js/media@4.23.2':
-    resolution: {integrity: sha512-mWbl/ZjAw4tT22Ks0O2CJLMX3ht4uKPsDm2+fb5XOalrUVNzJOtwJA4E36d/o4ZfVtvwiJAOYtuTpoib8LlLgQ==}
+  '@agora-js/media@4.23.2-1':
+    resolution: {integrity: sha512-d795kSsY/qmQ9OGYn/qSa8XcUhB4nypy5I4SAW+wQ/JJScfF2ZXF/HVc9ECb9NoVurTSRqfOaw8Y/hxA+76cNA==}
 
-  '@agora-js/report@4.23.2':
-    resolution: {integrity: sha512-enHyWN5uF0RuS1crlHUlTfBZ7yy3n2zvSqt2odvsz4S1DZ0DlYQoCHFbr5CBOhN+Zb3bLEWxY3ej/2kUMqCQBA==}
+  '@agora-js/report@4.23.2-1':
+    resolution: {integrity: sha512-FNDuGb1GKA+J/gBR2oaoArvNnaqXhZV1Si1Qli9GNodrO4SCntz4SSQds7A3BQRMTFTSuQu2tAbkCfJtQBNGuA==}
 
-  '@agora-js/shared@4.23.2':
-    resolution: {integrity: sha512-DaeqskGUWero8SeqU0QeYEfJu4OcPIIltiQ0PRyMbyVa4HL7vCzr6gRZkef9sFMVyJPNe0QXL7gdX132kA2uhg==}
+  '@agora-js/shared@4.23.2-1':
+    resolution: {integrity: sha512-qF0okTndl5mQzfnfV1CymQs3/TY+oxKnnvAxQ/NiJ/Hf/wo+LfgMh2UaJl7xQH5mlhQE8VE2dHMXuU3LpDTbcw==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -7695,8 +7695,8 @@ packages:
     peerDependencies:
       agora-rtc-sdk-ng: '>=4.15.0'
 
-  agora-rtc-sdk-ng@4.23.2:
-    resolution: {integrity: sha512-uZcJVJ0g4PJfCqnlcP9kFU6y/2n9uIlRSljRFnK2FNLHo8nlB8Vc0pf5Gs4n75PmThC4u1G2FvL4k7iFau6boQ==}
+  agora-rtc-sdk-ng@4.23.2-1:
+    resolution: {integrity: sha512-Tng16+2eVKC+JsBCggey4uXk9a92W7DxwmzPMtCMMsxRgO3EAIhS9EHVjycwyCcRdDanlbeWsrGH5faD4e+eGw==}
 
   agora-rte-extension@1.2.4:
     resolution: {integrity: sha512-0ovZz1lbe30QraG1cU+ji7EnQ8aUu+Hf3F+a8xPml3wPOyUQEK6CTdxV9kMecr9t+fIDrGeW7wgJTsM1DQE7Nw==}
@@ -7974,6 +7974,9 @@ packages:
 
   axios@1.7.9:
     resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
+
+  axios@1.9.0:
+    resolution: {integrity: sha512-re4CqKTJaURpzbLHtIi6XpDv20/CnpXOtjRY5/CU32L8gU8ek9UIivcfvSWvmKEngmVbrUtPpdDwWDWL7DNHvg==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -12590,6 +12593,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-emoji@1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
@@ -16720,26 +16724,26 @@ snapshots:
 
   '@adobe/css-tools@4.4.0': {}
 
-  '@agora-js/media@4.23.2':
+  '@agora-js/media@4.23.2-1':
     dependencies:
-      '@agora-js/report': 4.23.2
-      '@agora-js/shared': 4.23.2
+      '@agora-js/report': 4.23.2-1
+      '@agora-js/shared': 4.23.2-1
       agora-rte-extension: 1.2.4
-      axios: 1.7.9
+      axios: 1.9.0
       webrtc-adapter: 8.2.0
     transitivePeerDependencies:
       - debug
 
-  '@agora-js/report@4.23.2':
+  '@agora-js/report@4.23.2-1':
     dependencies:
-      '@agora-js/shared': 4.23.2
-      axios: 1.7.9
+      '@agora-js/shared': 4.23.2-1
+      axios: 1.9.0
     transitivePeerDependencies:
       - debug
 
-  '@agora-js/shared@4.23.2':
+  '@agora-js/shared@4.23.2-1':
     dependencies:
-      axios: 1.7.9
+      axios: 1.9.0
       ua-parser-js: 0.7.40
     transitivePeerDependencies:
       - debug
@@ -24254,17 +24258,17 @@ snapshots:
 
   agent-base@7.1.3: {}
 
-  agora-extension-ai-denoiser@1.1.0(agora-rtc-sdk-ng@4.23.2):
+  agora-extension-ai-denoiser@1.1.0(agora-rtc-sdk-ng@4.23.2-1):
     dependencies:
-      agora-rtc-sdk-ng: 4.23.2
+      agora-rtc-sdk-ng: 4.23.2-1
 
-  agora-rtc-sdk-ng@4.23.2:
+  agora-rtc-sdk-ng@4.23.2-1:
     dependencies:
-      '@agora-js/media': 4.23.2
-      '@agora-js/report': 4.23.2
-      '@agora-js/shared': 4.23.2
+      '@agora-js/media': 4.23.2-1
+      '@agora-js/report': 4.23.2-1
+      '@agora-js/shared': 4.23.2-1
       agora-rte-extension: 1.2.4
-      axios: 1.7.9
+      axios: 1.9.0
       formdata-polyfill: 4.0.10
       pako: 2.1.0
       ua-parser-js: 0.7.40
@@ -24651,6 +24655,14 @@ snapshots:
       - debug
 
   axios@1.7.9:
+    dependencies:
+      follow-redirects: 1.15.9(debug@4.3.7)
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
+  axios@1.9.0:
     dependencies:
       follow-redirects: 1.15.9(debug@4.3.7)
       form-data: 4.0.1
