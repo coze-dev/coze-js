@@ -2,7 +2,7 @@ import { botId, client, sleep } from './client';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 async function bot_variables() {
-  client.variables.update({
+  await client.variables.update({
     // app_id: '123',
     bot_id: botId,
     data: [{ keyword: 'input', value: 'Hello2' }],
@@ -19,7 +19,7 @@ async function bot_variables() {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 async function app_variables() {
-  client.variables.update({
+  await client.variables.update({
     app_id: '7497905162918035493',
     data: [{ keyword: 'input', value: '你好' }],
   });
