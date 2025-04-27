@@ -65,6 +65,7 @@ async function quickChat() {
 | Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
 | Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
+| Variables | Variable management | [variables.ts](../../examples/coze-js-node/src/variables.ts) |
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 | Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
 | Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |

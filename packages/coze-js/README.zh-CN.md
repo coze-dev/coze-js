@@ -63,6 +63,8 @@ async function quickChat() {
 | Bot管理 | 创建和管理Bot | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
 | 数据集 | 文档管理 | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | 工作流 | 执行工作流 | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
+| 变量 | 变量管理 | [variables.ts](../../examples/coze-js-node/src/variables.ts) |
+| 模板 | 模板管理 | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
 | 语音 | 语音合成 | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 | 流式对话（websocket） | 文本、语音对话 | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
 | 语音合成（websocket） | 文本转语音 | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |

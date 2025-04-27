@@ -1,4 +1,4 @@
-import { client } from './client.js';
+import { client } from './client';
 
 async function main() {
   const templateId = '7418160152504827942';

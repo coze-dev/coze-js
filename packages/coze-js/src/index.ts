@@ -16,6 +16,7 @@ export class CozeAPI extends APIClient {
   audio: API.Audio = new API.Audio(this);
   templates: API.Templates = new API.Templates(this);
   websockets: API.Websockets = new API.Websockets(this);
+  variables: API.Variables = new API.Variables(this);
 }
 export { type ClientOptions, type RequestOptions, type GetToken } from './core';
 export * from './auth';
