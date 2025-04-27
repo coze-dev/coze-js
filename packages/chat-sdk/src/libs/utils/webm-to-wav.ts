@@ -58,7 +58,6 @@ function _writeAudioBufferToArray(audioBuffer, targetArray, offset, bitDepth) {
         _writeInt32ToArray(sample, targetArray, offset);
         offset += 4;
       } else {
-        console.log('Invalid bit depth for PCM encoding.');
         return;
       }
     }

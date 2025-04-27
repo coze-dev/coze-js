@@ -1,6 +1,5 @@
 import { FC, useState, useEffect, useRef } from 'react';
 
-import cls from 'classnames';
 import {
   Textarea as TaroTextarea,
   type TextareaProps,
@@ -50,14 +49,6 @@ export const Textarea: FC<
   return (
     <View className={styles['input-padding-container']}>
       <View className={styles['input-container']}>
-        {/** Weixin Textarea 未居中，需要自己hack */}
-        <View
-          className={cls(styles.placeholder, {
-            [styles['placeholder-hidden']]: !!value || !isMini,
-          })}
-        >
-          {placeholder}
-        </View>
         <TaroTextarea
           className={styles.input}
           maxlength={-1}
@@ -65,7 +56,7 @@ export const Textarea: FC<
           showConfirmBar={true}
           controlled
           cursorSpacing={20}
-          placeholder={!isMini ? placeholder : undefined}
+          placeholder={placeholder}
           placeholderClass={styles.placeholder}
           style={{
             height: getHeight(lineNum),
@@ -76,7 +67,7 @@ export const Textarea: FC<
             }
           }}
           onInput={event => {
-            console.log('onInputKeyDown: onInput ', event.detail.value);
+            logger.debug('onInputKeyDown: onInput ', event.detail.value);
             handleInputChange(event.detail.value);
           }}
           onLineChange={event => {
@@ -122,11 +113,9 @@ const useInputKeyDownOnWeb = ({
           e.stopPropagation();
           const before = val.substring(0, start);
           const after = val.substring(end);
-          console.log('onInputKeyDown: start ', el.value);
           el.value = `${before}\n${after}`;
           el.selectionStart = start + 1;
           el.selectionEnd = start + 1;
-          console.log('onInputKeyDown: end ', el.value);
 
           handleInputChange(el.value);
         }

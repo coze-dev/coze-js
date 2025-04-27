@@ -156,7 +156,7 @@ export class MiniCozeApi extends CozeAPI {
       try {
         return super.makeRequest(apiUrl, method, body, isStream, options);
       } catch (err) {
-        console.log('makeRequestError:', err);
+        logger.error('makeRequestError:', err);
       }
     }
     return this.requestMiniSse({
