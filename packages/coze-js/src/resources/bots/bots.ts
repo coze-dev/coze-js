@@ -167,11 +167,39 @@ export interface CreateBotReq {
      */
     suggested_questions?: string[];
   };
+  plugin_id_list?: {
+    id_list: PluginIdInfo[];
+  };
+  workflow_id_list?: {
+    ids: WorkflowIdInfo[];
+  };
+  model_info_config?: ModelInfoConfig;
+  suggest_reply_info?: SuggestReplyInfo;
+}
+
+export interface SuggestReplyInfo {
+  reply_mode: SuggestReplyMode;
+  customized_prompt?: string;
+}
+
+export enum SuggestReplyMode {
+  /**
+   * The bot does not suggest replies.
+   */
+  DISABLE = 'disable',
+  /**
+   * The bot suggests replies.
+   */
+  ENABLE = 'enable',
+  /**
+   * The bot suggests replies based on the customized prompt.
+   */
+  CUSTOMIZED = 'customized',
 }
 
 export interface UpdateBotReq {
   bot_id: string;
-  name: string;
+  name?: string;
   description?: string;
   icon_file_id?: string;
   prompt_info?: {
@@ -182,13 +210,14 @@ export interface UpdateBotReq {
     suggested_questions?: string[];
   };
   knowledge?: KnowledgeInfo;
-  plugin_id_list: {
-    id_list?: PluginIdInfo[];
+  plugin_id_list?: {
+    id_list: PluginIdInfo[];
   };
-  workflow_id_list: {
-    ids?: WorkflowIdInfo[];
+  workflow_id_list?: {
+    ids: WorkflowIdInfo[];
   };
   model_info_config?: ModelInfoConfig;
+  suggest_reply_info?: SuggestReplyInfo;
 }
 
 export interface PluginIdInfo {
@@ -360,6 +389,9 @@ export interface BotInfo {
   knowledge: CommonKnowledge;
   shortcut_commands: ShortcutCommandInfo[];
   workflow_info_list: WorkflowInfo[];
+  suggest_reply_info: SuggestReplyInfo;
+  background_image_info: BotBackgroundImageInfo;
+  variables: BotVariable[];
 }
 
 export interface BotPlugin {
@@ -554,6 +586,96 @@ export namespace Bots {
    * Bot mode, the value is:
    * - 0: Single Agent mode
    * - 1: Multi Agent mode
+     - 2：Single Agent workflow
    */
-  export type BotModeType = 0 | 1;
+  export type BotModeType = 0 | 1 | 2;
+}
+
+export interface GradientPosition {
+  left?: number;
+  right?: number;
+}
+
+export interface CanvasPosition {
+  width?: number;
+  height?: number;
+  left?: number;
+  top?: number;
+}
+
+export interface BackgroundImageInfo {
+  image_url: string;
+  theme_color?: string;
+  gradient_position?: GradientPosition;
+  canvas_position?: CanvasPosition;
+}
+
+export interface BotBackgroundImageInfo {
+  web_background_image?: BackgroundImageInfo;
+  mobile_background_image?: BackgroundImageInfo;
+}
+
+export enum VariableType {
+  /**
+   * The variable is a key-value pair.
+   */
+  KVVariable = 'KVVariable',
+  /**
+   * The variable is a list.
+   */
+  ListVariable = 'ListVariable',
+}
+
+export enum VariableChannel {
+  /**
+   * The variable is a custom variable.
+   */
+  Custom = 'custom',
+  /**
+   * The variable is a system variable.
+   */
+  System = 'system',
+  /**
+   * The variable is a location variable.
+   */
+  Location = 'location',
+  /**
+   * The variable is a Feishu variable.
+   */
+  Feishu = 'feishu',
+  /**
+   * The variable is an app variable.
+   */
+  APP = 'app',
+}
+
+export interface BotVariable {
+  /**
+   * The name of the variable.
+   */
+  keyword: string;
+  /**
+   * The default value of the variable.
+   */
+  default_value: string;
+  /**
+   * The type of the variable.
+   */
+  variable_type: VariableType;
+  /**
+   * The source of the variable.
+   */
+  channel: VariableChannel;
+  /**
+   * The description of the variable.
+   */
+  description: string;
+  /**
+   * Whether the variable is enabled.
+   */
+  enable: boolean;
+  /**
+   * Whether the variable is supported in the prompt.
+   */
+  prompt_enable: boolean;
 }

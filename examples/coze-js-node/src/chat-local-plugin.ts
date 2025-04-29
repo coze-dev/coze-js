@@ -7,7 +7,7 @@ import {
   type ToolOutputType,
 } from '@coze/api';
 
-import { client, botId } from './client.js';
+import { client, botId } from './client';
 
 // local-plugin(端插件使用示例）)
 // see more : https://www.coze.cn/open/docs/guides/local_plugin_overview

@@ -42,6 +42,7 @@ export class Voices extends APIResource {
    * | 不传默认从 1 开始，传值需要 > 0
    * @param params.page_size - Optional. Default is 100, value must be (0, 100]
    * | 不传默认 100，传值需要 (0, 100]
+   * @param params.model_type - Optional. The type of the voice model, if not filled, all will be returned.
    * @param options - Request options
    * @returns List voices data
    */
@@ -85,6 +86,8 @@ export interface CloneVoiceData {
 }
 
 export interface ListVoicesReq {
+  /** The type of the voice model, if not filled, all will be returned. | 音色模型的类型，如果不填，默认都返回。*/
+  model_type?: 'big' | 'small';
   /** Whether to filter system voices, default is false | 是否过滤系统音色, 默认不过滤 */
   filter_system_voice?: boolean;
   /** Starts from 1 by default, value must be > 0 | 不传默认从 1 开始，传值需要 > 0 */

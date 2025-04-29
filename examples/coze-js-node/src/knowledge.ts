@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import fs from 'fs';
 
-import { client } from './client.js';
+import { client } from './client';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 

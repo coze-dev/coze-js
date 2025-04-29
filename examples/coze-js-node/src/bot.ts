@@ -1,6 +1,8 @@
 import assert from 'assert';
 
-import { client, spaceId } from './client.js';
+import { SuggestReplyMode } from '@coze/api';
+
+import { client, sleep, spaceId } from './client';
 
 async function main() {
   assert(spaceId, 'spaceId is required');
@@ -12,6 +14,10 @@ async function main() {
     prompt_info: {
       prompt:
         'your are a translator, translate the following text from English to Chinese',
+    },
+    suggest_reply_info: {
+      reply_mode: SuggestReplyMode.CUSTOMIZED,
+      customized_prompt: 'generate custom user question reply suggestion',
     },
   });
   console.log('client.bots.create', bot);
@@ -25,10 +31,11 @@ async function main() {
 
   const publishedBot = await client.bots.publish({
     bot_id: bot.bot_id,
-    connector_ids: ['API'],
+    connector_ids: ['1024'],
   });
   console.log('client.bots.publish', publishedBot);
 
+  await sleep(1000);
   const list = await client.bots.list({
     space_id: spaceId,
     page_index: 1,
@@ -36,12 +43,10 @@ async function main() {
   });
   console.log('client.bots.list', list);
 
-  if (list.space_bots.length > 0) {
-    const info = await client.bots.retrieve({
-      bot_id: list.space_bots[0].bot_id,
-    });
-    console.log('client.bots.retrieve', info);
-  }
+  const info = await client.bots.retrieve({
+    bot_id: bot.bot_id,
+  });
+  console.log('client.bots.retrieve', info);
 }
 
 main().catch(console.error);

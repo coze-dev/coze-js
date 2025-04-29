@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import { RoleType } from '@coze/api';
 
-import { client, botId, workflowId } from './client.js';
+import { client, botId, workflowId } from './client';
 async function streamWorkflow() {
   assert(botId, 'botId is required');
   assert(workflowId, 'workflowId is required');
