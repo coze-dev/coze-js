@@ -44,6 +44,8 @@ export class Chat extends APIResource {
    * @param params.meta_data - Optional Additional metadata for the message. | 创建消息时的附加消息。
    * @param params.conversation_id - Optional The ID of the conversation. | 标识对话发生在哪一次会话中。
    * @param params.extra_params - Optional Extra parameters for the conversation. | 附加参数。
+   * @param params.shortcut_command - Optional The shortcut command information. | 快捷指令信息。
+   * @param params.parameters - Optional custom parameters. | 自定义参数。
    * @returns The data of the created chat. | 创建的对话数据。
    */
   async create(
@@ -88,6 +90,8 @@ export class Chat extends APIResource {
    * @param params.meta_data - Optional Additional metadata for the message. | 创建消息时的附加消息。
    * @param params.conversation_id - Optional The ID of the conversation. | 标识对话发生在哪一次会话中。
    * @param params.extra_params - Optional Extra parameters for the conversation. | 附加参数。
+   * @param params.shortcut_command - Optional The shortcut command information. | 快捷指令信息。
+   * @param params.parameters - Optional custom parameters. | 自定义参数。
    * @returns
    */
   async createAndPoll(
@@ -152,6 +156,8 @@ export class Chat extends APIResource {
    * @param params.meta_data - Optional Additional metadata for the message. | 创建消息时的附加消息。
    * @param params.conversation_id - Optional The ID of the conversation. | 标识对话发生在哪一次会话中。
    * @param params.extra_params - Optional Extra parameters for the conversation. | 附加参数。
+   * @param params.shortcut_command - Optional The shortcut command information. | 快捷指令信息。
+   * @param params.parameters - Optional custom parameters. | 自定义参数。
    * @returns A stream of chat data. | 对话数据流。
    */
   async *stream(
@@ -383,6 +389,13 @@ export interface CreateChatReq {
    * Shortcut command information for executing a shortcut command in the conversation.
    */
   shortcut_command?: ShortcutCommand;
+
+  /**
+   * Assign values to custom parameters.
+   *
+   * You can set custom parameters in the input parameters of the starting node of the chat flow.
+   */
+  parameters?: Record<string, unknown>;
 }
 
 export interface CreateChatRes {
@@ -563,6 +576,13 @@ export interface StreamChatReq {
    * Shortcut command information for executing a shortcut command in the conversation.
    */
   shortcut_command?: ShortcutCommand;
+
+  /**
+   * Assign values to custom parameters.
+   *
+   * You can set custom parameters in the input parameters of the starting node of the chat flow.
+   */
+  parameters?: Record<string, unknown>;
 }
 
 export enum ChatEventType {

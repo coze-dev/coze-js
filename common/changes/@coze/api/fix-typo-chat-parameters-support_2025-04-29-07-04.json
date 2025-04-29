@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "typo issue for chat api in @coze/api",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "vkbo@qq.com"
+}
