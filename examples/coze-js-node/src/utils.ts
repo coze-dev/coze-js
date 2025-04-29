@@ -4,6 +4,7 @@ import {
   type CozeAPI,
   type CreateChatData,
   RoleType,
+  type StreamChatData,
 } from '@coze/api';
 
 export async function nonStreamingChat({
@@ -79,4 +80,27 @@ export async function streamingChat({
   }
 
   console.log('=== End of Streaming Chat ===');
+}
+
+export async function handleStream(result: AsyncIterable<StreamChatData>) {
+  for await (const part of result) {
+    if (part.event === ChatEventType.CONVERSATION_CHAT_CREATED) {
+      console.log('[START]');
+    } else if (part.event === ChatEventType.CONVERSATION_MESSAGE_DELTA) {
+      process.stdout.write(part.data.content);
+    } else if (part.event === ChatEventType.CONVERSATION_MESSAGE_COMPLETED) {
+      const { role, type, content } = part.data;
+      if (role === 'assistant' && type === 'answer') {
+        process.stdout.write('\n');
+      } else {
+        console.log('[%s]:[%s]:%s', role, type, content);
+      }
+    } else if (part.event === ChatEventType.CONVERSATION_CHAT_COMPLETED) {
+      console.log(part.data.usage);
+    } else if (part.event === ChatEventType.DONE) {
+      console.log(part.data);
+    } else if (part.event === ChatEventType.ERROR) {
+      console.error(part.data);
+    }
+  }
 }

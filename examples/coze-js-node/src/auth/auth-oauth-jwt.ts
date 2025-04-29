@@ -20,9 +20,9 @@ import fs from 'fs';
 
 import { CozeAPI, getJWTToken } from '@coze/api';
 
-import { streamingChat } from '../utils.js';
-import config from '../config/config.js';
-import { botId } from '../client.js';
+import { streamingChat } from '../utils';
+import config from '../config/config';
+import { botId } from '../client';
 
 // 'en' for https://api.coze.com, 'cn' for https://api.coze.cn
 const key = (process.env.COZE_ENV || 'en') as keyof typeof config;

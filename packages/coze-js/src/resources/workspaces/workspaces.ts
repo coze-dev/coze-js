@@ -42,4 +42,5 @@ export interface WorkSpace {
   icon_url: string;
   role_type: string;
   workspace_type: string;
+  enterprise_id?: string;
 }

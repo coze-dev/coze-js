@@ -420,6 +420,7 @@ export enum ChatStatus {
   FAILED = 'failed',
   REQUIRES_ACTION = 'requires_action',
   CANCELED = 'canceled',
+  UNKNOWN = 'unknown',
 }
 
 export interface CreateChatData {

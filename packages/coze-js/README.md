@@ -62,12 +62,14 @@ async function quickChat() {
 |---------|-------------|----------|
 | Chat | Text conversations | [chat.ts](../../examples/coze-js-node/src/chat.ts) |
 | Chat | Chat With Local Plugin | [chat-local-plugin.ts](../../examples/coze-js-node/src/chat-local-plugin.ts)|
+| Chat | Chat With File(Image) | [chat-with-file.ts](../../examples/coze-js-node/src/chat-with-file.ts) |
 | Bot Management | Create and manage bots | [bot.ts](../../examples/coze-js-node/src/bot.ts) |
 | Datasets | Document management | [datasets.ts](../../examples/coze-js-node/src/datasets.ts) |
 | Workflow | Run workflow | [workflow.ts](../../examples/coze-js-node/src/workflow.ts) |
 | Variables | Variable management | [variables.ts](../../examples/coze-js-node/src/variables.ts) |
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 | Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
+| Users | Get user info | [users-me.ts](../../examples/coze-js-node/src/users-me.ts) |
 | Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
 | Speech（websocket） | Text to speech | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
 | Transcriptions（websocket） | Speech to text | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |

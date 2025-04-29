@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { CozeAPI } from '@coze/api';
 
-import config from './config/config.js';
+import config from './config/config';
 
 const key = (process.env.COZE_ENV as keyof typeof config) || 'en';
 if (!(key in config)) {
