@@ -232,6 +232,9 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.WORKFLOW_ID]: localManager.get(
           LocalStorageKey.WORKFLOW_ID,
         ),
+        [LocalStorageKey.PROLOGUE_CONTENT]: localManager.get(
+          LocalStorageKey.PROLOGUE_CONTENT,
+        ),
         [LocalStorageKey.INTERRUPT_TEXT]: localManager.get(
           LocalStorageKey.INTERRUPT_TEXT,
         ),
@@ -252,6 +255,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       user_id,
       conversation_id,
       workflow_id,
+      prologue_content, // Add this line
       interrupt_text,
       interrupt_bot_id,
     } = form.getFieldsValue();
@@ -261,6 +265,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.USER_ID, user_id);
     localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
     localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
+    localManager.set(LocalStorageKey.PROLOGUE_CONTENT, prologue_content);
     localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
     localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
   };
@@ -476,6 +481,15 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
           >
             <Input placeholder="Enter workflow ID" />
           </Form.Item>
+
+          <Form.Item
+            name={LocalStorageKey.PROLOGUE_CONTENT}
+            label="Prologue Content"
+            tooltip="Optional: Specify prologue content for the conversation"
+          >
+            <Input.TextArea placeholder="Enter prologue content" rows={2} />
+          </Form.Item>
+
           <Form.Item
             name={LocalStorageKey.INTERRUPT_TEXT}
             label="Interrupt Text"

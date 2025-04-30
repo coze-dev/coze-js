@@ -84,6 +84,15 @@ const Settings: React.FC<SettingsProps> = ({ onSaveSettings, clientRef }) => {
           >
             Coze Realtime Console
           </div>
+          <Button
+            type="primary"
+            // color="danger"
+            href="https://www.coze.cn/open-platform/realtime/websocket"
+            target="_blank"
+            style={{ marginLeft: '16px' }}
+          >
+            体验 Websocket 实时语音
+          </Button>
         </div>
         <div
           style={{

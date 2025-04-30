@@ -61,7 +61,7 @@ export function mergeConfig(...objects: any[]) {
 }
 
 export function isPersonalAccessToken(token?: string) {
-  return token?.startsWith('pat_');
+  return !!token?.startsWith('pat_');
 }
 
 export function buildWebsocketUrl(path: string, params: Record<string, any>) {
