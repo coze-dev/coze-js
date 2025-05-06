@@ -27,6 +27,7 @@ class WsSpeechClient {
   private playbackPauseTime: number | null = null;
   private playbackTimeout: NodeJS.Timeout | null = null;
   private elapsedBeforePause = 0;
+  private audioDeltaList: string[] = [];
 
   constructor(config: WsToolsOptions) {
     this.api = new CozeAPI({
@@ -89,7 +90,10 @@ class WsSpeechClient {
           } else if (
             data.event_type === WebsocketsEventType.SPEECH_AUDIO_UPDATE
           ) {
-            this.handleAudioMessage(data.data.delta);
+            this.audioDeltaList.push(data.data.delta);
+            if (this.audioDeltaList.length === 1) {
+              this.handleAudioMessage();
+            }
           } else if (
             data.event_type === WebsocketsEventType.SPEECH_AUDIO_COMPLETED
           ) {
@@ -160,6 +164,7 @@ class WsSpeechClient {
     if (this.playbackTimeout) {
       clearTimeout(this.playbackTimeout);
     }
+    this.audioDeltaList.length = 0;
     await this.wavStreamPlayer.interrupt();
     this.closeWs();
   }
@@ -259,7 +264,8 @@ class WsSpeechClient {
     this.listeners.get(event)?.forEach(callback => callback(data));
   }
 
-  private handleAudioMessage = async (message: string) => {
+  private handleAudioMessage = async () => {
+    const message = this.audioDeltaList[0];
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);
     const view = new Uint8Array(arrayBuffer);
@@ -280,8 +286,17 @@ class WsSpeechClient {
         this.playbackStartTime = Date.now();
         this.elapsedBeforePause = 0;
       }
+
+      // Remove the processed message and process the next one if available
+      this.audioDeltaList.shift();
+      if (this.audioDeltaList.length > 0) {
+        this.handleAudioMessage();
+      }
     } catch (error) {
-      console.warn('[speech] wavStreamPlayer error', error);
+      console.warn(
+        `[speech] wavStreamPlayer error ${(error as Error)?.message}`,
+        error,
+      );
     }
   };
 }
