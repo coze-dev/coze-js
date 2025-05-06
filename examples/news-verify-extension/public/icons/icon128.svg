@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#4285F4" x="0" y="0" width="128" height="128" rx="16"></rect>
+        <text font-family="Arial-BoldMT, Arial" font-size="80" font-weight="bold" fill="#FFFFFF">
+            <tspan x="32" y="90">N</tspan>
+        </text>
+    </g>
+</svg>

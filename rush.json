@@ -471,6 +471,10 @@
     {
       "packageName": "@coze/simult-extension",
       "projectFolder": "examples/simult-extension"
+    },
+    {
+      "packageName": "@coze/news-verify-extension",
+      "projectFolder": "examples/news-verify-extension"
     }
   ]
 }

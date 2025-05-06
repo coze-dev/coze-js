@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "News Verify Extension",
+  "version": "0.0.1",
+  "description": "A browser extension for news verification",
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "icons/icon16.svg",
+      "48": "icons/icon48.svg",
+      "128": "icons/icon128.svg"
+    }
+  },
+  "permissions": ["activeTab", "storage"],
+  "background": {
+    "service_worker": "src/background/main.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.svg",
+    "48": "icons/icon48.svg",
+    "128": "icons/icon128.svg"
+  },
+  "host_permissions": ["https://*/*", "http://*/*"]
+}
