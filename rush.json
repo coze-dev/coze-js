@@ -473,8 +473,8 @@
       "projectFolder": "examples/simult-extension"
     },
     {
-      "packageName": "@coze/news-verify-extension",
-      "projectFolder": "examples/news-verify-extension"
+      "packageName": "@coze/fact-check-extension",
+      "projectFolder": "examples/fact-check-extension"
     }
   ]
 }

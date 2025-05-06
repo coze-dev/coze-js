@@ -1,17 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "News Verify Extension",
+  "name": "Fact Check Extension",
   "version": "0.0.1",
-  "description": "A browser extension for news verification",
+  "description": "A browser extension for fact-checking news and information.",
   "action": {
     "default_popup": "src/popup/index.html",
     "default_icon": {
-      "16": "icons/icon16.svg",
-      "48": "icons/icon48.svg",
-      "128": "icons/icon128.svg"
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
   },
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "contextMenus", "identity"],
   "background": {
     "service_worker": "src/background/main.js",
     "type": "module"
@@ -23,9 +23,9 @@
     }
   ],
   "icons": {
-    "16": "icons/icon16.svg",
-    "48": "icons/icon48.svg",
-    "128": "icons/icon128.svg"
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "host_permissions": ["https://*/*", "http://*/*"]
 }
