@@ -256,15 +256,24 @@ describe('WsSpeechClient', () => {
       await initPromise;
     });
 
-    it('should process audio message correctly', async () => {
-      const mockMessage = btoa('test audio data');
-
-      await (client as any).handleAudioMessage(mockMessage);
+    it('should process audio data from the audioDeltaList queue', async () => {
+      // Create a valid base64 encoding for the test
+      // Using a valid base64 string that represents PCM audio data
+      const validBase64 = 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      
+      // Add message to the audioDeltaList
+      (client as any).audioDeltaList.push(validBase64);
+      
+      // Process the first message in the queue
+      await (client as any).handleAudioMessage();
 
       expect(client['wavStreamPlayer'].add16BitPCM).toHaveBeenCalledWith(
         expect.any(ArrayBuffer),
         client['trackId'],
       );
+      
+      // The message should be removed from the queue after processing
+      expect((client as any).audioDeltaList.length).toBe(0);
     });
 
     it('should handle audio processing errors', async () => {
@@ -275,15 +284,58 @@ describe('WsSpeechClient', () => {
       }));
 
       const client = new WsSpeechClient(mockConfig);
-      const mockMessage = btoa('test audio data');
-      // await client.init();
-
-      await (client as any).handleAudioMessage(mockMessage);
+      
+      // Using a valid base64 string for testing
+      const validBase64 = 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      
+      // Add message to the audioDeltaList
+      (client as any).audioDeltaList.push(validBase64);
+      
+      // Process the message
+      await (client as any).handleAudioMessage();
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        '[speech] wavStreamPlayer error',
+        '[speech] wavStreamPlayer error Processing failed',
         mockError,
       );
+    });
+
+    it('should process messages from audioDeltaList one by one', () => {
+      // For this test we're verifying just the queue behavior in isolation
+      // Test how audioDeltaList is processed when messages arrive
+      
+      // First, verify the onmessage handler correctly adds items to the queue
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_UPDATE,
+          id: 'test-id',
+          data: {
+            delta: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+          },
+          detail: {
+            logid: 'test-logid',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+      
+      // Add another message
+      client.ws?.onmessage?.(
+        {
+          event_type: WebsocketsEventType.SPEECH_AUDIO_UPDATE,
+          id: 'test-id-2',
+          data: {
+            delta: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAB=',
+          },
+          detail: {
+            logid: 'test-logid-2',
+          },
+        },
+        undefined as unknown as MessageEvent,
+      );
+      
+      // Verify that the messages have been added to the queue
+      expect((client as any).audioDeltaList.length).toBe(2);
     });
   });
 
@@ -361,6 +413,7 @@ describe('WsSpeechClient', () => {
         event_type: WebsocketsEventType.INPUT_TEXT_BUFFER_COMPLETE,
       });
     });
+
     it('should interrupt', async () => {
       client.interrupt();
 
@@ -368,11 +421,12 @@ describe('WsSpeechClient', () => {
     });
 
     it('should resume', async () => {
-      const mockMessage = btoa('test audio data');
-
-      await (client as any).handleAudioMessage(mockMessage);
-
-      await client.pause();
+      // Using a valid base64 string for testing
+      const validBase64 = 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      
+      // Add to the queue and process
+      (client as any).audioDeltaList.push(validBase64);
+      await (client as any).handleAudioMessage();
 
       await client.resume();
 
@@ -386,9 +440,12 @@ describe('WsSpeechClient', () => {
     });
 
     it('should clear playbackTimeout before pause', async () => {
-      const mockMessage = btoa('test audio data');
-
-      await (client as any).handleAudioMessage(mockMessage);
+      // Using a valid base64 string for testing
+      const validBase64 = 'UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+      
+      // Add to the queue and process
+      (client as any).audioDeltaList.push(validBase64);
+      await (client as any).handleAudioMessage();
 
       await client.pause();
 
