@@ -11,7 +11,7 @@ import {
   Card,
   Input,
 } from 'antd';
-import { WsSpeechClient } from '@coze/api/ws-tools';
+import { WsSpeechClient, WsToolsUtils } from '@coze/api/ws-tools';
 import {
   SoundOutlined,
   PauseOutlined,
@@ -21,6 +21,7 @@ import {
 
 import getConfig from '../../utils/config';
 import Settings from '../../components/settings';
+import { ConsoleLog } from '../../components/console-log';
 
 const { Paragraph, Text } = Typography;
 const { TextArea } = Input;
@@ -36,6 +37,7 @@ const SpeechDemo: React.FC = () => {
   const [disabled, setDisabled] = useState(false);
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [status, setStatus] = useState<string>('未开始');
+  const isMobile = WsToolsUtils.isMobile();
 
   // 检查令牌
   useEffect(() => {
@@ -290,6 +292,7 @@ const SpeechDemo: React.FC = () => {
             )}
           </Row>
         </Card>
+        {isMobile && <ConsoleLog />}
 
         {/* 使用说明 */}
         <Card title="使用说明" style={{ marginTop: '20px' }}>
