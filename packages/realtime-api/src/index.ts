@@ -3,7 +3,12 @@ import {
   type AudioPropertiesConfig,
   type IRTCEngine,
 } from '@volcengine/rtc';
-import { CozeAPI, type CreateRoomData, type GetToken } from '@coze/api';
+import {
+  CozeAPI,
+  type RoomConfig,
+  type CreateRoomData,
+  type GetToken,
+} from '@coze/api';
 
 import * as RealtimeUtils from './utils';
 import { isScreenShareDevice } from './utils';
@@ -39,6 +44,7 @@ export interface RealtimeClientConfig {
   suppressNonStationaryNoise?: boolean /** optional, Suppress non-stationary noise, defaults to false */;
   videoConfig?: VideoConfig /** optional, Video configuration */;
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
+  prologueContent?: string /** optional, Prologue content */;
 }
 
 // Only use for test
@@ -94,6 +100,7 @@ class RealtimeClient extends RealtimeEventHandler {
    *                                               可选，视频输入设备的设备 ID。
    * @param config.videoConfig.screenConfig - Optional, Screen share configuration if videoInputDeviceId is 'screenShare' see https://www.volcengine.com/docs/6348/104481#screenconfig for more details. |
    *                                         可选，屏幕共享配置，如果 videoInputDeviceId 是 'screenShare'，请参考 https://www.volcengine.com/docs/6348/104481#screenconfig 了解更多详情。
+   * @param config.prologueContent - Optional, Prologue content. | 可选，开场白内容。
    */
   constructor(config: RealtimeClientConfig) {
     super(config.debug);
@@ -126,21 +133,20 @@ class RealtimeClient extends RealtimeEventHandler {
       if (getRoomInfo) {
         roomInfo = await getRoomInfo();
       } else {
-        let config = undefined;
+        const config: RoomConfig = {};
+        if (this._config.prologueContent) {
+          config.prologue_content = this._config.prologueContent;
+        }
         if (this._config.videoConfig) {
           if (
             isScreenShareDevice(this._config.videoConfig.videoInputDeviceId)
           ) {
-            config = {
-              video_config: {
-                stream_video_type: 'screen' as const,
-              },
+            config.video_config = {
+              stream_video_type: 'screen' as const,
             };
           } else {
-            config = {
-              video_config: {
-                stream_video_type: 'main' as const,
-              },
+            config.video_config = {
+              stream_video_type: 'main' as const,
             };
           }
         }
