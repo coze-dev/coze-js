@@ -6,7 +6,11 @@ import {
   type AIDenoiserProcessorLevel,
   type AIDenoiserProcessorMode,
 } from '../index';
-import { type ChatUpdateEvent, WebsocketsEventType } from '../../index';
+import {
+  type AudioCodec,
+  type ChatUpdateEvent,
+  WebsocketsEventType,
+} from '../../index';
 import BaseWsChatClient from './base';
 import { getAudioDevices } from '../utils';
 export { WsChatEventNames };
@@ -14,6 +18,7 @@ export { WsChatEventNames };
 class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
   private isMuted = false;
+  private inputAudioCodec: AudioCodec = 'pcm';
 
   constructor(config: WsChatClientOptions) {
     super(config);
@@ -30,7 +35,7 @@ class WsChatClient extends BaseWsChatClient {
 
   private async startRecord() {
     // 1. start recorder
-    await this.recorder.start();
+    await this.recorder.start(this.inputAudioCodec);
 
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
@@ -91,9 +96,6 @@ class WsChatClient extends BaseWsChatClient {
     const ws = await this.init();
     this.ws = ws;
 
-    if (!this.isMuted) {
-      await this.startRecord();
-    }
     const sampleRate = await this.recorder?.getSampleRate();
 
     const event: ChatUpdateEvent = {
@@ -119,6 +121,12 @@ class WsChatClient extends BaseWsChatClient {
         ...chatUpdate?.data,
       },
     };
+
+    this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
+
+    if (!this.isMuted) {
+      await this.startRecord();
+    }
 
     this.ws.send(event);
 

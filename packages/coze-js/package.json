@@ -65,6 +65,7 @@
     "agora-rte-extension": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.x",
+    "opus-encdec": "^0.1.1",
     "reconnecting-websocket": "^4.4.0",
     "uuid": "^10.0.0",
     "ws": "^8.11.0"

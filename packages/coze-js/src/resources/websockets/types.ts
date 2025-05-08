@@ -193,8 +193,8 @@ export interface CommonErrorEvent extends BaseEventWithDetail {
 interface AudioConfig {
   /** Input audio format, supports pcm/wav/ogg */
   format?: 'pcm' | 'wav' | 'ogg';
-  /** Input audio codec, supports pcm/opus */
-  codec?: 'pcm' | 'opus';
+  /** Input audio codec, supports pcm/opus/g711a/g711u */
+  codec?: AudioCodec;
   /** Input audio sample rate, default 24000 */
   sample_rate?: number;
   /** Number of audio channels, default 1 (mono) */
@@ -202,6 +202,8 @@ interface AudioConfig {
   /** Audio bit depth, default 16 */
   bit_depth?: number;
 }
+
+export type AudioCodec = 'pcm' | 'opus' | 'g711a' | 'g711u';
 
 interface ChatConfig {
   /** Additional information, typically used for business-related fields */
