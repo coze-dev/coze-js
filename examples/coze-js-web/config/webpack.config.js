@@ -334,6 +334,8 @@ module.exports = function (webpackEnv) {
     },
     module: {
       strictExportPresence: true,
+      // fix: Critical dependency: require function is used in a way in which dependencies cannot be statically extracted
+      unknownContextCritical: false,
       rules: [
         // Handle node_modules packages that contain sourcemaps
         shouldUseSourceMap && {
