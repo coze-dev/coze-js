@@ -32,7 +32,7 @@ export const checkDevicePermission = async (): Promise<{
       name: 'microphone' as PermissionName,
     });
 
-    // 如果权限已被拒绝
+    // If permission has been denied
     if (permissionStatus.state === 'denied') {
       console.error('Microphone permission denied');
       result.audio = false;
@@ -47,13 +47,13 @@ export const checkDevicePermission = async (): Promise<{
         audio: true,
       });
 
-      // 获取成功后，关闭音频流
+      // After obtaining successfully, close the audio stream
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     }
   } catch (error) {
-    // 用户拒绝授权或其他错误
+    // User denied authorization or other errors
     console.error('Failed to get audio permission:', error);
     result.audio = false;
   }
@@ -66,14 +66,14 @@ export const checkDevicePermission = async (): Promise<{
  */
 export const getAudioDevices = async () => {
   try {
-    // request microphone permission first, so we can get the complete device information
+    // Request microphone permission first, so we can get the complete device information
     const { audio: audioPermission } = await checkDevicePermission();
 
     if (!audioPermission) {
       throw new Error('Microphone permission denied');
     }
 
-    // get all media devices
+    // Get all media devices
     const devices = await navigator.mediaDevices.enumerateDevices();
 
     if (!devices?.length) {
@@ -113,6 +113,33 @@ export const floatTo16BitPCM = (float32Array: Float32Array) => {
 };
 
 /**
+ * Convert Float32Array to Int16Array (without going through ArrayBuffer)
+ */
+export function float32ToInt16Array(float32: Float32Array): Int16Array {
+  const int16 = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32[i]));
+    int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return int16;
+}
+
+/**
+ * Simple linear extraction method to downsample Float32Array from 48000Hz to 8000Hz
+ * @param input Float32Array 48000Hz
+ * @returns Float32Array 8000Hz
+ */
+export function downsampleTo8000(input: Float32Array): Float32Array {
+  const ratio = 48000 / 8000; // 6
+  const outputLength = Math.floor(input.length / ratio);
+  const output = new Float32Array(outputLength);
+  for (let i = 0; i < outputLength; i++) {
+    output[i] = input[Math.floor(i * ratio)];
+  }
+  return output;
+}
+
+/**
  * Check if device is mobile
  * @returns {boolean} Whether device is mobile
  */
@@ -130,7 +157,7 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
   if (window.__denoiserSupported !== undefined) {
     return window.__denoiserSupported;
   }
-  // 传入 Wasm 文件所在的公共路径以创建 AIDenoiserExtension 实例，路径结尾不带 / "
+  // Pass in the public path where the Wasm file is located to create an AIDenoiserExtension instance, path does not end with / "
   const external =
     window.__denoiser ||
     new AIDenoiserExtension({
@@ -142,19 +169,19 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
   window.__denoiser = external;
 
   external.onloaderror = e => {
-    // 如果 Wasm 文件加载失败，你可以关闭插件，例如：
+    // If the Wasm file fails to load, you can disable the plugin, for example:
     console.error('Denoiser load error', e);
     window.__denoiserSupported = false;
   };
 
-  // 检查兼容性
+  // Check compatibility
   if (!external.checkCompatibility()) {
-    // 当前浏览器可能不支持 AI 降噪插件，你可以停止执行之后的逻辑
+    // The current browser may not support the AI denoising plugin, you can stop executing subsequent logic
     console.error('Does not support AI Denoiser!');
     window.__denoiserSupported = false;
     return false;
   } else {
-    // 注册插件
+    // Register the plugin
     // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
     AgoraRTC.registerExtensions([external]);
     window.__denoiserSupported = true;
@@ -164,3 +191,85 @@ export const checkDenoiserSupport = (assetsPath?: string) => {
 
 export const isBrowserExtension = (): boolean =>
   typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;
+
+/**
+ * Convert 16-bit linear PCM data to G.711 A-law
+ * @param {Int16Array|Array} pcmData - 16-bit signed PCM sample data
+ * @returns {Uint8Array} - G.711 A-law encoded data
+ */
+export function encodeG711A(pcmData: Int16Array) {
+  const aLawData = new Uint8Array(pcmData.length);
+
+  // A-law compression table - used to optimize performance
+  const LOG_TABLE = [
+    1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7,
+  ];
+
+  for (let i = 0; i < pcmData.length; i++) {
+    let sample = pcmData[i];
+    const sign = sample < 0 ? 0 : 0x80;
+
+    // Get the absolute value of the sample and limit it to the 16-bit range
+    if (sign === 0) {
+      sample = -sample;
+    }
+    if (sample > 32767) {
+      sample = 32767;
+    }
+
+    // Use linear quantization for small signals, logarithmic quantization for large signals
+    let compressedValue;
+    if (sample < 256) {
+      compressedValue = sample >> 4;
+    } else {
+      // Determine the "exponent" part of the sample
+      const exponent = LOG_TABLE[(sample >> 8) & 0x7f];
+      const mantissa = (sample >> (exponent + 3)) & 0x0f;
+      compressedValue = (exponent << 4) | mantissa;
+    }
+
+    // Invert even bits (this is a feature of A-law)
+    aLawData[i] = (sign | compressedValue) ^ 0x55;
+  }
+
+  return aLawData;
+}
+
+/**
+ * Encode 16-bit PCM to G.711 μ-law (g711u)
+ * @param pcm16 - Int16Array of PCM samples
+ * @returns {Uint8Array} G.711U encoded data
+ */
+export function encodeG711U(pcm16: Int16Array): Uint8Array {
+  const BIAS = 0x84;
+  const CLIP = 32635;
+  const out = new Uint8Array(pcm16.length);
+  for (let i = 0; i < pcm16.length; i++) {
+    let pcm = pcm16[i];
+    const sign = (pcm >> 8) & 0x80;
+    if (sign !== 0) {
+      pcm = -pcm;
+    }
+    if (pcm > CLIP) {
+      pcm = CLIP;
+    }
+    pcm = pcm + BIAS;
+    let exponent = 7;
+    for (
+      let expMask = 0x4000;
+      (pcm & expMask) === 0 && exponent > 0;
+      expMask >>= 1
+    ) {
+      exponent--;
+    }
+    const mantissa = (pcm >> (exponent + 3)) & 0x0f;
+    const ulaw = ~(sign | (exponent << 4) | mantissa);
+    out[i] = ulaw;
+  }
+  return out;
+}

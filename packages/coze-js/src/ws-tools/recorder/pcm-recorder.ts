@@ -52,7 +52,6 @@ class PcmRecorder {
   private wavAudioProcessor2: WavAudioProcessor | undefined;
   private processor: AIDenoiserProcessor | undefined;
   private pcmAudioCallback: ((data: { raw: ArrayBuffer }) => void) | undefined;
-  private opusAudioCallback: ((data: { raw: ArrayBuffer }) => void) | undefined;
   private wavAudioCallback: ((blob: Blob, name: string) => void) | undefined;
   private dumpAudioCallback: ((blob: Blob, name: string) => void) | undefined;
   private static aiDenoiserSupport = false;
@@ -129,13 +128,13 @@ class PcmRecorder {
     // 实时音频处理
     if (inputAudioCodec === 'opus') {
       this.audioProcessor = new OpusAudioProcessor(data => {
-        this.opusAudioCallback?.({ raw: data });
+        this.pcmAudioCallback?.({ raw: data });
       });
     } else {
       // pcm 音频处理
       this.audioProcessor = new PcmAudioProcessor(data => {
         this.pcmAudioCallback?.({ raw: data });
-      });
+      }, inputAudioCodec);
     }
 
     let audioProcessor: IAudioProcessor | undefined;
@@ -177,7 +176,6 @@ class PcmRecorder {
     pcmAudioCallback,
     wavAudioCallback,
     dumpAudioCallback,
-    opusAudioCallback,
   }: {
     pcmAudioCallback?: (data: { raw: ArrayBuffer }) => void;
     wavAudioCallback?: (blob: Blob, name: string) => void;
@@ -194,7 +192,6 @@ class PcmRecorder {
     this.pcmAudioCallback = pcmAudioCallback;
     this.wavAudioCallback = wavAudioCallback;
     this.dumpAudioCallback = dumpAudioCallback;
-    this.opusAudioCallback = opusAudioCallback;
     this.recording = true;
   }
 

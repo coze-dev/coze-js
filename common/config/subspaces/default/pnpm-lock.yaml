@@ -2090,9 +2090,6 @@ importers:
       axios:
         specifier: ^1.7.7
         version: 1.7.7(debug@4.3.7)
-      types-opus-recorder:
-        specifier: ^1.0.1
-        version: 1.0.1
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
@@ -15746,9 +15743,6 @@ packages:
 
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
-
-  types-opus-recorder@1.0.1:
-    resolution: {integrity: sha512-UALYgAkKZnlG44UBMT2gz2b9ZvefFSf6XhhM8I0U2vdXDbOWQyGoa+oRnEzrPrPEvr7YRqvE0RW03Pne9r4txw==}
 
   typescript-compare@0.0.2:
     resolution: {integrity: sha512-8ja4j7pMHkfLJQO2/8tut7ub+J3Lw2S3061eJLFQcvs3tsmJKp8KG5NtpLn7KcY2w08edF74BSVN7qJS0U6oHA==}
@@ -34391,8 +34385,6 @@ snapshots:
   typedarray-to-buffer@3.1.5:
     dependencies:
       is-typedarray: 1.0.0
-
-  types-opus-recorder@1.0.1: {}
 
   typescript-compare@0.0.2:
     dependencies:

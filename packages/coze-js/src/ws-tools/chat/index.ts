@@ -65,22 +65,6 @@ class WsChatClient extends BaseWsChatClient {
         // this.log('input_audio_buffer_append', performance.now() - startTime);
         // startTime = performance.now();
       },
-      opusAudioCallback: data => {
-        const { raw } = data;
-        const base64String = btoa(
-          Array.from(new Uint8Array(raw))
-            .map(byte => String.fromCharCode(byte))
-            .join(''),
-        );
-        // send audio to ws
-        this.ws?.send({
-          id: uuid(),
-          event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_APPEND,
-          data: {
-            delta: base64String,
-          },
-        });
-      },
       wavAudioCallback: (blob, name) => {
         const event = {
           event_type: 'audio.input.dump' as const,

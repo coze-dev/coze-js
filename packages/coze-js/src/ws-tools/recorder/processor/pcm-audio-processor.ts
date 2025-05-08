@@ -1,6 +1,12 @@
 import { type IAudioProcessorContext } from 'agora-rte-extension';
 
-import { floatTo16BitPCM } from '../../utils';
+import {
+  floatTo16BitPCM,
+  encodeG711U,
+  float32ToInt16Array,
+  downsampleTo8000,
+  encodeG711A,
+} from '../../utils';
 import { AudioProcessorSrc } from './pcm-worklet-processor';
 import BaseAudioProcessor from './base-audio-processor';
 
@@ -8,11 +14,16 @@ class PcmAudioProcessor extends BaseAudioProcessor {
   name: 'PcmAudioProcessor';
   private chunkProcessor?: (data: ArrayBuffer) => void;
   private workletNode?: AudioWorkletNode;
+  private encoding: 'pcm' | 'g711a' | 'g711u';
 
-  constructor(chunkProcessor: (data: ArrayBuffer) => void) {
+  constructor(
+    chunkProcessor: (data: ArrayBuffer) => void,
+    encoding: 'pcm' | 'g711a' | 'g711u' = 'pcm',
+  ) {
     super();
     this.name = 'PcmAudioProcessor';
     this.chunkProcessor = chunkProcessor;
+    this.encoding = encoding;
   }
 
   protected async onNode(node: AudioNode, context: IAudioProcessorContext) {
@@ -24,9 +35,26 @@ class PcmAudioProcessor extends BaseAudioProcessor {
     // workletNode.connect(node);
 
     this.workletNode.port.onmessage = event => {
-      this.chunkProcessor?.(
-        floatTo16BitPCM(event.data.audioData as Float32Array),
-      );
+      const float32 = event.data.audioData as Float32Array;
+      let buffer: ArrayBuffer;
+      switch (this.encoding) {
+        case 'g711a': {
+          const float32_8000 = downsampleTo8000(float32);
+          const pcm16_8000 = float32ToInt16Array(float32_8000);
+          buffer = encodeG711A(pcm16_8000).buffer;
+          break;
+        }
+        case 'g711u': {
+          const float32_8000 = downsampleTo8000(float32);
+          const pcm16_8000 = float32ToInt16Array(float32_8000);
+          buffer = encodeG711U(pcm16_8000).buffer;
+          break;
+        }
+        case 'pcm':
+        default:
+          buffer = floatTo16BitPCM(float32);
+      }
+      this.chunkProcessor?.(buffer);
     };
 
     this.startRecording();
