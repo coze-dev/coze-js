@@ -9,7 +9,10 @@ import {
 } from '@coze/api/ws-tools';
 import SendMessage from './send-message';
 import ReceiveMessage from './receive-message';
-import { ConversationAudioTranscriptUpdateEvent } from '@coze/api';
+import {
+  CommonErrorEvent,
+  ConversationAudioTranscriptUpdateEvent,
+} from '@coze/api';
 import Operation from './operation';
 import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { ConsoleLog } from '../../components/console-log';
@@ -135,6 +138,18 @@ function Chat() {
         console.log('[chat] transcript update', event);
         setTranscript(
           (event as ConversationAudioTranscriptUpdateEvent).data.content,
+        );
+      },
+    );
+    clientRef.current?.on(
+      WsChatEventNames.SERVER_ERROR,
+      (_: string, event: unknown) => {
+        console.log('[chat] error', event);
+        message.error(
+          '发生错误：' +
+            (event as CommonErrorEvent)?.data?.msg +
+            ' logid: ' +
+            (event as CommonErrorEvent)?.detail.logid,
         );
       },
     );

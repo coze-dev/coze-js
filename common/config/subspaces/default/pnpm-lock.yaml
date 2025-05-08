@@ -2038,6 +2038,9 @@ importers:
       node-fetch:
         specifier: ^2.x
         version: 2.7.0
+      opus-encdec:
+        specifier: ^0.1.1
+        version: 0.1.1
       reconnecting-websocket:
         specifier: ^4.4.0
         version: 4.4.0
@@ -2087,6 +2090,9 @@ importers:
       axios:
         specifier: ^1.7.7
         version: 1.7.7(debug@4.3.7)
+      types-opus-recorder:
+        specifier: ^1.0.1
+        version: 1.0.1
       typescript:
         specifier: ^5.5.3
         version: 5.6.3
@@ -12778,6 +12784,9 @@ packages:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
 
+  opus-encdec@0.1.1:
+    resolution: {integrity: sha512-TDzyGqYqrwn5UEUNaLsfLGu8Ma+HRNrgLYj7Vx5wfTnafAA21G6Bnm/qTIa3orQi/yZPZYmkdpO/gez4nfA1Rw==}
+
   ora@5.4.1:
     resolution: {integrity: sha512-5b6Y85tPxZZ7QytO+BQzysW31HJku27cRIlkbAXaNx+BdcVi+LlRFmVXzeF6a7JCwJpyw5c4b+YSVImQIrBpuQ==}
     engines: {node: '>=10'}
@@ -15737,6 +15746,9 @@ packages:
 
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
+
+  types-opus-recorder@1.0.1:
+    resolution: {integrity: sha512-UALYgAkKZnlG44UBMT2gz2b9ZvefFSf6XhhM8I0U2vdXDbOWQyGoa+oRnEzrPrPEvr7YRqvE0RW03Pne9r4txw==}
 
   typescript-compare@0.0.2:
     resolution: {integrity: sha512-8ja4j7pMHkfLJQO2/8tut7ub+J3Lw2S3061eJLFQcvs3tsmJKp8KG5NtpLn7KcY2w08edF74BSVN7qJS0U6oHA==}
@@ -30782,6 +30794,8 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
+  opus-encdec@0.1.1: {}
+
   ora@5.4.1:
     dependencies:
       bl: 4.1.0
@@ -34377,6 +34391,8 @@ snapshots:
   typedarray-to-buffer@3.1.5:
     dependencies:
       is-typedarray: 1.0.0
+
+  types-opus-recorder@1.0.1: {}
 
   typescript-compare@0.0.2:
     dependencies:

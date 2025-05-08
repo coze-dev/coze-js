@@ -11,12 +11,15 @@ import {
 
 import WavAudioProcessor from './processor/wav-audio-processor';
 import PcmAudioProcessor from './processor/pcm-audio-processor';
+import OpusAudioProcessor from './processor/opus-audio-processor';
+import type BaseAudioProcessor from './processor/base-audio-processor';
 import { checkDenoiserSupport } from '../utils';
 import {
   type AIDenoisingConfig,
   type AudioCaptureConfig,
   type WavRecordConfig,
 } from '../types';
+import { type AudioCodec } from '../../index';
 
 export enum AIDenoiserProcessorMode {
   NSNG = 'NSNG',
@@ -45,10 +48,11 @@ class PcmRecorder {
   private recording = false;
   private static denoiser: AIDenoiserExtension | undefined;
   private wavAudioProcessor: WavAudioProcessor | undefined;
-  private pcmAudioProcessor: PcmAudioProcessor | undefined;
+  private audioProcessor: BaseAudioProcessor | undefined;
   private wavAudioProcessor2: WavAudioProcessor | undefined;
   private processor: AIDenoiserProcessor | undefined;
   private pcmAudioCallback: ((data: { raw: ArrayBuffer }) => void) | undefined;
+  private opusAudioCallback: ((data: { raw: ArrayBuffer }) => void) | undefined;
   private wavAudioCallback: ((blob: Blob, name: string) => void) | undefined;
   private dumpAudioCallback: ((blob: Blob, name: string) => void) | undefined;
   private static aiDenoiserSupport = false;
@@ -72,7 +76,7 @@ class PcmRecorder {
     }
   }
 
-  async start() {
+  async start(inputAudioCodec: AudioCodec = 'pcm') {
     const {
       deviceId,
       mediaStreamTrack,
@@ -99,7 +103,7 @@ class PcmRecorder {
         AGC: audioCaptureConfig?.autoGainControl ?? true, // 是否开启音频增益控制
         microphoneId: deviceId,
         encoderConfig: {
-          sampleRate: 44100,
+          sampleRate: this.getSampleRate(),
         },
       });
     }
@@ -122,10 +126,17 @@ class PcmRecorder {
       });
     }
 
-    // pcm 音频处理
-    this.pcmAudioProcessor = new PcmAudioProcessor(data => {
-      this.pcmAudioCallback?.({ raw: data });
-    });
+    // 实时音频处理
+    if (inputAudioCodec === 'opus') {
+      this.audioProcessor = new OpusAudioProcessor(data => {
+        this.opusAudioCallback?.({ raw: data });
+      });
+    } else {
+      // pcm 音频处理
+      this.audioProcessor = new PcmAudioProcessor(data => {
+        this.pcmAudioCallback?.({ raw: data });
+      });
+    }
 
     let audioProcessor: IAudioProcessor | undefined;
     if (this.isSupportAIDenoiser()) {
@@ -144,7 +155,7 @@ class PcmRecorder {
         audioProcessor = this.audioTrack.pipe(this.processor);
       }
 
-      audioProcessor = audioProcessor.pipe(this.pcmAudioProcessor);
+      audioProcessor = audioProcessor.pipe(this.audioProcessor);
 
       if (this.wavAudioProcessor2) {
         audioProcessor = audioProcessor.pipe(this.wavAudioProcessor2);
@@ -153,7 +164,7 @@ class PcmRecorder {
 
       this.handleProcessor();
     } else {
-      audioProcessor = this.audioTrack.pipe(this.pcmAudioProcessor);
+      audioProcessor = this.audioTrack.pipe(this.audioProcessor);
       if (this.wavAudioProcessor) {
         audioProcessor = audioProcessor.pipe(this.wavAudioProcessor);
       }
@@ -166,10 +177,12 @@ class PcmRecorder {
     pcmAudioCallback,
     wavAudioCallback,
     dumpAudioCallback,
+    opusAudioCallback,
   }: {
     pcmAudioCallback?: (data: { raw: ArrayBuffer }) => void;
     wavAudioCallback?: (blob: Blob, name: string) => void;
     dumpAudioCallback?: (blob: Blob, name: string) => void;
+    opusAudioCallback?: (data: { raw: ArrayBuffer }) => void;
   } = {}) {
     if (!this.audioTrack || !this.stream) {
       throw new Error('audioTrack is not initialized');
@@ -181,7 +194,7 @@ class PcmRecorder {
     this.pcmAudioCallback = pcmAudioCallback;
     this.wavAudioCallback = wavAudioCallback;
     this.dumpAudioCallback = dumpAudioCallback;
-
+    this.opusAudioCallback = opusAudioCallback;
     this.recording = true;
   }
 
@@ -233,7 +246,7 @@ class PcmRecorder {
       // 2. 暂停所有处理器的录制
       this.wavAudioProcessor?.stopRecording();
       this.wavAudioProcessor2?.stopRecording();
-      this.pcmAudioProcessor?.stopRecording();
+      this.audioProcessor?.stopRecording();
 
       // 3. 更新录制状态
       this.recording = false;
@@ -255,7 +268,7 @@ class PcmRecorder {
       // 2. 恢复所有处理器的录制
       this.wavAudioProcessor?.startRecording();
       this.wavAudioProcessor2?.startRecording();
-      this.pcmAudioProcessor?.startRecording();
+      this.audioProcessor?.startRecording();
 
       // 3. 更新录制状态
       this.recording = true;
@@ -272,7 +285,7 @@ class PcmRecorder {
     // 1. 销毁所有音频处理器
     this.wavAudioProcessor?.destroy();
     this.wavAudioProcessor2?.destroy();
-    this.pcmAudioProcessor?.destroy();
+    this.audioProcessor?.destroy();
 
     // 2. 关闭并清理音频轨道
     if (this.audioTrack) {
@@ -351,7 +364,7 @@ class PcmRecorder {
    * 获取音频采样率
    */
   getSampleRate() {
-    return 44100;
+    return 48000;
     // return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
   }
 

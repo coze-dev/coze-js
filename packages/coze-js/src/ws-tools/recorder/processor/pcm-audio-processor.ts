@@ -1,12 +1,10 @@
-import {
-  AudioProcessor,
-  type IAudioProcessorContext,
-} from 'agora-rte-extension';
+import { type IAudioProcessorContext } from 'agora-rte-extension';
 
-import { AudioProcessorSrc } from './pcm-worklet-processor';
 import { floatTo16BitPCM } from '../../utils';
+import { AudioProcessorSrc } from './pcm-worklet-processor';
+import BaseAudioProcessor from './base-audio-processor';
 
-class PcmAudioProcessor extends AudioProcessor {
+class PcmAudioProcessor extends BaseAudioProcessor {
   name: 'PcmAudioProcessor';
   private chunkProcessor?: (data: ArrayBuffer) => void;
   private workletNode?: AudioWorkletNode;
