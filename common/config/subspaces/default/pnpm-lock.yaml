@@ -770,7 +770,7 @@ importers:
         specifier: ^5.5.3
         version: 5.6.3
 
-  ../../../examples/news-verify-extension:
+  ../../../examples/fact-check-extension:
     dependencies:
       '@ant-design/icons':
         specifier: ^5.5.1

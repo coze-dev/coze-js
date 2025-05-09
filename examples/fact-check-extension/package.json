@@ -8,6 +8,7 @@
     "fix-manifest": "node scripts/fix-manifest.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "run-preinstall": "node scripts/preinstall.cjs",
     "start": "vite",
     "zip": "cd dist && zip -r ../fact-check-extension.zip * && cd .. && echo 'Created fact-check-extension.zip in the project root'"
   },
