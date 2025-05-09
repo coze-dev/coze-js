@@ -20,18 +20,10 @@ function createVerificationPopup(selectedText: string) {
   popup.style.maxHeight = '600px';
   popup.style.overflow = 'auto';
   // 适配暗黑模式
-  if (
-    window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-  ) {
-    popup.style.background = '#222';
-    popup.style.color = '#fff';
-    popup.style.boxShadow = '0 4px 16px rgba(0,0,0,0.6)';
-  } else {
-    popup.style.background = 'white';
-    popup.style.color = '#222';
-    popup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-  }
+  // 强制 light mode 样式
+  popup.style.background = 'white';
+  popup.style.color = '#222';
+  popup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
   popup.style.borderRadius = '8px';
   popup.style.zIndex = '10000';
   popup.style.padding = '16px';
@@ -69,16 +61,11 @@ function createVerificationPopup(selectedText: string) {
   loadingMessage.style.padding = '12px';
   contentContainer.appendChild(loadingMessage);
 
-  // 追加到body前插入样式，适配明暗模式下的链接颜色
+  // 追加到body前插入样式，强制 light mode 链接颜色
   const style = document.createElement('style');
   style.textContent = `
     #fact-check-popup a {
       color: #2563eb;
-    }
-    @media (prefers-color-scheme: dark) {
-      #fact-check-popup a {
-        color: #90cdf4;
-      }
     }
   `;
   document.head.appendChild(style);

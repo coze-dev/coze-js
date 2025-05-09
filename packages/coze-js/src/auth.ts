@@ -27,7 +27,12 @@ const getCrypto = () => {
     };
   }
   if (isBrowser() || isBrowserExtension()) {
-    return self.crypto || window.crypto;
+    if (typeof self !== 'undefined' && self.crypto) {
+      return self.crypto;
+    }
+    if (typeof window !== 'undefined' && window.crypto) {
+      return window.crypto;
+    }
   }
 
   // #ifndef MP

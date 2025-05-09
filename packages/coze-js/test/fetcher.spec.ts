@@ -10,6 +10,7 @@ vi.mock('node-fetch');
 vi.mock('../src/utils', () => ({
   isBrowser: vi.fn().mockReturnValue(false),
   isUniApp: vi.fn().mockReturnValue(false),
+  isBrowserExtension: vi.fn().mockReturnValue(false),
 }));
 
 const mockedAxios = vi.mocked(axios);
