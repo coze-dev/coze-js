@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 declare const uni: any;
+declare const chrome: any;
+
 export function safeJsonParse(jsonString: string, defaultValue: any = '') {
   try {
     return JSON.parse(jsonString);
@@ -73,3 +75,6 @@ export function buildWebsocketUrl(path: string, params: Record<string, any>) {
     .join('&');
   return `${path}?${queryString}`;
 }
+
+export const isBrowserExtension = (): boolean =>
+  typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;

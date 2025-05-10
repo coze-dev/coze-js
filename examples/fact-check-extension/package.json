@@ -1,27 +1,28 @@
 {
-  "name": "@coze/realtime-websocket",
-  "version": "0.0.0",
+  "name": "@coze/fact-check-extension",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/postbuild.js",
+    "fix-manifest": "node scripts/fix-manifest.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "run-preinstall": "node scripts/preinstall.cjs",
     "start": "vite",
-    "test": "exit 0"
+    "zip": "cd dist && zip -r ../fact-check-extension.zip * && cd .. && echo 'Created fact-check-extension.zip in the project root'"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@coze/api": "workspace:*",
     "antd": "^5.21.3",
-    "console-feed": "^3.8.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "~6.28.0"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
+    "@types/chrome": "^0.0.260",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.5.0",

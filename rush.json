@@ -471,6 +471,10 @@
     {
       "packageName": "@coze/simult-extension",
       "projectFolder": "examples/simult-extension"
+    },
+    {
+      "packageName": "@coze/fact-check-extension",
+      "projectFolder": "examples/fact-check-extension"
     }
   ]
 }
