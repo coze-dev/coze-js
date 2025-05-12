@@ -14,6 +14,7 @@ import {
 } from './version';
 import {
   isBrowser,
+  isBrowserExtension,
   isPersonalAccessToken,
   isUniApp,
   mergeConfig,
@@ -132,7 +133,7 @@ export class APIClient {
 
     if (isUniApp()) {
       headers['X-Coze-Client-User-Agent'] = getUniAppClientUserAgent();
-    } else if (isBrowser()) {
+    } else if (isBrowser() || isBrowserExtension()) {
       headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     } else {
       headers['User-Agent'] = getUserAgent();

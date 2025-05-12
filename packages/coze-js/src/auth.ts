@@ -2,7 +2,7 @@ import * as nodeCrypto from 'crypto';
 
 import jwt from 'jsonwebtoken';
 
-import { isBrowser, isUniApp, sleep } from './utils';
+import { isBrowser, isBrowserExtension, isUniApp, sleep } from './utils';
 import { APIError } from './error';
 import { APIClient, type RequestOptions } from './core';
 import {
@@ -26,8 +26,13 @@ const getCrypto = () => {
       },
     };
   }
-  if (isBrowser()) {
-    return window.crypto;
+  if (isBrowser() || isBrowserExtension()) {
+    if (typeof self !== 'undefined' && self.crypto) {
+      return self.crypto;
+    }
+    if (typeof window !== 'undefined' && window.crypto) {
+      return window.crypto;
+    }
   }
 
   // #ifndef MP
