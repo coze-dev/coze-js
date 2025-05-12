@@ -75,23 +75,33 @@ export class Runs extends APIResource {
    * @param params.event_id - Required The ID of the event to resume from. | 必选 要从中恢复的事件 ID。
    * @param params.resume_data - Required Data needed to resume the workflow. | 必选 恢复工作流所需的数据。
    * @param params.interrupt_type - Required The type of interruption to resume from. | 必选 要恢复的中断类型。
-   * @returns { id: string; event: WorkflowEventType; data: WorkflowEventMessage | WorkflowEventInterrupt | WorkflowEventError | null } | 恢复的工作流事件数据
+   * @returns AsyncGenerator<WorkflowEvent, { id: string; event: string; data: string }> | 工作流事件流
    */
-  async resume(params: ResumeWorkflowReq, options?: RequestOptions) {
+  async *resume(params: ResumeWorkflowReq, options?: RequestOptions) {
     const apiUrl = '/v1/workflow/stream_resume';
-    const response = await this._client.post<
+
+    const result = await this._client.post<
       ResumeWorkflowReq,
-      {
-        id: string;
-        event: WorkflowEventType;
-        data:
-          | WorkflowEventMessage
-          | WorkflowEventInterrupt
-          | WorkflowEventError
-          | null;
+      AsyncGenerator<{ id: string; event: WorkflowEventType; data: string }>
+    >(apiUrl, params, true, options);
+
+    for await (const message of result) {
+      try {
+        if (message.event === WorkflowEventType.DONE) {
+          yield new WorkflowEvent(Number(message.id), WorkflowEventType.DONE);
+        } else {
+          yield new WorkflowEvent(
+            Number(message.id),
+            message.event,
+            JSON.parse(message.data),
+          );
+        }
+      } catch (error) {
+        throw new CozeError(
+          `Could not parse message into JSON:${message.data}`,
+        );
       }
-    >(apiUrl, params, false, options);
-    return response;
+    }
   }
 
   /**

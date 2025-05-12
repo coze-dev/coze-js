@@ -4,6 +4,7 @@ import {
   type RunWorkflowReq,
   WorkflowEventType,
 } from '../../src/resources/workflows/runs/runs';
+import { WorkflowEvent } from '../../src/resources/workflows/runs/runs';
 import { Workflows } from '../../src/resources/workflows/index';
 import { ChatEventType, RoleType } from '../../src/resources/chat/chat.js';
 import { CozeAPI } from '../../src/index';
@@ -73,12 +74,22 @@ describe('Workflows', () => {
 
     describe('resume', () => {
       it('should resume a workflow run', async () => {
-        const mockResponse = {
-          id: 'event-id',
+        const mockMessage = {
+          id: '1',
           event: WorkflowEventType.MESSAGE,
-          data: { content: 'resumed content' },
+          data: JSON.stringify({
+            content: 'resumed content',
+            node_title: 'Test Node',
+            node_seq_id: '1',
+            node_is_finish: true,
+          }),
         };
-        vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
+
+        const mockAsyncGenerator = function* () {
+          yield mockMessage;
+        };
+
+        vi.spyOn(client, 'post').mockResolvedValue(mockAsyncGenerator());
 
         const params = {
           workflow_id: 'workflow-id',
@@ -90,15 +101,26 @@ describe('Workflows', () => {
           interrupt_type: 1,
         };
 
-        const result = await workflows.runs.resume(params);
+        const messages = [];
+        for await (const message of await workflows.runs.resume(params)) {
+          messages.push(message);
+        }
 
         expect(client.post).toHaveBeenCalledWith(
           '/v1/workflow/stream_resume',
           params,
-          false,
+          true,
           undefined,
         );
-        expect(result).toEqual(mockResponse);
+        expect(messages).toHaveLength(1);
+        expect(messages[0]).toEqual(
+          new WorkflowEvent(1, WorkflowEventType.MESSAGE, {
+            content: 'resumed content',
+            node_title: 'Test Node',
+            node_seq_id: '1',
+            node_is_finish: true,
+          }),
+        );
       });
     });
 
