@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "workflow resumt bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
