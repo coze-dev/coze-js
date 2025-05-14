@@ -48,6 +48,7 @@ const TextItem: FC<IMessageContentProps> = props => {
     message,
     isAWaiting,
     onImageClick,
+    onLinkClick,
     onTaskChange,
     messageUiConfigMap,
     isLastMessage,
@@ -72,6 +73,7 @@ const TextItem: FC<IMessageContentProps> = props => {
               content={message.content}
               isComplete={!isAWaiting || message.isComplete}
               onImageClick={onImageClick}
+              onLinkClick={onLinkClick}
               onTaskChange={onTaskChange}
               taskDisabled={!isLastMessage}
             />
