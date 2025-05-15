@@ -64,6 +64,7 @@ export default function Index() {
     conversationName: botInfo.conversationName || 'Default',
     name: 'Coze',
     mode: 'draft',
+    connectorId: '999',
     onBoarding,
   });
   const [areaUi, setAreaUi] = useState<IChatFlowProps['areaUi']>({
