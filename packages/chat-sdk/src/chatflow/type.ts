@@ -46,6 +46,7 @@ export interface IEventCallbacks {
   onImageClick?: (extra: { url: string }) => void;
   onGetChatFlowExecuteId?: (id: string) => void;
   onThemeChange?: (theme: ThemeType) => void;
+  onLinkClick?: (url: string) => void;
   onInitSuccess?: () => void;
   message?: IMessageCallback;
 }

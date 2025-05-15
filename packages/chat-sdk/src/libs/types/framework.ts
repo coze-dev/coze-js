@@ -36,6 +36,7 @@ export interface ChatFrameworkProps {
   eventCallbacks?: {
     onImageClick?: IOnImageClickEvent;
     onInitRetry?: () => void;
+    onLinkClick?: (url: string) => void;
     onThemeChange?: (theme: ThemeType) => void;
     message?: IMessageCallback;
   };

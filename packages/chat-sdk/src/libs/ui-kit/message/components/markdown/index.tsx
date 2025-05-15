@@ -1,8 +1,10 @@
 import { FC, useMemo, useState } from 'react';
 
 import cls from 'classnames';
+import { ITouchEvent } from '@tarojs/components';
 
 import { logger } from '@/libs/utils';
+import { LinkEventData } from '@/libs/types/base/event-callback';
 import { IOnImageClickEvent, IOnTaskListChange, Language } from '@/libs/types';
 import { useI18n } from '@/libs/provider';
 import { usePersistCallback, useUpdateEffect } from '@/libs/hooks';
@@ -18,11 +20,13 @@ const MarkdownContent: FC<{
   isComplete?: boolean; // 是否消息结束
   onImageClick?: IOnImageClickEvent;
   onTaskChange?: IOnTaskListChange;
+  onLinkClick?: (url: string) => void;
   taskDisabled?: boolean;
 }> = ({
   content,
   isComplete = true,
   onImageClick,
+  onLinkClick,
   taskDisabled,
   onTaskChange,
   className,
@@ -37,6 +41,14 @@ const MarkdownContent: FC<{
   useUpdateEffect(() => {
     onMarkdownEnd();
   }, [isComplete]);
+  const markdownEventCallback = useMemo(
+    () => ({
+      onLinkClick: (_e: ITouchEvent, data: LinkEventData) => {
+        onLinkClick?.(data?.url);
+      },
+    }),
+    [onLinkClick],
+  );
 
   return (
     <MdStream
@@ -50,6 +62,7 @@ const MarkdownContent: FC<{
       onTaskChange={onTaskChange}
       taskDisabled={taskDisabled}
       language={i18n.language as Language}
+      eventCallbacks={markdownEventCallback}
       debug={logger.isDebug()}
     />
   );
@@ -61,6 +74,7 @@ export const MarkdownMessage: FC<{
   isComplete?: boolean; // 是否消息结束
   className?: string;
   onImageClick?: IOnImageClickEvent;
+  onLinkClick?: (url: string) => void;
   onTaskChange?: IOnTaskListChange;
   taskDisabled?: boolean;
 }> = ({
@@ -69,6 +83,7 @@ export const MarkdownMessage: FC<{
   isComplete = true,
   className,
   onImageClick,
+  onLinkClick,
   taskDisabled,
   onTaskChange,
 }) => {
@@ -83,7 +98,7 @@ export const MarkdownMessage: FC<{
     <Bubble isNeedBorder={false} className={cls(styles.markdown, className)}>
       {reasonMessage ? (
         <MarkdownContent
-          {...{ onImageClick }}
+          {...{ onImageClick, onLinkClick }}
           taskDisabled={true}
           className={styles.reason}
           isComplete={isComplete || !!content}
@@ -92,7 +107,13 @@ export const MarkdownMessage: FC<{
       ) : null}
       {!reasonMessage || content ? (
         <MarkdownContent
-          {...{ isComplete, onImageClick, onTaskChange, taskDisabled }}
+          {...{
+            isComplete,
+            onImageClick,
+            onLinkClick,
+            onTaskChange,
+            taskDisabled,
+          }}
           content={content}
         />
       ) : null}

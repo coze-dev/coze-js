@@ -69,6 +69,7 @@ export const useInitChat = (props: IChatFlowProps) => {
           setHasReady(false);
         },
         onThemeChange: props?.eventCallbacks?.onThemeChange,
+        onLinkClick: props?.eventCallbacks?.onLinkClick,
         message: props?.eventCallbacks?.message,
       },
       setting: {

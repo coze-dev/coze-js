@@ -58,6 +58,7 @@ export const Textarea: FC<
           cursorSpacing={20}
           placeholder={placeholder}
           placeholderClass={styles.placeholder}
+          disableDefaultPadding={true}
           style={{
             height: getHeight(lineNum),
           }}
