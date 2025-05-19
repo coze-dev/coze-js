@@ -62,8 +62,9 @@ export default function Index() {
     id: botInfo.appId,
     type: 'app',
     conversationName: botInfo.conversationName || 'Default',
-    name: 'Coze',
+    //name: 'Coze',
     mode: 'draft',
+    connectorId: '10000126',
     onBoarding,
   });
   const [areaUi, setAreaUi] = useState<IChatFlowProps['areaUi']>({
@@ -158,6 +159,9 @@ export default function Index() {
               },
               onInitSuccess: () => {
                 console.log('onInitSuccess。。。。');
+              },
+              onLinkClick: url => {
+                console.log('onLinkClick:', url);
               },
               message: {
                 afterMessageReceivedFinish: props => {

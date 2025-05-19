@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 
 import type { Link as LinkMdType } from 'mdast';
 import cls from 'classnames';
@@ -17,7 +17,13 @@ export const Link: FC<{
 }> = ({ node }) => {
   const i18n = useMdStreamI18n();
   const { eventCallbacks } = useMdStreamContext();
-  const isValidUrl = node.url && node.url !== '#';
+  const isValidUrl = useMemo(() => {
+    let isValid = node.url && node.url !== '#';
+    if (node.url.startsWith('javascript:')) {
+      isValid = false;
+    }
+    return isValid;
+  }, [node.url]);
   return (
     <View
       onClick={e => {

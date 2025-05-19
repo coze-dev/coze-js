@@ -16,6 +16,7 @@ export interface IMessageContentProps {
   isLastMessage?: boolean;
   isReadOnly?: boolean;
   onImageClick?: IOnImageClickEvent;
+  onLinkClick?: (url: string) => void;
   onTaskChange?: IOnTaskListChange;
   //disabled?: boolean;
   messageUiConfigMap?: MessageUiConfigMap;

@@ -48,6 +48,7 @@ const TextItem: FC<IMessageContentProps> = props => {
     message,
     isAWaiting,
     onImageClick,
+    onLinkClick,
     onTaskChange,
     messageUiConfigMap,
     isLastMessage,
@@ -72,6 +73,7 @@ const TextItem: FC<IMessageContentProps> = props => {
               content={message.content}
               isComplete={!isAWaiting || message.isComplete}
               onImageClick={onImageClick}
+              onLinkClick={onLinkClick}
               onTaskChange={onTaskChange}
               taskDisabled={!isLastMessage}
             />
@@ -87,6 +89,7 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
     onImageClick,
     messageUiConfigMap,
     onTaskChange,
+    onLinkClick,
     isLastMessage,
   } = props;
   const i18n = useI18n();
@@ -111,6 +114,7 @@ const ObjectStringItem: FC<IMessageContentProps> = props => {
                     <MarkdownMessage
                       content={item.text}
                       isComplete={true}
+                      onLinkClick={onLinkClick}
                       onImageClick={onImageClick}
                       onTaskChange={onTaskChange}
                       taskDisabled={!isLastMessage}

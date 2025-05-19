@@ -112,6 +112,9 @@ const RespMessageListContent: FC<{
   const onImageClick = useChatPropsStore(
     store => store.eventCallbacks?.onImageClick,
   );
+  const onLinkClick = useChatPropsStore(
+    store => store.eventCallbacks?.onLinkClick,
+  );
   const setTaskList = useChatInputStore(store => store.setTaskList);
   const messageUiConfigMap = useChatPropsStore(
     store => store.ui?.chatSlot?.message,
@@ -157,6 +160,7 @@ const RespMessageListContent: FC<{
                 <MessageContent
                   message={item}
                   onImageClick={onImageClick}
+                  onLinkClick={onLinkClick}
                   sendTextMessage={sendTextMessage}
                   i18n={i18n}
                   //disabled={!isLastMessage || isReadOnly}
