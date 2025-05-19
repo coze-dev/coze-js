@@ -160,9 +160,9 @@ export default function Index() {
               onInitSuccess: () => {
                 console.log('onInitSuccess。。。。');
               },
-              onLinkClick: url => {
+              /*onLinkClick: url => {
                 console.log('onLinkClick:', url);
-              },
+              },*/
               message: {
                 afterMessageReceivedFinish: props => {
                   console.log('afterMessageReceivedFinish:', props);
