@@ -1,6 +1,11 @@
 import assert from 'assert';
 
-import { RoleType } from '@coze/api';
+import {
+  RoleType,
+  type WorkflowEvent,
+  type WorkflowEventInterrupt,
+  WorkflowEventType,
+} from '@coze/api';
 
 import { client, botId, workflowId } from './client';
 async function streamWorkflow() {
@@ -8,12 +13,27 @@ async function streamWorkflow() {
   assert(workflowId, 'workflowId is required');
   const workflow = await client.workflows.runs.stream({
     workflow_id: workflowId,
-    parameters: { norco: 'JavaScript' },
-    bot_id: botId,
+    parameters: { input: 'JavaScript' },
+    // bot_id: botId,
   });
 
+  handleStream(workflow);
+}
+
+async function handleStream(workflow: AsyncGenerator<WorkflowEvent, void>) {
   for await (const event of workflow) {
     console.log('event', event);
+    if (event.event === WorkflowEventType.INTERRUPT) {
+      const interrupt = event.data as WorkflowEventInterrupt;
+      handleStream(
+        await client.workflows.runs.resume({
+          workflow_id: workflowId,
+          event_id: interrupt.interrupt_data.event_id,
+          resume_data: '我是 Coze',
+          interrupt_type: interrupt.interrupt_data.type,
+        }),
+      );
+    }
   }
 }
 
