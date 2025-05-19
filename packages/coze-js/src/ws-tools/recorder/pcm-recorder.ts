@@ -111,6 +111,8 @@ class PcmRecorder {
       this.audioTrack.getMediaStreamTrack(),
     ]);
 
+    // window.stream = this.stream;
+
     // 降噪前音频
     if (debug && wavRecordConfig?.enableSourceRecord) {
       this.wavAudioProcessor = new WavAudioProcessor(audioData => {

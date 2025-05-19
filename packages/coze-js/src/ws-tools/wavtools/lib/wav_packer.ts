@@ -1,12 +1,13 @@
 /**
  * Raw wav audio file contents
- * @typedef {Object} WavPackerAudioType
- * @property {Blob} blob
- * @property {string} url
- * @property {number} channelCount
- * @property {number} sampleRate
- * @property {number} duration
  */
+export type WavPackerAudioType = {
+  blob: Blob;
+  url: string;
+  channelCount: number;
+  sampleRate: number;
+  duration: number;
+};
 
 /**
  * Utility class for assembling PCM16 "audio/wav" data
@@ -18,7 +19,7 @@ export class WavPacker {
    * @param {Float32Array} float32Array
    * @returns {ArrayBuffer}
    */
-  static floatTo16BitPCM(float32Array) {
+  static floatTo16BitPCM(float32Array: Float32Array): ArrayBuffer {
     const buffer = new ArrayBuffer(float32Array.length * 2);
     const view = new DataView(buffer);
     let offset = 0;
@@ -35,7 +36,7 @@ export class WavPacker {
    * @param {ArrayBuffer} rightBuffer
    * @returns {ArrayBuffer}
    */
-  static mergeBuffers(leftBuffer, rightBuffer) {
+  static mergeBuffers(leftBuffer: ArrayBuffer, rightBuffer: ArrayBuffer): ArrayBuffer {
     const tmpArray = new Uint8Array(
       leftBuffer.byteLength + rightBuffer.byteLength
     );
@@ -49,9 +50,9 @@ export class WavPacker {
    * @private
    * @param {number} size 0 = 1x Int16, 1 = 2x Int16
    * @param {number} arg value to pack
-   * @returns
+   * @returns {Uint8Array}
    */
-  _packData(size, arg) {
+  private _packData(size: 0 | 1, arg: number): Uint8Array {
     return [
       new Uint8Array([arg, arg >> 8]),
       new Uint8Array([arg, arg >> 8, arg >> 16, arg >> 24]),
@@ -64,7 +65,11 @@ export class WavPacker {
    * @param {{bitsPerSample: number, channels: Array<Float32Array>, data: Int16Array}} audio
    * @returns {WavPackerAudioType}
    */
-  pack(sampleRate, audio) {
+  pack(sampleRate: number, audio: {
+    bitsPerSample: number;
+    channels: Array<Float32Array>;
+    data: Int16Array | ArrayBuffer;
+  }): WavPackerAudioType {
     if (!audio?.bitsPerSample) {
       throw new Error(`Missing "bitsPerSample"`);
     } else if (!audio?.channels) {
@@ -109,5 +114,3 @@ export class WavPacker {
     };
   }
 }
-
-globalThis.WavPacker = WavPacker;

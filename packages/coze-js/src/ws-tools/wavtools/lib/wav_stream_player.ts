@@ -1,17 +1,27 @@
 import { StreamProcessorSrc } from './worklets/stream_processor.js';
 import { AudioAnalysis } from './analysis/audio_analysis.js';
+import type { AudioAnalysisOutputType } from './analysis/audio_analysis.js';
 
 /**
  * Plays audio streams received in raw PCM16 chunks from the browser
  * @class
  */
 export class WavStreamPlayer {
+  scriptSrc: string;
+  sampleRate: number;
+  context: AudioContext | null;
+  stream: AudioWorkletNode | null;
+  analyser: AnalyserNode | null;
+  trackSampleOffsets: Record<string, { trackId: string, offset: number, currentTime: number }>;
+  interruptedTrackIds: Record<string, boolean>;
+  isPaused: boolean;
+
   /**
    * Creates a new WavStreamPlayer instance
    * @param {{sampleRate?: number}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100 } = {}) {
+  constructor({ sampleRate = 44100 }: { sampleRate?: number } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
     this.context = null;
@@ -26,7 +36,7 @@ export class WavStreamPlayer {
    * Connects the audio context and enables output to speakers
    * @returns {Promise<true>}
    */
-  async connect() {
+  async connect(): Promise<true> {
     this.context = new AudioContext({ sampleRate: this.sampleRate });
     if (this.context.state === 'suspended') {
       await this.context.resume();
@@ -44,29 +54,43 @@ export class WavStreamPlayer {
     return true;
   }
 
-  async pause() {
+  /**
+   * Pauses audio playback
+   */
+  async pause(): Promise<void> {
     if (this.context && !this.isPaused) {
       await this.context.suspend();
       this.isPaused = true;
     }
   }
 
-  async resume() {
+  /**
+   * Resumes audio playback
+   */
+  async resume(): Promise<void> {
     if (this.context && this.isPaused) {
       await this.context.resume();
       this.isPaused = false;
     }
   }
-  async togglePlay() {
+
+  /**
+   * Toggles between play and pause states
+   */
+  async togglePlay(): Promise<void> {
     if (this.isPaused) {
-        await this.resume();
+      await this.resume();
     } else {
-        await this.pause();
+      await this.pause();
     }
   }
 
-  isPlaying() {
-    return this.context && this.stream && !this.isPaused && this.context.state === 'running';
+  /**
+   * Checks if audio is currently playing
+   * @returns {boolean}
+   */
+  isPlaying(): boolean {
+    return Boolean(this.context && this.stream && !this.isPaused && this.context.state === 'running');
   }
 
   /**
@@ -74,20 +98,20 @@ export class WavStreamPlayer {
    * @param {"frequency"|"music"|"voice"} [analysisType]
    * @param {number} [minDecibels] default -100
    * @param {number} [maxDecibels] default -30
-   * @returns {import('./analysis/audio_analysis.js').AudioAnalysisOutputType}
+   * @returns {AudioAnalysisOutputType}
    */
   getFrequencies(
-    analysisType = 'frequency',
-    minDecibels = -100,
-    maxDecibels = -30
-  ) {
+    analysisType: "frequency" | "music" | "voice" = 'frequency',
+    minDecibels: number = -100,
+    maxDecibels: number = -30
+  ): AudioAnalysisOutputType {
     if (!this.analyser) {
       throw new Error('Not connected, please call .connect() first');
     }
     return AudioAnalysis.getFrequencies(
       this.analyser,
       this.sampleRate,
-      null,
+      undefined,
       analysisType,
       minDecibels,
       maxDecibels
@@ -99,15 +123,15 @@ export class WavStreamPlayer {
    * @private
    * @returns {Promise<true>}
    */
-  async _start() {
+  private async _start(): Promise<true> {
     // Ensure worklet is loaded
     if (!this.context) {
       await this.connect();
     }
 
-    const streamNode = new AudioWorkletNode(this.context, 'stream-processor');
-    streamNode.connect(this.context.destination);
-    streamNode.port.onmessage = (e) => {
+    const streamNode = new AudioWorkletNode(this.context!, 'stream-processor');
+    streamNode.connect(this.context!.destination);
+    streamNode.port.onmessage = (e: MessageEvent) => {
       const { event } = e.data;
       if (event === 'stop') {
         streamNode.disconnect();
@@ -119,8 +143,8 @@ export class WavStreamPlayer {
       }
     };
 
-    this.analyser.disconnect();
-    streamNode.connect(this.analyser);
+    this.analyser!.disconnect();
+    streamNode.connect(this.analyser!);
     this.stream = streamNode;
     return true;
   }
@@ -132,16 +156,16 @@ export class WavStreamPlayer {
    * @param {string} [trackId]
    * @returns {Int16Array}
    */
-  async add16BitPCM(arrayBuffer, trackId = 'default') {
+  async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array, trackId: string = 'default'): Promise<Int16Array> {
     if (typeof trackId !== 'string') {
       throw new Error(`trackId must be a string`);
     } else if (this.interruptedTrackIds[trackId]) {
-      return;
+      return new Int16Array();
     }
     if (!this.stream) {
       await this._start();
     }
-    let buffer;
+    let buffer: Int16Array;
     if (arrayBuffer instanceof Int16Array) {
       buffer = arrayBuffer;
     } else if (arrayBuffer instanceof ArrayBuffer) {
@@ -149,16 +173,20 @@ export class WavStreamPlayer {
     } else {
       throw new Error(`argument must be Int16Array or ArrayBuffer`);
     }
-    this.stream.port.postMessage({ event: 'write', buffer, trackId });
+    this.stream!.port.postMessage({ event: 'write', buffer, trackId });
     return buffer;
   }
 
   /**
    * Gets the offset (sample count) of the currently playing stream
    * @param {boolean} [interrupt]
-   * @returns {{trackId: string|null, offset: number, currentTime: number}}
+   * @returns {{trackId: string|null, offset: number, currentTime: number} | null}
    */
-  async getTrackSampleOffset(interrupt = false) {
+  async getTrackSampleOffset(interrupt: boolean = false): Promise<{
+    trackId: string | null;
+    offset: number;
+    currentTime: number;
+  } | null> {
     if (!this.stream) {
       return null;
     }
@@ -170,7 +198,7 @@ export class WavStreamPlayer {
     let trackSampleOffset;
     while (!trackSampleOffset) {
       trackSampleOffset = this.trackSampleOffsets[requestId];
-      await new Promise((r) => setTimeout(() => r(), 1));
+      await new Promise((r) => setTimeout(r, 1));
     }
     const { trackId } = trackSampleOffset;
     if (interrupt && trackId) {
@@ -181,12 +209,13 @@ export class WavStreamPlayer {
 
   /**
    * Strips the current stream and returns the sample offset of the audio
-   * @param {boolean} [interrupt]
-   * @returns {{trackId: string|null, offset: number, currentTime: number}}
+   * @returns {{trackId: string|null, offset: number, currentTime: number} | null}
    */
-  async interrupt() {
+  async interrupt(): Promise<{
+    trackId: string | null;
+    offset: number;
+    currentTime: number;
+  } | null> {
     return this.getTrackSampleOffset(true);
   }
 }
-
-globalThis.WavStreamPlayer = WavStreamPlayer;
