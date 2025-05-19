@@ -1,6 +1,5 @@
-import { StreamProcessorSrc } from './worklets/stream_processor.js';
-import { AudioAnalysis } from './analysis/audio_analysis.js';
-import type { AudioAnalysisOutputType } from './analysis/audio_analysis.js';
+import { StreamProcessorSrc } from './worklets/stream_processor';
+import LocalLookback from './local-lookback';
 
 /**
  * Plays audio streams received in raw PCM16 chunks from the browser
@@ -11,33 +10,46 @@ export class WavStreamPlayer {
   sampleRate: number;
   context: AudioContext | null;
   stream: AudioWorkletNode | null;
-  analyser: AnalyserNode | null;
   trackSampleOffsets: Record<string, { trackId: string, offset: number, currentTime: number }>;
   interruptedTrackIds: Record<string, boolean>;
   isPaused: boolean;
+  /**
+   * Whether to enable local lookback
+   */
+  enableLocalLookback: boolean;
+  localLookback: LocalLookback | undefined;
 
   /**
    * Creates a new WavStreamPlayer instance
    * @param {{sampleRate?: number}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100 }: { sampleRate?: number } = {}) {
+  constructor({ sampleRate = 44100, enableLocalLookback = false }: { sampleRate?: number, enableLocalLookback?: boolean } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
     this.context = null;
     this.stream = null;
-    this.analyser = null;
     this.trackSampleOffsets = {};
     this.interruptedTrackIds = {};
     this.isPaused = false;
+    this.enableLocalLookback = enableLocalLookback;
+
+    if(this.enableLocalLookback) {
+      this.localLookback = new LocalLookback(true);
+    }
   }
 
   /**
    * Connects the audio context and enables output to speakers
    * @returns {Promise<true>}
    */
-  async connect(): Promise<true> {
+  private async connect(): Promise<true> {
     this.context = new AudioContext({ sampleRate: this.sampleRate });
+
+    if(this.enableLocalLookback) {
+      this.localLookback?.connect(this.context);
+    }
+
     if (this.context.state === 'suspended') {
       await this.context.resume();
     }
@@ -47,10 +59,6 @@ export class WavStreamPlayer {
       console.error(e);
       throw new Error(`Could not add audioWorklet module: ${this.scriptSrc}`);
     }
-    const analyser = this.context.createAnalyser();
-    analyser.fftSize = 8192;
-    analyser.smoothingTimeConstant = 0.1;
-    this.analyser = analyser;
     return true;
   }
 
@@ -94,31 +102,6 @@ export class WavStreamPlayer {
   }
 
   /**
-   * Gets the current frequency domain data from the playing track
-   * @param {"frequency"|"music"|"voice"} [analysisType]
-   * @param {number} [minDecibels] default -100
-   * @param {number} [maxDecibels] default -30
-   * @returns {AudioAnalysisOutputType}
-   */
-  getFrequencies(
-    analysisType: "frequency" | "music" | "voice" = 'frequency',
-    minDecibels: number = -100,
-    maxDecibels: number = -30
-  ): AudioAnalysisOutputType {
-    if (!this.analyser) {
-      throw new Error('Not connected, please call .connect() first');
-    }
-    return AudioAnalysis.getFrequencies(
-      this.analyser,
-      this.sampleRate,
-      undefined,
-      analysisType,
-      minDecibels,
-      maxDecibels
-    );
-  }
-
-  /**
    * Starts audio streaming
    * @private
    * @returns {Promise<true>}
@@ -130,12 +113,16 @@ export class WavStreamPlayer {
     }
 
     const streamNode = new AudioWorkletNode(this.context!, 'stream-processor');
-    streamNode.connect(this.context!.destination);
     streamNode.port.onmessage = (e: MessageEvent) => {
       const { event } = e.data;
       if (event === 'stop') {
         streamNode.disconnect();
         this.stream = null;
+
+        if(this.enableLocalLookback) {
+          this.localLookback?.disconnect();
+        }
+
       } else if (event === 'offset') {
         const { requestId, trackId, offset } = e.data;
         const currentTime = offset / this.sampleRate;
@@ -143,8 +130,12 @@ export class WavStreamPlayer {
       }
     };
 
-    this.analyser!.disconnect();
-    streamNode.connect(this.analyser!);
+    if(this.enableLocalLookback) {
+      this.localLookback?.start(streamNode);
+    } else {
+      streamNode.connect(this.context!.destination);
+    }
+
     this.stream = streamNode;
     return true;
   }
@@ -217,5 +208,12 @@ export class WavStreamPlayer {
     currentTime: number;
   } | null> {
     return this.getTrackSampleOffset(true);
+  }
+
+  /**
+   * Set media stream for local lookback
+   */
+  setMediaStream(stream?: MediaStream) {
+    this.localLookback?.setMediaStream(stream);
   }
 }

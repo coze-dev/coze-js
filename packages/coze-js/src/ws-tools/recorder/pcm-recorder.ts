@@ -111,8 +111,6 @@ class PcmRecorder {
       this.audioTrack.getMediaStreamTrack(),
     ]);
 
-    // window.stream = this.stream;
-
     // 降噪前音频
     if (debug && wavRecordConfig?.enableSourceRecord) {
       this.wavAudioProcessor = new WavAudioProcessor(audioData => {
@@ -365,6 +363,10 @@ class PcmRecorder {
   getSampleRate() {
     return 48000;
     // return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
+  }
+
+  getMediaStream() {
+    return this.stream;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

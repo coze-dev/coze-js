@@ -36,7 +36,10 @@ class BaseWsChatClient {
     });
 
     this.config = config;
-    this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
+    this.wavStreamPlayer = new WavStreamPlayer({
+      sampleRate: 24000,
+      enableLocalLookback: true,
+    });
   }
 
   protected async init() {

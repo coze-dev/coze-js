@@ -36,6 +36,7 @@ class WsChatClient extends BaseWsChatClient {
   private async startRecord() {
     // 1. start recorder
     await this.recorder.start(this.inputAudioCodec);
+    this.wavStreamPlayer.setMediaStream(this.recorder.getMediaStream());
 
     // init stream player
     await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
