@@ -46,9 +46,9 @@ export default function Index() {
           console.log({ value });
         }}
         eventCallbacks={{
-          onLinkClick: (e, { url }) => {
+          /*onLinkClick: (e, { url }) => {
             console.log({ url });
-          },
+          },*/
           onImageClick: ({ url }) => {
             console.log({ url });
           },

@@ -62,9 +62,9 @@ export default function Index() {
     id: botInfo.appId,
     type: 'app',
     conversationName: botInfo.conversationName || 'Default',
-    name: 'Coze',
+    //name: 'Coze',
     mode: 'draft',
-    connectorId: '999',
+    connectorId: '10000126',
     onBoarding,
   });
   const [areaUi, setAreaUi] = useState<IChatFlowProps['areaUi']>({
