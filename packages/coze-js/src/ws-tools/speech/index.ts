@@ -146,7 +146,15 @@ class WsSpeechClient {
     );
   }
 
-  async connect({ voiceId }: { voiceId?: string } = {}) {
+  async connect({
+    voiceId,
+    speechRate,
+  }: {
+    /**音色ID */
+    voiceId?: string;
+    /**输出音频的语速，取值范围 [-50, 100]，默认为 0。-50 表示 0.5 倍速，100 表示 2 倍速。 */
+    speechRate?: number;
+  } = {}) {
     await this.init();
     this.ws?.send({
       id: uuid(),
@@ -155,6 +163,7 @@ class WsSpeechClient {
         output_audio: {
           codec: 'pcm',
           voice_id: voiceId || undefined,
+          speech_rate: speechRate || undefined,
         },
       },
     });

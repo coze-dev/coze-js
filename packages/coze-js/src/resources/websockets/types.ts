@@ -489,6 +489,15 @@ interface OutputAudio {
   pcm_config?: {
     sample_rate?: number;
   };
+  opus_config?: {
+    /**输出 opus 的码率，默认 48000。 */
+    bitrate?: number;
+    /**输出 opus 是否使用 CBR 编码，默认为 false。 */
+    use_cbr?: boolean;
+    /**输出 opus 的帧长，默认是 10。 */
+    frame_size_ms?: number;
+  };
+  /**输出音频的语速，取值范围 [-50, 100]，默认为 0。-50 表示 0.5 倍速，100 表示 2 倍速。 */
   speech_rate?: number;
   voice_id?: string;
 }
