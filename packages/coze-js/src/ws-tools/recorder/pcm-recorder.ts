@@ -365,6 +365,10 @@ class PcmRecorder {
     // return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
   }
 
+  getMediaStream() {
+    return this.stream;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private log(...args: any[]) {
     if (this.config.debug) {

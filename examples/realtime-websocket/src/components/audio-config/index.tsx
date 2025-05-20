@@ -50,7 +50,7 @@ export const AudioConfig = forwardRef<
     useState(!isDenoiserSupported);
   const [echoCancellation, setEchoCancellation] = useState(true);
   const [autoGainControl, setAutoGainControl] = useState(true);
-  const [debug, setDebug] = useState(true);
+  const [debug, setDebug] = useState(false);
   const [audioMutedDefault, setAudioMutedDefault] = useState(false);
 
   useEffect(() => {

@@ -19,7 +19,9 @@ class PcmPlayer {
     onCompleted: () => void;
     isPauseDefault?: boolean;
   }) {
-    this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
+    this.wavStreamPlayer = new WavStreamPlayer({
+      sampleRate: 24000,
+    });
     this.onCompleted = onCompleted;
     this.isPauseDefault = isPauseDefault;
   }

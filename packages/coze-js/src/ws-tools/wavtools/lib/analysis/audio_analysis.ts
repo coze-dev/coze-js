@@ -3,21 +3,38 @@ import {
   noteFrequencyLabels,
   voiceFrequencies,
   voiceFrequencyLabels,
-} from './constants.js';
+} from './constants';
 
 /**
  * Output of AudioAnalysis for the frequency domain of the audio
- * @typedef {Object} AudioAnalysisOutputType
- * @property {Float32Array} values Amplitude of this frequency between {0, 1} inclusive
- * @property {number[]} frequencies Raw frequency bucket values
- * @property {string[]} labels Labels for the frequency bucket values
  */
+export type AudioAnalysisOutputType = {
+  /**
+   * Amplitude of this frequency between {0, 1} inclusive
+   */
+  values: Float32Array;
+  /**
+   * Raw frequency bucket values
+   */
+  frequencies: number[];
+  /**
+   * Labels for the frequency bucket values
+   */
+  labels: string[];
+};
 
 /**
  * Analyzes audio for visual output
  * @class
  */
 export class AudioAnalysis {
+  fftResults: Float32Array[];
+  audio: HTMLAudioElement;
+  context: AudioContext | OfflineAudioContext;
+  analyser: AnalyserNode;
+  sampleRate: number;
+  audioBuffer: AudioBuffer | null;
+
   /**
    * Retrieves frequency domain data from an AnalyserNode adjusted to a decibel range
    * returns human-readable formatting and labels
@@ -30,22 +47,22 @@ export class AudioAnalysis {
    * @returns {AudioAnalysisOutputType}
    */
   static getFrequencies(
-    analyser,
-    sampleRate,
-    fftResult,
-    analysisType = 'frequency',
-    minDecibels = -100,
-    maxDecibels = -30,
-  ) {
+    analyser: AnalyserNode,
+    sampleRate: number,
+    fftResult?: Float32Array,
+    analysisType: "frequency" | "music" | "voice" = 'frequency',
+    minDecibels: number = -100,
+    maxDecibels: number = -30,
+  ): AudioAnalysisOutputType {
     if (!fftResult) {
       fftResult = new Float32Array(analyser.frequencyBinCount);
       analyser.getFloatFrequencyData(fftResult);
     }
     const nyquistFrequency = sampleRate / 2;
     const frequencyStep = (1 / fftResult.length) * nyquistFrequency;
-    let outputValues;
-    let frequencies;
-    let labels;
+    let outputValues: number[];
+    let frequencies: number[];
+    let labels: string[];
     if (analysisType === 'music' || analysisType === 'voice') {
       const useFrequencies =
         analysisType === 'voice' ? voiceFrequencies : noteFrequencies;
@@ -91,7 +108,7 @@ export class AudioAnalysis {
    * @param {AudioBuffer|null} [audioBuffer] If provided, will cache all frequency domain data from the buffer
    * @returns {AudioAnalysis}
    */
-  constructor(audioElement, audioBuffer = null) {
+  constructor(audioElement: HTMLAudioElement, audioBuffer: AudioBuffer | null = null) {
     this.fftResults = [];
     if (audioBuffer) {
       /**
@@ -117,7 +134,7 @@ export class AudioAnalysis {
       // but we just want 60fps - cuts ~1s from 6MB to 1MB of RAM
       const renderQuantumInSeconds = 1 / 60;
       const durationInSeconds = length / sampleRate;
-      const analyze = (index) => {
+      const analyze = (index: number) => {
         const suspendTime = renderQuantumInSeconds * index;
         if (suspendTime < durationInSeconds) {
           offlineAudioContext.suspend(suspendTime).then(() => {
@@ -164,11 +181,11 @@ export class AudioAnalysis {
    * @returns {AudioAnalysisOutputType}
    */
   getFrequencies(
-    analysisType = 'frequency',
-    minDecibels = -100,
-    maxDecibels = -30,
-  ) {
-    let fftResult = null;
+    analysisType: "frequency" | "music" | "voice" = 'frequency',
+    minDecibels: number = -100,
+    maxDecibels: number = -30,
+  ): AudioAnalysisOutputType {
+    let fftResult: Float32Array | null = null;
     if (this.audioBuffer && this.fftResults.length) {
       const pct = this.audio.currentTime / this.audio.duration;
       const index = Math.min(
@@ -180,7 +197,7 @@ export class AudioAnalysis {
     return AudioAnalysis.getFrequencies(
       this.analyser,
       this.sampleRate,
-      fftResult,
+      fftResult || undefined,
       analysisType,
       minDecibels,
       maxDecibels,
@@ -192,12 +209,10 @@ export class AudioAnalysis {
    * user interaction when the AudioAnalysis was instantiated.
    * @returns {Promise<true>}
    */
-  async resumeIfSuspended() {
+  async resumeIfSuspended(): Promise<true> {
     if (this.context.state === 'suspended') {
       await this.context.resume();
     }
     return true;
   }
 }
-
-globalThis.AudioAnalysis = AudioAnalysis;
