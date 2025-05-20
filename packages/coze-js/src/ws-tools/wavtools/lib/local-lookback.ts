@@ -25,6 +25,9 @@ class LocalLookback {
 
     this.isDebug = isDebug;
 
+    // Unlock audio context for iOS devices
+    this._unlockAudioContext();
+
     this.gotDescription1  = this.gotDescription1.bind(this);
     this.gotDescription2  = this.gotDescription2.bind(this);
   }
@@ -48,6 +51,9 @@ class LocalLookback {
 
     const filteredStream = this.applyFilter(context);
     if(!filteredStream) {
+       // Prevent resource leakage
+      pc1.close();
+      pc2.close();
       return;
     }
     filteredStream.getTracks().forEach(track => pc1.addTrack(track, filteredStream));
@@ -69,22 +75,6 @@ class LocalLookback {
       return;
     }
     streamNode.connect(this.peer);
-  }
-
-  /**
-   * Disconnects and cleans up resources used by the loopback connection
-   * Note: Implementation currently commented out
-   */
-  disconnect() {
-    // if (this.mic) {
-    //   this.mic.disconnect(0);
-    //   this.mic = undefined;
-    // }
-
-    // this.peer = undefined;
-
-    // this.pc1?.close();
-    // this.pc2?.close();
   }
 
   /**
@@ -125,7 +115,16 @@ class LocalLookback {
     if (this.remoteAudio.srcObject !== e.streams[0]) {
       this.remoteAudio.srcObject = e.streams[0];
       this.remoteAudio.muted = false;
-      this.remoteAudio.play();
+      this.remoteAudio.volume = 0.5;
+
+      const playPromise = this.remoteAudio.play();
+      if (playPromise) {
+        playPromise.catch(err => {
+          this._error('Failed to play audio:', err);
+          // If autoplay is prevented, try unlocking the audio context again
+          this._unlockAudioContext();
+        });
+      }
     }
   }
 
@@ -239,6 +238,56 @@ class LocalLookback {
    */
   private _error(...args: any[]) {
     console.error(...args);
+  }
+
+  /**
+   * Attempts to unlock the audio context for iOS devices
+   * Creates a silent audio element and plays it on user interaction
+   * to bypass iOS autoplay restrictions
+   * @private
+   */
+  private _unlockAudioContext() {
+    // Create a silent audio element
+    const silentSound = document.createElement('audio');
+    silentSound.setAttribute('src', 'data:audio/mp3;base64,//MkxAAHiAICWABElBeKPL/RANb2w+yiT1g/gTok//lP/W/l3h8QO/OCdCqCW2Cw//MkxAQHkAIWUAhEmAQXWUOFW2dxPu//9mr60ElY5sseQ+xxesmHKtZr7bsqqX2L//MkxAgFwAYiQAhEAC2hq22d3///9FTV6tA36JdgBJoOGgc+7qvqej5EPomQ+RMn/QmSACAv7mcADf//MkxBQHAAYi8AhEAO193vt9KGOq+6qcT7hhfN5FTInmwk8RkqKImTM55pRQHQSq//MkxBsGkgoIAABHhTACIJLf99nVI///yuW1uBqWfEu7CgNPWGpUadBmZ////4sL//MkxCMHMAH9iABEmAsKioqKigsLCwtVTEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVV//MkxCkECAUYCAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+    silentSound.volume = 0.001; // Very low volume, essentially silent
+
+    // Add event listeners for user interaction events
+    const pageEvents = ['touchstart', 'touchend', 'mousedown', 'keydown'];
+    const unlockAudio = () => {
+      this._debug('User interaction detected, trying to unlock audio');
+      const playPromise = silentSound.play();
+      if (playPromise) {
+        playPromise.catch(() => {
+          // Catch error but don't handle it
+        }).then(() => {
+          // Also try to play the actual remote audio
+          const remotePlayPromise = this.remoteAudio.play();
+          if (remotePlayPromise) {
+            remotePlayPromise.catch(() => {
+              // Catch error but don't process it
+            });
+          }
+
+          // Remove all event listeners once succeeded
+          pageEvents.forEach(event => {
+            document.removeEventListener(event, unlockAudio);
+          });
+          this._debug('Audio context unlocked');
+        });
+      }
+    };
+
+    // Add all event listeners
+    pageEvents.forEach(event => {
+      document.addEventListener(event, unlockAudio);
+    });
+
+    // Also try to play immediately
+    setTimeout(() => {
+      this._debug('Attempting initial audio unlock');
+      unlockAudio();
+    }, 100);
   }
 }
 

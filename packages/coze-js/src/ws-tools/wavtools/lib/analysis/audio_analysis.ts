@@ -3,7 +3,7 @@ import {
   noteFrequencyLabels,
   voiceFrequencies,
   voiceFrequencyLabels,
-} from './constants.js';
+} from './constants';
 
 /**
  * Output of AudioAnalysis for the frequency domain of the audio

@@ -2,6 +2,15 @@
 // @vitest-environment jsdom
 /* eslint-disable */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+// Mock MediaStream which is not available in jsdom environment
+global.MediaStream = vi.fn().mockImplementation(() => ({
+  getAudioTracks: vi.fn().mockReturnValue([]),
+  getVideoTracks: vi.fn().mockReturnValue([]),
+  getTracks: vi.fn().mockReturnValue([]),
+  addTrack: vi.fn(),
+  removeTrack: vi.fn(),
+}));
 import WsChatClient from '@ws-tools/chat';
 import { APIError, RoleType, WebSocketAPI, WebsocketsEventType } from '@/index';
 import { WavStreamPlayer } from '@ws-tools/wavtools';
@@ -28,6 +37,7 @@ vi.mock('@ws-tools/index', () => ({
     setDenoiserEnabled: vi.fn(),
     setDenoiserLevel: vi.fn(),
     setDenoiserMode: vi.fn(),
+    getMediaStream: vi.fn().mockReturnValue(new MediaStream()),
   })),
 }));
 
@@ -73,6 +83,7 @@ vi.mock('@ws-tools/wavtools', () => ({
     pause: vi.fn(),
     togglePlay: vi.fn(),
     isPlaying: vi.fn(),
+    setMediaStream: vi.fn(),
   })),
 }));
 
@@ -110,7 +121,7 @@ describe('WebSocket Chat Tools', () => {
   describe('constructor', () => {
     it('should initialize with correct configuration', () => {
       expect(client.ws).toBeNull();
-      expect(WavStreamPlayer).toHaveBeenCalledWith({ sampleRate: 24000 });
+      expect(WavStreamPlayer).toHaveBeenCalledWith({ sampleRate: 24000, enableLocalLookback: true });
       expect(PcmRecorder).toHaveBeenCalled();
     });
   });
@@ -119,7 +130,7 @@ describe('WebSocket Chat Tools', () => {
     it('should connect to the chat', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
       mockWebsocket.send = vi.fn();
 
       // act
@@ -134,7 +145,7 @@ describe('WebSocket Chat Tools', () => {
     it('should disconnect from the chat', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
 
       // act
       await client.connect();
@@ -151,8 +162,8 @@ describe('WebSocket Chat Tools', () => {
     it('should set the audio enable', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockReturnValue('ended');
       client['recorder'].audioTrack = {} as any;
 
       // act
@@ -166,8 +177,8 @@ describe('WebSocket Chat Tools', () => {
     it('should start recording when audio is first enabled', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockReturnValue('ended');
       client['isMuted'] = true;
 
       // act
@@ -182,8 +193,8 @@ describe('WebSocket Chat Tools', () => {
     it('should set the audio enable to false', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('recording');
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockReturnValue('recording');
 
       // act
       await client.connect();
@@ -198,10 +209,8 @@ describe('WebSocket Chat Tools', () => {
     it('should set the audio input device', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
-
-      console.log(client['recorder']);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockReturnValue('ended');
 
       // act
       await client.connect();
@@ -213,8 +222,8 @@ describe('WebSocket Chat Tools', () => {
     it('should set the audio input device to a specific device', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
-      vi.spyOn(client['recorder'], 'getStatus').mockResolvedValue('ended');
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client['recorder'], 'getStatus').mockReturnValue('ended');
 
       // act
       await client.connect();
@@ -229,7 +238,7 @@ describe('WebSocket Chat Tools', () => {
     it('should interrupt the conversation', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
       mockWebsocket.send = vi.fn();
       // act
       await client.connect();
@@ -278,7 +287,7 @@ describe('WebSocket Chat Tools', () => {
     it('should send a message', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
       mockWebsocket.send = vi.fn();
 
       // act
@@ -309,7 +318,7 @@ describe('WebSocket Chat Tools', () => {
     it('should send a text message', async () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
-      vi.spyOn(client, 'init').mockResolvedValue(mockWebsocket);
+      vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
       mockWebsocket.send = vi.fn();
 
       // act

@@ -1,8 +1,8 @@
-import { AudioProcessorSrc } from './worklets/audio_processor.js';
-import { AudioAnalysis } from './analysis/audio_analysis.js';
-import { WavPacker } from './wav_packer.js';
-import type { AudioAnalysisOutputType } from './analysis/audio_analysis.js';
-import type { WavPackerAudioType } from './wav_packer.js';
+import { AudioProcessorSrc } from './worklets/audio_processor';
+import { AudioAnalysis } from './analysis/audio_analysis';
+import { WavPacker } from './wav_packer';
+import type { AudioAnalysisOutputType } from './analysis/audio_analysis';
+import type { WavPackerAudioType } from './wav_packer';
 
 /**
  * Decodes audio into a wav file

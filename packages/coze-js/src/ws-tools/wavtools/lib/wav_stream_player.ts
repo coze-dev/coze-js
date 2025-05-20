@@ -119,10 +119,6 @@ export class WavStreamPlayer {
         streamNode.disconnect();
         this.stream = null;
 
-        if(this.enableLocalLookback) {
-          this.localLookback?.disconnect();
-        }
-
       } else if (event === 'offset') {
         const { requestId, trackId, offset } = e.data;
         const currentTime = offset / this.sampleRate;
