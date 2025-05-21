@@ -43,9 +43,11 @@ const MarkdownContent: FC<{
   }, [isComplete]);
   const markdownEventCallback = useMemo(
     () => ({
-      onLinkClick: (_e: ITouchEvent, data: LinkEventData) => {
-        onLinkClick?.(data?.url);
-      },
+      onLinkClick: onLinkClick
+        ? (_e: ITouchEvent, data: LinkEventData) => {
+            onLinkClick?.(data?.url);
+          }
+        : undefined,
     }),
     [onLinkClick],
   );
