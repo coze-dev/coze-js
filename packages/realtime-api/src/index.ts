@@ -355,8 +355,15 @@ class RealtimeClient extends RealtimeEventHandler {
     await this._client?.setAudioOutputDevice(deviceId);
     this.dispatch(EventNames.AUDIO_OUTPUT_DEVICE_CHANGED, { deviceId });
   }
+  /**
+   * en: Set the video input device
+   *
+   * zh: 设置视频输入设备
+   */
 
-  async setVideoInputDevice(deviceId: string) {
+  async setVideoInputDevice(
+    deviceId: string | 'screenShare' | 'user' | 'environment',
+  ) {
     await this._client?.setVideoInputDevice(deviceId);
     this.dispatch(EventNames.VIDEO_INPUT_DEVICE_CHANGED, { deviceId });
   }

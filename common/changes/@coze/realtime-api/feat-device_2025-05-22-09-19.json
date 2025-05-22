@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "Support mobile device front/back camera selection with friendly labels",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
