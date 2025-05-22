@@ -1,6 +1,6 @@
 {
   "name": "@coze/realtime-api",
-  "version": "1.2.0",
+  "version": "1.2.1-beta.1",
   "description": "A powerful real-time communication SDK for voice interactions with Coze AI bots | 扣子官方实时通信 SDK，用于与 Coze AI bots 进行语音交互",
   "keywords": [
     "coze",
