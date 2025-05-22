@@ -85,6 +85,14 @@ export const isScreenShareDevice = (deviceId?: string): boolean =>
   deviceId === 'screenShare';
 
 /**
+ * 判断是否前后置摄像头
+ * @param deviceId
+ * @returns
+ */
+export const isMobileVideoDevice = (deviceId?: string): boolean =>
+  deviceId === 'user' || deviceId === 'environment';
+
+/**
  * Check if browser supports screen sharing
  * 检查浏览器是否支持屏幕共享
  */

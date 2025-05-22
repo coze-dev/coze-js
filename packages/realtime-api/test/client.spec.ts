@@ -78,6 +78,7 @@ vi.mock('../src/utils', () => ({
   getAudioDevices: vi.fn(),
   isScreenShareDevice: vi.fn(),
   isScreenShareSupported: vi.fn(),
+  isMobileVideoDevice: vi.fn(),
 }));
 
 describe('EngineClient', () => {

@@ -11,7 +11,11 @@ import VERTC, {
   VideoSourceType,
 } from '@volcengine/rtc';
 
-import { getAudioDevices, isScreenShareDevice } from './utils';
+import {
+  getAudioDevices,
+  isMobileVideoDevice,
+  isScreenShareDevice,
+} from './utils';
 import EventNames from './event-names';
 import { RealtimeEventHandler } from './event-handler';
 import { RealtimeAPIError, RealtimeError } from './error';
@@ -228,7 +232,10 @@ export class EngineClient extends RealtimeEventHandler {
 
   async setVideoInputDevice(deviceId: string, isAutoCapture = true) {
     const devices = await getAudioDevices({ video: true });
-    if (devices.videoInputs.findIndex(i => i.deviceId === deviceId) === -1) {
+    if (
+      !isMobileVideoDevice(deviceId) &&
+      devices.videoInputs.findIndex(i => i.deviceId === deviceId) === -1
+    ) {
       throw new RealtimeAPIError(
         RealtimeError.DEVICE_ACCESS_ERROR,
         `Video input device not found: ${deviceId}`,
