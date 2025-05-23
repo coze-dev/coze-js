@@ -15,6 +15,11 @@ enum EventNames {
    */
   ALL_SERVER = 'server.*',
   /**
+   * en: Room info
+   * zh: 房间信息
+   */
+  ROOM_INFO = 'client.room.info',
+  /**
    * en: Client connected
    * zh: 客户端连接
    */
