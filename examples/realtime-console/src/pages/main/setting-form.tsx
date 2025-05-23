@@ -14,7 +14,7 @@ import {
   Avatar,
   Input,
 } from 'antd';
-import { AuthenticationError } from '@coze/api';
+import { AuthenticationError, RoomMode } from '@coze/api';
 import {
   RobotOutlined,
   InfoCircleOutlined,
@@ -241,6 +241,9 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.INTERRUPT_BOT_ID]: localManager.get(
           LocalStorageKey.INTERRUPT_BOT_ID,
         ),
+        [LocalStorageKey.ROOM_MODE]: Number(
+          localManager.get(LocalStorageKey.ROOM_MODE, '0'),
+        ),
       });
     })().catch(err => {
       console.error(err);
@@ -255,7 +258,8 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       user_id,
       conversation_id,
       workflow_id,
-      prologue_content, // Add this line
+      prologue_content,
+      room_mode,
       interrupt_text,
       interrupt_bot_id,
     } = form.getFieldsValue();
@@ -266,6 +270,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.CONVERSATION_ID, conversation_id);
     localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
     localManager.set(LocalStorageKey.PROLOGUE_CONTENT, prologue_content);
+    localManager.set(LocalStorageKey.ROOM_MODE, room_mode);
     localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
     localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
   };
@@ -491,6 +496,18 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
           </Form.Item>
 
           <Form.Item
+            name={LocalStorageKey.ROOM_MODE}
+            label="Room Mode"
+            tooltip="Optional: Specify the room mode for the conversation"
+          >
+            <Select placeholder="Select room mode">
+              <Select.Option value={RoomMode.Default}>Default</Select.Option>
+              <Select.Option value={RoomMode.S2S}>End-to-End</Select.Option>
+              <Select.Option value={RoomMode.Podcast}>Podcast</Select.Option>
+            </Select>
+          </Form.Item>
+
+          {/* <Form.Item
             name={LocalStorageKey.INTERRUPT_TEXT}
             label="Interrupt Text"
             tooltip="Optional: Specify a custom interrupt text"
@@ -503,7 +520,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             tooltip="Optional: Specify a custom interrupt bot ID"
           >
             <Input placeholder="Enter interrupt bot ID" />
-          </Form.Item>
+          </Form.Item> */}
         </div>
 
         <Form.Item>

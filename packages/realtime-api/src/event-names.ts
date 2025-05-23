@@ -143,7 +143,7 @@ enum EventNames {
    * en: Session updated
    * zh: 会话更新
    */
-  SESSION_UPDATE = 'server.session.update',
+  SESSION_UPDATED = 'server.session.updated',
 }
 
 export default EventNames;
