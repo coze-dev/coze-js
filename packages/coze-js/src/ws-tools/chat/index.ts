@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
+import { type AudioFormat } from '../wavtools/lib/wav_stream_player';
 import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import {
   PcmRecorder,
@@ -123,7 +124,12 @@ class WsChatClient extends BaseWsChatClient {
       },
     };
 
-    this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
+    this.wavStreamPlayer.setSampleRate(
+      event.data?.output_audio?.pcm_config?.sample_rate || 24000,
+    );
+    this.wavStreamPlayer.setDefaultFormat(
+      (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
+    );
 
     if (!this.isMuted) {
       await this.startRecord();

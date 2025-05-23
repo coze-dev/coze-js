@@ -84,6 +84,8 @@ vi.mock('@ws-tools/wavtools', () => ({
     togglePlay: vi.fn(),
     isPlaying: vi.fn(),
     setMediaStream: vi.fn(),
+    setSampleRate: vi.fn(),
+    setDefaultFormat: vi.fn(),
   })),
 }));
 
@@ -121,7 +123,10 @@ describe('WebSocket Chat Tools', () => {
   describe('constructor', () => {
     it('should initialize with correct configuration', () => {
       expect(client.ws).toBeNull();
-      expect(WavStreamPlayer).toHaveBeenCalledWith({ sampleRate: 24000, enableLocalLookback: true });
+      expect(WavStreamPlayer).toHaveBeenCalledWith({
+        sampleRate: 24000,
+        enableLocalLookback: true,
+      });
       expect(PcmRecorder).toHaveBeenCalled();
     });
   });
