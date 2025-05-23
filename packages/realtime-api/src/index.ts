@@ -169,6 +169,13 @@ class RealtimeClient extends RealtimeEventHandler {
       );
     }
 
+    this.dispatch(EventNames.ROOM_INFO, {
+      roomId: roomInfo.room_id,
+      uid: roomInfo.uid,
+      token: roomInfo.token,
+      appId: roomInfo.app_id,
+    });
+
     this._isTestEnv = TEST_APP_ID === roomInfo.app_id;
 
     // Step2 create engine

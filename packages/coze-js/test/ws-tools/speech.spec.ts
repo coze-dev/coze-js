@@ -33,11 +33,14 @@ vi.mock('../../src/websocket-api', () => ({
 vi.mock('../../src/ws-tools/wavtools', () => ({
   WavStreamPlayer: vi.fn().mockImplementation(() => ({
     add16BitPCM: vi.fn(),
+    addG711a: vi.fn(),
+    addG711u: vi.fn(),
     interrupt: vi.fn(),
     resume: vi.fn(),
     pause: vi.fn(),
     togglePlay: vi.fn(),
     isPlaying: vi.fn(),
+    defaultFormat: 'pcm',
   })),
 }));
 
@@ -280,7 +283,27 @@ describe('WsSpeechClient', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
       const mockError = new Error('Processing failed');
       vi.mocked(WavStreamPlayer).mockImplementationOnce(() => ({
+        scriptSrc: '',
+        sampleRate: 24000,
+        context: null,
+        stream: null,
+        trackSampleOffsets: {},
+        interruptedTrackIds: {},
+        isPaused: false,
+        enableLocalLookback: false,
+        defaultFormat: 'pcm',
+        localLookback: undefined,
         add16BitPCM: vi.fn().mockRejectedValue(mockError),
+        addG711a: vi.fn(),
+        addG711u: vi.fn(),
+        interrupt: vi.fn(),
+        resume: vi.fn(),
+        pause: vi.fn(),
+        togglePlay: vi.fn(),
+        isPlaying: vi.fn(),
+        _start: vi.fn(),
+        getTrackSampleOffset: vi.fn(),
+        setMediaStream: vi.fn()
       }));
 
       const client = new WsSpeechClient(mockConfig);

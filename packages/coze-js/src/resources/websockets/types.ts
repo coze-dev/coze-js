@@ -485,7 +485,7 @@ export interface AudioDumpEvent extends BaseEventWithDetail {
 
 interface OutputAudio {
   /** Output audio codec */
-  codec?: 'pcm' | 'opus';
+  codec?: 'pcm' | 'opus' | 'g711a' | 'g711u';
   pcm_config?: {
     sample_rate?: number;
   };

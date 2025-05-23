@@ -1,8 +1,14 @@
 import { StreamProcessorSrc } from './worklets/stream_processor';
 import LocalLookback from './local-lookback';
+import { decodeAlaw, decodeUlaw } from './codecs/g711';
 
 /**
- * Plays audio streams received in raw PCM16 chunks from the browser
+ * Audio format types supported by WavStreamPlayer
+ */
+export type AudioFormat = 'pcm' | 'g711a' | 'g711u';
+
+/**
+ * Plays audio streams received in raw PCM16, G.711a, or G.711u chunks from the browser
  * @class
  */
 export class WavStreamPlayer {
@@ -20,11 +26,20 @@ export class WavStreamPlayer {
   localLookback: LocalLookback | undefined;
 
   /**
+   * Default audio format
+   */
+  defaultFormat: AudioFormat;
+
+  /**
    * Creates a new WavStreamPlayer instance
-   * @param {{sampleRate?: number}} options
+   * @param {{sampleRate?: number, enableLocalLookback?: boolean, defaultFormat?: AudioFormat}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100, enableLocalLookback = false }: { sampleRate?: number, enableLocalLookback?: boolean } = {}) {
+  constructor({ sampleRate = 44100, enableLocalLookback = false, defaultFormat = 'pcm' }: {
+    sampleRate?: number,
+    enableLocalLookback?: boolean,
+    defaultFormat?: AudioFormat
+  } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
     this.context = null;
@@ -33,6 +48,7 @@ export class WavStreamPlayer {
     this.interruptedTrackIds = {};
     this.isPaused = false;
     this.enableLocalLookback = enableLocalLookback;
+    this.defaultFormat = defaultFormat;
 
     if(this.enableLocalLookback) {
       this.localLookback = new LocalLookback(true);
@@ -137,13 +153,14 @@ export class WavStreamPlayer {
   }
 
   /**
-   * Adds 16BitPCM data to the currently playing audio stream
+   * Adds audio data to the currently playing audio stream
    * You can add chunks beyond the current play point and they will be queued for play
-   * @param {ArrayBuffer|Int16Array} arrayBuffer
+   * @param {ArrayBuffer|Int16Array|Uint8Array} arrayBuffer
    * @param {string} [trackId]
+   * @param {AudioFormat} [format] - Audio format: 'pcm', 'g711a', or 'g711u'
    * @returns {Int16Array}
    */
-  async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array, trackId: string = 'default'): Promise<Int16Array> {
+  async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array | Uint8Array, trackId: string = 'default', format?: AudioFormat): Promise<Int16Array> {
     if (typeof trackId !== 'string') {
       throw new Error(`trackId must be a string`);
     } else if (this.interruptedTrackIds[trackId]) {
@@ -153,12 +170,33 @@ export class WavStreamPlayer {
       await this._start();
     }
     let buffer: Int16Array;
+    const audioFormat = format || this.defaultFormat;
+
     if (arrayBuffer instanceof Int16Array) {
+      // Already in PCM format
       buffer = arrayBuffer;
+    } else if (arrayBuffer instanceof Uint8Array) {
+      // Handle G.711 formats
+      if (audioFormat === 'g711a') {
+        buffer = decodeAlaw(arrayBuffer);
+      } else if (audioFormat === 'g711u') {
+        buffer = decodeUlaw(arrayBuffer);
+      } else {
+        // Treat as PCM data in Uint8Array
+        buffer = new Int16Array(arrayBuffer.buffer);
+      }
     } else if (arrayBuffer instanceof ArrayBuffer) {
-      buffer = new Int16Array(arrayBuffer);
+      // Handle different formats based on the specified format
+      if (audioFormat === 'g711a') {
+        buffer = decodeAlaw(new Uint8Array(arrayBuffer));
+      } else if (audioFormat === 'g711u') {
+        buffer = decodeUlaw(new Uint8Array(arrayBuffer));
+      } else {
+        // Default to PCM
+        buffer = new Int16Array(arrayBuffer);
+      }
     } else {
-      throw new Error(`argument must be Int16Array or ArrayBuffer`);
+      throw new Error(`argument must be Int16Array, Uint8Array, or ArrayBuffer`);
     }
     this.stream!.port.postMessage({ event: 'write', buffer, trackId });
     return buffer;
@@ -211,5 +249,33 @@ export class WavStreamPlayer {
    */
   setMediaStream(stream?: MediaStream) {
     this.localLookback?.setMediaStream(stream);
+  }
+
+  /**
+   * Adds G.711 A-law encoded audio data to the currently playing audio stream
+   * @param {ArrayBuffer|Uint8Array} arrayBuffer - G.711 A-law encoded data
+   * @param {string} [trackId]
+   * @returns {Int16Array}
+   */
+  async addG711a(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default'): Promise<Int16Array> {
+    return this.add16BitPCM(arrayBuffer, trackId, 'g711a');
+  }
+
+  /**
+   * Adds G.711 μ-law encoded audio data to the currently playing audio stream
+   * @param {ArrayBuffer|Uint8Array} arrayBuffer - G.711 μ-law encoded data
+   * @param {string} [trackId]
+   * @returns {Int16Array}
+   */
+  async addG711u(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default'): Promise<Int16Array> {
+    return this.add16BitPCM(arrayBuffer, trackId, 'g711u');
+  }
+
+  setSampleRate(sampleRate: number) {
+    this.sampleRate = sampleRate;
+  }
+
+  setDefaultFormat(format: AudioFormat) {
+    this.defaultFormat = format;
   }
 }
