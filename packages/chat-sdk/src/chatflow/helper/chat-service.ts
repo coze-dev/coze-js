@@ -70,7 +70,7 @@ export const getCustomAppInfo = (chatFlowProps: IChatFlowProps) => {
 export const getBgInfo = (
   resp?: BackgroundImageResp,
 ): BgImageInfo | undefined => {
-  if (resp?.origin_image_url) {
+  if (resp?.image_url) {
     return {
       canvasPosition: {
         height: resp.canvas_position?.height || 0,
@@ -82,7 +82,7 @@ export const getBgInfo = (
         left: resp.gradient_position?.left || 0,
         right: resp.gradient_position?.right || 0,
       },
-      imgUrl: resp.origin_image_url || '',
+      imgUrl: resp.image_url || resp.origin_image_url || '',
       themeColor: resp.theme_color || '',
     };
   }
