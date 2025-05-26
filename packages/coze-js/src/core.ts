@@ -162,11 +162,11 @@ export class APIClient {
 
     if (isUniApp()) {
       headers['X-Coze-Client-User-Agent'] = getUniAppClientUserAgent();
-    } else if (!isBrowser()) {
+    } else if (isBrowser()) {
+      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
+    } else {
       headers['User-Agent'] = getUserAgent();
       headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
-    } else {
-      headers['X-Coze-Client-User-Agent'] = getBrowserClientUserAgent();
     }
 
     const config = mergeConfig(
