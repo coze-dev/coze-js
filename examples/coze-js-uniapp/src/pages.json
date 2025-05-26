@@ -2,9 +2,15 @@
   "pages": [
     //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
+      "path": "pages/speech/index",
+      "style": {
+        "navigationBarTitleText": "文本转语音 WebSocket"
+      }
+    },
+    {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "uni-app"
+        "navigationBarTitleText": "Coze.js Demo"
       }
     }
   ],
