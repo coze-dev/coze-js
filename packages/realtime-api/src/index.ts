@@ -8,6 +8,7 @@ import {
   type RoomConfig,
   type CreateRoomData,
   type GetToken,
+  type RoomMode,
 } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -45,6 +46,7 @@ export interface RealtimeClientConfig {
   videoConfig?: VideoConfig /** optional, Video configuration */;
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
   prologueContent?: string /** optional, Prologue content */;
+  roomMode?: RoomMode /** optional, Room mode */;
 }
 
 // Only use for test
@@ -101,6 +103,7 @@ class RealtimeClient extends RealtimeEventHandler {
    * @param config.videoConfig.screenConfig - Optional, Screen share configuration if videoInputDeviceId is 'screenShare' see https://www.volcengine.com/docs/6348/104481#screenconfig for more details. |
    *                                         可选，屏幕共享配置，如果 videoInputDeviceId 是 'screenShare'，请参考 https://www.volcengine.com/docs/6348/104481#screenconfig 了解更多详情。
    * @param config.prologueContent - Optional, Prologue content. | 可选，开场白内容。
+   * @param config.roomMode - Optional, Room mode. | 可选，房间模式。
    */
   constructor(config: RealtimeClientConfig) {
     super(config.debug);
@@ -136,6 +139,12 @@ class RealtimeClient extends RealtimeEventHandler {
         const config: RoomConfig = {};
         if (this._config.prologueContent) {
           config.prologue_content = this._config.prologueContent;
+        }
+        if (
+          this._config.roomMode !== undefined &&
+          this._config.roomMode !== null
+        ) {
+          config.room_mode = this._config.roomMode;
         }
         if (this._config.videoConfig) {
           if (

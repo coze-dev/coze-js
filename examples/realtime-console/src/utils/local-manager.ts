@@ -19,6 +19,7 @@ export enum LocalStorageKey {
   PROLOGUE_CONTENT = 'prologue_content',
   INTERRUPT_TEXT = 'interrupt_text',
   INTERRUPT_BOT_ID = 'interrupt_bot_id',
+  ROOM_MODE = 'room_mode',
 }
 
 export class LocalManager {

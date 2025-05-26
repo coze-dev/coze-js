@@ -15,7 +15,7 @@ import {
   RealtimeAPIError,
   EventNames,
 } from '@coze/realtime-api';
-import { type APIError } from '@coze/api';
+import { type RoomMode, type APIError } from '@coze/api';
 
 import {
   getBaseUrl,
@@ -103,6 +103,9 @@ const RealtimeConsole: React.FC = () => {
       conversationId: localManager.get(LocalStorageKey.CONVERSATION_ID),
       workflowId: localManager.get(LocalStorageKey.WORKFLOW_ID),
       prologueContent: localManager.get(LocalStorageKey.PROLOGUE_CONTENT),
+      roomMode: Number(
+        localManager.get(LocalStorageKey.ROOM_MODE, '0'),
+      ) as RoomMode,
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
