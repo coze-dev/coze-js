@@ -28,9 +28,11 @@ export const checkDevicePermission = async (): Promise<{
     }
 
     // Check permission status first through permissions API
-    const permissionStatus = await navigator.permissions.query({
+    const permissionStatus = (await navigator.permissions?.query({
       name: 'microphone' as PermissionName,
-    });
+    })) || {
+      state: 'prompt',
+    };
 
     // If permission has been denied
     if (permissionStatus.state === 'denied') {

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "Publish feat/weex-realtime",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "shenxiaojie.316@bytedance.com"
+}

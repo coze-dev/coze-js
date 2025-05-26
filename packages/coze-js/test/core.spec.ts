@@ -31,6 +31,7 @@ describe('APIClient', () => {
   let client: APIClient;
 
   beforeEach(() => {
+    vi.spyOn(utils, 'isUniApp').mockReturnValue(false);
     client = new APIClient(mockConfig);
     vi.clearAllMocks();
   });

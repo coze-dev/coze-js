@@ -13,6 +13,7 @@ import {
   APIError,
 } from '@coze/api';
 
+import { registerUniAppWebSocket } from './ws-tool/websocket/integrator';
 import { sharedMixins } from './mixins/shared';
 import { platformMixins } from './mixins/platform';
 
@@ -29,6 +30,10 @@ export interface ClientOptions extends InnerClientOptions {
 export class CozeAPI extends InnerCozeAPI {
   constructor(public options: ClientOptions) {
     super({ ...options });
+
+    // 注册 WebSocket 适配器
+    // 这确保了 client.websockets.chat.create() 等高级 API 可以正常工作
+    registerUniAppWebSocket();
 
     this.axiosInstance = axios.create({
       adapter: this.getAdapter(),

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "Add Websocket WebSocket implementation for better UniApp compatibility",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
