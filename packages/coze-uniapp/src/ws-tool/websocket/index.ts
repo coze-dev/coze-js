@@ -34,7 +34,7 @@ export class UniAppWebSocket implements WebSocket {
 
     // Create the UniApp WebSocket
     this.ws = uni.connectSocket({
-      url: this.url.replace(' ', '%20'), // 微信小程序，url 不能有空格
+      url: this.url.replace(/ /g, '%20'), // 微信小程序，url 不能有空格
       protocols: Array.isArray(protocols)
         ? protocols
         : protocols
@@ -96,7 +96,7 @@ export class UniAppWebSocket implements WebSocket {
     }
 
     this.ws.send({
-      data: typeof data === 'string' ? data : data,
+      data,
       success: () => {
         // 数据发送成功
       },

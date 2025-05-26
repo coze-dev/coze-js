@@ -20,7 +20,7 @@ export function registerWebSocketFactory(factory: {
   }
 
   // 在全局作用域中定义获取函数，确保小程序环境可访问
-  (globalThis as any).getUniAppWebSocketFactory = getWebSocketFactory;
+  (globalThis as any).getMiniAppWebSocketFactory = getWebSocketFactory;
 }
 
 /**

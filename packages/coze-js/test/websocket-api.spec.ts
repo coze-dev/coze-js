@@ -10,6 +10,7 @@ vi.mock('ws');
 vi.mock('reconnecting-websocket');
 vi.mock('../src/utils', () => ({
   isBrowser: vi.fn(),
+  isUniApp: vi.fn(),
 }));
 
 describe('WebSocketAPI', () => {
