@@ -24,9 +24,23 @@
   },
   "license": "MIT",
   "author": "",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ws-tools": "./src/ws-tool/index.ts"
+  },
   "main": "src/index.ts",
   "module": "src/index.ts",
   "types": "src/index.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/index.d.ts"
+      ],
+      "ws-tools": [
+        "dist/ws-tool/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist",
     "LICENSE",
