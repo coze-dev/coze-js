@@ -164,8 +164,8 @@ export interface CreateDatasetData {
 }
 
 export interface ListDatasetData {
-  /** The ID of the created dataset. */
-  dataset_id: string;
+  total_count: number;
+  dataset_list: Dataset[];
 }
 
 export interface Dataset {
