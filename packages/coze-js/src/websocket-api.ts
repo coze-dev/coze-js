@@ -7,12 +7,21 @@ import {
 } from 'reconnecting-websocket/dist/events';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import { isBrowser } from './utils';
+import { isBrowser, isUniApp } from './utils';
 import {
   type CommonErrorEvent,
   WebsocketsEventType,
 } from './resources/websockets/types';
 import { type WebsocketOptions } from './core';
+
+// Declare types for MiniApp WebSocket integration
+declare global {
+  // Define a global function to get WebSocket factory
+  // This ensures proper functionality in mini-program environments
+  function getMiniAppWebSocketFactory(): {
+    getWebSocketImplementation: () => typeof WebSocket;
+  } | null;
+}
 
 export class WebSocketAPI<Req, Rsp> {
   private rws: ReconnectingWebSocket;
@@ -21,19 +30,40 @@ export class WebSocketAPI<Req, Rsp> {
     const separator = url.includes('?') ? '&' : '?';
     const { authorization } = options.headers || {};
 
+    // Get the appropriate WebSocket implementation
+    let WebSocketImpl;
+
+    if (isUniApp()) {
+      // Use MiniApp WebSocket implementation
+      const factory =
+        typeof getMiniAppWebSocketFactory === 'function'
+          ? getMiniAppWebSocketFactory()
+          : null;
+
+      if (factory) {
+        WebSocketImpl = factory.getWebSocketImplementation();
+      } else {
+        throw new Error('MiniApp WebSocket implementation not found');
+      }
+    } else if (isBrowser()) {
+      // Use browser's native WebSocket
+      WebSocketImpl = window.WebSocket;
+    } else {
+      // Use Node.js ws package
+      WebSocketImpl = class extends WS {
+        constructor(url2: string, protocols: string | string[]) {
+          super(url2, protocols, {
+            headers: options.headers,
+          });
+        }
+      };
+    }
+
     this.rws = new ReconnectingWebSocket(
       `${url}${separator}authorization=${authorization}`,
       [],
       {
-        WebSocket: isBrowser()
-          ? window.WebSocket
-          : class extends WS {
-              constructor(url2: string, protocols: string | string[]) {
-                super(url2, protocols, {
-                  headers: options.headers,
-                });
-              }
-            },
+        WebSocket: WebSocketImpl,
         ...options,
       },
     );

@@ -160,7 +160,9 @@ export class APIClient {
       authorization: `Bearer ${token}`,
     };
 
-    if (!isBrowser()) {
+    if (isUniApp()) {
+      headers['X-Coze-Client-User-Agent'] = getUniAppClientUserAgent();
+    } else if (!isBrowser()) {
       headers['User-Agent'] = getUserAgent();
       headers['X-Coze-Client-User-Agent'] = getNodeClientUserAgent();
     } else {
