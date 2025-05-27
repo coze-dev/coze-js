@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/uniapp-api",
+      "comment": "Upgrade vitest to version 2.1.9 for security bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/uniapp-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}

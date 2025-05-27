@@ -24,6 +24,6 @@
     "@vitest/coverage-v8": "~2.1.4",
     "sucrase": "^3.32.0",
     "typescript": "^5.5.3",
-    "vitest": "~2.1.4"
+    "vitest": "~2.1.9"
   }
 }
