@@ -40,4 +40,5 @@ export interface CreateRoomData {
   uid: string;
   room_id: string;
   app_id: string;
+  live_id?: string; // 同声传译才会用到
 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { useState, useEffect } from 'react';
 
 import Link from 'antd/es/typography/Link';
@@ -14,6 +15,7 @@ import {
   Avatar,
   Input,
 } from 'antd';
+import { RoomType } from '@coze/realtime-api';
 import { AuthenticationError, RoomMode } from '@coze/api';
 import {
   RobotOutlined,
@@ -110,7 +112,6 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
   const [loadingVoices, setLoadingVoices] = useState(false);
   const [loadingBots, setLoadingBots] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
   const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces, cloneVoice } =
     useCozeAPI();
 
@@ -244,6 +245,8 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.ROOM_MODE]: localManager.get(
           LocalStorageKey.ROOM_MODE,
         ),
+        [LocalStorageKey.ROOM_TYPE]:
+          localManager.get(LocalStorageKey.ROOM_TYPE) || RoomType.Conversation,
       });
     })().catch(err => {
       console.error(err);
@@ -260,6 +263,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       workflow_id,
       prologue_content,
       room_mode,
+      room_type,
       interrupt_text,
       interrupt_bot_id,
     } = form.getFieldsValue();
@@ -271,6 +275,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.WORKFLOW_ID, workflow_id);
     localManager.set(LocalStorageKey.PROLOGUE_CONTENT, prologue_content);
     localManager.set(LocalStorageKey.ROOM_MODE, room_mode);
+    localManager.set(LocalStorageKey.ROOM_TYPE, room_type);
     localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
     localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
   };
@@ -507,20 +512,21 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             </Select>
           </Form.Item>
 
-          {/* <Form.Item
-            name={LocalStorageKey.INTERRUPT_TEXT}
-            label="Interrupt Text"
-            tooltip="Optional: Specify a custom interrupt text"
-          >
-            <Input placeholder="Enter interrupt text" />
-          </Form.Item>
           <Form.Item
-            name={LocalStorageKey.INTERRUPT_BOT_ID}
-            label="Interrupt Bot ID"
-            tooltip="Optional: Specify a custom interrupt bot ID"
+            name={LocalStorageKey.ROOM_TYPE}
+            label="Room Type"
+            tooltip="Optional: Specify the room type for the conversation"
+            initialValue={RoomType.Conversation}
           >
-            <Input placeholder="Enter interrupt bot ID" />
-          </Form.Item> */}
+            <Select placeholder="Select room type">
+              <Select.Option value={RoomType.Conversation}>
+                对话模式
+              </Select.Option>
+              <Select.Option value={RoomType.Translation}>
+                同声传译模式
+              </Select.Option>
+            </Select>
+          </Form.Item>
         </div>
 
         <Form.Item>

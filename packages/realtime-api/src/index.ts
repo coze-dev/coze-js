@@ -5,10 +5,12 @@ import {
 } from '@volcengine/rtc';
 import {
   CozeAPI,
+  RoomMode,
   type RoomConfig,
   type CreateRoomData,
   type GetToken,
-  type RoomMode,
+  type CreateRoomReq,
+  type TranslateConfig,
 } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -23,6 +25,11 @@ export interface VideoConfig {
   renderDom?: string /** optional, The DOM element to render the video stream to */;
   videoInputDeviceId?: string /** optional, The device ID of the video input device to use */;
   screenConfig?: ScreenConfig; // optional, Screen share configuration if videoInputDeviceId is 'screenShare' see https://www.volcengine.com/docs/6348/104481#screenconfig for more details
+}
+
+export enum RoomType {
+  Conversation = 'conversation', // 对话模式
+  Translation = 'translation', // 同声传译模式
 }
 
 export interface RealtimeClientConfig {
@@ -47,6 +54,8 @@ export interface RealtimeClientConfig {
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
   prologueContent?: string /** optional, Prologue content */;
   roomMode?: RoomMode /** optional, Room mode */;
+  roomType?: RoomType /** optional, Room type */;
+  translateConfig?: TranslateConfig /** optional, Translation configuration */;
 }
 
 // Only use for test
@@ -144,7 +153,7 @@ class RealtimeClient extends RealtimeEventHandler {
           this._config.roomMode !== undefined &&
           this._config.roomMode !== null
         ) {
-          config.room_mode = this._config.roomMode;
+          config.room_mode = this._config.roomMode || RoomMode.Default;
         }
         if (this._config.videoConfig) {
           if (
@@ -159,7 +168,7 @@ class RealtimeClient extends RealtimeEventHandler {
             };
           }
         }
-        roomInfo = await this._api.audio.rooms.create({
+        const params: CreateRoomReq = {
           bot_id: botId,
           conversation_id: conversationId || undefined,
           voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
@@ -167,7 +176,17 @@ class RealtimeClient extends RealtimeEventHandler {
           uid: this._config.userId || undefined,
           workflow_id: this._config.workflowId || undefined,
           config,
-        });
+        };
+        if (this._config.roomType === RoomType.Translation) {
+          // 同声传译接口
+          // roomInfo = await this._api.audio.translationRooms.create({
+          //   room_config: params,
+          //   translate_config: this._config.translateConfig,
+          // });
+          roomInfo = await this._api.audio.rooms.create(params);
+        } else {
+          roomInfo = await this._api.audio.rooms.create(params);
+        }
       }
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);

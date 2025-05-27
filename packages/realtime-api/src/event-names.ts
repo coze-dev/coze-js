@@ -152,6 +152,11 @@ enum EventNames {
    * zh: 会话更新
    */
   SESSION_UPDATED = 'server.session.updated',
+  /**
+   * en: Live created
+   * zh: 直播创建
+   */
+  LIVE_CREATED = 'server.live.created',
 }
 
 export default EventNames;
