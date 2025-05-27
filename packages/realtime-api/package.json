@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@coze/api": "workspace:*",
-    "@volcengine/rtc": "^4.62.1"
+    "@volcengine/rtc": "~4.62.11"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",

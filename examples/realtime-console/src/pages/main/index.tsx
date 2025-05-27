@@ -103,8 +103,9 @@ const RealtimeConsole: React.FC = () => {
       conversationId: localManager.get(LocalStorageKey.CONVERSATION_ID),
       workflowId: localManager.get(LocalStorageKey.WORKFLOW_ID),
       prologueContent: localManager.get(LocalStorageKey.PROLOGUE_CONTENT),
-      roomMode: Number(
-        localManager.get(LocalStorageKey.ROOM_MODE, '0'),
+      roomMode: localManager.get(
+        LocalStorageKey.ROOM_MODE,
+        'default',
       ) as RoomMode,
       videoConfig: isShowVideo()
         ? {
