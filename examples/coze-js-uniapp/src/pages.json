@@ -1,5 +1,11 @@
 {
   "pages": [
+    {
+      "path": "pages/transcription/index",
+      "style": {
+        "navigationBarTitleText": "实时语音转写 WebSocket"
+      }
+    },
     //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
       "path": "pages/speech/index",
@@ -19,5 +25,11 @@
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
+  },
+
+  "permission": {
+    "scope.record": {
+      "desc": "语音转写功能需要您的录音权限"
+    }
   }
 }

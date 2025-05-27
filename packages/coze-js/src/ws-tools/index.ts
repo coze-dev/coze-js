@@ -10,6 +10,7 @@ export {
   type WsChatEventData,
   type WsChatCallbackHandler,
   type AudioRecordEvent,
+  type WsToolsOptions,
 } from './types';
 export {
   default as PcmRecorder,
