@@ -8,6 +8,8 @@ const getConfig = (prefix: string) => {
     getBotId: () => localStorage.getItem(`${prefix}_bot_id`) || '',
     getVoiceId: () => localStorage.getItem(`${prefix}_voice_id`) || '',
     getWorkflowId: () => localStorage.getItem(`${prefix}_workflow_id`) || '',
+    getAppId: () => localStorage.getItem(`${prefix}_app_id`) || '',
+    getStreamId: () => localStorage.getItem(`${prefix}_stream_id`) || '',
   };
   return config;
 };

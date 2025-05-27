@@ -22,6 +22,8 @@ import TTSWithTranscription from './pages/tts_transcription';
 import Transcription from './pages/transcription';
 import Speech from './pages/speech';
 import SimultInterpretation from './pages/simult-interpretation';
+import Publish from './pages/publish';
+import Subscribe from './pages/subscribe';
 import Chat from './pages/chat';
 import AudioTest from './pages/audio-test';
 import logo from './logo.svg';
@@ -48,12 +50,18 @@ const menuItems = [
     label: '语音合成',
     title: '语音合成 (TTS) 演示',
   },
+  // {
+  //   key: '/simult',
+  //   icon: <CustomerServiceOutlined />,
+  //   label: '同声传译',
+  //   title: '多语种实时翻译 (Simult) 演示',
+  //   isHidden,
+  // },
   {
-    key: '/simult',
+    key: '/publish',
     icon: <CustomerServiceOutlined />,
     label: '同声传译',
-    title: '多语种实时翻译 (Simult) 演示',
-    isHidden,
+    title: '同声传译',
   },
   {
     key: '/tts_transcription',
@@ -212,6 +220,7 @@ function MainLayout() {
               <Route path="/transcription" element={<Transcription />} />
               <Route path="/speech" element={<Speech />} />
               <Route path="/simult" element={<SimultInterpretation />} />
+              <Route path="/publish" element={<Publish />} />
               <Route
                 path="/tts_transcription"
                 element={<TTSWithTranscription />}
@@ -224,10 +233,36 @@ function MainLayout() {
   );
 }
 
+// Simple layout without sidebar for the Subscribe page
+function SimpleLayout() {
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Content style={{ margin: '0', height: '100vh' }}>
+        <div
+          style={{
+            minHeight: '100vh',
+            background: colorBgContainer,
+            height: '100%',
+          }}
+        >
+          <Subscribe />
+        </div>
+      </Content>
+    </Layout>
+  );
+}
+
 function App() {
   return (
     <Router>
-      <MainLayout />
+      <Routes>
+        <Route path="subscribe" element={<SimpleLayout />} />
+        <Route path="*" element={<MainLayout />} />
+      </Routes>
     </Router>
   );
 }

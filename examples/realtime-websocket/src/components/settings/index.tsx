@@ -51,6 +51,18 @@ const formConfigs: FormConfig[] = [
     required: false,
     message: 'Please input Workflow ID!',
   },
+  {
+    name: 'app_id',
+    label: 'AppID',
+    required: true,
+    message: '请输入AppID!',
+  },
+  {
+    name: 'stream_id',
+    label: 'StreamID',
+    required: true,
+    message: '请输入StreamID!',
+  },
 ];
 
 // 渲染表单项组件
@@ -96,6 +108,9 @@ const Settings = ({
     const baseWsUrl = config.getBaseWsUrl();
     const voiceId = config.getVoiceId();
     const workflowId = config.getWorkflowId();
+    const appId = config.getAppId();
+    const streamId = config.getStreamId();
+
     form.setFieldsValue({
       base_url: baseUrl,
       base_ws_url: baseWsUrl,
@@ -103,6 +118,8 @@ const Settings = ({
       bot_id: botId,
       voice_id: voiceId,
       workflow_id: workflowId,
+      app_id: appId,
+      stream_id: streamId,
     });
   }, [form]);
 
