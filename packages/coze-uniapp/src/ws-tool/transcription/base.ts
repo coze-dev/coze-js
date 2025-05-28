@@ -60,7 +60,6 @@ export class BaseWsTranscriptionClient {
 
     this.recorder = new PcmRecorder({
       sampleRate: 24000,
-      numberOfChannels: 1,
       debug: config.debug,
     });
 

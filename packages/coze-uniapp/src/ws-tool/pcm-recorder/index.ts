@@ -22,18 +22,6 @@ export interface PcmRecorderConfig {
    */
   sampleRate?: number;
   /**
-   * Number of audio channels (default: 1, mono)
-   */
-  numberOfChannels?: number;
-  /**
-   * Format of the audio (always 'PCM' for this implementation)
-   */
-  format?: string;
-  /**
-   * Frame size in KB, determines how frequently the frameBuffer event is triggered
-   */
-  frameSize?: number;
-  /**
    * Enable debug logging
    */
   debug?: boolean;
@@ -60,16 +48,6 @@ export class PcmRecorder {
    * Configuration for the recorder
    */
   private config: PcmRecorderConfig;
-  /**
-   * Default configuration values
-   */
-  private static readonly DEFAULT_CONFIG: PcmRecorderConfig = {
-    sampleRate: 16000,
-    numberOfChannels: 1,
-    format: 'PCM',
-    frameSize: 1, // 1KB
-    debug: false,
-  };
 
   /**
    * Creates a new PcmRecorder instance
@@ -78,7 +56,6 @@ export class PcmRecorder {
   constructor(config: PcmRecorderConfig = {}) {
     // Merge provided config with defaults
     this.config = {
-      ...PcmRecorder.DEFAULT_CONFIG,
       ...config,
     };
 
@@ -149,15 +126,13 @@ export class PcmRecorder {
       return;
     }
 
-    const options = {
+    const options: UniApp.RecorderManagerStartOptions = {
       duration: 600000, // 10 minutes max
       sampleRate: this.config.sampleRate,
-      numberOfChannels: this.config.numberOfChannels,
+      numberOfChannels: 1,
       format: 'PCM', // Always PCM for our use case
-      frameSize: this.config.frameSize,
+      frameSize: 2,
     };
-
-    console.log('Starting recording with options:', options);
 
     try {
       this.recorderManager.start(options);
@@ -239,9 +214,7 @@ export class PcmRecorder {
    * @returns {number} - Sample rate in Hz
    */
   getSampleRate(): number {
-    return (
-      this.config.sampleRate || (PcmRecorder.DEFAULT_CONFIG.sampleRate ?? 16000)
-    );
+    return this.config.sampleRate || 16000;
   }
 
   /**

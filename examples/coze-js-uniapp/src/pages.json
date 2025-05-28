@@ -1,6 +1,12 @@
 {
   "pages": [
     {
+      "path": "pages/chat/index",
+      "style": {
+        "navigationBarTitleText": "实时语音聊天 WebSocket"
+      }
+    },
+    {
       "path": "pages/transcription/index",
       "style": {
         "navigationBarTitleText": "实时语音转写 WebSocket"
