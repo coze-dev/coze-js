@@ -9,7 +9,12 @@
       "import": "./dist/lib-h5/exports/index.js",
       "types": "./dist/lib-source/src/exports/index.d.ts"
     },
-    "./webCss": "./dist/lib-h5/exports/index.css",
+    "./markdownJs": {
+      "import": "./dist/lib-h5/exports/markdown/index.js",
+      "types": "./dist/lib-source/src/exports/index.d.ts"
+    },
+    "./webCss": "./dist/lib-h5/css/exports/index.css",
+    "./markdownCss": "./dist/lib-h5/css/exports/markdown/index.css",
     "./types": "./dist/lib-source/src/exports/index.d.ts"
   },
   "main": "./dist/lib-source/src/exports/index.js",

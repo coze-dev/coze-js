@@ -13,7 +13,7 @@ export default defineAppConfig({
   components:
     isBuildNative && isWeapp
       ? ['exports/weapp/chat-framework/index']
-      : ['exports/index'],
+      : ['exports/index', 'exports/markdown/index'],
   window: {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#fff',

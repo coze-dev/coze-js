@@ -100,7 +100,16 @@ export default defineConfig(async merge => {
       staticDirectory: 'static',
       output: isBuildNative
         ? {
-            filename: 'exports/index.js',
+            /* filename: (pathData, assetInfo) => {
+              console.log(
+                'pathData, assetInfo:',
+                pathData.filename,
+                pathData.basename,
+                pathData.url,
+                assetInfo,
+              );
+              return 'exports/index.js';
+            },*/
             chunkLoadingGlobal: `webpackJsonp_coze_chat_sdk`,
           }
         : undefined,
@@ -108,7 +117,7 @@ export default defineConfig(async merge => {
       miniCssExtractPluginOption: isBuildNative
         ? {
             ignoreOrder: true,
-            filename: 'exports/index.css',
+            //filename: 'exports/index.css',
           }
         : undefined,
       imageUrlLoaderOption: {
