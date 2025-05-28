@@ -2,6 +2,7 @@
   <view class="speech-container">
     <view class="header">
       <text class="title">文本转语音 WebSocket 演示</text>
+      <button class="back-button" @click="goBackToHome">返回首页</button>
     </view>
 
     <view class="input-section">
@@ -41,9 +42,7 @@
       <text>{{ errorMessage }}</text>
     </view>
 
-    <navigator url="/pages/index/index" open-type="navigate" class="nav-link">
-      返回主页
-    </navigator>
+    <!-- 导航按钮已移到顶部 -->
   </view>
 </template>
 
@@ -81,6 +80,13 @@ export default {
     const handleTogglePlay = async () => {
       await togglePlayback();
     };
+    
+    // 返回首页
+    const goBackToHome = () => {
+      uni.navigateTo({
+        url: '/pages/home/index'
+      });
+    };
 
     return {
       isPlaying,
@@ -89,6 +95,7 @@ export default {
       handleConvert,
       handleAbort,
       handleTogglePlay,
+      goBackToHome,
     };
   },
 };
@@ -104,9 +111,15 @@ export default {
 
 .header {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  font-size: 14px;
+  padding: 5px 10px;
 }
 
 .title {

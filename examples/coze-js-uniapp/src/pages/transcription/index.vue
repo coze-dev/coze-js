@@ -2,6 +2,7 @@
   <view class="transcription-container">
     <view class="header">
       <text class="title">实时语音转写 WebSocket 演示</text>
+      <button class="back-button" @click="goBackToHome">返回首页</button>
     </view>
 
     <view class="transcription-box">
@@ -104,6 +105,13 @@ export default {
     onUnmounted(() => {
       destroy();
     });
+    
+    // 返回首页
+    const goBackToHome = () => {
+      uni.reLaunch({
+        url: '/pages/home/index'
+      });
+    };
 
     return {
       isRecording,
@@ -114,6 +122,7 @@ export default {
       handleStopRecording,
       handlePauseResume,
       getStatusText,
+      goBackToHome,
     };
   },
 };
@@ -129,11 +138,19 @@ export default {
 
 .header {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .title {
   font-size: 18px;
   font-weight: bold;
+}
+
+.back-button {
+  font-size: 14px;
+  padding: 5px 10px;
 }
 
 .transcription-display {

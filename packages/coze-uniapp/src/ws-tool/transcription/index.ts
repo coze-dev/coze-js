@@ -87,8 +87,6 @@ export class WsTranscriptionClient extends BaseWsTranscriptionClient {
       pcmAudioCallback: data => {
         const { raw } = data;
 
-        console.log('Raw PCM data received:', raw, this.ws);
-
         // Convert ArrayBuffer to base64 string for UniApp
         const base64String = this.arrayBufferToBase64(raw);
 
