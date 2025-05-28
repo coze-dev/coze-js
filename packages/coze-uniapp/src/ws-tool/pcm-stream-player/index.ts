@@ -234,7 +234,7 @@ export class PcmStreamPlayer {
         if (!this.getNextBuffer()) {
           // No more data, fill rest with silence
           outputBuffer[i] = 0;
-          this.isProcessing = i === outputBuffer.length - 1 ? false : true;
+          this.isProcessing = i !== outputBuffer.length - 1;
         } else {
           // Got new buffer, use its first sample
           outputBuffer[i] = this.currentBuffer

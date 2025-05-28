@@ -155,8 +155,6 @@ export class PcmRecorder {
   } = {}): void {
     // Register the callback
     this.pcmAudioCallback = pcmAudioCallback;
-
-    this.status = RecordingStatus.RECORDING;
   }
 
   /**

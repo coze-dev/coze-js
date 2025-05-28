@@ -78,8 +78,7 @@ export class WsTranscriptionClient extends BaseWsTranscriptionClient {
    */
   async start() {
     if (this.getStatus() === 'recording') {
-      console.warn('Recording is already started');
-      return;
+      throw new Error('Recording is already started');
     }
 
     await this.connect();
