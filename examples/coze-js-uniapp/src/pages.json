@@ -1,10 +1,37 @@
 {
   "pages": [
-    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
-      "path": "pages/index/index",
+      "path": "pages/home/index",
       "style": {
-        "navigationBarTitleText": "uni-app"
+        "navigationBarTitleText": "Coze.js UniApp 演示"
+      }
+    },
+    {
+      "path": "pages/chat/index",
+      "style": {
+        "navigationBarTitleText": "实时语音聊天 WebSocket",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/transcription/index",
+      "style": {
+        "navigationBarTitleText": "实时语音转写 WebSocket",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/speech/index",
+      "style": {
+        "navigationBarTitleText": "文本转语音 WebSocket",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/api/index",
+      "style": {
+        "navigationBarTitleText": "Coze.js API 示例",
+        "navigationStyle": "default"
       }
     }
   ],
@@ -13,5 +40,11 @@
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
+  },
+
+  "permission": {
+    "scope.record": {
+      "desc": "语音转写功能需要您的录音权限"
+    }
   }
 }

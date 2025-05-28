@@ -157,7 +157,6 @@ describe('WebSocket Chat Tools', () => {
       await client.disconnect();
 
       // assert
-      expect(client['wavStreamPlayer'].interrupt).toHaveBeenCalled();
       expect(client.recorder?.destroy).toHaveBeenCalled();
       expect(client.ws).toBeNull();
     });

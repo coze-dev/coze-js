@@ -141,7 +141,10 @@ class WsChatClient extends BaseWsChatClient {
   }
 
   async disconnect() {
-    await this.wavStreamPlayer.interrupt();
+    this.ws?.send({
+      id: uuid(),
+      event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL,
+    });
     await this.recorder?.destroy();
     this.emit(WsChatEventNames.DISCONNECTED, undefined);
 
