@@ -1,28 +1,37 @@
 {
   "pages": [
     {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "Coze.js UniApp 演示"
+      }
+    },
+    {
       "path": "pages/chat/index",
       "style": {
-        "navigationBarTitleText": "实时语音聊天 WebSocket"
+        "navigationBarTitleText": "实时语音聊天 WebSocket",
+        "navigationStyle": "default"
       }
     },
     {
       "path": "pages/transcription/index",
       "style": {
-        "navigationBarTitleText": "实时语音转写 WebSocket"
+        "navigationBarTitleText": "实时语音转写 WebSocket",
+        "navigationStyle": "default"
       }
     },
-    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
       "path": "pages/speech/index",
       "style": {
-        "navigationBarTitleText": "文本转语音 WebSocket"
+        "navigationBarTitleText": "文本转语音 WebSocket",
+        "navigationStyle": "default"
       }
     },
     {
-      "path": "pages/index/index",
+      "path": "pages/api/index",
       "style": {
-        "navigationBarTitleText": "Coze.js Demo"
+        "navigationBarTitleText": "Coze.js API 示例",
+        "navigationStyle": "default"
       }
     }
   ],

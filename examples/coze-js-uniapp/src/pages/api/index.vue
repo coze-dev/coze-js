@@ -1,13 +1,21 @@
 <template>
   <view class="index">
-    <view>
-      <switch :checked="streaming" @change="handleStreamingChange" />
-      <text>{{ streaming ? 'streaming' : 'polling' }}</text>
+    <view class="header">
+      <text class="title">Coze.js API 示例</text>
+      <button class="back-button" @click="goBack">返回首页</button>
     </view>
-    <view>
-      <switch :checked="isWorkflow" @change="handleWorkflowChange" />
-      <text>{{ isWorkflow ? 'workflow' : 'chat' }}</text>
+    
+    <view class="api-options">
+      <view>
+        <switch :checked="streaming" @change="handleStreamingChange" />
+        <text>{{ streaming ? 'streaming' : 'polling' }}</text>
+      </view>
+      <view>
+        <switch :checked="isWorkflow" @change="handleWorkflowChange" />
+        <text>{{ isWorkflow ? 'workflow' : 'chat' }}</text>
+      </view>
     </view>
+    
     <template v-if="streaming">
       <button @click="isWorkflow ? handleWorkflow() : handleStreamingChat()">
         {{ isWorkflow ? 'workflow' : 'streaming chat' }}
@@ -27,16 +35,17 @@
       <button @click="handlePollingChat">polling chat</button>
       <text>{{ pollingMessage }}</text>
     </template>
-  </view>
-  <view class="upload-section">
-    <button @click="chooseImage">Image Upload</button>
-    <text v-if="fileId">File ID: {{ fileId }}</text>
-    <image
-      v-if="imagePath"
-      :src="imagePath"
-      mode="aspectFit"
-      class="preview-image"
-    ></image>
+  
+    <view class="upload-section">
+      <button @click="chooseImage">Image Upload</button>
+      <text v-if="fileId">File ID: {{ fileId }}</text>
+      <image
+        v-if="imagePath"
+        :src="imagePath"
+        mode="aspectFit"
+        class="preview-image"
+      ></image>
+    </view>
   </view>
 </template>
 
@@ -84,6 +93,13 @@ export default {
         handleChatAbort();
       }
     };
+    
+    // 返回首页
+    const goBack = () => {
+      uni.navigateTo({
+        url: '/pages/home/index'
+      });
+    };
 
     return {
       streaming,
@@ -102,6 +118,7 @@ export default {
       imagePath,
       isUploading,
       chooseImage,
+      goBack
     };
   },
 };
@@ -112,10 +129,37 @@ export default {
   padding: 20px;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.back-button {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.api-options {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
 .upload-section {
-  margin: 15px 0;
+  margin: 20px 0;
   display: flex;
   flex-direction: column;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
 }
 
 .preview-image {
