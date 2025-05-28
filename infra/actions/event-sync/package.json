@@ -26,7 +26,7 @@
     "@coze-infra/vitest-config": "workspace:*",
     "@types/node": "^20",
     "@vercel/ncc": "~0.38.3",
-    "@vitest/coverage-v8": "~2.1.4",
+    "@vitest/coverage-v8": "~2.1.9",
     "sucrase": "^3.32.0",
     "tsx": "^4.19.2",
     "typescript": "^5.5.3",
