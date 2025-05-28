@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "Upgrade vitest to version 2.1.9 for security bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "shenxiaojie.316@bytedance.com"
+}

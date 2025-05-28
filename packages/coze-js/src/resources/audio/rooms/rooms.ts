@@ -30,9 +30,9 @@ export interface RoomConfig {
 }
 
 export enum RoomMode {
-  Default = 0, // 普通模式
-  S2S = 1, // 端到端模式
-  Podcast = 2, // 博客模式
+  Default = 'default', // 普通模式
+  S2S = 's2s', // 端到端模式
+  Podcast = 'podcast', // 博客模式
 }
 
 export interface CreateRoomData {

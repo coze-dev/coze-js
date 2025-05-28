@@ -118,7 +118,7 @@
     "@types/react": "^18.3.11",
     "@types/showdown": "^2.0.6",
     "@types/webpack-env": "^1.13.6",
-    "@vitest/coverage-v8": "~2.1.4",
+    "@vitest/coverage-v8": "~2.1.9",
     "axios": "^1.7.7",
     "babel-loader": "^8.2.3",
     "babel-plugin-module-resolver": "^5.0.2",
@@ -139,7 +139,7 @@
     "ttsc": "^0.3.1",
     "typescript": "^4.9.5",
     "typescript-transform-paths": "^3.5.2",
-    "vitest": "~2.1.4",
+    "vitest": "~2.1.9",
     "webpack": "^5.64.4"
   },
   "peerDependencies": {

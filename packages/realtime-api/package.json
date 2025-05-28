@@ -1,6 +1,6 @@
 {
   "name": "@coze/realtime-api",
-  "version": "1.2.1-beta.2",
+  "version": "1.2.1-beta.5",
   "description": "A powerful real-time communication SDK for voice interactions with Coze AI bots | 扣子官方实时通信 SDK，用于与 Coze AI bots 进行语音交互",
   "keywords": [
     "coze",
@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "@coze/api": "workspace:*",
-    "@volcengine/rtc": "^4.62.1"
+    "@volcengine/rtc": "~4.62.11"
   },
   "devDependencies": {
     "@coze-infra/eslint-config": "workspace:*",
@@ -58,10 +58,10 @@
     "@types/node": "^20",
     "@types/uuid": "^9.0.1",
     "@types/whatwg-fetch": "^0.0.33",
-    "@vitest/coverage-v8": "~2.1.4",
+    "@vitest/coverage-v8": "~2.1.9",
     "axios": "^1.7.7",
     "typescript": "^5.5.3",
-    "vitest": "~2.1.4"
+    "vitest": "~2.1.9"
   },
   "cozePublishConfig": {
     "exports": {

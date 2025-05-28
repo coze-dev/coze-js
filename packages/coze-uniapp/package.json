@@ -48,9 +48,9 @@
     "@coze-infra/vitest-config": "workspace:*",
     "@dcloudio/types": "^3.4.8",
     "@types/node": "^20",
-    "@vitest/coverage-v8": "~2.1.4",
+    "@vitest/coverage-v8": "~2.1.9",
     "typescript": "^5.5.3",
-    "vitest": "~2.1.4"
+    "vitest": "~2.1.9"
   },
   "peerDependencies": {
     "@dcloudio/uni-app": "3.0.0-4030620241128001",

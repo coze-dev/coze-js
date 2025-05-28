@@ -19,7 +19,7 @@
   "dependencies": {
     "@coze/api": "workspace:*",
     "@coze/realtime-api": "workspace:*",
-    "@volcengine/rtc": "^4.62.1",
+    "@volcengine/rtc": "~4.62.11",
     "ant-design-vue": "^4.2.6",
     "core-js": "^3.39.0",
     "typescript": "^5.5.3",

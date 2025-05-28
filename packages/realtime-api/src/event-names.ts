@@ -99,6 +99,19 @@ enum EventNames {
    * zh: 网络质量改变
    */
   NETWORK_QUALITY = 'client.network.quality',
+
+  /**
+   * en: User publish screen
+   * zh: 用户发布屏幕
+   */
+  USER_PUBLISH_SCREEN = 'client.user.publish.screen',
+
+  /**
+   * en: User unpublish screen
+   * zh: 用户取消发布屏幕
+   */
+  USER_UNPUBLISH_SCREEN = 'client.user.unpublish.screen',
+
   /**
    * en: Bot joined
    * zh: Bot 加入

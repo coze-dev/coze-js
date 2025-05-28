@@ -52,6 +52,8 @@ export class EngineClient extends RealtimeEventHandler {
     this.handleEventError = this.handleEventError.bind(this);
     this.handlePlayerEvent = this.handlePlayerEvent.bind(this);
     this.handleNetworkQuality = this.handleNetworkQuality.bind(this);
+    this.handleUserPublishScreen = this.handleUserPublishScreen.bind(this);
+    this.handleUserUnpublishScreen = this.handleUserUnpublishScreen.bind(this);
 
     // Debug only
     this.handleLocalAudioPropertiesReport =
@@ -69,6 +71,14 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.on(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.on(VERTC.events.onError, this.handleEventError);
     this.engine.on(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
+    this.engine.on(
+      VERTC.events.onUserPublishScreen,
+      this.handleUserPublishScreen,
+    );
+    this.engine.on(
+      VERTC.events.onUserUnpublishScreen,
+      this.handleUserUnpublishScreen,
+    );
 
     if (this._isSupportVideo) {
       this.engine.on(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -92,6 +102,14 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.off(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.off(VERTC.events.onError, this.handleEventError);
     this.engine.off(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
+    this.engine.off(
+      VERTC.events.onUserPublishScreen,
+      this.handleUserPublishScreen,
+    );
+    this.engine.off(
+      VERTC.events.onUserUnpublishScreen,
+      this.handleUserUnpublishScreen,
+    );
 
     if (this._isSupportVideo) {
       this.engine.off(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -169,6 +187,14 @@ export class EngineClient extends RealtimeEventHandler {
       uplinkNetworkQuality,
       downlinkNetworkQuality,
     });
+  }
+
+  handleUserPublishScreen(event: unknown) {
+    this.dispatch(EventNames.USER_PUBLISH_SCREEN, event);
+  }
+
+  handleUserUnpublishScreen(event: unknown) {
+    this.dispatch(EventNames.USER_UNPUBLISH_SCREEN, event);
   }
 
   async joinRoom(options: {

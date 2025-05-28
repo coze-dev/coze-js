@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/taro-api",
+      "comment": "Upgrade vitest to version 2.1.9 for security bug",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/taro-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}

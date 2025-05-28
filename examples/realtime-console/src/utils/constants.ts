@@ -4,4 +4,4 @@ export const DEFAULT_OAUTH_CLIENT_ID =
 export const DISCONNECT_TIME = 1800; // 30 minutes
 
 export const DOCS_URL =
-  'https://bytedance.larkoffice.com/docx/FQJ9dvBE7oLzu3xtacJc6Cyjnof';
+  'https://www.coze.cn/open/docs/dev_how_to_guides/access_process';
