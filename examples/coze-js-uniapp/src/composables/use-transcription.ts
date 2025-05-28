@@ -8,8 +8,6 @@ import {
   type TranscriptionsMessageUpdateEvent,
 } from '@coze/api';
 
-import { cozeClient } from '../api/client';
-
 /**
  * Composable for handling speech-to-text transcription
  */
@@ -28,7 +26,7 @@ export function useTranscription() {
     try {
       if (!transcriptionClient.value) {
         transcriptionClient.value = new WsTranscriptionClient({
-          ...cozeClient.options,
+          token: import.meta.env.VITE_COZE_TOKEN || '',
           debug: true,
         });
 

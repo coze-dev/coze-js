@@ -13,3 +13,6 @@ export { PcmRecorder, RecordingStatus } from './pcm-recorder';
 
 // Export WsTranscriptionClient for speech-to-text conversion
 export { WsTranscriptionClient } from './transcription';
+
+// Export WsChatClient for WebSocket chat client
+export { WsChatClient, WsChatEventNames } from './chat';

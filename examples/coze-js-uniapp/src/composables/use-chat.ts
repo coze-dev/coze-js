@@ -69,7 +69,7 @@ export function useChat() {
           ],
         },
         {
-          signal: controller.signal,
+          signal: controller.value?.signal,
         },
       );
 

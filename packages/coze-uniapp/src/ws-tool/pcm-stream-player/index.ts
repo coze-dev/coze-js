@@ -1,12 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Resampler } from './resampler';
+import { decodeAlaw, decodeUlaw } from './codecs/g711';
+
+/**
+ * Audio format types supported by PcmStreamPlayer
+ */
+export type AudioFormat = 'pcm' | 'g711a' | 'g711u';
+
 /**
  * PcmStreamPlayer for WeChat Mini Program
- * Plays audio streams received in raw PCM16 chunks
+ * Plays audio streams received in raw PCM16, G.711a, or G.711u chunks
  * @class
  */
 export class PcmStreamPlayer {
   private audioContext: any | null = null; // Using 'any' for WebAudioContext due to type limitations
-  private sampleRate: number;
+  private inputSampleRate: number;
+  private outputSampleRate: number;
   private audioQueue: Int16Array[] = [];
   private isPaused = false;
   private trackSampleOffsets: Record<
@@ -17,31 +26,46 @@ export class PcmStreamPlayer {
   private isInitialized = false;
   private isProcessing = false;
   private scriptNode: any = null;
+  private bufferSize = 1024;
+  private base64Queue: Array<{ base64String: string; trackId: string }> = [];
+  private isProcessingQueue = false;
+  private lastAudioProcessTime = Infinity;
+  private processingTimeThreshold = 0; // 1ms threshold
 
   // Current buffer and position for continuous playback
-  private currentBuffer: Float32Array | null = null;
+  private currentBuffer: Int16Array | null = null;
   private playbackPosition = 0;
+
+  /**
+   * Default audio format
+   */
+  private defaultFormat: AudioFormat = 'pcm';
 
   // Trigger audio for iPhone silent mode
   private static triggerAudio: any = null;
 
   /**
    * Creates a new PcmStreamPlayer instance
-   * @param {{sampleRate?: number}} options
+   * @param {{sampleRate?: number, defaultFormat?: AudioFormat}} options
    * @returns {PcmStreamPlayer}
    */
   constructor({
     sampleRate = 24000,
+    defaultFormat = 'pcm',
   }: {
     sampleRate?: number;
+    defaultFormat?: AudioFormat;
   } = {}) {
-    this.sampleRate = sampleRate;
+    this.inputSampleRate = sampleRate;
+    // 微信小程序，输出的采样率是固定的，所有需要重采样
+    this.outputSampleRate = PcmStreamPlayer.getSampleRate();
+    this.defaultFormat = defaultFormat;
   }
 
   /**
    * Initialize the audio context
    * @private
-   * @returns {Promise<boolean>}
+   * @returns {boolean}
    */
   private initialize(): boolean {
     if (this.isInitialized) {
@@ -57,12 +81,9 @@ export class PcmStreamPlayer {
         return false;
       }
 
-      // Set the sample rate
-      if (this.audioContext.sampleRate !== this.sampleRate) {
-        console.warn(
-          `Audio context sample rate (${this.audioContext.sampleRate}) differs from specified rate (${this.sampleRate})`,
-        );
-      }
+      // 在下一帧音频处理前5ms，确保主线程是空闲的
+      this.processingTimeThreshold =
+        Math.floor((this.bufferSize / this.audioContext.sampleRate) * 1000) - 5;
 
       // Initialize silent audio trigger for iPhone
       this.initSilentModeTrigger();
@@ -122,11 +143,11 @@ export class PcmStreamPlayer {
    * Start audio playback system
    * @private
    */
-  private async startPlayback(): Promise<boolean> {
+  private startPlayback(): boolean {
     try {
       // Initialize audio if needed
       if (!this.isInitialized) {
-        const initialized = await this.initialize();
+        const initialized = this.initialize();
         if (!initialized) {
           return false;
         }
@@ -137,11 +158,19 @@ export class PcmStreamPlayer {
         return false;
       }
 
-      // Create the scriptProcessor node (only once)
-      const bufferSize = 4096;
+      // Clean up any existing scriptNode to prevent duplicate audio playback
+      if (this.scriptNode) {
+        try {
+          this.scriptNode.disconnect();
+          this.scriptNode = null;
+        } catch (error) {
+          console.warn('Error disconnecting previous script node:', error);
+        }
+      }
+
       // Using optional chaining to handle potential null and checking if method exists
       const scriptNode = this.audioContext?.createScriptProcessor
-        ? this.audioContext.createScriptProcessor(bufferSize, 0, 1)
+        ? this.audioContext.createScriptProcessor(this.bufferSize, 0, 1)
         : null;
 
       if (!scriptNode) {
@@ -158,6 +187,12 @@ export class PcmStreamPlayer {
 
         // Fill the output buffer
         this.fillOutputBuffer(outputBuffer);
+
+        // Record the last audio process time
+        this.lastAudioProcessTime = Date.now();
+
+        // Check if we have base64 data to process and not currently processing
+        this.processBase64Queue();
       };
 
       // Connect to destination (speakers)
@@ -174,32 +209,39 @@ export class PcmStreamPlayer {
    * @private
    */
   private fillOutputBuffer(outputBuffer: Float32Array): void {
-    // If we don't have a current buffer or have finished playing it, get the next one
-    if (
-      !this.currentBuffer ||
-      this.playbackPosition >= this.currentBuffer.length
-    ) {
-      // Get next buffer from queue
-      this.getNextBuffer();
+    // If no current buffer, try to get the next one
+    if (!this.currentBuffer) {
+      if (!this.getNextBuffer()) {
+        // No more data, fill with silence
+        for (let i = 0; i < outputBuffer.length; i++) {
+          outputBuffer[i] = 0;
+        }
+        this.isProcessing = false;
+        return;
+      }
     }
 
-    // Fill the output buffer
+    // Fill the output buffer with data from current buffer
     for (let i = 0; i < outputBuffer.length; i++) {
       if (
         this.currentBuffer &&
         this.playbackPosition < this.currentBuffer.length
       ) {
-        // If we have data, use it
-        outputBuffer[i] = this.currentBuffer[this.playbackPosition++];
+        // Convert from 16-bit PCM to float [-1.0, 1.0] on-the-fly
+        outputBuffer[i] = this.currentBuffer[this.playbackPosition++] / 0x8000;
       } else {
-        // Try to get the next buffer if we ran out
-        if (this.getNextBuffer() && this.currentBuffer) {
-          // If we got a new buffer, use its first sample
-          outputBuffer[i] = this.currentBuffer[0];
-          this.playbackPosition = 1; // Move to next position for next time
-        } else {
-          // No more data, output silence
+        // Current buffer is exhausted, try to get next buffer
+        if (!this.getNextBuffer()) {
+          // No more data, fill rest with silence
           outputBuffer[i] = 0;
+          this.isProcessing = i === outputBuffer.length - 1 ? false : true;
+        } else {
+          // Got new buffer, use its first sample
+          outputBuffer[i] = this.currentBuffer
+            ? this.currentBuffer[this.playbackPosition++] / 0x8000
+            : 0;
+          // Ensure we're still marked as processing since we got a new buffer
+          this.isProcessing = true;
         }
       }
     }
@@ -211,8 +253,8 @@ export class PcmStreamPlayer {
    * @returns {boolean} True if a new buffer was prepared, false if queue is empty
    */
   private getNextBuffer(): boolean {
+    // If queue is empty, return false
     if (this.audioQueue.length === 0) {
-      this.currentBuffer = null;
       return false;
     }
 
@@ -223,15 +265,8 @@ export class PcmStreamPlayer {
       return false;
     }
 
-    // Convert Int16Array to Float32Array for audio processing
-    const float32Data = new Float32Array(pcmData.length);
-    for (let i = 0; i < pcmData.length; i++) {
-      // Convert from 16-bit PCM to float [-1.0, 1.0]
-      float32Data[i] = pcmData[i] / 0x8000;
-    }
-
-    // Set as current buffer and reset position
-    this.currentBuffer = float32Data;
+    // Keep the data in Int16Array format and only convert when needed during playback
+    this.currentBuffer = pcmData;
     this.playbackPosition = 0;
     return true;
   }
@@ -307,16 +342,87 @@ export class PcmStreamPlayer {
     );
   }
 
+  private isProcessingIdle(): boolean {
+    if (this.lastAudioProcessTime === 0) {
+      return true;
+    }
+    const now = Date.now();
+    const diff = now - this.lastAudioProcessTime;
+    if (diff > 100 || diff < this.processingTimeThreshold) {
+      return true;
+    }
+    return false;
+  }
+
   /**
-   * Adds PCM audio data to the currently playing audio stream
+   * Adds base64 encoded PCM data to a queue for processing
+   * This prevents blocking the main thread during audio processing
+   * @param {string} base64String - Base64 encoded PCM data
+   * @param {string} trackId - Track identifier
+   * @returns {boolean} - Success status
+   */
+  addBase64PCM(base64String: string, trackId = 'default') {
+    // Add to processing queue
+    this.base64Queue.push({ base64String, trackId });
+
+    // If we're outside the processing window, try to process the queue
+    if (this.isProcessingIdle()) {
+      this.processBase64Queue();
+    }
+
+    return true;
+  }
+
+  /**
+   * Process the base64 queue when the main thread is idle
+   * @private
+   */
+  private processBase64Queue() {
+    // If already processing or queue is empty, do nothing
+    if (this.isProcessingQueue || this.base64Queue.length === 0) {
+      return;
+    }
+
+    this.isProcessingQueue = true;
+
+    try {
+      // Process one item from the queue
+      const item = this.base64Queue.shift();
+      if (item) {
+        const { base64String, trackId } = item;
+        // console.log(
+        //   `Processing base64 data for track ${trackId}, queue size: ${this.base64Queue.length}`,
+        // );
+        const binaryString = uni.base64ToArrayBuffer(base64String);
+        this.add16BitPCM(binaryString, trackId);
+      }
+    } catch (error) {
+      console.error('Error processing base64 queue:', error);
+    } finally {
+      this.isProcessingQueue = false;
+
+      // If there are more items and we're still outside the processing window, process the next item
+      if (this.base64Queue.length > 0) {
+        if (this.isProcessingIdle()) {
+          // Use setTimeout to give the main thread a chance to breathe
+          setTimeout(() => this.processBase64Queue(), 0);
+        }
+      }
+    }
+  }
+
+  /**
+   * Adds audio data to the currently playing audio stream
    * @param {ArrayBuffer|Int16Array|Uint8Array} arrayBuffer
    * @param {string} [trackId]
+   * @param {AudioFormat} [format] - Audio format: 'pcm', 'g711a', or 'g711u'
    * @returns {Int16Array}
    */
-  async add16BitPCM(
+  add16BitPCM(
     arrayBuffer: ArrayBuffer | Int16Array | Uint8Array,
     trackId = 'default',
-  ): Promise<Int16Array> {
+    format?: AudioFormat,
+  ): Int16Array {
     if (typeof trackId !== 'string') {
       throw new Error('trackId must be a string');
     } else if (this.interruptedTrackIds[trackId]) {
@@ -324,28 +430,51 @@ export class PcmStreamPlayer {
     }
 
     let buffer: Int16Array;
+    const audioFormat = format || this.defaultFormat;
 
     if (arrayBuffer instanceof Int16Array) {
       // Already in PCM format
       buffer = arrayBuffer;
     } else if (arrayBuffer instanceof Uint8Array) {
-      // Treat as PCM data in Uint8Array
-      buffer = new Int16Array(arrayBuffer.buffer);
+      // Handle different formats based on the specified format
+      if (audioFormat === 'g711a') {
+        buffer = decodeAlaw(arrayBuffer);
+      } else if (audioFormat === 'g711u') {
+        buffer = decodeUlaw(arrayBuffer);
+      } else {
+        // Treat as PCM data in Uint8Array
+        buffer = new Int16Array(arrayBuffer.buffer);
+      }
     } else if (arrayBuffer instanceof ArrayBuffer) {
-      // Convert ArrayBuffer to Int16Array
-      buffer = new Int16Array(arrayBuffer);
+      // Handle different formats based on the specified format
+      if (audioFormat === 'g711a') {
+        buffer = decodeAlaw(new Uint8Array(arrayBuffer));
+      } else if (audioFormat === 'g711u') {
+        buffer = decodeUlaw(new Uint8Array(arrayBuffer));
+      } else {
+        // Default to PCM
+        buffer = new Int16Array(arrayBuffer);
+      }
     } else {
       throw new Error(
         'argument must be Int16Array, Uint8Array, or ArrayBuffer',
       );
     }
 
+    // Resample the buffer if input and output sample rates are different
+    if (this.inputSampleRate !== this.outputSampleRate) {
+      buffer = Resampler.resample(
+        buffer,
+        this.inputSampleRate,
+        this.outputSampleRate,
+      );
+    }
+
     // Add to the audio queue
     this.audioQueue.push(buffer);
 
-    // Start playback if not already playing and not paused
     if (!this.isProcessing && !this.isPaused) {
-      await this.startPlayback();
+      this.startPlayback();
     }
 
     return buffer;
@@ -367,7 +496,7 @@ export class PcmStreamPlayer {
 
     // Calculate approximate offset based on audio context time
     const currentTime = this.audioContext?.currentTime || 0;
-    const offset = Math.floor(currentTime * this.sampleRate);
+    const offset = Math.floor(currentTime * this.inputSampleRate);
     const requestId = Date.now().toString();
     const trackId = 'default'; // We're using a default track for all audio
 
@@ -392,6 +521,7 @@ export class PcmStreamPlayer {
           this.scriptNode = null;
           this.currentBuffer = null;
           this.playbackPosition = 0;
+          this.isPaused = false;
         } catch (error) {
           console.warn('Error disconnecting script node:', error);
         }
@@ -419,15 +549,49 @@ export class PcmStreamPlayer {
   }
 
   /**
-   * Set the sample rate for audio playback
-   * @param {number} sampleRate
+   * Set the input sample rate for audio playback
+   * @param {number} sampleRate - The sample rate of the incoming audio data
    */
   setSampleRate(sampleRate: number): void {
-    if (sampleRate !== PcmStreamPlayer.getSampleRate()) {
-      throw new Error('Sample rate cannot be changed after initialization');
-    } else {
-      this.sampleRate = sampleRate;
-    }
+    // We can change the input sample rate at any time
+    this.inputSampleRate = sampleRate;
+    console.log(
+      `Input sample rate set to ${sampleRate}Hz, output sample rate is ${this.outputSampleRate}Hz`,
+    );
+  }
+
+  /**
+   * Set the default audio format
+   * @param {AudioFormat} format
+   */
+  setDefaultFormat(format: AudioFormat): void {
+    this.defaultFormat = format;
+  }
+
+  /**
+   * Adds G.711 A-law encoded audio data to the currently playing audio stream
+   * @param {ArrayBuffer|Uint8Array} arrayBuffer - G.711 A-law encoded data
+   * @param {string} [trackId]
+   * @returns {Int16Array}
+   */
+  addG711a(
+    arrayBuffer: ArrayBuffer | Uint8Array,
+    trackId = 'default',
+  ): Int16Array {
+    return this.add16BitPCM(arrayBuffer, trackId, 'g711a');
+  }
+
+  /**
+   * Adds G.711 μ-law encoded audio data to the currently playing audio stream
+   * @param {ArrayBuffer|Uint8Array} arrayBuffer - G.711 μ-law encoded data
+   * @param {string} [trackId]
+   * @returns {Int16Array}
+   */
+  addG711u(
+    arrayBuffer: ArrayBuffer | Uint8Array,
+    trackId = 'default',
+  ): Int16Array {
+    return this.add16BitPCM(arrayBuffer, trackId, 'g711u');
   }
 
   static getSampleRate(): number {
