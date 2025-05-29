@@ -40,9 +40,9 @@ const Operation = ({
     }
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
     try {
-      clientRef.current?.disconnect();
+      await clientRef.current?.disconnect();
       clientRef.current = undefined;
       setIsConnected(false);
     } catch (error) {

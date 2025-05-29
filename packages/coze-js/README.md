@@ -292,7 +292,7 @@ try {
 client.appendAndComplete('Hello, Coze!');
 
 // Interrupt
-client.interrupt();
+await client.interrupt();
 
 
 // Pause speech playback

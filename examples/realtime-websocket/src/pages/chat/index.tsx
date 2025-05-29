@@ -123,7 +123,7 @@ function Chat() {
       !audioConfig?.noiseSuppression &&
       !WsToolsUtils.checkDenoiserSupport()
     ) {
-      message.info('当前浏览器不支持降噪');
+      message.info('当前浏览器不支持AI降噪');
     }
 
     clientRef.current = client;

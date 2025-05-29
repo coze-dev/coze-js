@@ -44,7 +44,6 @@ export interface PcmRecorderConfig {
 
 class PcmRecorder {
   audioTrack: ILocalAudioTrack | undefined;
-  private stream: MediaStream | undefined;
   private recording = false;
   private static denoiser: AIDenoiserExtension | undefined;
   private wavAudioProcessor: WavAudioProcessor | undefined;
@@ -106,10 +105,6 @@ class PcmRecorder {
         },
       });
     }
-
-    this.stream = new window.MediaStream([
-      this.audioTrack.getMediaStreamTrack(),
-    ]);
 
     // 降噪前音频
     if (debug && wavRecordConfig?.enableSourceRecord) {
@@ -182,7 +177,7 @@ class PcmRecorder {
     dumpAudioCallback?: (blob: Blob, name: string) => void;
     opusAudioCallback?: (data: { raw: ArrayBuffer }) => void;
   } = {}) {
-    if (!this.audioTrack || !this.stream) {
+    if (!this.audioTrack) {
       throw new Error('audioTrack is not initialized');
     }
     if (this.isSupportAIDenoiser() && !this.processor) {
@@ -290,13 +285,7 @@ class PcmRecorder {
       this.audioTrack = undefined;
     }
 
-    // 3. 停止并清理媒体流
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-      this.stream = undefined;
-    }
-
-    // 4. 清理 AI 降噪处理器
+    // 3. 清理 AI 降噪处理器
     if (this.processor) {
       // 移除事件监听器
       this.processor.removeAllListeners();
@@ -310,7 +299,7 @@ class PcmRecorder {
     this.wavAudioCallback = undefined;
     this.dumpAudioCallback = undefined;
 
-    // 5. 重置录音状态
+    // 4. 重置录音状态
     this.recording = false;
   }
 
@@ -365,8 +354,17 @@ class PcmRecorder {
     // return this.audioTrack?.getMediaStreamTrack().getSettings().sampleRate;
   }
 
-  getMediaStream() {
-    return this.stream;
+  /**
+   * 获取原始麦克风输入的MediaStream（总是返回未处理的原始输入）
+   */
+  getRawMediaStream() {
+    if (!this.audioTrack) {
+      return undefined;
+    }
+
+    // 直接从audioTrack获取原始麦克风轨道并创建新的MediaStream
+    const rawTrack = this.audioTrack.getMediaStreamTrack();
+    return new MediaStream([rawTrack]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
