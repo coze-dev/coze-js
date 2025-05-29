@@ -9,9 +9,9 @@
 ### 1. 安装
 
 ```sh
-npm install @coze/uniapp-api @coze/api
+npm install @coze/uniapp-api @coze/api axios reconnecting-websocket
 # or
-pnpm install @coze/uniapp-api @coze/api
+pnpm install @coze/uniapp-api @coze/api axios reconnecting-websocket
 ```
 
 ### 2. 基本用法
@@ -325,6 +325,8 @@ transcriptionClient.destroy();
 ```bash
 cd examples/coze-js-uniapp
 cp .env.development .env.local # 编辑 .env.local 填入你的凭证
+npm run run-preinstall # 务必先执行
+npm install
 npm run dev:h5
 npm run dev:mp-weixin # 微信小程序
 ```

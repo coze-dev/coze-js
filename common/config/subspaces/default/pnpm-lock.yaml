@@ -542,6 +542,12 @@ importers:
       '@dcloudio/uni-quickapp-webview':
         specifier: 3.0.0-4030620241128001
         version: 3.0.0-4030620241128001(postcss@8.4.49)(rollup@4.24.4)(ts-node@10.9.2(@swc/core@1.7.39(@swc/helpers@0.5.15))(@types/node@20.16.15)(typescript@4.9.5))(vue@3.5.13(typescript@4.9.5))
+      axios:
+        specifier: ^1.7.7
+        version: 1.9.0
+      reconnecting-websocket:
+        specifier: ^4.4.0
+        version: 4.4.0
       vue:
         specifier: ^3.0.0
         version: 3.5.13(typescript@4.9.5)
@@ -21338,7 +21344,7 @@ snapshots:
       '@tarojs/service': 3.6.35(@swc/helpers@0.5.15)(@tarojs/shared@3.6.35)(@tarojs/taro@3.6.35(@tarojs/helper@3.6.35(@swc/helpers@0.5.15))(@tarojs/runtime@3.6.35(@tarojs/shared@3.6.35))(postcss@8.4.49)(vue@3.5.13(typescript@5.6.3)))
       '@tarojs/shared': 3.6.35
       adm-zip: 0.4.16
-      axios: 1.7.7(debug@4.3.7)
+      axios: 1.9.0
       cli-highlight: 2.1.11
       download-git-repo: 2.0.0
       envinfo: 7.14.0
@@ -22035,7 +22041,7 @@ snapshots:
       '@tarojs/service': 3.6.35(@swc/helpers@0.5.15)(@tarojs/shared@3.6.35)(@tarojs/taro@3.6.35(@tarojs/helper@3.6.35(@swc/helpers@0.5.15))(@tarojs/runtime@3.6.35(@tarojs/shared@3.6.35))(postcss@8.4.49)(vue@3.5.13(typescript@5.6.3)))
       '@tarojs/shared': 3.6.35
       '@tarojs/taro-h5': 3.6.35(@tarojs/components@3.6.35(@tarojs/helper@3.6.35(@swc/helpers@0.5.15))(@tarojs/runtime@3.6.35(@tarojs/shared@3.6.35))(@tarojs/shared@3.6.35)(postcss@8.4.49)(react@18.3.1)(vue@3.5.13(typescript@5.6.3)))(@tarojs/taro@3.6.35(@tarojs/helper@3.6.35(@swc/helpers@0.5.15))(@tarojs/runtime@3.6.35(@tarojs/shared@3.6.35))(postcss@8.4.49)(vue@3.5.13(typescript@5.6.3)))
-      axios: 1.7.7(debug@4.3.7)
+      axios: 1.9.0
       babel-plugin-transform-taroapi: 3.6.35
       base64-js: 1.5.1
       change-case: 4.1.2
