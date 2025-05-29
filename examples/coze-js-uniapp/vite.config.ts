@@ -7,4 +7,9 @@ export default defineConfig({
   optimizeDeps: {
     disabled: true, // 禁用依赖优化
   },
+  build: {
+    rollupOptions: {
+      external: ['axios', 'reconnecting-websocket'],
+    },
+  },
 });
