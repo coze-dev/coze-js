@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/uniapp-api",
+      "comment": "Add client_interrupt support",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/uniapp-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
