@@ -13,6 +13,7 @@ import {
 import {
   type AudioCodec,
   type ChatUpdateEvent,
+  type TurnDetectionType,
   WebsocketsEventType,
 } from '../../index';
 import BaseWsChatClient from './base';
@@ -27,6 +28,7 @@ class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
   private isMuted = false;
   private inputAudioCodec: AudioCodec = 'pcm';
+  private turnDetection: TurnDetectionType = 'server_vad';
 
   constructor(config: WsChatClientOptions) {
     super(config);
@@ -49,7 +51,15 @@ class WsChatClient extends BaseWsChatClient {
     this.isMuted = config.audioMutedDefault ?? false;
   }
 
-  private async startRecord() {
+  async startRecord() {
+    if (this.recorder.getStatus() === 'recording') {
+      console.warn('Recorder is already recording');
+      return;
+    }
+    // 如果是客户端判停，需要先取消当前的播放
+    if (this.turnDetection === 'client_interrupt') {
+      this.interrupt();
+    }
     // 1. start recorder
     await this.recorder.start(this.inputAudioCodec);
 
@@ -111,6 +121,18 @@ class WsChatClient extends BaseWsChatClient {
     });
   }
 
+  stopRecord() {
+    if (this.recorder.getStatus() !== 'recording') {
+      console.warn('Recorder is not recording');
+      return;
+    }
+    this.recorder.destroy();
+    this.ws?.send({
+      id: Date.now().toString(),
+      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
+    });
+  }
+
   async connect({
     chatUpdate,
   }: {
@@ -152,7 +174,10 @@ class WsChatClient extends BaseWsChatClient {
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
 
-    if (!this.isMuted) {
+    // 判停模式，server_vad（服务端判停） 或 client_interrupt（客户端判停，需自行调用 startRecord/stopRecord）
+    this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
+
+    if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
       await this.startRecord();
     }
 
@@ -181,13 +206,16 @@ class WsChatClient extends BaseWsChatClient {
    * @param enable - The enable to set
    */
   async setAudioEnable(enable: boolean) {
+    if (this.turnDetection === 'client_interrupt') {
+      throw new Error('Client VAD mode does not support setAudioEnable');
+    }
     const status = await this.recorder?.getStatus();
     if (enable) {
       if (status === 'ended') {
         if (this.recorder.audioTrack) {
           await this.recorder?.resume();
         } else {
-          this.startRecord();
+          await this.startRecord();
         }
         this.isMuted = false;
         this.emit(WsChatEventNames.AUDIO_UNMUTED, undefined);

@@ -1,6 +1,17 @@
 /* eslint-disable */
 import { useRef, useState, useEffect } from 'react';
-import { Button, message, Select, Modal, Layout, Row, Col, Card } from 'antd';
+import './index.css';
+import {
+  Button,
+  message,
+  Select,
+  Modal,
+  Layout,
+  Row,
+  Col,
+  Card,
+  Typography,
+} from 'antd';
 import getConfig from '../../utils/config';
 import {
   WsChatClient,
@@ -19,12 +30,12 @@ import { ConsoleLog } from '../../components/console-log';
 import EventInput from '../../components/event-input';
 import Settings from '../../components/settings';
 import { AudioOutlined } from '@ant-design/icons';
-import { Typography } from 'antd';
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
 
-const chatUpdate = {
+// Helper function to get chatUpdate config based on turn detection mode
+const getChatUpdateConfig = (turnDetectionType: string) => ({
   data: {
     input_audio: {
       format: 'pcm',
@@ -39,11 +50,11 @@ const chatUpdate = {
       voice_id: config.getVoiceId(),
     },
     turn_detection: {
-      type: 'server_vad',
+      type: turnDetectionType,
     },
     need_play_prologue: true,
   },
-};
+});
 function Chat() {
   const clientRef = useRef<WsChatClient>();
   const audioConfigRef = useRef<AudioConfigRef>(null);
@@ -59,6 +70,18 @@ function Chat() {
   // 添加控制弹窗显示的状态
   const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
   const isMobile = WsToolsUtils.isMobile();
+
+  // 按键说话状态
+  const [isPressRecording, setIsPressRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recordTimer = useRef<NodeJS.Timeout | null>(null);
+  const maxRecordingTime = 60; // 最大录音时长（秒）
+  const [isCancelRecording, setIsCancelRecording] = useState(false);
+  const startTouchY = useRef<number>(0);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // 获取对话模式
+  const turnDetection = config.getTurnDetection();
 
   useEffect(() => {
     const getDevices = async () => {
@@ -116,7 +139,11 @@ function Chat() {
         enableDenoiseRecord: false,
       },
       deviceId: selectedInputDevice || undefined,
-      audioMutedDefault: audioConfig?.audioMutedDefault,
+      // 如果是按键说话模式，默认关闭麦克风
+      audioMutedDefault:
+        turnDetection === 'client_interrupt'
+          ? true
+          : audioConfig?.audioMutedDefault || false,
     });
 
     if (
@@ -134,13 +161,24 @@ function Chat() {
   const handleMessageEvent = async () => {
     clientRef.current?.on(
       WsChatEventNames.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE,
-      (_: string, event: unknown) => {
-        console.log('[chat] transcript update', event);
-        setTranscript(
-          (event as ConversationAudioTranscriptUpdateEvent).data.content,
-        );
+      (_, data) => {
+        const event = data as ConversationAudioTranscriptUpdateEvent;
+        if (event.data.content) {
+          setTranscript(event.data.content);
+        }
       },
     );
+
+    // 处理音频状态变化
+    clientRef.current?.on(WsChatEventNames.AUDIO_MUTED, () => {
+      console.log('麦克风已关闭');
+      setIsMuted(true);
+    });
+
+    clientRef.current?.on(WsChatEventNames.AUDIO_UNMUTED, () => {
+      console.log('麦克风已打开');
+      setIsMuted(false);
+    });
     clientRef.current?.on(
       WsChatEventNames.SERVER_ERROR,
       (_: string, event: unknown) => {
@@ -164,6 +202,10 @@ function Chat() {
       if (chatUpdate?.data?.output_audio?.voice_id === '') {
         delete chatUpdate.data.output_audio.voice_id;
       }
+      // 更新判停模式
+      if (chatUpdate?.data?.turn_detection?.type) {
+        chatUpdate.data.turn_detection.type = turnDetection;
+      }
       await clientRef.current?.connect({ chatUpdate });
       setIsConnected(true);
     } catch (error) {
@@ -182,9 +224,153 @@ function Chat() {
   };
 
   // 添加设置变更处理函数
-  const handleSettingsChange = () => {
-    window.location.reload();
+  function handleSettingsChange() {
+    console.log('Settings changed');
+    // 重新读取对话模式
+    window.location.reload(); // 简单处理：刷新页面应用新设置
+  }
+
+  // 处理按住说话按钮
+  const handleVoiceButtonMouseDown = (
+    e: React.MouseEvent | React.TouchEvent,
+  ) => {
+    if (
+      isConnected &&
+      clientRef.current &&
+      turnDetection === 'client_interrupt'
+    ) {
+      startPressRecord(e);
+    }
   };
+
+  const handleVoiceButtonMouseUp = () => {
+    if (isPressRecording && !isCancelRecording) {
+      finishPressRecord();
+    } else if (isPressRecording && isCancelRecording) {
+      cancelPressRecord();
+    }
+  };
+
+  const handleVoiceButtonMouseLeave = () => {
+    if (isPressRecording) {
+      cancelPressRecord();
+    }
+  };
+
+  const handleVoiceButtonMouseMove = (
+    e: React.MouseEvent | React.TouchEvent,
+  ) => {
+    if (isPressRecording && startTouchY.current) {
+      // 上滑超过50px则取消发送
+      const clientY =
+        'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+      if (clientY < startTouchY.current - 50) {
+        setIsCancelRecording(true);
+      } else {
+        setIsCancelRecording(false);
+      }
+    }
+  };
+
+  // 开始按键录音
+  const startPressRecord = async (e: React.MouseEvent | React.TouchEvent) => {
+    if (isConnected && clientRef.current) {
+      try {
+        // 重置录音状态
+        setIsPressRecording(true);
+        setRecordingDuration(0);
+        setIsCancelRecording(false);
+        // Store initial touch position for determining sliding direction
+        if ('clientY' in e) {
+          startTouchY.current = (e as React.MouseEvent).clientY;
+        } else if ('touches' in e && e.touches.length > 0) {
+          startTouchY.current = e.touches[0].clientY;
+        } else {
+          startTouchY.current = 0;
+        }
+
+        // 开始录音
+        await clientRef.current.startRecord();
+
+        // 开始计时
+        recordTimer.current = setInterval(() => {
+          setRecordingDuration(prev => {
+            const newDuration = prev + 1;
+            // 超过最大录音时长自动结束
+            if (newDuration >= maxRecordingTime) {
+              finishPressRecord();
+            }
+            return newDuration;
+          });
+        }, 1000);
+      } catch (error: any) {
+        message.error(`开始录音错误: ${error.message || '未知错误'}`);
+        console.error('开始录音错误:', error);
+      }
+    }
+  };
+
+  // 结束按键录音并发送
+  const finishPressRecord = () => {
+    if (isPressRecording && clientRef.current) {
+      try {
+        // 停止计时
+        if (recordTimer.current) {
+          clearInterval(recordTimer.current);
+          recordTimer.current = null;
+        }
+
+        // 如果录音时间太短（小于1秒），视为无效
+        if (recordingDuration < 1) {
+          cancelPressRecord();
+          return;
+        }
+
+        // 停止录音并发送
+        clientRef.current.stopRecord();
+        setIsPressRecording(false);
+
+        // 显示提示
+        message.success(`发送了 ${recordingDuration} 秒的语音消息`);
+      } catch (error: any) {
+        message.error(`结束录音错误: ${error.message || '未知错误'}`);
+        console.error('结束录音错误:', error);
+      }
+    }
+  };
+
+  // 取消按键录音
+  const cancelPressRecord = async () => {
+    if (isPressRecording && clientRef.current) {
+      try {
+        // 停止计时
+        if (recordTimer.current) {
+          clearInterval(recordTimer.current);
+          recordTimer.current = null;
+        }
+
+        // 取消录音
+        await clientRef.current?.stopRecord();
+        setIsPressRecording(false);
+        setIsCancelRecording(false);
+
+        // 显示提示
+        message.info('取消了语音消息');
+      } catch (error: any) {
+        message.error(`取消录音错误: ${error.message || '未知错误'}`);
+        console.error('取消录音错误:', error);
+      }
+    }
+  };
+
+  // 清理资源
+  useEffect(() => {
+    return () => {
+      if (recordTimer.current) {
+        clearInterval(recordTimer.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -195,11 +381,18 @@ function Chat() {
   }, []);
 
   return (
-    <Layout style={{ height: '100%' }}>
+    <Layout className="chat-page">
       <Settings
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
-        fields={['base_ws_url', 'bot_id', 'pat', 'voice_id', 'workflow_id']}
+        fields={[
+          'base_ws_url',
+          'bot_id',
+          'pat',
+          'voice_id',
+          'workflow_id',
+          'turn_detection',
+        ]}
         className="settings-button"
       />
       <Layout.Content style={{ padding: '16px', background: '#fff' }}>
@@ -278,6 +471,72 @@ function Chat() {
           </Col>
         </Row>
 
+        {/* 按键说话功能区 */}
+        {turnDetection === 'client_interrupt' && isConnected && (
+          <Row style={{ maxWidth: '400px', margin: 'auto' }}>
+            <Col span={24}>
+              <div
+                className={`voice-button ${isPressRecording ? 'recording' : ''}`}
+                onMouseDown={handleVoiceButtonMouseDown}
+                onMouseUp={handleVoiceButtonMouseUp}
+                onMouseLeave={handleVoiceButtonMouseLeave}
+                onMouseMove={handleVoiceButtonMouseMove}
+                onTouchStart={handleVoiceButtonMouseDown}
+                onTouchEnd={handleVoiceButtonMouseUp}
+                onTouchCancel={handleVoiceButtonMouseLeave}
+                onTouchMove={handleVoiceButtonMouseMove}
+              >
+                {isPressRecording ? '松开 发送' : '按住 说话'}
+              </div>
+
+              {/* 录音状态提示 */}
+              {isPressRecording && (
+                <div className="recording-status">
+                  <div className="recording-time">
+                    {Math.floor(recordingDuration / 60)
+                      .toString()
+                      .padStart(2, '0')}
+                    :{(recordingDuration % 60).toString().padStart(2, '0')}
+                  </div>
+                  <div className="recording-progress-container">
+                    <div
+                      className="recording-progress"
+                      style={{
+                        width: `${(recordingDuration / maxRecordingTime) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                  <div
+                    className={`recording-tip ${isCancelRecording ? 'cancel-tip' : ''}`}
+                  >
+                    {isCancelRecording ? '松开手指，取消发送' : '上滑取消发送'}
+                  </div>
+                </div>
+              )}
+            </Col>
+          </Row>
+        )}
+
+        {/* 状态指示器 */}
+        {turnDetection === 'client_interrupt' && (
+          <Row style={{ margin: '16px 0' }}>
+            <Col span={24}>
+              <div className="status-indicator">
+                <div
+                  className={`status-dot ${isConnected ? (isMuted ? 'muted' : 'active') : 'inactive'}`}
+                ></div>
+                <Text>
+                  {isConnected
+                    ? isMuted
+                      ? '麦克风已关闭'
+                      : '麦克风已打开'
+                    : '未连接'}
+                </Text>
+              </div>
+            </Col>
+          </Row>
+        )}
+
         <ReceiveMessage clientRef={clientRef} />
         {isMobile && <ConsoleLog />}
 
@@ -294,7 +553,7 @@ function Chat() {
           <EventInput
             defaultValue={
               localStorage.getItem('chatUpdate') ||
-              JSON.stringify(chatUpdate, null, 2)
+              JSON.stringify(getChatUpdateConfig(turnDetection), null, 2)
             }
           />
         </Modal>

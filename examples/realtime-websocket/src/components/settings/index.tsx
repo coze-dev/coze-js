@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Modal, Form, Input, Button } from 'antd';
+import { Modal, Form, Input, Button, Select } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 
 import getConfig from '../../utils/config';
@@ -11,6 +11,19 @@ interface FormConfig {
   label: string;
   required?: boolean;
   message?: string;
+}
+
+// 定义配置项类型
+type FormConfigType = 'input' | 'select';
+
+// 扩展配置项接口
+interface FormConfig {
+  name: string;
+  label: string;
+  required?: boolean;
+  message?: string;
+  type?: FormConfigType;
+  options?: { label: string; value: string }[];
 }
 
 // 定义所有配置项
@@ -51,6 +64,17 @@ const formConfigs: FormConfig[] = [
     required: false,
     message: 'Please input Workflow ID!',
   },
+  {
+    name: 'turn_detection',
+    label: '对话模式',
+    required: true,
+    message: 'Please select conversation mode!',
+    type: 'select',
+    options: [
+      { label: '自由对话模式', value: 'server_vad' },
+      { label: '按键说话模式', value: 'client_interrupt' },
+    ],
+  },
 ];
 
 // 渲染表单项组件
@@ -69,7 +93,17 @@ const renderFormItems = (fields?: string[]) =>
           },
         ]}
       >
-        <Input />
+        {config.type === 'select' && config.options ? (
+          <Select>
+            {config.options.map(option => (
+              <Select.Option key={option.value} value={option.value}>
+                {option.label}
+              </Select.Option>
+            ))}
+          </Select>
+        ) : (
+          <Input />
+        )}
       </Form.Item>
     ));
 
@@ -96,6 +130,7 @@ const Settings = ({
     const baseWsUrl = config.getBaseWsUrl();
     const voiceId = config.getVoiceId();
     const workflowId = config.getWorkflowId();
+    const turnDetection = config.getTurnDetection() || 'server_vad';
     form.setFieldsValue({
       base_url: baseUrl,
       base_ws_url: baseWsUrl,
@@ -103,6 +138,7 @@ const Settings = ({
       bot_id: botId,
       voice_id: voiceId,
       workflow_id: workflowId,
+      turn_detection: turnDetection,
     });
   }, [form]);
 

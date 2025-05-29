@@ -1,0 +1,93 @@
+.voice-button {
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 16px;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.voice-button.recording {
+  background-color: #e0e0e0;
+  color: #ff3b30;
+}
+
+.recording-status {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recording-time {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.recording-progress-container {
+  width: 90%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.recording-progress {
+  height: 100%;
+  background-color: #ff3b30;
+  border-radius: 3px;
+  transition: width 0.3s linear;
+}
+
+.recording-tip {
+  font-size: 14px;
+  color: #fff;
+}
+
+.cancel-tip {
+  color: #ff3b30;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.inactive {
+  background-color: #ccc;
+}
+
+.active {
+  background-color: #4cd964;
+  animation: pulse 1.5s infinite;
+}
+
+.muted {
+  background-color: #ff9500;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
