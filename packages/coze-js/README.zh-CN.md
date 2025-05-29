@@ -291,7 +291,7 @@ try {
 client.appendAndComplete('你好，Coze!');
 
 // 打断
-client.interrupt();
+await client.interrupt();
 
 
 // 暂停语音播放

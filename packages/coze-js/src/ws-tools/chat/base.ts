@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { WavStreamPlayer } from '../wavtools';
+import { type WavStreamPlayer } from '../wavtools';
 import {
   type WsChatClientOptions,
   WsChatEventNames,
@@ -22,7 +22,7 @@ import {
 class BaseWsChatClient {
   public ws: WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null = null;
   protected listeners: Map<string, Set<WsChatCallbackHandler>> = new Map();
-  protected wavStreamPlayer: WavStreamPlayer;
+  protected wavStreamPlayer?: WavStreamPlayer;
   protected trackId = 'default';
   protected api: CozeAPI;
   protected audioDeltaList: string[] = [];
@@ -36,10 +36,6 @@ class BaseWsChatClient {
     });
 
     this.config = config;
-    this.wavStreamPlayer = new WavStreamPlayer({
-      sampleRate: 24000,
-      enableLocalLookback: true,
-    });
   }
 
   protected async init() {
@@ -194,17 +190,6 @@ class BaseWsChatClient {
     });
   }
 
-  // isPlaying() {
-  //   return this.wavStreamPlayer.isPlaying();
-  // }
-
-  // protected complete() {
-  //   this.ws?.send({
-  //     id: uuid(),
-  //     event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
-  //   });
-  // }
-
   protected closeWs() {
     if (this.ws?.readyState === 1) {
       this.ws?.close();
@@ -216,7 +201,7 @@ class BaseWsChatClient {
     this.log('clear');
 
     this.audioDeltaList.length = 0;
-    await this.wavStreamPlayer.interrupt();
+    await this.wavStreamPlayer?.interrupt();
     this.trackId = `my-track-id-${uuid()}`;
   }
 
@@ -240,7 +225,7 @@ class BaseWsChatClient {
     }
 
     try {
-      await this.wavStreamPlayer.add16BitPCM(arrayBuffer, this.trackId);
+      await this.wavStreamPlayer?.add16BitPCM(arrayBuffer, this.trackId);
 
       this.audioDeltaList.shift();
       if (this.audioDeltaList.length > 0) {

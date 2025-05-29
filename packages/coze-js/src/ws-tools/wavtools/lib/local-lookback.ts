@@ -1,6 +1,11 @@
 /**
  * Local audio loopback implementation using WebRTC peer connections
  * to create a local audio communication channel.
+ * 完整的音频回环生命周期管理：
+ * connect() - 建立初始连接
+ * start() - 开始音频回环
+ * stop() - 暂停音频回环
+ * cleanup() - 完全清理所有资源
  */
 class LocalLookback {
   pc1: RTCPeerConnection | undefined;
@@ -10,7 +15,10 @@ class LocalLookback {
   mic: MediaStreamAudioSourceNode | undefined;
   peer: MediaStreamAudioDestinationNode | undefined;
   isDebug: boolean;
-  stream: MediaStream | undefined;
+  mediaStream: MediaStream | undefined;
+  private eventListeners: Array<{ element: EventTarget; event: string; handler: EventListener }> = [];
+  private currentStreamNode: AudioWorkletNode | undefined;
+
 
   /**
    * Initializes a new instance of LocalLookback
@@ -30,34 +38,43 @@ class LocalLookback {
 
     this.gotDescription1  = this.gotDescription1.bind(this);
     this.gotDescription2  = this.gotDescription2.bind(this);
+    this.gotRemoteStream = this.gotRemoteStream.bind(this);
   }
 
   /**
    * Establishes a connection between two RTCPeerConnection objects
    * to create a local audio loopback channel
    * @param context - The AudioContext to use for audio processing
+   * @param stream - The MediaStream to use for the loopback
    */
-  connect(context: AudioContext) {
-    const servers = undefined;
+  async connect(context: AudioContext, stream?: MediaStream) {
+    const servers = {
+      iceServers: [],
+      iceCandidatePoolSize: 1
+    } as RTCConfiguration;
+    this.mediaStream = stream;
+
     const pc1 = new RTCPeerConnection(servers);
-    this._debug('Created local peer connection object pc1');
     pc1.onicecandidate = e => this.onIceCandidate(pc1, e);
-    const pc2 = new RTCPeerConnection(servers);
-    this._debug('Created remote peer connection object pc2');
-    pc2.onicecandidate = e => this.onIceCandidate(pc2, e);
     pc1.oniceconnectionstatechange = e => this.onIceStateChange(pc1, e);
+    this._debug('Created local peer connection object pc1');
+
+    const pc2 = new RTCPeerConnection(servers);
+    pc2.onicecandidate = e => this.onIceCandidate(pc2, e);
     pc2.oniceconnectionstatechange = e => this.onIceStateChange(pc2, e);
-    pc2.ontrack = this.gotRemoteStream.bind(this);
+    pc2.ontrack = this.gotRemoteStream;
+    this._debug('Created remote peer connection object pc2');
 
     const filteredStream = this.applyFilter(context);
     if(!filteredStream) {
-       // Prevent resource leakage
       pc1.close();
       pc2.close();
       return;
     }
     filteredStream.getTracks().forEach(track => pc1.addTrack(track, filteredStream));
-    pc1.createOffer().then(this.gotDescription1).catch(error => console.log(`createOffer failed: ${error}`));
+    pc1.createOffer({iceRestart: true})
+    .then(this.gotDescription1)
+    .catch(error => console.log(`createOffer failed: ${error}`));
 
 
     this.pc1 = pc1;
@@ -74,15 +91,50 @@ class LocalLookback {
       this._error('No audio context or peer found');
       return;
     }
-    streamNode.connect(this.peer);
+    if(this.context.state !== 'running') {
+      this._error('Audio context is not running');
+      return;
+    }
+
+    // 检查WebRTC连接状态
+    if (!this.pc1 || !this.pc2) {
+      this._error('WebRTC peer connections not initialized');
+      return;
+    }
+
+    // 检查ICE连接状态
+    // WebRTC连接状态可能是: new, checking, connected, completed, failed, disconnected, closed
+    const validStates = ['connected', 'completed'];
+    if (!validStates.includes(this.pc1.iceConnectionState)) {
+      this._debug(`WebRTC connection not ready, current state: ${this.pc1.iceConnectionState}`);
+      // return;
+    }
+
+    this.currentStreamNode = streamNode;
+    streamNode.connect(this.peer!);
+    this._debug('local lookback start');
   }
 
   /**
-   * Sets the media stream to be used for the loopback
-   * @param stream - The MediaStream to use, or undefined to clear
+   * Stops the audio loopback temporarily without destroying connections
+   * Can be restarted by calling start() again
    */
-  setMediaStream(stream?: MediaStream) {
-    this.stream = stream;
+  stop() {
+    if (!this.currentStreamNode) {
+      this._debug('No active stream to stop');
+      return;
+    }
+
+    try {
+      // Disconnect the stream node from the peer destination
+      if (this.peer) {
+        this.currentStreamNode.disconnect(this.peer);
+      }
+      this.currentStreamNode = undefined;
+      this._debug('local lookback stopped');
+    } catch (err) {
+      this._error('Error stopping local lookback:', err);
+    }
   }
 
   /**
@@ -92,12 +144,12 @@ class LocalLookback {
    * @private
    */
   private applyFilter(context: AudioContext) {
-    if(!this.stream) {
+    if(!this.mediaStream) {
       this._error('No media stream found');
       return;
     }
     this.context = context;
-    this.mic = this.context.createMediaStreamSource(this.stream);
+    this.mic = this.context.createMediaStreamSource(this.mediaStream);
     this.peer = this.context.createMediaStreamDestination();
 
     this.mic.connect(this.peer);
@@ -133,11 +185,11 @@ class LocalLookback {
    * @param desc - The RTCSessionDescriptionInit containing the SDP offer
    * @private
    */
-  private gotDescription1(desc:RTCSessionDescriptionInit) {
+  private async gotDescription1(desc:RTCSessionDescriptionInit) {
     this._debug(`Offer from pc1\n${desc.sdp}`);
 
-    this.pc1?.setLocalDescription(desc);
-    this.pc2?.setRemoteDescription(desc);
+    await this.pc1?.setLocalDescription(desc);
+    await this.pc2?.setRemoteDescription(desc);
     this.pc2?.createAnswer()
         .then(this.gotDescription2)
         .catch(error => console.error(`createAnswer failed: ${error}`));
@@ -148,10 +200,10 @@ class LocalLookback {
    * @param desc - The RTCSessionDescriptionInit containing the SDP answer
    * @private
    */
-  private gotDescription2(desc:RTCSessionDescriptionInit) {
+  private async gotDescription2(desc:RTCSessionDescriptionInit) {
     this._debug(`Answer from pc2\n${desc.sdp}`);
-    this.pc2?.setLocalDescription(desc);
-    this.pc1?.setRemoteDescription(desc);
+    await this.pc2?.setLocalDescription(desc);
+    await this.pc1?.setRemoteDescription(desc);
   }
 
 
@@ -278,9 +330,10 @@ class LocalLookback {
       }
     };
 
-    // Add all event listeners
+    // Add all event listeners and track them for later cleanup
     pageEvents.forEach(event => {
       document.addEventListener(event, unlockAudio);
+      this.eventListeners.push({ element: document, event, handler: unlockAudio as EventListener });
     });
 
     // Also try to play immediately
@@ -288,6 +341,87 @@ class LocalLookback {
       this._debug('Attempting initial audio unlock');
       unlockAudio();
     }, 100);
+  }
+  /**
+   * Cleans up all resources used by the LocalLookback instance
+   * This should be called when the instance is no longer needed to prevent memory leaks
+   */
+  cleanup(): void {
+    this._debug('Cleaning up LocalLookback resources');
+
+    // Close peer connections
+    if (this.pc1) {
+       // 1. 关闭所有轨道（摄像头/麦克风）
+      this.pc1.getSenders().forEach(sender => {
+        if (sender.track) sender.track.stop(); // 停止媒体轨道
+      });
+
+      // 2. 移除所有事件监听器（避免内存泄漏）
+      this.pc1.onicecandidate = null;
+      this.pc1.oniceconnectionstatechange = null;
+      this.pc1.close();
+      this.pc1 = undefined;
+    }
+
+    if (this.pc2) {
+      // 1. 关闭所有轨道（摄像头/麦克风）
+      this.pc2.getSenders().forEach(sender => {
+        if (sender.track) sender.track.stop(); // 停止媒体轨道
+      });
+
+      // 2. 移除所有事件监听器（避免内存泄漏）
+      this.pc2.onicecandidate = null;
+      this.pc2.oniceconnectionstatechange = null;
+      this.pc2.close();
+      this.pc2 = undefined;
+    }
+
+    // Cleanup media stream
+    if (this.mediaStream) {
+      // Stop all tracks in the media stream
+      this.mediaStream.getTracks().forEach(track => {
+        track.stop();
+      });
+      this.mediaStream = undefined;
+    }
+
+    // Clean up current stream node
+    if (this.currentStreamNode) {
+      try {
+        this.currentStreamNode.disconnect();
+      } catch (e) {
+        // Ignore errors during disconnect
+      }
+      this.currentStreamNode = undefined;
+    }
+
+    // Disconnect audio nodes
+    if (this.mic) {
+      this.mic.disconnect();
+      this.mic = undefined;
+    }
+
+    if (this.peer) {
+      this.peer.disconnect();
+      this.peer = undefined;
+    }
+
+    // Clean up HTML audio element
+    if (this.remoteAudio) {
+      this.remoteAudio.pause();
+      this.remoteAudio.srcObject = null;
+      if (this.remoteAudio.parentNode) {
+        this.remoteAudio.parentNode.removeChild(this.remoteAudio);
+      }
+    }
+
+    // Remove any registered event listeners
+    this.eventListeners.forEach(({ element, event, handler }: { element: EventTarget; event: string; handler: EventListener }) => {
+      element.removeEventListener(event, handler);
+    });
+    this.eventListeners = [];
+
+    this._debug('LocalLookback cleanup complete');
   }
 }
 

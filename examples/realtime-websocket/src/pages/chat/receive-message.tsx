@@ -1,4 +1,4 @@
-import { type MutableRefObject, useEffect, useState } from 'react';
+import { type MutableRefObject, useEffect, useRef, useState } from 'react';
 
 import { Col, List, Row, Space } from 'antd';
 import {
@@ -8,26 +8,32 @@ import {
 } from '@coze/api/ws-tools';
 import {
   type AudioDumpEvent,
-  type ConversationMessageDeltaEvent,
+  type ConversationAudioTranscriptCompletedEvent,
   WebsocketsEventType,
 } from '@coze/api';
+
+// 实时语音回复消息列表
+interface ChatMessage {
+  content: string;
+  type: 'user' | 'ai';
+  timestamp: number;
+}
 
 const ReceiveMessage = ({
   clientRef,
 }: {
   clientRef: MutableRefObject<WsChatClient | undefined>;
 }) => {
-  // 实时语音回复消息列表
-  const [messageList, setMessageList] = useState<string[]>([]);
+  const [messageList, setMessageList] = useState<ChatMessage[]>([]);
   const [audioList, setAudioList] = useState<{ label: string; url: string }[]>(
     [],
   );
+  const isFirstDeltaRef = useRef(true);
 
   useEffect(() => {
     if (!clientRef.current) {
       return;
     }
-    let lastEventName: string;
     const handleMessageEvent = (_: string, event: WsChatEventData) => {
       if (!event) {
         return;
@@ -57,36 +63,48 @@ const ReceiveMessage = ({
             return newAudioList;
           });
           break;
+        case WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED: {
+          const { content } = (
+            event as ConversationAudioTranscriptCompletedEvent
+          ).data;
+          setMessageList(prev => [
+            ...prev,
+            { content, type: 'user', timestamp: Date.now() },
+          ]);
+          break;
+        }
         case WebsocketsEventType.CONVERSATION_MESSAGE_DELTA:
-        case WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED: {
-          if (event.data.type === 'question') {
-            return;
+          if (event.data.content) {
+            if (isFirstDeltaRef.current) {
+              // 第一次增量，创建新消息
+              setMessageList(prev => [
+                ...prev,
+                {
+                  content: event.data.content,
+                  type: 'ai',
+                  timestamp: Date.now(),
+                },
+              ]);
+              isFirstDeltaRef.current = false;
+            } else {
+              setMessageList(prev => {
+                // 后续增量，追加到最后一条消息
+                const lastMessage = prev[prev.length - 1];
+                if (lastMessage && lastMessage.type === 'ai') {
+                  lastMessage.content += event.data.content;
+                }
+                const newMessageList = [
+                  ...prev.slice(0, -1),
+                  { ...lastMessage },
+                ];
+                return newMessageList;
+              });
+            }
           }
-          // 处理语音文本消息
-          const { content } = (event as ConversationMessageDeltaEvent).data;
-          setMessageList(prev => {
-            // 如果上一个事件是增量更新，则附加到最后一条消息
-            if (
-              lastEventName ===
-                WebsocketsEventType.CONVERSATION_MESSAGE_DELTA &&
-              event.event_type ===
-                WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
-            ) {
-              return prev
-                .slice(0, -1)
-                .concat([(prev[prev.length - 1] || '') + content]);
-            }
-            lastEventName = event.event_type;
-            // 否则添加新消息
-            if (
-              event.event_type ===
-              WebsocketsEventType.CONVERSATION_MESSAGE_DELTA
-            ) {
-              return prev.concat([content]);
-            }
-            return prev;
-          });
-
+          break;
+        case WebsocketsEventType.CONVERSATION_MESSAGE_COMPLETED: {
+          // 收到完成事件，重置标记，下一次将创建新消息
+          isFirstDeltaRef.current = true;
           break;
         }
         default:
@@ -114,15 +132,35 @@ const ReceiveMessage = ({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          maxHeight: '600px',
+          overflowY: 'auto',
           padding: '10px',
         }}
       >
-        <h3>实时语音回复</h3>
+        <h3>实时语音对话</h3>
         <List
           dataSource={messageList}
           renderItem={(message, index) => (
-            <List.Item key={index} style={{ textAlign: 'left' }}>
-              {message}
+            <List.Item
+              key={index}
+              style={{
+                textAlign: 'left',
+                padding: '8px 16px',
+              }}
+            >
+              <div
+                style={{
+                  // maxWidth: '70%',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  backgroundColor:
+                    message.type === 'user' ? '#95EC69' : '#FFFFFF',
+                  border: message.type === 'ai' ? '1px solid #E5E5E5' : 'none',
+                  display: 'inline-block',
+                }}
+              >
+                {message.content}
+              </div>
             </List.Item>
           )}
         />
