@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/uniapp-api",
+      "comment": "package.json error",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/uniapp-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
