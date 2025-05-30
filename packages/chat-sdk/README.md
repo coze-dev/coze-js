@@ -1,4 +1,5 @@
 # Coze Chat Sdk
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
 Coze Chat Sdk is a chat sdk for Coze, which provides a unified chat interface for Coze platforms. It is designed to be compatible with Taro and Web.

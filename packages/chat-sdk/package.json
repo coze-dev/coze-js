@@ -1,7 +1,8 @@
 {
   "name": "@coze/chat-sdk",
-  "version": "0.1.11-beta.15",
+  "version": "0.1.11-beta.17",
   "description": "Coze chat components for taro",
+  "license": "MIT",
   "author": "gaoding.devingao@bytedance.com",
   "exports": {
     ".": "./dist/lib-source/src/exports/index.js",
@@ -9,7 +10,12 @@
       "import": "./dist/lib-h5/exports/index.js",
       "types": "./dist/lib-source/src/exports/index.d.ts"
     },
-    "./webCss": "./dist/lib-h5/exports/index.css",
+    "./markdownJs": {
+      "import": "./dist/lib-h5/exports/markdown/index.js",
+      "types": "./dist/lib-source/src/exports/index.d.ts"
+    },
+    "./webCss": "./dist/lib-h5/css/exports/index.css",
+    "./markdownCss": "./dist/lib-h5/css/exports/markdown/index.css",
     "./types": "./dist/lib-source/src/exports/index.d.ts"
   },
   "main": "./dist/lib-source/src/exports/index.js",
@@ -23,6 +29,7 @@
   },
   "files": [
     "dist",
+    "LICENSE",
     "!**/*.map",
     "README.md"
   ],
