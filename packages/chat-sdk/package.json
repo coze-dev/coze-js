@@ -29,6 +29,7 @@
   },
   "files": [
     "dist",
+    "LICENSE",
     "!**/*.map",
     "README.md"
   ],
