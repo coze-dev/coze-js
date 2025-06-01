@@ -70,36 +70,38 @@ const getBrowserClientUserAgent = (): string => {
 
   const { userAgent } = navigator;
 
-  // 检测操作系统及版本
-  if (userAgent.indexOf('Windows') > -1) {
-    osInfo.name = 'windows';
-    const windowsVersion =
-      userAgent.match(/Windows NT ([0-9.]+)/)?.[1] || 'unknown';
-    osInfo.version = windowsVersion;
-  } else if (userAgent.indexOf('Mac OS X') > -1) {
-    osInfo.name = 'macos';
-    // 将 10_15_7 格式转换为 10.15.7
-    osInfo.version = (
-      userAgent.match(/Mac OS X ([0-9_]+)/)?.[1] || 'unknown'
-    ).replace(/_/g, '.');
-  } else if (userAgent.indexOf('Linux') > -1) {
-    osInfo.name = 'linux';
-    osInfo.version = userAgent.match(/Linux ([0-9.]+)/)?.[1] || 'unknown';
-  }
+  if (userAgent) {
+    // 检测操作系统及版本
+    if (userAgent.indexOf('Windows') > -1) {
+      osInfo.name = 'windows';
+      const windowsVersion =
+        userAgent.match(/Windows NT ([0-9.]+)/)?.[1] || 'unknown';
+      osInfo.version = windowsVersion;
+    } else if (userAgent.indexOf('Mac OS X') > -1) {
+      osInfo.name = 'macos';
+      // 将 10_15_7 格式转换为 10.15.7
+      osInfo.version = (
+        userAgent.match(/Mac OS X ([0-9_]+)/)?.[1] || 'unknown'
+      ).replace(/_/g, '.');
+    } else if (userAgent.indexOf('Linux') > -1) {
+      osInfo.name = 'linux';
+      osInfo.version = userAgent.match(/Linux ([0-9.]+)/)?.[1] || 'unknown';
+    }
 
-  // 检测浏览器及版本
-  if (userAgent.indexOf('Chrome') > -1) {
-    browserInfo.name = 'chrome';
-    browserInfo.version =
-      userAgent.match(/Chrome\/([0-9.]+)/)?.[1] || 'unknown';
-  } else if (userAgent.indexOf('Firefox') > -1) {
-    browserInfo.name = 'firefox';
-    browserInfo.version =
-      userAgent.match(/Firefox\/([0-9.]+)/)?.[1] || 'unknown';
-  } else if (userAgent.indexOf('Safari') > -1) {
-    browserInfo.name = 'safari';
-    browserInfo.version =
-      userAgent.match(/Version\/([0-9.]+)/)?.[1] || 'unknown';
+    // 检测浏览器及版本
+    if (userAgent.indexOf('Chrome') > -1) {
+      browserInfo.name = 'chrome';
+      browserInfo.version =
+        userAgent.match(/Chrome\/([0-9.]+)/)?.[1] || 'unknown';
+    } else if (userAgent.indexOf('Firefox') > -1) {
+      browserInfo.name = 'firefox';
+      browserInfo.version =
+        userAgent.match(/Firefox\/([0-9.]+)/)?.[1] || 'unknown';
+    } else if (userAgent.indexOf('Safari') > -1) {
+      browserInfo.name = 'safari';
+      browserInfo.version =
+        userAgent.match(/Version\/([0-9.]+)/)?.[1] || 'unknown';
+    }
   }
 
   const ua = {
