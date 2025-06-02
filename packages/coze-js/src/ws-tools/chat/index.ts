@@ -1,9 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import {
-  WavStreamPlayer,
-  type AudioFormat,
-} from '../wavtools/lib/wav_stream_player';
+import { WavStreamPlayer, type AudioFormat } from '../wavtools';
 import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import {
   PcmRecorder,

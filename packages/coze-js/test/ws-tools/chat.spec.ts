@@ -37,7 +37,7 @@ vi.mock('@ws-tools/index', () => ({
     setDenoiserEnabled: vi.fn(),
     setDenoiserLevel: vi.fn(),
     setDenoiserMode: vi.fn(),
-    getMediaStream: vi.fn().mockReturnValue(new MediaStream()),
+    getRawMediaStream: vi.fn().mockReturnValue(new MediaStream()),
   })),
 }));
 
@@ -86,6 +86,9 @@ vi.mock('@ws-tools/wavtools', () => ({
     setMediaStream: vi.fn(),
     setSampleRate: vi.fn(),
     setDefaultFormat: vi.fn(),
+    addG711a: vi.fn(),
+    addG711u: vi.fn(),
+    destroy: vi.fn(),
   })),
 }));
 
@@ -101,6 +104,7 @@ vi.mock('@ws-tools/utils', () => ({
       { deviceId: 'output1', label: 'Speaker 1' },
     ],
   }),
+  isBrowserExtension: vi.fn().mockReturnValue(false),
 }));
 
 describe('WebSocket Chat Tools', () => {
@@ -125,7 +129,7 @@ describe('WebSocket Chat Tools', () => {
       expect(client.ws).toBeNull();
       expect(WavStreamPlayer).toHaveBeenCalledWith({
         sampleRate: 24000,
-        enableLocalLookback: true,
+        enableLocalLookback: false,
       });
       expect(PcmRecorder).toHaveBeenCalled();
     });
