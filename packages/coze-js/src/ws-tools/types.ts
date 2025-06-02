@@ -139,6 +139,12 @@ export interface WsChatClientOptions extends WsToolsOptions {
    * zh: 音频录制配置，仅在 debug = true 时有效
    */
   wavRecordConfig?: WavRecordConfig;
+
+  /**
+   * en: Whether to enable local loopback, default is true on mobile, false on PC
+   * zh: 是否启用本地回环播放音频，移动端(window.innerWidth <= 768)上默认设置为 true，PC 端默认设置为 false
+   */
+  enableLocalLoopback?: boolean;
 }
 
 export enum WsChatEventNames {

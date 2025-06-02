@@ -241,8 +241,8 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.INTERRUPT_BOT_ID]: localManager.get(
           LocalStorageKey.INTERRUPT_BOT_ID,
         ),
-        [LocalStorageKey.ROOM_MODE]: Number(
-          localManager.get(LocalStorageKey.ROOM_MODE, '0'),
+        [LocalStorageKey.ROOM_MODE]: localManager.get(
+          LocalStorageKey.ROOM_MODE,
         ),
       });
     })().catch(err => {

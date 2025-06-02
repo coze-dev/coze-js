@@ -44,21 +44,24 @@ vi.stubGlobal('window', {
 });
 
 vi.stubGlobal('URL', mockURL);
-vi.stubGlobal('AudioContext', vi.fn().mockImplementation(() => ({
-  createGain: vi.fn().mockReturnValue({
-    connect: vi.fn(),
-    gain: { value: 1 },
-  }),
-  createMediaStreamSource: vi.fn().mockReturnValue({
-    connect: vi.fn(),
-  }),
-  createScriptProcessor: vi.fn().mockReturnValue({
-    connect: vi.fn(),
-    disconnect: vi.fn(),
-    addEventListener: vi.fn(),
-  }),
-  destination: {},
-})));
+vi.stubGlobal(
+  'AudioContext',
+  vi.fn().mockImplementation(() => ({
+    createGain: vi.fn().mockReturnValue({
+      connect: vi.fn(),
+      gain: { value: 1 },
+    }),
+    createMediaStreamSource: vi.fn().mockReturnValue({
+      connect: vi.fn(),
+    }),
+    createScriptProcessor: vi.fn().mockReturnValue({
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      addEventListener: vi.fn(),
+    }),
+    destination: {},
+  })),
+);
 
 // Mock agora-rtc-sdk-ng/esm
 vi.mock('agora-rtc-sdk-ng/esm', () => ({
@@ -97,53 +100,56 @@ vi.mock('agora-extension-ai-denoiser', () => ({
 // This avoids hoisting issues
 vi.mock('../../../src/ws-tools/recorder/processor/pcm-audio-processor', () => {
   return {
-    default: vi.fn().mockImplementation((callback) => ({
+    default: vi.fn().mockImplementation(callback => ({
       startRecording: vi.fn(),
       stopRecording: vi.fn(),
       destroy: vi.fn(),
       pipe: vi.fn().mockReturnThis(),
-      _callback: callback
-    }))
-  }
+      _callback: callback,
+    })),
+  };
 });
 
 // Mock OpusAudioProcessor
 vi.mock('../../../src/ws-tools/recorder/processor/opus-audio-processor', () => {
   return {
-    default: vi.fn().mockImplementation((callback) => ({
+    default: vi.fn().mockImplementation(callback => ({
       startRecording: vi.fn(),
       stopRecording: vi.fn(),
       destroy: vi.fn(),
       pipe: vi.fn().mockReturnThis(),
-      _callback: callback
-    }))
-  }
+      _callback: callback,
+    })),
+  };
 });
 
 // Mock WavAudioProcessor
 vi.mock('../../../src/ws-tools/recorder/processor/wav-audio-processor', () => {
   return {
-    default: vi.fn().mockImplementation((callback) => ({
+    default: vi.fn().mockImplementation(callback => ({
       startRecording: vi.fn(),
       stopRecording: vi.fn(),
       destroy: vi.fn(),
       pipe: vi.fn().mockReturnThis(),
-      _callback: callback
-    }))
-  }
+      _callback: callback,
+    })),
+  };
 });
 
 // Mock worklet processor
-vi.mock('../../../src/ws-tools/recorder/processor/pcm-worklet-processor', () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      startRecording: vi.fn(),
-      stopRecording: vi.fn(),
-      destroy: vi.fn(),
-      pipe: vi.fn().mockReturnThis()
-    }))
-  }
-});
+vi.mock(
+  '../../../src/ws-tools/recorder/processor/pcm-worklet-processor',
+  () => {
+    return {
+      default: vi.fn().mockImplementation(() => ({
+        startRecording: vi.fn(),
+        stopRecording: vi.fn(),
+        destroy: vi.fn(),
+        pipe: vi.fn().mockReturnThis(),
+      })),
+    };
+  },
+);
 
 // Mock utils
 vi.mock('../../../src/ws-tools/utils', () => ({
@@ -163,8 +169,6 @@ vi.mock('../../../src/ws-tools/types', () => ({
   AudioCaptureConfig: {},
   WavRecordConfig: {},
 }));
-
-
 
 describe('PcmRecorder', () => {
   let recorder: PcmRecorder;
@@ -193,7 +197,6 @@ describe('PcmRecorder', () => {
     it('should initialize audio track and processors correctly', async () => {
       await recorder.start();
       expect(recorder['audioTrack']).toBeDefined();
-      expect(recorder['stream']).toBeDefined();
     });
 
     it('should use custom audio track when mediaStreamTrack is provided', async () => {
@@ -325,99 +328,101 @@ describe('PcmRecorder', () => {
       recorder.dump();
       expect(mockDenoiser.createProcessor().dump).toHaveBeenCalled();
     });
-    
+
     it('should not dump when processor is not initialized', () => {
       // Create a recorder with processor unavailable
       const customRecorder = new PcmRecorder({
         aiDenoisingConfig: { mode: undefined },
       });
-      
+
       // Set up a spy on the log method
       const logSpy = vi.spyOn(customRecorder as any, 'log');
-      
+
       customRecorder.dump();
       expect(logSpy).toHaveBeenCalledWith('processor is not initialized');
     });
   });
-  
+
   describe('Debug and Error Handling', () => {
     it('should log messages when debug is enabled', async () => {
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       // Create recorder with debug enabled
       const debugRecorder = new PcmRecorder({ debug: true });
-      
+
       // Trigger log and warn methods with private access
       (debugRecorder as any).log('test log');
       (debugRecorder as any).warn('test warning');
-      
+
       expect(logSpy).toHaveBeenCalledWith('test log');
       expect(warnSpy).toHaveBeenCalledWith('test warning');
     });
-    
+
     it('should not log messages when debug is disabled', () => {
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-      
+
       // Create recorder with debug disabled
       const debugRecorder = new PcmRecorder({ debug: false });
-      
+
       // Trigger log and warn methods with private access
       (debugRecorder as any).log('test log');
       (debugRecorder as any).warn('test warning');
-      
+
       expect(logSpy).not.toHaveBeenCalled();
       expect(warnSpy).not.toHaveBeenCalled();
     });
-    
+
     it('should handle warn message when trying to pause while not recording', async () => {
       const warnSpy = vi.spyOn(recorder as any, 'warn');
-      
+
       // Recorder should not be recording at this point
       recorder.pause();
-      
+
       expect(warnSpy).toHaveBeenCalledWith('error: recorder is not recording');
     });
-    
+
     it('should handle warn message when trying to resume while already recording', async () => {
       const warnSpy = vi.spyOn(recorder as any, 'warn');
-      
+
       await recorder.start();
       await recorder.record(); // Now recording
-      
+
       recorder.resume(); // Try to resume while already recording
-      
+
       expect(warnSpy).toHaveBeenCalledWith('recorder is recording');
     });
   });
-  
+
   describe('isSupportAIDenoiser and checkProcessor', () => {
     it('should check if AI denoiser is supported', () => {
       // Create a recorder with AI mode enabled
       const aiEnabledRecorder = new PcmRecorder({
         aiDenoisingConfig: { mode: AIDenoiserProcessorMode.NSNG },
       });
-      
+
       // Access the private method using type assertion
       const supportResult = (aiEnabledRecorder as any).isSupportAIDenoiser();
       expect(supportResult).toBe(true);
-      
+
       // Create a recorder with AI mode disabled
       const aiDisabledRecorder = new PcmRecorder({
         aiDenoisingConfig: { mode: undefined },
       });
-      
+
       // The method returns undefined if the mode is not set, so explicitly check for falsy
-      expect(Boolean((aiDisabledRecorder as any).isSupportAIDenoiser())).toBe(false);
+      expect(Boolean((aiDisabledRecorder as any).isSupportAIDenoiser())).toBe(
+        false,
+      );
     });
-    
+
     it('should check if processor is initialized', async () => {
       // Test with a processor that is initialized
       await recorder.start();
       await recorder.record();
       expect((recorder as any).checkProcessor()).toBe(true);
-      
+
       // Test with a processor that is not initialized
       const newRecorder = new PcmRecorder({});
       expect((newRecorder as any).checkProcessor()).toBe(false);

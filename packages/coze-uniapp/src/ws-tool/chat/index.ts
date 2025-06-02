@@ -1,4 +1,8 @@
-import { type ChatUpdateEvent, WebsocketsEventType } from '@coze/api';
+import {
+  type ChatUpdateEvent,
+  type TurnDetectionType,
+  WebsocketsEventType,
+} from '@coze/api';
 
 import { PcmRecorder, RecordingStatus } from '../pcm-recorder';
 import { WsChatEventNames } from './event-names';
@@ -14,7 +18,7 @@ export { WsChatClientOptions, WsChatEventNames };
 class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
   private isMuted = false;
-  private turnDetection: 'server_vad' | 'client_vad' = 'server_vad';
+  private turnDetection: TurnDetectionType = 'server_vad';
 
   /**
    * Create a new WsChatClient instance
@@ -41,7 +45,7 @@ class WsChatClient extends BaseWsChatClient {
       return;
     }
     // 如果是客户端判停，需要先取消当前的播放
-    if (this.turnDetection === 'client_vad') {
+    if (this.turnDetection === 'client_interrupt') {
       this.interrupt();
     }
     // 1. Start recorder
@@ -151,7 +155,7 @@ class WsChatClient extends BaseWsChatClient {
     console.debug('chat.update:', event);
 
     // Start recording if not muted && not client_vad
-    if (!this.isMuted && this.turnDetection !== 'client_vad') {
+    if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
       await this.startRecord();
     }
 
@@ -181,7 +185,7 @@ class WsChatClient extends BaseWsChatClient {
    * @returns {Promise<void>} - Promise that resolves when the operation completes
    */
   async setAudioEnable(enable: boolean) {
-    if (this.turnDetection === 'client_vad') {
+    if (this.turnDetection === 'client_interrupt') {
       throw new Error('Client VAD mode does not support setAudioEnable');
     }
     const status = this.recorder.getStatus();

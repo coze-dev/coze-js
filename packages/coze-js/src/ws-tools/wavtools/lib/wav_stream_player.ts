@@ -1,5 +1,5 @@
 import { StreamProcessorSrc } from './worklets/stream_processor';
-import LocalLookback from './local-lookback';
+import LocalLoopback from './local-loopback';
 import { decodeAlaw, decodeUlaw } from './codecs/g711';
 
 /**
@@ -15,43 +15,44 @@ export class WavStreamPlayer {
   scriptSrc: string;
   sampleRate: number;
   context: AudioContext | null;
-  stream: AudioWorkletNode | null;
+  streamNode: AudioWorkletNode | null;
   trackSampleOffsets: Record<string, { trackId: string, offset: number, currentTime: number }>;
   interruptedTrackIds: Record<string, boolean>;
   isPaused: boolean;
   /**
-   * Whether to enable local lookback
+   * Whether to enable local loopback
    */
-  enableLocalLookback: boolean;
-  localLookback: LocalLookback | undefined;
+  enableLocalLoopback: boolean;
+  localLoopback: LocalLoopback | undefined;
 
   /**
    * Default audio format
    */
   defaultFormat: AudioFormat;
+  localLoopbackStream: MediaStream | undefined;
 
   /**
    * Creates a new WavStreamPlayer instance
-   * @param {{sampleRate?: number, enableLocalLookback?: boolean, defaultFormat?: AudioFormat}} options
+   * @param {{sampleRate?: number, enableLocalLoopback?: boolean, defaultFormat?: AudioFormat}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100, enableLocalLookback = false, defaultFormat = 'pcm' }: {
+  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm' }: {
     sampleRate?: number,
-    enableLocalLookback?: boolean,
+    enableLocalLoopback?: boolean,
     defaultFormat?: AudioFormat
   } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
     this.context = null;
-    this.stream = null;
+    this.streamNode = null;
     this.trackSampleOffsets = {};
     this.interruptedTrackIds = {};
     this.isPaused = false;
-    this.enableLocalLookback = enableLocalLookback;
+    this.enableLocalLoopback = enableLocalLoopback;
     this.defaultFormat = defaultFormat;
 
-    if(this.enableLocalLookback) {
-      this.localLookback = new LocalLookback(true);
+    if(this.enableLocalLoopback) {
+      this.localLoopback = new LocalLoopback(true);
     }
   }
 
@@ -62,8 +63,8 @@ export class WavStreamPlayer {
   private async connect(): Promise<true> {
     this.context = new AudioContext({ sampleRate: this.sampleRate });
 
-    if(this.enableLocalLookback) {
-      this.localLookback?.connect(this.context);
+    if(this.enableLocalLoopback) {
+      await this.localLoopback?.connect(this.context, this.localLoopbackStream);
     }
 
     if (this.context.state === 'suspended') {
@@ -114,7 +115,7 @@ export class WavStreamPlayer {
    * @returns {boolean}
    */
   isPlaying(): boolean {
-    return Boolean(this.context && this.stream && !this.isPaused && this.context.state === 'running');
+    return Boolean(this.context && this.streamNode && !this.isPaused && this.context.state === 'running');
   }
 
   /**
@@ -132,8 +133,12 @@ export class WavStreamPlayer {
     streamNode.port.onmessage = (e: MessageEvent) => {
       const { event } = e.data;
       if (event === 'stop') {
-        streamNode.disconnect();
-        this.stream = null;
+        if(this.localLoopback) {
+          this.localLoopback.stop();
+        } else {
+          streamNode.disconnect();
+        }
+        this.streamNode = null;
 
       } else if (event === 'offset') {
         const { requestId, trackId, offset } = e.data;
@@ -142,13 +147,13 @@ export class WavStreamPlayer {
       }
     };
 
-    if(this.enableLocalLookback) {
-      this.localLookback?.start(streamNode);
+    if(this.enableLocalLoopback) {
+      this.localLoopback?.start(streamNode);
     } else {
       streamNode.connect(this.context!.destination);
     }
 
-    this.stream = streamNode;
+    this.streamNode = streamNode;
     return true;
   }
 
@@ -166,7 +171,7 @@ export class WavStreamPlayer {
     } else if (this.interruptedTrackIds[trackId]) {
       return new Int16Array();
     }
-    if (!this.stream) {
+    if (!this.streamNode) {
       await this._start();
     }
     let buffer: Int16Array;
@@ -198,7 +203,7 @@ export class WavStreamPlayer {
     } else {
       throw new Error(`argument must be Int16Array, Uint8Array, or ArrayBuffer`);
     }
-    this.stream!.port.postMessage({ event: 'write', buffer, trackId });
+    this.streamNode!.port.postMessage({ event: 'write', buffer, trackId });
     return buffer;
   }
 
@@ -212,11 +217,11 @@ export class WavStreamPlayer {
     offset: number;
     currentTime: number;
   } | null> {
-    if (!this.stream) {
+    if (!this.streamNode) {
       return null;
     }
     const requestId = crypto.randomUUID();
-    this.stream.port.postMessage({
+    this.streamNode.port.postMessage({
       event: interrupt ? 'interrupt' : 'offset',
       requestId,
     });
@@ -245,10 +250,10 @@ export class WavStreamPlayer {
   }
 
   /**
-   * Set media stream for local lookback
+   * Set media stream for local loopback
    */
   setMediaStream(stream?: MediaStream) {
-    this.localLookback?.setMediaStream(stream);
+    this.localLoopbackStream = stream;
   }
 
   /**
@@ -277,5 +282,34 @@ export class WavStreamPlayer {
 
   setDefaultFormat(format: AudioFormat) {
     this.defaultFormat = format;
+  }
+
+  /**
+   * Destroys the player instance and releases all resources
+   * Should be called when the player is no longer needed
+   */
+  async destroy(): Promise<void> {
+    // Stop any audio that's playing
+    if (this.streamNode) {
+      this.streamNode.disconnect();
+      this.streamNode = null;
+    }
+
+    // Clean up local loopback
+    if (this.localLoopback) {
+      this.localLoopback.cleanup();
+      this.localLoopback = undefined;
+    }
+
+    // Close audio context
+    if (this.context) {
+      await this.context.close();
+      this.context = null;
+    }
+
+    // Reset all state
+    this.trackSampleOffsets = {};
+    this.interruptedTrackIds = {};
+    this.isPaused = false;
   }
 }

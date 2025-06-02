@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import { type AudioFormat } from '../wavtools/lib/wav_stream_player';
+import { WavStreamPlayer, type AudioFormat } from '../wavtools';
 import { type WsChatClientOptions, WsChatEventNames } from '../types';
 import {
   PcmRecorder,
@@ -10,19 +10,33 @@ import {
 import {
   type AudioCodec,
   type ChatUpdateEvent,
+  type TurnDetectionType,
   WebsocketsEventType,
 } from '../../index';
 import BaseWsChatClient from './base';
 import { getAudioDevices } from '../utils';
 export { WsChatEventNames };
 
+function isMobileView() {
+  return window.innerWidth <= 768; // 通常移动端宽度 <= 768px
+}
+
 class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
   private isMuted = false;
   private inputAudioCodec: AudioCodec = 'pcm';
+  private turnDetection: TurnDetectionType = 'server_vad';
 
   constructor(config: WsChatClientOptions) {
     super(config);
+
+    const isMobile = config.enableLocalLoopback ?? isMobileView();
+
+    this.wavStreamPlayer = new WavStreamPlayer({
+      sampleRate: 24000,
+      enableLocalLoopback: isMobile,
+    });
+
     this.recorder = new PcmRecorder({
       audioCaptureConfig: config.audioCaptureConfig,
       aiDenoisingConfig: config.aiDenoisingConfig,
@@ -34,13 +48,27 @@ class WsChatClient extends BaseWsChatClient {
     this.isMuted = config.audioMutedDefault ?? false;
   }
 
-  private async startRecord() {
+  async startRecord() {
+    if (this.recorder.getStatus() === 'recording') {
+      console.warn('Recorder is already recording');
+      return;
+    }
+    // 如果是客户端判停，需要先取消当前的播放
+    if (this.turnDetection === 'client_interrupt') {
+      this.interrupt();
+    }
     // 1. start recorder
     await this.recorder.start(this.inputAudioCodec);
-    this.wavStreamPlayer.setMediaStream(this.recorder.getMediaStream());
+
+    // 获取原始麦克风输入用于本地回环
+    const rawMediaStream = this.recorder.getRawMediaStream();
+    if (!rawMediaStream) {
+      throw new Error('无法获取原始麦克风输入');
+    }
+    this.wavStreamPlayer?.setMediaStream(rawMediaStream);
 
     // init stream player
-    await this.wavStreamPlayer.add16BitPCM(new ArrayBuffer(0), this.trackId);
+    await this.wavStreamPlayer?.add16BitPCM(new ArrayBuffer(0), this.trackId);
 
     // let startTime = performance.now();
     // 2. recording
@@ -90,6 +118,18 @@ class WsChatClient extends BaseWsChatClient {
     });
   }
 
+  stopRecord() {
+    if (this.recorder.getStatus() !== 'recording') {
+      console.warn('Recorder is not recording');
+      return;
+    }
+    this.recorder.destroy();
+    this.ws?.send({
+      id: Date.now().toString(),
+      event_type: WebsocketsEventType.INPUT_AUDIO_BUFFER_COMPLETE,
+    });
+  }
+
   async connect({
     chatUpdate,
   }: {
@@ -124,14 +164,17 @@ class WsChatClient extends BaseWsChatClient {
       },
     };
 
-    this.wavStreamPlayer.setSampleRate(
+    this.wavStreamPlayer?.setSampleRate(
       event.data?.output_audio?.pcm_config?.sample_rate || 24000,
     );
-    this.wavStreamPlayer.setDefaultFormat(
+    this.wavStreamPlayer?.setDefaultFormat(
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
 
-    if (!this.isMuted) {
+    // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
+    this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
+
+    if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
       await this.startRecord();
     }
 
@@ -146,6 +189,7 @@ class WsChatClient extends BaseWsChatClient {
       event_type: WebsocketsEventType.CONVERSATION_CHAT_CANCEL,
     });
     await this.recorder?.destroy();
+    await this.wavStreamPlayer?.destroy();
     this.emit(WsChatEventNames.DISCONNECTED, undefined);
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -159,13 +203,16 @@ class WsChatClient extends BaseWsChatClient {
    * @param enable - The enable to set
    */
   async setAudioEnable(enable: boolean) {
+    if (this.turnDetection === 'client_interrupt') {
+      throw new Error('Client interrupt mode does not support setAudioEnable');
+    }
     const status = await this.recorder?.getStatus();
     if (enable) {
       if (status === 'ended') {
         if (this.recorder.audioTrack) {
           await this.recorder?.resume();
         } else {
-          this.startRecord();
+          await this.startRecord();
         }
         this.isMuted = false;
         this.emit(WsChatEventNames.AUDIO_UNMUTED, undefined);
