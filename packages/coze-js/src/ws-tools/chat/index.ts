@@ -171,7 +171,7 @@ class WsChatClient extends BaseWsChatClient {
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
 
-    // 判停模式，server_vad（服务端判停） 或 client_interrupt（客户端判停，需自行调用 startRecord/stopRecord）
+    // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
 
     if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
@@ -204,7 +204,7 @@ class WsChatClient extends BaseWsChatClient {
    */
   async setAudioEnable(enable: boolean) {
     if (this.turnDetection === 'client_interrupt') {
-      throw new Error('Client VAD mode does not support setAudioEnable');
+      throw new Error('Client interrupt mode does not support setAudioEnable');
     }
     const status = await this.recorder?.getStatus();
     if (enable) {
