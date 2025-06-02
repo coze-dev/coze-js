@@ -141,10 +141,10 @@ export interface WsChatClientOptions extends WsToolsOptions {
   wavRecordConfig?: WavRecordConfig;
 
   /**
-   * en: Whether to enable local lookback, default is true on mobile, false on PC
+   * en: Whether to enable local loopback, default is true on mobile, false on PC
    * zh: 是否启用本地回环播放音频，移动端(window.innerWidth <= 768)上默认设置为 true，PC 端默认设置为 false
    */
-  enableLocalLookback?: boolean;
+  enableLocalLoopback?: boolean;
 }
 
 export enum WsChatEventNames {

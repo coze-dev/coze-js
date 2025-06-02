@@ -7,7 +7,7 @@
  * stop() - 暂停音频回环
  * cleanup() - 完全清理所有资源
  */
-class LocalLookback {
+class LocalLoopback {
   pc1: RTCPeerConnection | undefined;
   pc2: RTCPeerConnection | undefined;
   remoteAudio: HTMLAudioElement;
@@ -21,7 +21,7 @@ class LocalLookback {
 
 
   /**
-   * Initializes a new instance of LocalLookback
+   * Initializes a new instance of LocalLoopback
    * @param isDebug - Whether to enable debug logging
    */
   constructor(isDebug: boolean = false) {
@@ -112,7 +112,7 @@ class LocalLookback {
 
     this.currentStreamNode = streamNode;
     streamNode.connect(this.peer!);
-    this._debug('local lookback start');
+    this._debug('local loopback start');
   }
 
   /**
@@ -131,9 +131,9 @@ class LocalLookback {
         this.currentStreamNode.disconnect(this.peer);
       }
       this.currentStreamNode = undefined;
-      this._debug('local lookback stopped');
+      this._debug('local loopback stopped');
     } catch (err) {
-      this._error('Error stopping local lookback:', err);
+      this._error('Error stopping local loopback:', err);
     }
   }
 
@@ -343,11 +343,11 @@ class LocalLookback {
     }, 100);
   }
   /**
-   * Cleans up all resources used by the LocalLookback instance
+   * Cleans up all resources used by the LocalLoopback instance
    * This should be called when the instance is no longer needed to prevent memory leaks
    */
   cleanup(): void {
-    this._debug('Cleaning up LocalLookback resources');
+    this._debug('Cleaning up LocalLoopback resources');
 
     // Close peer connections
     if (this.pc1) {
@@ -421,8 +421,8 @@ class LocalLookback {
     });
     this.eventListeners = [];
 
-    this._debug('LocalLookback cleanup complete');
+    this._debug('LocalLoopback cleanup complete');
   }
 }
 
-export default LocalLookback;
+export default LocalLoopback;

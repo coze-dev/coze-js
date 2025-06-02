@@ -30,11 +30,11 @@ class WsChatClient extends BaseWsChatClient {
   constructor(config: WsChatClientOptions) {
     super(config);
 
-    const isMobile = config.enableLocalLookback ?? isMobileView();
+    const isMobile = config.enableLocalLoopback ?? isMobileView();
 
     this.wavStreamPlayer = new WavStreamPlayer({
       sampleRate: 24000,
-      enableLocalLookback: isMobile,
+      enableLocalLoopback: isMobile,
     });
 
     this.recorder = new PcmRecorder({
