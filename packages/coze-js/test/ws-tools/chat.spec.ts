@@ -89,6 +89,8 @@ vi.mock('@ws-tools/wavtools', () => ({
     addG711a: vi.fn(),
     addG711u: vi.fn(),
     destroy: vi.fn(),
+    setMuted: vi.fn(),
+    isMuted: vi.fn(),
   })),
 }));
 
@@ -411,6 +413,14 @@ describe('WebSocket Chat Tools', () => {
           id: 'test-id',
           data: {
             content: btoa('test audio data'),
+            content_type: 'audio',
+            id: 'test-audio-id',
+            conversation_id: 'test-conv-id',
+            bot_id: 'test-bot-id',
+            chat_id: 'test-chat-id',
+            type: 'answer',
+            meta_data: {},
+            role: 'assistant',
           },
           detail: {
             logid: 'test-logid',

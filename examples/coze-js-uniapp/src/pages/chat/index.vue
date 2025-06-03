@@ -120,6 +120,15 @@
           结束聊天
         </button>
       </view>
+      <view class="button-cell" v-if="isConnected">
+        <button
+          @click="handleToggleAudioPlayback"
+          :type="isPlaybackMuted ? 'primary' : 'default'"
+          :disabled="!isConnected"
+        >
+          {{ isPlaybackMuted ? '取消静音' : '静音播放' }}
+        </button>
+      </view>
     </view>
 
     <!-- 错误信息 -->
@@ -139,6 +148,7 @@ export default {
       isConnected,
       isRecording,
       isMuted,
+      isPlaybackMuted,
       messages,
       errorMessage,
       isPressRecording,
@@ -152,6 +162,7 @@ export default {
       startPressRecord,
       finishPressRecord,
       cancelPressRecord,
+      togglePlaybackMute,
       destroy,
       turnDetection,
     } = useVoiceChat();
@@ -199,6 +210,16 @@ export default {
       if (textMessage.value.trim()) {
         sendTextMessage(textMessage.value);
         textMessage.value = '';
+      }
+    };
+
+    // 切换音频静音
+    const handleToggleAudioPlayback = () => {
+      try {
+        togglePlaybackMute();
+      } catch (error) {
+        console.error('Error toggling audio playback:', error);
+        errorMessage.value = `操作失败: ${error.message}`;
       }
     };
 
@@ -314,11 +335,13 @@ export default {
       handleVoiceButtonTouchMove,
       handleVoiceButtonTouchEnd,
       handleVoiceButtonTouchCancel,
+      handleToggleAudioPlayback,
       getStatusText,
       getMessageClass,
       getRoleName,
       goBackToHome,
       turnDetection,
+      isPlaybackMuted,
     };
   },
 };

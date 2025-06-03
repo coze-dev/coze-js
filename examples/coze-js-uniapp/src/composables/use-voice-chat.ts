@@ -20,10 +20,13 @@ export function useVoiceChat() {
   const isConnected = ref(false);
   const isRecording = ref(false);
   const isMuted = ref(false);
+  const isPlaybackMuted = ref(false);
   const messages = ref<{ role: string; content: string }[]>([]);
   const errorMessage = ref('');
   const voiceId = ref('');
-  const turnDetection = ref<'client_vad' | 'server_vad'>('client_vad');
+  const turnDetection = ref<'client_interrupt' | 'server_vad'>(
+    'client_interrupt',
+  );
 
   // 按键录音状态管理
   const isPressRecording = ref(false);
@@ -322,10 +325,21 @@ export function useVoiceChat() {
     isPressRecording.value = false;
   };
 
+  // 切换静音
+  const togglePlaybackMute = () => {
+    if (chatClient.value) {
+      chatClient.value.setPlaybackMuted(!isPlaybackMuted.value);
+      isPlaybackMuted.value = !isPlaybackMuted.value;
+    } else {
+      throw new Error('Chat client not initialized');
+    }
+  };
+
   return {
     isConnected,
     isRecording,
     isMuted,
+    isPlaybackMuted,
     messages,
     errorMessage,
     voiceId,
@@ -342,5 +356,6 @@ export function useVoiceChat() {
     cancelPressRecord,
     destroy,
     turnDetection,
+    togglePlaybackMute,
   };
 }

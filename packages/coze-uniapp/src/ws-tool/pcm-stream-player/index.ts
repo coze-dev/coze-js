@@ -35,6 +35,7 @@ export class PcmStreamPlayer {
   // Current buffer and position for continuous playback
   private currentBuffer: Int16Array | null = null;
   private playbackPosition = 0;
+  private muted = false; // Mute state
 
   /**
    * Default audio format
@@ -212,7 +213,6 @@ export class PcmStreamPlayer {
     // If no current buffer, try to get the next one
     if (!this.currentBuffer) {
       if (!this.getNextBuffer()) {
-        // No more data, fill with silence
         for (let i = 0; i < outputBuffer.length; i++) {
           outputBuffer[i] = 0;
         }
@@ -221,26 +221,27 @@ export class PcmStreamPlayer {
       }
     }
 
-    // Fill the output buffer with data from current buffer
     for (let i = 0; i < outputBuffer.length; i++) {
       if (
         this.currentBuffer &&
         this.playbackPosition < this.currentBuffer.length
       ) {
-        // Convert from 16-bit PCM to float [-1.0, 1.0] on-the-fly
-        outputBuffer[i] = this.currentBuffer[this.playbackPosition++] / 0x8000;
+        // If muted, output silence, otherwise output the actual sample
+        outputBuffer[i] = this.muted
+          ? 0
+          : this.currentBuffer[this.playbackPosition] / 0x8000;
+        this.playbackPosition++;
       } else {
-        // Current buffer is exhausted, try to get next buffer
         if (!this.getNextBuffer()) {
-          // No more data, fill rest with silence
           outputBuffer[i] = 0;
           this.isProcessing = i !== outputBuffer.length - 1;
         } else {
-          // Got new buffer, use its first sample
           outputBuffer[i] = this.currentBuffer
-            ? this.currentBuffer[this.playbackPosition++] / 0x8000
+            ? this.muted
+              ? 0
+              : this.currentBuffer[this.playbackPosition] / 0x8000
             : 0;
-          // Ensure we're still marked as processing since we got a new buffer
+          this.playbackPosition++;
           this.isProcessing = true;
         }
       }
@@ -601,6 +602,25 @@ export class PcmStreamPlayer {
     return sampleRate;
   }
 
+  /**
+   * Set mute state
+   * @param {boolean} muted - Whether to mute the audio
+   */
+  setMuted(muted: boolean): void {
+    this.muted = muted;
+  }
+
+  /**
+   * Get current mute state
+   * @returns {boolean} Whether audio is muted
+   */
+  isMuted(): boolean {
+    return this.muted;
+  }
+
+  /**
+   * Cleanup static resources when the app is closed or the page is unloaded
+   */
   /**
    * Cleanup static resources when the app is closed or the page is unloaded
    */

@@ -239,6 +239,12 @@ await client.setAudioEnable(false);
 // set audio input device
 await client.setAudioInputDevice('your_device_id');
 
+// set playback muted
+client.setPlaybackMuted(true);
+
+// get playback muted
+const muted = client.isPlaybackMuted();
+
 ```
 
 
