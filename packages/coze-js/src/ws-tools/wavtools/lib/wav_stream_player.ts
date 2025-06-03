@@ -30,6 +30,7 @@ export class WavStreamPlayer {
    */
   defaultFormat: AudioFormat;
   localLoopbackStream: MediaStream | undefined;
+  private muted: boolean = false;
 
   /**
    * Creates a new WavStreamPlayer instance
@@ -282,6 +283,25 @@ export class WavStreamPlayer {
 
   setDefaultFormat(format: AudioFormat) {
     this.defaultFormat = format;
+  }
+
+  /**
+   * Sets whether audio playback is muted
+   * @param {boolean} muted - Whether to mute audio playback
+   */
+  setMuted(muted: boolean) {
+    this.muted = muted;
+    if (this.streamNode) {
+      this.streamNode.port.postMessage({ event: 'mute', muted });
+    }
+  }
+
+  /**
+   * Gets whether audio playback is muted
+   * @returns {boolean} Whether audio playback is muted
+   */
+  isMuted(): boolean {
+    return this.muted;
   }
 
   /**

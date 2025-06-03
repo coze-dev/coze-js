@@ -238,6 +238,13 @@ await client.setAudioEnable(false);
 // 设置音频输入设备
 await client.setAudioInputDevice('your_device_id');
 
+
+// 设置播放静音
+client.setPlaybackMuted(true);
+
+// 获取播放静音状态
+const muted = client.isPlaybackMuted();
+
 ```
 
 

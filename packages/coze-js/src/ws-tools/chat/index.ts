@@ -36,6 +36,7 @@ class WsChatClient extends BaseWsChatClient {
       sampleRate: 24000,
       enableLocalLoopback: isMobile,
     });
+    this.wavStreamPlayer.setMuted(config.playbackMutedDefault ?? false);
 
     this.recorder = new PcmRecorder({
       audioCaptureConfig: config.audioCaptureConfig,
@@ -270,6 +271,23 @@ class WsChatClient extends BaseWsChatClient {
     });
 
     this.emit(WsChatEventNames.INTERRUPTED, undefined);
+  }
+
+  /**
+   * en: Set the playback muted
+   * zh: 设置是否静音
+   * @param muted - The muted to set
+   */
+  setPlaybackMuted(muted: boolean) {
+    this.wavStreamPlayer?.setMuted(muted);
+  }
+
+  /**
+   * en: Get the playback muted
+   * zh: 获取是否静音
+   */
+  isPlaybackMuted() {
+    return this.wavStreamPlayer?.isMuted() ?? false;
   }
 
   /**

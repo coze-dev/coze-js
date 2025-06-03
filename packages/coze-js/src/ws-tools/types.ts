@@ -145,6 +145,12 @@ export interface WsChatClientOptions extends WsToolsOptions {
    * zh: 是否启用本地回环播放音频，移动端(window.innerWidth <= 768)上默认设置为 true，PC 端默认设置为 false
    */
   enableLocalLoopback?: boolean;
+
+  /**
+   * en: Whether to mute audio playback default
+   * zh: 是否默认静音播放
+   */
+  playbackMutedDefault?: boolean;
 }
 
 export enum WsChatEventNames {
