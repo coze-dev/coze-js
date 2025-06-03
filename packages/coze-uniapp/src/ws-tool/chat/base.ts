@@ -39,6 +39,11 @@ export interface WsChatClientOptions extends WsToolsOptions {
    * zh: 是否默认静音
    */
   audioMutedDefault?: boolean;
+  /**
+   * en: Whether to mute audio playback default
+   * zh: 是否默认静音播放
+   */
+  playbackMutedDefault?: boolean;
 }
 
 /**
@@ -66,6 +71,8 @@ export class BaseWsChatClient {
       sampleRate: 8000,
       defaultFormat: 'g711a',
     });
+
+    this.wavStreamPlayer.setMuted(this.config.playbackMutedDefault ?? false);
   }
 
   /**
@@ -249,6 +256,14 @@ export class BaseWsChatClient {
     this.audioDeltaList.length = 0;
     this.wavStreamPlayer.interrupt();
     this.trackId = `my-track-id-${Date.now()}`;
+  }
+
+  setPlaybackMuted(muted: boolean) {
+    this.wavStreamPlayer.setMuted(muted);
+  }
+
+  isPlaybackMuted() {
+    return this.wavStreamPlayer.isMuted();
   }
 
   /**
