@@ -101,16 +101,10 @@ enum EventNames {
   NETWORK_QUALITY = 'client.network.quality',
 
   /**
-   * en: User publish screen
-   * zh: 用户发布屏幕
+   * en: Track ended
+   * zh: 轨道结束
    */
-  USER_PUBLISH_SCREEN = 'client.user.publish.screen',
-
-  /**
-   * en: User unpublish screen
-   * zh: 用户取消发布屏幕
-   */
-  USER_UNPUBLISH_SCREEN = 'client.user.unpublish.screen',
+  TRACK_ENDED = 'client.track.ended',
 
   /**
    * en: Bot joined
