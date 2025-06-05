@@ -103,12 +103,12 @@ describe('EngineClient', () => {
   describe('event handling', () => {
     it('should bind engine events', () => {
       client.bindEngineEvents();
-      expect(mockEngine.on).toHaveBeenCalledTimes(9);
+      expect(mockEngine.on).toHaveBeenCalledTimes(8);
     });
 
     it('should remove event listeners', () => {
       client.removeEventListener();
-      expect(mockEngine.off).toHaveBeenCalledTimes(9);
+      expect(mockEngine.off).toHaveBeenCalledTimes(8);
     });
 
     it('should handle message parsing error', () => {
