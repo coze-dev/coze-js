@@ -11,7 +11,9 @@ const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');
 
 async function textChat() {
-  const ws = await client.websockets.chat.create(botId);
+  const ws = await client.websockets.chat.create({
+    bot_id: botId,
+  });
 
   ws.onopen = () => {
     ws.send({
@@ -68,9 +70,14 @@ async function textChat() {
 }
 
 async function voiceChat() {
-  const ws = await client.websockets.chat.create(botId, {
-    headers: {},
-  });
+  const ws = await client.websockets.chat.create(
+    {
+      bot_id: botId,
+    },
+    {
+      headers: {},
+    },
+  );
   const eventSet = new Set();
 
   const speaker = new Speaker({
