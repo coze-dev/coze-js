@@ -264,6 +264,7 @@ export class APIClient {
   ): Promise<Rsp> {
     // 拼接参数
     const queryString = Object.entries(param || {})
+      .filter(([_, value]) => value !== undefined && value !== null)
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
     return this.makeRequest<Req, Rsp>(
