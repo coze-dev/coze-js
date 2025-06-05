@@ -297,11 +297,12 @@ class RealtimeClient extends RealtimeEventHandler {
   }
 
   async setVideoEnable(isEnable: boolean) {
-    await this._client?.changeVideoState(isEnable);
-    if (isEnable) {
-      this.dispatch(EventNames.VIDEO_ON, {});
-    } else {
-      this.dispatch(EventNames.VIDEO_OFF, {});
+    try {
+      await this._client?.changeVideoState(isEnable);
+      this.dispatch(isEnable ? EventNames.VIDEO_ON : EventNames.VIDEO_OFF, {});
+    } catch (e) {
+      this.dispatch(EventNames.VIDEO_ERROR, e);
+      throw e;
     }
   }
 
@@ -380,7 +381,13 @@ class RealtimeClient extends RealtimeEventHandler {
   async setVideoInputDevice(
     deviceId: string | 'screenShare' | 'user' | 'environment',
   ) {
-    await this._client?.setVideoInputDevice(deviceId);
+    try {
+      await this._client?.setVideoInputDevice(deviceId);
+      this.dispatch(EventNames.VIDEO_ON, {});
+    } catch (e) {
+      this.dispatch(EventNames.VIDEO_ERROR, e);
+      throw e;
+    }
     this.dispatch(EventNames.VIDEO_INPUT_DEVICE_CHANGED, { deviceId });
   }
 

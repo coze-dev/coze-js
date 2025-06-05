@@ -174,8 +174,11 @@ export class EngineClient extends RealtimeEventHandler {
     });
   }
 
-  handleTrackEnded(event: unknown) {
-    this.dispatch(EventNames.TRACK_ENDED, event);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleTrackEnded(event: any) {
+    if (event?.kind === 'video') {
+      this.dispatch(EventNames.VIDEO_OFF, event);
+    }
   }
 
   async joinRoom(options: {
@@ -300,10 +303,20 @@ export class EngineClient extends RealtimeEventHandler {
     await this.engine.startAudioCapture(devices.audioInputs[0].deviceId);
 
     if (this._isSupportVideo) {
-      await this.setVideoInputDevice(
-        videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
-        videoConfig?.videoOnDefault,
-      );
+      try {
+        await this.setVideoInputDevice(
+          videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
+          videoConfig?.videoOnDefault,
+        );
+        this.dispatch(
+          videoConfig?.videoOnDefault
+            ? EventNames.VIDEO_ON
+            : EventNames.VIDEO_OFF,
+          {},
+        );
+      } catch (e) {
+        this.dispatch(EventNames.VIDEO_ERROR, e);
+      }
     }
   }
 
@@ -333,29 +346,24 @@ export class EngineClient extends RealtimeEventHandler {
   }
 
   async changeVideoState(isVideoOn: boolean) {
-    try {
-      if (isVideoOn) {
-        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
-          await this.engine.startVideoCapture();
-        } else {
-          this.engine.setVideoSourceType(
-            StreamIndex.STREAM_INDEX_SCREEN,
-            VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
-          );
-          await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
-          await this.engine.publishScreen(MediaType.VIDEO);
-        }
+    if (isVideoOn) {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+        await this.engine.startVideoCapture();
       } else {
-        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
-          await this.engine.stopVideoCapture();
-        } else {
-          await this.engine.stopScreenCapture();
-          await this.engine.unpublishScreen(MediaType.VIDEO);
-        }
+        this.engine.setVideoSourceType(
+          StreamIndex.STREAM_INDEX_SCREEN,
+          VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
+        );
+        await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+        await this.engine.publishScreen(MediaType.VIDEO);
       }
-    } catch (e) {
-      this.dispatch(EventNames.ERROR, e);
-      throw e;
+    } else {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+        await this.engine.stopVideoCapture();
+      } else {
+        await this.engine.stopScreenCapture();
+        await this.engine.unpublishScreen(MediaType.VIDEO);
+      }
     }
   }
 

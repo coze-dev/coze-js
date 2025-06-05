@@ -59,6 +59,12 @@ enum EventNames {
    * zh: 客户端视频关闭
    */
   VIDEO_OFF = 'client.video.off',
+
+  /**
+   * en: Client video error
+   * zh: 客户端视频(或屏幕共享）错误
+   */
+  VIDEO_ERROR = 'client.video.error',
   /**
    * en: Client video event
    * zh: 客户端视频事件
@@ -69,6 +75,7 @@ enum EventNames {
    * zh: 客户端错误
    */
   ERROR = 'client.error',
+
   /**
    * en: Audio noise reduction enabled
    * zh: 抑制平稳噪声
@@ -99,12 +106,6 @@ enum EventNames {
    * zh: 网络质量改变
    */
   NETWORK_QUALITY = 'client.network.quality',
-
-  /**
-   * en: Track ended
-   * zh: 断流事件
-   */
-  TRACK_ENDED = 'client.track.ended',
 
   /**
    * en: Bot joined
