@@ -300,7 +300,7 @@ export class EngineClient extends RealtimeEventHandler {
     await this.engine.startAudioCapture(devices.audioInputs[0].deviceId);
 
     if (this._isSupportVideo) {
-      this.setVideoInputDevice(
+      await this.setVideoInputDevice(
         videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
         videoConfig?.videoOnDefault,
       );

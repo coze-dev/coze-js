@@ -102,7 +102,7 @@ enum EventNames {
 
   /**
    * en: Track ended
-   * zh: 轨道结束
+   * zh: 断流事件
    */
   TRACK_ENDED = 'client.track.ended',
 
