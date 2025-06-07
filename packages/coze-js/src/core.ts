@@ -30,6 +30,8 @@ export type RequestOptions = Omit<
 > & {
   /** Whether to enable debug mode in current request */
   debug?: boolean;
+  /** Error callback for API errors. Will be called when an API error occurs, but the error will still be thrown */
+  onApiError?: (error: APIError) => void;
 } & Record<string, unknown>;
 
 export interface WebsocketOptions {
@@ -67,6 +69,8 @@ export interface ClientOptions {
   baseWsURL?: string;
   /** websocket options */
   websocketOptions?: WebsocketOptions;
+  /** Error callback for API errors. Will be called when an API error occurs, but the error will still be thrown */
+  onApiError?: (error: APIError) => void;
 }
 
 export class APIClient {
@@ -191,23 +195,42 @@ export class APIClient {
   ): Promise<Rsp> {
     const fullUrl = `${this.baseURL}${apiUrl}`;
 
-    const fetchOptions = await this.buildOptions(method, body, options);
-    fetchOptions.isStreaming = isStream;
-    fetchOptions.axiosInstance = this.axiosInstance;
+    try {
+      const fetchOptions = await this.buildOptions(method, body, options);
+      fetchOptions.isStreaming = isStream;
+      fetchOptions.axiosInstance = this.axiosInstance;
 
-    this.debugLog(options?.debug, `--- request url: ${fullUrl}`);
-    this.debugLog(options?.debug, '--- request options:', fetchOptions);
+      this.debugLog(options?.debug, `--- request url: ${fullUrl}`);
+      this.debugLog(options?.debug, '--- request options:', fetchOptions);
 
-    const { response, stream, json } = await fetchAPI(fullUrl, fetchOptions);
+      const { response, stream, json } = await fetchAPI(fullUrl, fetchOptions);
 
-    this.debugLog(options?.debug, `--- response status: ${response.status}`);
-    this.debugLog(options?.debug, '--- response headers: ', response.headers);
+      this.debugLog(options?.debug, `--- response status: ${response.status}`);
+      this.debugLog(options?.debug, '--- response headers: ', response.headers);
 
-    // Taro use `header`
-    const contentType = (response.headers ??
-      (response as unknown as Record<string, string>).header)['content-type'];
+      // Taro use `header`
+      const contentType = (response.headers ??
+        (response as unknown as Record<string, string>).header)['content-type'];
 
-    if (isStream) {
+      if (isStream) {
+        if (contentType && contentType.includes('application/json')) {
+          const result = (await json()) as {
+            code: number;
+            msg: string;
+          } & Record<string, unknown>;
+          const { code, msg } = result;
+          if (code !== 0 && code !== undefined) {
+            throw APIError.generate(
+              response.status,
+              result as ErrorRes,
+              msg,
+              response.headers as AxiosResponseHeaders,
+            );
+          }
+        }
+        return stream() as Rsp;
+      }
+
       if (contentType && contentType.includes('application/json')) {
         const result = (await json()) as { code: number; msg: string } & Record<
           string,
@@ -222,28 +245,20 @@ export class APIClient {
             response.headers as AxiosResponseHeaders,
           );
         }
-      }
-      return stream() as Rsp;
-    }
 
-    if (contentType && contentType.includes('application/json')) {
-      const result = (await json()) as { code: number; msg: string } & Record<
-        string,
-        unknown
-      >;
-      const { code, msg } = result;
-      if (code !== 0 && code !== undefined) {
-        throw APIError.generate(
-          response.status,
-          result as ErrorRes,
-          msg,
-          response.headers as AxiosResponseHeaders,
-        );
+        return result as Rsp;
+      } else {
+        return (await response.data) as Rsp;
       }
-
-      return result as Rsp;
-    } else {
-      return (await response.data) as Rsp;
+    } catch (error: unknown) {
+      // Call the onApiError callback if provided
+      // This handles network errors and other exceptions not caught above
+      const onApiError = options?.onApiError || this._config?.onApiError;
+      if (onApiError) {
+        onApiError(error as APIError);
+      }
+      // Re-throw the error after calling the callback
+      throw error;
     }
   }
 

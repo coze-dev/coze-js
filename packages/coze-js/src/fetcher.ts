@@ -49,7 +49,12 @@ const handleError = (error: any) => {
       );
     }
   } else {
-    return new CozeError(`Unexpected error: ${error.message}`);
+    return APIError.generate(
+      500,
+      undefined,
+      `Unexpected error: ${error.message}`,
+      undefined,
+    );
   }
 };
 
@@ -112,7 +117,7 @@ new CozeAPI({
         : adapterFetch
       : undefined,
     ...options,
-  }).catch(error => {
+  }).catch((error: AxiosResponse) => {
     if (error?.status === 401) {
       checkError();
     }
