@@ -106,7 +106,6 @@ const EventInput = ({ defaultValue }: EventInputProps) => {
     <div style={{ padding: '24px' }}>
       <Form.Item name="turn_detection" label="对话模式">
         <Select
-          prefix={<span>对话模式</span>}
           defaultValue={turnDetection || 'server_vad'}
           onChange={handleTurnDetectionChange}
           options={[
