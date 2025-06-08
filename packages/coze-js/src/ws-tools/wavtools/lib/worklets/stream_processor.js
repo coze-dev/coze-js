@@ -11,7 +11,7 @@ class StreamProcessor extends AudioWorkletProcessor {
     this.write = { buffer: new Float32Array(this.bufferLength), trackId: null };
     this.writeOffset = 0;
     this.trackSampleOffsets = {};
-    this.isMuted = false;
+    this.volume = 1.0;
     this.port.onmessage = (event) => {
       if (event.data) {
         const payload = event.data;
@@ -22,8 +22,8 @@ class StreamProcessor extends AudioWorkletProcessor {
             float32Array[i] = int16Array[i] / 0x8000; // Convert Int16 to Float32
           }
           this.writeData(float32Array, payload.trackId);
-        } else if (payload.event === 'mute') {
-          this.isMuted = payload.muted;
+        } else if (payload.event === 'volume') {
+          this.volume = payload.volume;
         } else if (
           payload.event === 'offset' ||
           payload.event === 'interrupt'
@@ -74,7 +74,7 @@ class StreamProcessor extends AudioWorkletProcessor {
       this.hasStarted = true;
       const { buffer, trackId } = outputBuffers.shift();
       for (let i = 0; i < outputChannelData.length; i++) {
-        outputChannelData[i] = this.isMuted ? 0 : (buffer[i] || 0);
+        outputChannelData[i] = (buffer[i] || 0) * this.volume;
       }
       if (trackId) {
         this.trackSampleOffsets[trackId] =

@@ -30,17 +30,18 @@ export class WavStreamPlayer {
    */
   defaultFormat: AudioFormat;
   localLoopbackStream: MediaStream | undefined;
-  private muted: boolean = false;
+  private volume: number = 1.0;
 
   /**
    * Creates a new WavStreamPlayer instance
-   * @param {{sampleRate?: number, enableLocalLoopback?: boolean, defaultFormat?: AudioFormat}} options
+   * @param {{sampleRate?: number, enableLocalLoopback?: boolean, defaultFormat?: AudioFormat, volume?: number}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm' }: {
+  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm', volume = 1.0 }: {
     sampleRate?: number,
     enableLocalLoopback?: boolean,
-    defaultFormat?: AudioFormat
+    defaultFormat?: AudioFormat,
+    volume?: number
   } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
@@ -55,6 +56,9 @@ export class WavStreamPlayer {
     if(this.enableLocalLoopback) {
       this.localLoopback = new LocalLoopback(true);
     }
+    
+    // Initialize volume (0 = muted, 1 = full volume)
+    this.volume = volume;
   }
 
   /**
@@ -286,22 +290,23 @@ export class WavStreamPlayer {
   }
 
   /**
-   * Sets whether audio playback is muted
-   * @param {boolean} muted - Whether to mute audio playback
+   * Sets the volume of audio playback
+   * @param {number} volume - Volume level (0.0 to 1.0)
    */
-  setMuted(muted: boolean) {
-    this.muted = muted;
+  setVolume(volume: number) {
+    // Clamp volume between 0 and 1
+    this.volume = Math.max(0, Math.min(1, volume));
     if (this.streamNode) {
-      this.streamNode.port.postMessage({ event: 'mute', muted });
+      this.streamNode.port.postMessage({ event: 'volume', volume: this.volume });
     }
   }
 
   /**
-   * Gets whether audio playback is muted
-   * @returns {boolean} Whether audio playback is muted
+   * Gets the current volume level of audio playback
+   * @returns {number} Current volume level (0.0 to 1.0)
    */
-  isMuted(): boolean {
-    return this.muted;
+  getVolume(): number {
+    return this.volume;
   }
 
   /**

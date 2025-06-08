@@ -147,10 +147,10 @@ export interface WsChatClientOptions extends WsToolsOptions {
   enableLocalLoopback?: boolean;
 
   /**
-   * en: Whether to mute audio playback default
-   * zh: 是否默认静音播放
+   * en: Audio playback volume default
+   * zh: 默认播放音量
    */
-  playbackMutedDefault?: boolean;
+  playbackVolumeDefault?: number;
 }
 
 export enum WsChatEventNames {

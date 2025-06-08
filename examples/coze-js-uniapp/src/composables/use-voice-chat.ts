@@ -20,7 +20,7 @@ export function useVoiceChat() {
   const isConnected = ref(false);
   const isRecording = ref(false);
   const isMuted = ref(false);
-  const isPlaybackMuted = ref(false);
+  const playbackVolume = ref(1.0); // Volume level from 0.0 to 1.0
   const messages = ref<{ role: string; content: string }[]>([]);
   const errorMessage = ref('');
   const voiceId = ref('');
@@ -325,21 +325,26 @@ export function useVoiceChat() {
     isPressRecording.value = false;
   };
 
-  // 切换静音
-  const togglePlaybackMute = () => {
+  // 设置播放音量
+  const setPlaybackVolume = (volume: number) => {
     if (chatClient.value) {
-      chatClient.value.setPlaybackMuted(!isPlaybackMuted.value);
-      isPlaybackMuted.value = !isPlaybackMuted.value;
+      // Ensure volume is between 0 and 1
+      const normalizedVolume = Math.max(0, Math.min(1, volume));
+      chatClient.value.setPlaybackVolume(normalizedVolume);
+      playbackVolume.value = normalizedVolume;
     } else {
       throw new Error('Chat client not initialized');
     }
   };
 
+  // 获取当前播放音量
+  const getPlaybackVolume = (): number => playbackVolume.value;
+
   return {
     isConnected,
     isRecording,
     isMuted,
-    isPlaybackMuted,
+    playbackVolume,
     messages,
     errorMessage,
     voiceId,
@@ -356,6 +361,7 @@ export function useVoiceChat() {
     cancelPressRecord,
     destroy,
     turnDetection,
-    togglePlaybackMute,
+    setPlaybackVolume,
+    getPlaybackVolume,
   };
 }

@@ -132,6 +132,7 @@ describe('WebSocket Chat Tools', () => {
       expect(WavStreamPlayer).toHaveBeenCalledWith({
         sampleRate: 24000,
         enableLocalLoopback: false,
+        volume: 1,
       });
       expect(PcmRecorder).toHaveBeenCalled();
     });

@@ -11,6 +11,8 @@ import {
   Col,
   Card,
   Typography,
+  Slider,
+  Tooltip,
 } from 'antd';
 import getConfig from '../../utils/config';
 import {
@@ -29,7 +31,7 @@ import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
 import { ConsoleLog } from '../../components/console-log';
 import EventInput from '../../components/event-input';
 import Settings from '../../components/settings';
-import { AudioOutlined } from '@ant-design/icons';
+import { AudioOutlined, SoundOutlined, SoundFilled } from '@ant-design/icons';
 const { Paragraph, Text } = Typography;
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
@@ -79,6 +81,8 @@ function Chat() {
   const [isCancelRecording, setIsCancelRecording] = useState(false);
   const startTouchY = useRef<number>(0);
   const [isMuted, setIsMuted] = useState(false);
+  // 音量控制 (0-100)
+  const [volume, setVolume] = useState(100);
 
   // 获取对话模式
   const turnDetection = config.getTurnDetection();
@@ -208,6 +212,11 @@ function Chat() {
       }
       await clientRef.current?.connect({ chatUpdate });
       setIsConnected(true);
+
+      // 设置初始音量
+      if (clientRef.current) {
+        clientRef.current.setPlaybackVolume(volume / 100);
+      }
     } catch (error) {
       console.error(error);
       message.error('连接错误：' + (error as Error).message);
@@ -228,6 +237,14 @@ function Chat() {
     console.log('Settings changed');
     // 重新读取对话模式
     window.location.reload(); // 简单处理：刷新页面应用新设置
+  }
+
+  // 处理音量变化
+  function handleVolumeChange(value: number) {
+    setVolume(value);
+    if (clientRef.current) {
+      clientRef.current.setPlaybackVolume(value / 100);
+    }
   }
 
   // 处理按住说话按钮
@@ -469,6 +486,23 @@ function Chat() {
                 </Select.Option>
               ))}
             </Select>
+            <span style={{ display: 'flex', alignItems: 'center' }}>
+              <Tooltip title="设置播放音量">
+                {volume === 0 ? (
+                  <SoundOutlined style={{ fontSize: '20px', color: '#999' }} />
+                ) : (
+                  <SoundFilled style={{ fontSize: '20px', color: '#1890ff' }} />
+                )}
+              </Tooltip>
+              <Slider
+                value={volume}
+                min={0}
+                max={100}
+                onChange={handleVolumeChange}
+                style={{ width: '120px' }}
+                tooltip={{ formatter: value => `${value}%` }}
+              />
+            </span>
           </Col>
         </Row>
         <SendMessage isConnected={isConnected} clientRef={clientRef} />
@@ -550,7 +584,7 @@ function Chat() {
 
         {/* 配置弹窗 */}
         <Modal
-          title="音频配置"
+          title="高级配置"
           open={isConfigModalOpen}
           onCancel={() => setIsConfigModalOpen(false)}
           footer={null}

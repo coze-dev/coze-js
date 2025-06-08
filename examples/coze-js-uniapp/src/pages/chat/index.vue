@@ -120,14 +120,20 @@
           结束聊天
         </button>
       </view>
-      <view class="button-cell" v-if="isConnected">
-        <button
-          @click="handleToggleAudioPlayback"
-          :type="isPlaybackMuted ? 'primary' : 'default'"
-          :disabled="!isConnected"
+      <view class="volume-control-container" v-if="isConnected">
+        <view class="volume-control-label"
+          >播放音量: {{ Math.round(playbackVolume * 100) }}%</view
         >
-          {{ isPlaybackMuted ? '取消静音' : '静音播放' }}
-        </button>
+        <view class="volume-control-slider">
+          <slider
+            :value="playbackVolume * 100"
+            min="0"
+            max="100"
+            show-value
+            @change="handleVolumeChange"
+            :disabled="!isConnected"
+          />
+        </view>
       </view>
     </view>
 
@@ -148,23 +154,22 @@ export default {
       isConnected,
       isRecording,
       isMuted,
-      isPlaybackMuted,
+      playbackVolume,
       messages,
       errorMessage,
-      isPressRecording,
-      recordingDuration,
-      maxRecordingTime,
+      toggleMute,
       startChat,
       stopChat,
-      sendTextMessage,
-      toggleMute,
       interrupt,
+      sendTextMessage,
       startPressRecord,
       finishPressRecord,
       cancelPressRecord,
-      togglePlaybackMute,
-      destroy,
       turnDetection,
+      isPressRecording,
+      recordingDuration,
+      maxRecordingTime,
+      setPlaybackVolume,
     } = useVoiceChat();
 
     // 文本消息
@@ -213,13 +218,15 @@ export default {
       }
     };
 
-    // 切换音频静音
-    const handleToggleAudioPlayback = () => {
+    // 处理音量变化
+    const handleVolumeChange = e => {
       try {
-        togglePlaybackMute();
+        // Slider returns value from 0-100, convert to 0-1
+        const volume = e.detail.value / 100;
+        setPlaybackVolume(volume);
       } catch (error) {
-        console.error('Error toggling audio playback:', error);
-        errorMessage.value = `操作失败: ${error.message}`;
+        console.error('Error setting audio volume:', error);
+        errorMessage.value = `设置音量失败: ${error.message}`;
       }
     };
 
@@ -335,13 +342,13 @@ export default {
       handleVoiceButtonTouchMove,
       handleVoiceButtonTouchEnd,
       handleVoiceButtonTouchCancel,
-      handleToggleAudioPlayback,
+      handleVolumeChange,
       getStatusText,
       getMessageClass,
       getRoleName,
       goBackToHome,
       turnDetection,
-      isPlaybackMuted,
+      playbackVolume,
     };
   },
 };
@@ -577,5 +584,34 @@ export default {
 
 .cancel-tip {
   color: #ff3b30;
+}
+
+/* Volume control styles */
+.volume-control-container {
+  width: 140px;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+}
+
+.volume-control-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.volume-control-slider {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.volume-control-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.volume-control-button {
+  width: 130px !important;
+  font-size: 14px !important;
 }
 </style>

@@ -191,8 +191,11 @@ await chatClient.setAudioEnable(false); // 关闭麦克风
 // 中断对话
 chatClient.interrupt();
 
-// 切换静音
-chatClient.setPlaybackMuted(true);
+// 设置播放音量
+chatClient.setPlaybackVolume(0.5);
+
+// 获取播放音量
+chatClient.getPlaybackVolume();
 
 // 断开连接
 await chatClient.disconnect();
