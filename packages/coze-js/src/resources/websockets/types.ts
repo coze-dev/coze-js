@@ -237,6 +237,8 @@ export interface ChatUpdateEvent extends BaseEvent {
     event_subscriptions?: string[];
     /** Whether to play the prologue, default is false. */
     need_play_prologue?: boolean;
+    /** Voice print group ID */
+    voice_print_group_id?: string;
   };
 }
 

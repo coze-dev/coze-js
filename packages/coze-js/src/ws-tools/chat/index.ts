@@ -14,7 +14,7 @@ import {
   WebsocketsEventType,
 } from '../../index';
 import BaseWsChatClient from './base';
-import { getAudioDevices } from '../utils';
+import { getAudioDevices, setValueByPath } from '../utils';
 export { WsChatEventNames };
 
 function isMobileView() {
@@ -156,7 +156,6 @@ class WsChatClient extends BaseWsChatClient {
           pcm_config: {
             sample_rate: 24000,
           },
-          voice_id: this.config.voiceId || undefined,
         },
         turn_detection: {
           type: 'server_vad',
@@ -166,12 +165,17 @@ class WsChatClient extends BaseWsChatClient {
       },
     };
 
+    if (this.config.voiceId) {
+      setValueByPath(event, 'data.output_audio.voice_id', this.config.voiceId);
+    }
+
     this.wavStreamPlayer?.setSampleRate(
       event.data?.output_audio?.pcm_config?.sample_rate || 24000,
     );
     this.wavStreamPlayer?.setDefaultFormat(
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
+    this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
 
     // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
