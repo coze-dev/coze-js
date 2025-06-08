@@ -64,17 +64,6 @@ const formConfigs: FormConfig[] = [
     required: false,
     message: 'Please input Workflow ID!',
   },
-  {
-    name: 'turn_detection',
-    label: '对话模式',
-    required: true,
-    message: 'Please select conversation mode!',
-    type: 'select',
-    options: [
-      { label: '自由对话模式', value: 'server_vad' },
-      { label: '按键说话模式', value: 'client_interrupt' },
-    ],
-  },
 ];
 
 // 渲染表单项组件
@@ -130,7 +119,6 @@ const Settings = ({
     const baseWsUrl = config.getBaseWsUrl();
     const voiceId = config.getVoiceId();
     const workflowId = config.getWorkflowId();
-    const turnDetection = config.getTurnDetection() || 'server_vad';
     form.setFieldsValue({
       base_url: baseUrl,
       base_ws_url: baseWsUrl,
@@ -138,7 +126,6 @@ const Settings = ({
       bot_id: botId,
       voice_id: voiceId,
       workflow_id: workflowId,
-      turn_detection: turnDetection,
     });
   }, [form]);
 

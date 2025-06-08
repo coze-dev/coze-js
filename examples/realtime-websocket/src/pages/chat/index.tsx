@@ -79,9 +79,7 @@ function Chat() {
   const [isCancelRecording, setIsCancelRecording] = useState(false);
   const startTouchY = useRef<number>(0);
   const [isMuted, setIsMuted] = useState(false);
-
-  // 获取对话模式
-  const turnDetection = config.getTurnDetection();
+  const [turnDetectionType, setTurnDetectionType] = useState('server_vad');
 
   useEffect(() => {
     const getDevices = async () => {
@@ -140,10 +138,7 @@ function Chat() {
       },
       deviceId: selectedInputDevice || undefined,
       // 如果是按键说话模式，默认关闭麦克风
-      audioMutedDefault:
-        turnDetection === 'client_interrupt'
-          ? true
-          : audioConfig?.audioMutedDefault || false,
+      audioMutedDefault: false,
     });
 
     if (
@@ -198,14 +193,14 @@ function Chat() {
       if (!clientRef.current) {
         await initClient();
       }
-      const chatUpdate = JSON.parse(localStorage.getItem('chatUpdate') || '{}');
+      const chatUpdate = config.getChatUpdate();
       if (chatUpdate?.data?.output_audio?.voice_id === '') {
         delete chatUpdate.data.output_audio.voice_id;
       }
-      // 更新判停模式
-      if (chatUpdate?.data?.turn_detection?.type) {
-        chatUpdate.data.turn_detection.type = turnDetection;
-      }
+      setTurnDetectionType(
+        chatUpdate?.data?.turn_detection?.type || 'server_vad',
+      );
+
       await clientRef.current?.connect({ chatUpdate });
       setIsConnected(true);
     } catch (error) {
@@ -237,7 +232,7 @@ function Chat() {
     if (
       isConnected &&
       clientRef.current &&
-      turnDetection === 'client_interrupt'
+      turnDetectionType === 'client_interrupt'
     ) {
       startPressRecord(e);
     }
@@ -393,14 +388,7 @@ function Chat() {
       <Settings
         onSettingsChange={handleSettingsChange}
         localStorageKey={localStorageKey}
-        fields={[
-          'base_ws_url',
-          'bot_id',
-          'pat',
-          'voice_id',
-          'workflow_id',
-          'turn_detection',
-        ]}
+        fields={['base_ws_url', 'bot_id', 'pat', 'voice_id', 'workflow_id']}
         className="settings-button"
       />
       <Layout.Content style={{ padding: '16px', background: '#fff' }}>
@@ -480,7 +468,7 @@ function Chat() {
         </Row>
 
         {/* 按键说话功能区 */}
-        {turnDetection === 'client_interrupt' && isConnected && (
+        {turnDetectionType === 'client_interrupt' && isConnected && (
           <Row style={{ maxWidth: '400px', margin: 'auto' }}>
             <Col span={24}>
               <div
@@ -526,7 +514,7 @@ function Chat() {
         )}
 
         {/* 状态指示器 */}
-        {turnDetection === 'client_interrupt' && (
+        {turnDetectionType === 'client_interrupt' && (
           <Row style={{ margin: '16px 0' }}>
             <Col span={24}>
               <div className="status-indicator">
@@ -561,7 +549,7 @@ function Chat() {
           <EventInput
             defaultValue={
               localStorage.getItem('chatUpdate') ||
-              JSON.stringify(getChatUpdateConfig(turnDetection), null, 2)
+              JSON.stringify(getChatUpdateConfig(turnDetectionType), null, 2)
             }
           />
         </Modal>

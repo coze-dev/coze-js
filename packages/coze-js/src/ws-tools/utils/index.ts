@@ -275,3 +275,51 @@ export function encodeG711U(pcm16: Int16Array): Uint8Array {
   }
   return out;
 }
+
+/**
+ * Sets a value in an object at a specified path using dot notation.
+ * Creates nested objects along the path if they don't exist.
+ *
+ * @param obj - The target object to modify
+ * @param path - The path in dot notation (e.g., 'a.b.c')
+ * @param value - The value to set at the specified path
+ * @returns The modified object
+ *
+ * @example
+ * // Set a value at a nested path
+ * const obj = {};
+ * setValueByPath(obj, 'user.profile.name', 'John');
+ * // Result: { user: { profile: { name: 'John' } } }
+ */
+export function setValueByPath<T extends Record<string, any>, V>(
+  obj: T,
+  path: string,
+  value: V,
+): T {
+  if (!obj || typeof obj !== 'object') {
+    throw new Error('Target must be an object');
+  }
+
+  if (!path) {
+    throw new Error('Path cannot be empty');
+  }
+
+  const keys = path.split('.');
+  let current: Record<string, any> = obj;
+
+  // Navigate to the last-but-one key
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    // Create empty object if the key doesn't exist or is not an object
+    if (!current[key] || typeof current[key] !== 'object') {
+      current[key] = {};
+    }
+    current = current[key] as Record<string, any>;
+  }
+
+  // Set the value at the final key
+  const lastKey = keys[keys.length - 1];
+  current[lastKey] = value;
+
+  return obj;
+}
