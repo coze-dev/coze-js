@@ -149,7 +149,6 @@ class WsChatClient extends BaseWsChatClient {
         input_audio: {
           format: 'pcm',
           codec: 'pcm',
-          sample_rate: sampleRate,
         },
         output_audio: {
           codec: 'pcm',
@@ -168,6 +167,8 @@ class WsChatClient extends BaseWsChatClient {
     if (this.config.voiceId) {
       setValueByPath(event, 'data.output_audio.voice_id', this.config.voiceId);
     }
+    // 强制设置输入音频的采样率为系统默认的采样率
+    setValueByPath(event, 'data.input_audio.sample_rate', sampleRate);
 
     this.wavStreamPlayer?.setSampleRate(
       event.data?.output_audio?.pcm_config?.sample_rate || 24000,

@@ -42,7 +42,7 @@ const getChatUpdateConfig = (turnDetectionType: string) => ({
     input_audio: {
       format: 'pcm',
       codec: 'pcm',
-      sample_rate: 44100,
+      sample_rate: 48000,
     },
     output_audio: {
       codec: 'pcm',
