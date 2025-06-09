@@ -52,8 +52,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.handleEventError = this.handleEventError.bind(this);
     this.handlePlayerEvent = this.handlePlayerEvent.bind(this);
     this.handleNetworkQuality = this.handleNetworkQuality.bind(this);
-    this.handleUserPublishScreen = this.handleUserPublishScreen.bind(this);
-    this.handleUserUnpublishScreen = this.handleUserUnpublishScreen.bind(this);
+    this.handleTrackEnded = this.handleTrackEnded.bind(this);
 
     // Debug only
     this.handleLocalAudioPropertiesReport =
@@ -71,14 +70,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.on(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.on(VERTC.events.onError, this.handleEventError);
     this.engine.on(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
-    this.engine.on(
-      VERTC.events.onUserPublishScreen,
-      this.handleUserPublishScreen,
-    );
-    this.engine.on(
-      VERTC.events.onUserUnpublishScreen,
-      this.handleUserUnpublishScreen,
-    );
+    this.engine.on(VERTC.events.onTrackEnded, this.handleTrackEnded);
 
     if (this._isSupportVideo) {
       this.engine.on(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -102,14 +94,7 @@ export class EngineClient extends RealtimeEventHandler {
     this.engine.off(VERTC.events.onUserLeave, this.handleUserLeave);
     this.engine.off(VERTC.events.onError, this.handleEventError);
     this.engine.off(VERTC.events.onNetworkQuality, this.handleNetworkQuality);
-    this.engine.off(
-      VERTC.events.onUserPublishScreen,
-      this.handleUserPublishScreen,
-    );
-    this.engine.off(
-      VERTC.events.onUserUnpublishScreen,
-      this.handleUserUnpublishScreen,
-    );
+    this.engine.off(VERTC.events.onTrackEnded, this.handleTrackEnded);
 
     if (this._isSupportVideo) {
       this.engine.off(VERTC.events.onPlayerEvent, this.handlePlayerEvent);
@@ -189,12 +174,11 @@ export class EngineClient extends RealtimeEventHandler {
     });
   }
 
-  handleUserPublishScreen(event: unknown) {
-    this.dispatch(EventNames.USER_PUBLISH_SCREEN, event);
-  }
-
-  handleUserUnpublishScreen(event: unknown) {
-    this.dispatch(EventNames.USER_UNPUBLISH_SCREEN, event);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleTrackEnded(event: any) {
+    if (event?.kind === 'video') {
+      this.dispatch(EventNames.VIDEO_OFF, event);
+    }
   }
 
   async joinRoom(options: {
@@ -319,10 +303,20 @@ export class EngineClient extends RealtimeEventHandler {
     await this.engine.startAudioCapture(devices.audioInputs[0].deviceId);
 
     if (this._isSupportVideo) {
-      this.setVideoInputDevice(
-        videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
-        videoConfig?.videoOnDefault,
-      );
+      try {
+        await this.setVideoInputDevice(
+          videoConfig?.videoInputDeviceId || devices.videoInputs[0].deviceId,
+          videoConfig?.videoOnDefault,
+        );
+        this.dispatch(
+          videoConfig?.videoOnDefault
+            ? EventNames.VIDEO_ON
+            : EventNames.VIDEO_OFF,
+          {},
+        );
+      } catch (e) {
+        this.dispatch(EventNames.VIDEO_ERROR, e);
+      }
     }
   }
 
@@ -352,29 +346,24 @@ export class EngineClient extends RealtimeEventHandler {
   }
 
   async changeVideoState(isVideoOn: boolean) {
-    try {
-      if (isVideoOn) {
-        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
-          await this.engine.startVideoCapture();
-        } else {
-          this.engine.setVideoSourceType(
-            StreamIndex.STREAM_INDEX_SCREEN,
-            VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
-          );
-          await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
-          await this.engine.publishScreen(MediaType.VIDEO);
-        }
+    if (isVideoOn) {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+        await this.engine.startVideoCapture();
       } else {
-        if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
-          await this.engine.stopVideoCapture();
-        } else {
-          await this.engine.stopScreenCapture();
-          await this.engine.unpublishScreen(MediaType.VIDEO);
-        }
+        this.engine.setVideoSourceType(
+          StreamIndex.STREAM_INDEX_SCREEN,
+          VideoSourceType.VIDEO_SOURCE_TYPE_INTERNAL,
+        );
+        await this.engine.startScreenCapture(this._videoConfig?.screenConfig);
+        await this.engine.publishScreen(MediaType.VIDEO);
       }
-    } catch (e) {
-      this.dispatch(EventNames.ERROR, e);
-      throw e;
+    } else {
+      if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
+        await this.engine.stopVideoCapture();
+      } else {
+        await this.engine.stopScreenCapture();
+        await this.engine.unpublishScreen(MediaType.VIDEO);
+      }
     }
   }
 
