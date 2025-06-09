@@ -120,6 +120,21 @@
           结束聊天
         </button>
       </view>
+      <view class="volume-control-container" v-if="isConnected">
+        <view class="volume-control-label"
+          >播放音量: {{ Math.round(playbackVolume * 100) }}%</view
+        >
+        <view class="volume-control-slider">
+          <slider
+            :value="playbackVolume * 100"
+            min="0"
+            max="100"
+            show-value
+            @change="handleVolumeChange"
+            :disabled="!isConnected"
+          />
+        </view>
+      </view>
     </view>
 
     <!-- 错误信息 -->
@@ -139,21 +154,22 @@ export default {
       isConnected,
       isRecording,
       isMuted,
+      playbackVolume,
       messages,
       errorMessage,
-      isPressRecording,
-      recordingDuration,
-      maxRecordingTime,
+      toggleMute,
       startChat,
       stopChat,
-      sendTextMessage,
-      toggleMute,
       interrupt,
+      sendTextMessage,
       startPressRecord,
       finishPressRecord,
       cancelPressRecord,
-      destroy,
       turnDetection,
+      isPressRecording,
+      recordingDuration,
+      maxRecordingTime,
+      setPlaybackVolume,
     } = useVoiceChat();
 
     // 文本消息
@@ -199,6 +215,18 @@ export default {
       if (textMessage.value.trim()) {
         sendTextMessage(textMessage.value);
         textMessage.value = '';
+      }
+    };
+
+    // 处理音量变化
+    const handleVolumeChange = e => {
+      try {
+        // Slider returns value from 0-100, convert to 0-1
+        const volume = e.detail.value / 100;
+        setPlaybackVolume(volume);
+      } catch (error) {
+        console.error('Error setting audio volume:', error);
+        errorMessage.value = `设置音量失败: ${error.message}`;
       }
     };
 
@@ -314,11 +342,13 @@ export default {
       handleVoiceButtonTouchMove,
       handleVoiceButtonTouchEnd,
       handleVoiceButtonTouchCancel,
+      handleVolumeChange,
       getStatusText,
       getMessageClass,
       getRoleName,
       goBackToHome,
       turnDetection,
+      playbackVolume,
     };
   },
 };
@@ -554,5 +584,34 @@ export default {
 
 .cancel-tip {
   color: #ff3b30;
+}
+
+/* Volume control styles */
+.volume-control-container {
+  width: 140px;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+}
+
+.volume-control-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.volume-control-slider {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.volume-control-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.volume-control-button {
+  width: 130px !important;
+  font-size: 14px !important;
 }
 </style>

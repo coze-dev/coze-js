@@ -239,6 +239,12 @@ await client.setAudioEnable(false);
 // set audio input device
 await client.setAudioInputDevice('your_device_id');
 
+// set playback volume
+client.setPlaybackVolume(0.5);
+
+// get playback volume
+const volume = client.getPlaybackVolume();
+
 ```
 
 

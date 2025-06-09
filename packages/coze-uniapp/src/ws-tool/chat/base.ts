@@ -39,6 +39,11 @@ export interface WsChatClientOptions extends WsToolsOptions {
    * zh: 是否默认静音
    */
   audioMutedDefault?: boolean;
+  /**
+   * en: Default volume for audio playback (0.0 to 1.0, 0.0 means muted)
+   * zh: 默认音频播放音量（0.0 到 1.0，0.0 表示静音）
+   */
+  playbackVolumeDefault?: number;
 }
 
 /**
@@ -65,6 +70,7 @@ export class BaseWsChatClient {
     this.wavStreamPlayer = new PcmStreamPlayer({
       sampleRate: 8000,
       defaultFormat: 'g711a',
+      volume: this.config.playbackVolumeDefault ?? 1.0,
     });
   }
 
@@ -249,6 +255,22 @@ export class BaseWsChatClient {
     this.audioDeltaList.length = 0;
     this.wavStreamPlayer.interrupt();
     this.trackId = `my-track-id-${Date.now()}`;
+  }
+
+  /**
+   * Set playback volume level
+   * @param {number} volume - Volume level from 0.0 (muted) to 1.0 (full volume)
+   */
+  setPlaybackVolume(volume: number) {
+    this.wavStreamPlayer.setVolume(volume);
+  }
+
+  /**
+   * Get current playback volume level
+   * @returns {number} Current volume level from 0.0 (muted) to 1.0 (full volume)
+   */
+  getPlaybackVolume(): number {
+    return this.wavStreamPlayer.getVolume();
   }
 
   /**

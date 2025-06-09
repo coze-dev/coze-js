@@ -17,7 +17,7 @@ export class PcmStreamPlayer {
   private inputSampleRate: number;
   private outputSampleRate: number;
   private audioQueue: Int16Array[] = [];
-  private isPaused = false;
+  private volume = 1.0; // Volume level from 0.0 (muted) to 1.0 (full volume)
   private trackSampleOffsets: Record<
     string,
     { trackId: string; offset: number; currentTime: number }
@@ -31,6 +31,7 @@ export class PcmStreamPlayer {
   private isProcessingQueue = false;
   private lastAudioProcessTime = Infinity;
   private processingTimeThreshold = 0; // 1ms threshold
+  private isPaused = false; // Track pause state
 
   // Current buffer and position for continuous playback
   private currentBuffer: Int16Array | null = null;
@@ -52,14 +53,17 @@ export class PcmStreamPlayer {
   constructor({
     sampleRate = 24000,
     defaultFormat = 'pcm',
+    volume = 1.0,
   }: {
     sampleRate?: number;
     defaultFormat?: AudioFormat;
+    volume?: number;
   } = {}) {
     this.inputSampleRate = sampleRate;
     // 微信小程序，输出的采样率是固定的，所有需要重采样
     this.outputSampleRate = PcmStreamPlayer.getSampleRate();
     this.defaultFormat = defaultFormat;
+    this.setVolume(volume);
   }
 
   /**
@@ -209,10 +213,9 @@ export class PcmStreamPlayer {
    * @private
    */
   private fillOutputBuffer(outputBuffer: Float32Array): void {
-    // If no current buffer, try to get the next one
     if (!this.currentBuffer) {
       if (!this.getNextBuffer()) {
-        // No more data, fill with silence
+        // No data available, fill with silence
         for (let i = 0; i < outputBuffer.length; i++) {
           outputBuffer[i] = 0;
         }
@@ -221,26 +224,39 @@ export class PcmStreamPlayer {
       }
     }
 
-    // Fill the output buffer with data from current buffer
+    // We have a buffer, process it with volume control
     for (let i = 0; i < outputBuffer.length; i++) {
       if (
         this.currentBuffer &&
         this.playbackPosition < this.currentBuffer.length
       ) {
-        // Convert from 16-bit PCM to float [-1.0, 1.0] on-the-fly
-        outputBuffer[i] = this.currentBuffer[this.playbackPosition++] / 0x8000;
+        // Apply volume scaling to the PCM samples (convert Int16 to Float32 and scale by volume)
+        outputBuffer[i] =
+          this.volume <= 0
+            ? 0
+            : (this.currentBuffer[this.playbackPosition] / 0x8000) *
+              this.volume;
+        this.playbackPosition++;
       } else {
         // Current buffer is exhausted, try to get next buffer
         if (!this.getNextBuffer()) {
-          // No more data, fill rest with silence
+          // No more buffers available
           outputBuffer[i] = 0;
           this.isProcessing = i !== outputBuffer.length - 1;
         } else {
-          // Got new buffer, use its first sample
-          outputBuffer[i] = this.currentBuffer
-            ? this.currentBuffer[this.playbackPosition++] / 0x8000
-            : 0;
-          // Ensure we're still marked as processing since we got a new buffer
+          // Got a new buffer, process it
+          if (this.currentBuffer) {
+            // Apply volume scaling
+            outputBuffer[i] =
+              this.volume <= 0
+                ? 0
+                : (this.currentBuffer[this.playbackPosition] / 0x8000) *
+                  this.volume;
+            this.playbackPosition++;
+          } else {
+            // Should not happen but still handle it
+            outputBuffer[i] = 0;
+          }
           this.isProcessing = true;
         }
       }
@@ -594,11 +610,34 @@ export class PcmStreamPlayer {
     return this.add16BitPCM(arrayBuffer, trackId, 'g711u');
   }
 
+  /**
+   * Get the WebAudioContext's sample rate
+   * @returns {number} System sample rate
+   * @static
+   */
   static getSampleRate(): number {
     const audioContext = uni.createWebAudioContext() as any;
     const { sampleRate } = audioContext;
     audioContext.close();
     return sampleRate;
+  }
+
+  /**
+   * Set volume level for audio playback
+   * @param {number} volume - Volume level from 0.0 (muted) to 1.0 (full volume)
+   */
+  setVolume(volume: number): void {
+    // Ensure volume is between 0 and 1
+    this.volume = Math.max(0, Math.min(1, volume));
+    console.log(`Audio volume set to ${this.volume}`);
+  }
+
+  /**
+   * Get current volume level
+   * @returns {number} Current volume level from 0.0 (muted) to 1.0 (full volume)
+   */
+  getVolume(): number {
+    return this.volume;
   }
 
   /**

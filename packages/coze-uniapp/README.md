@@ -153,6 +153,8 @@ const chatClient = new WsChatClient({
   botId: 'your_bot_id',
   // 可选：默认是否静音
   audioMutedDefault: false,
+  // 可选：是否静音播放
+  playbackMutedDefault: false,
   // 可选：语音 ID
   voiceId: 'voice_id',
 });
@@ -188,6 +190,12 @@ await chatClient.setAudioEnable(false); // 关闭麦克风
 
 // 中断对话
 chatClient.interrupt();
+
+// 设置播放音量
+chatClient.setPlaybackVolume(0.5);
+
+// 获取播放音量
+chatClient.getPlaybackVolume();
 
 // 断开连接
 await chatClient.disconnect();

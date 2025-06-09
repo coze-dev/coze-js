@@ -317,7 +317,7 @@ describe('WsTranscriptionClient', () => {
   describe('start', () => {
     it('should start recording', async () => {
       client['isRecording'] = false;
-      vi.spyOn(client, 'connect').mockResolvedValue(undefined);
+      vi.spyOn(client as any, 'connect').mockResolvedValue(undefined);
 
       await client.start();
       expect(client['isRecording']).toBe(true);

@@ -238,6 +238,13 @@ await client.setAudioEnable(false);
 // 设置音频输入设备
 await client.setAudioInputDevice('your_device_id');
 
+
+// 设置播放音量
+client.setPlaybackVolume(0);
+
+// 获取播放音量
+const volume = client.getPlaybackVolume();
+
 ```
 
 

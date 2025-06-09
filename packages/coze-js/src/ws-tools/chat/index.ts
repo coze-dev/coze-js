@@ -26,6 +26,7 @@ class WsChatClient extends BaseWsChatClient {
   private isMuted = false;
   private inputAudioCodec: AudioCodec = 'pcm';
   private turnDetection: TurnDetectionType = 'server_vad';
+  private playbackVolume = 1.0;
 
   constructor(config: WsChatClientOptions) {
     super(config);
@@ -35,6 +36,7 @@ class WsChatClient extends BaseWsChatClient {
     this.wavStreamPlayer = new WavStreamPlayer({
       sampleRate: 24000,
       enableLocalLoopback: isMobile,
+      volume: config.playbackVolumeDefault ?? 1,
     });
 
     this.recorder = new PcmRecorder({
@@ -270,6 +272,25 @@ class WsChatClient extends BaseWsChatClient {
     });
 
     this.emit(WsChatEventNames.INTERRUPTED, undefined);
+  }
+
+  /**
+   * en: Set the playback volume
+   * zh: 设置播放音量
+   * @param volume - The volume level to set (0.0 to 1.0)
+   */
+  setPlaybackVolume(volume: number) {
+    this.playbackVolume = Math.max(0, Math.min(1, volume));
+    this.wavStreamPlayer?.setVolume(this.playbackVolume);
+  }
+
+  /**
+   * en: Get the playback volume
+   * zh: 获取播放音量
+   * @returns The current volume level (0.0 to 1.0)
+   */
+  getPlaybackVolume(): number {
+    return this.wavStreamPlayer?.getVolume() ?? 0;
   }
 
   /**
