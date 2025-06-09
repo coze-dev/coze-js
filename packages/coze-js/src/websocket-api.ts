@@ -43,7 +43,7 @@ export class WebSocketAPI<Req, Rsp> {
       if (factory) {
         WebSocketImpl = factory.getWebSocketImplementation();
       } else {
-        throw new Error('MiniApp WebSocket implementation not found');
+        WebSocketImpl = window.WebSocket;
       }
     } else if (isBrowser()) {
       // Use browser's native WebSocket
