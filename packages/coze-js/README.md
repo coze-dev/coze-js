@@ -70,6 +70,7 @@ async function quickChat() {
 | Voice | Speech synthesis | [voice.ts](../../examples/coze-js-node/src/voice.ts) |
 | Templates | Template management | [templates.ts](../../examples/coze-js-node/src/templates.ts) |
 | Users | Get user info | [users-me.ts](../../examples/coze-js-node/src/users-me.ts) |
+| Voiceprint | Voiceprint management | [voiceprint.ts](../../examples/coze-js-node/src/voiceprint.ts) |
 | Chat（websocket） | Text and voice chat | [chat.ts](../../examples/coze-js-node/src/websockets/chat.ts) |
 | Speech（websocket） | Text to speech | [speech.ts](../../examples/coze-js-node/src/websockets/speech.ts) |
 | Transcriptions（websocket） | Speech to text | [transcriptions.ts](../../examples/coze-js-node/src/websockets/transcriptions.ts) |

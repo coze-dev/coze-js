@@ -107,6 +107,7 @@ vi.mock('@ws-tools/utils', () => ({
     ],
   }),
   isBrowserExtension: vi.fn().mockReturnValue(false),
+  setValueByPath: vi.fn(),
 }));
 
 describe('WebSocket Chat Tools', () => {
