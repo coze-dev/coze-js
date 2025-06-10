@@ -8,8 +8,7 @@ const getConfig = (prefix: string) => {
     getBotId: () => localStorage.getItem(`${prefix}_bot_id`) || '',
     getVoiceId: () => localStorage.getItem(`${prefix}_voice_id`) || '',
     getWorkflowId: () => localStorage.getItem(`${prefix}_workflow_id`) || '',
-    getTurnDetection: () =>
-      localStorage.getItem(`${prefix}_turn_detection`) || 'server_vad',
+    getChatUpdate: () => JSON.parse(localStorage.getItem('chatUpdate') || '{}'),
   };
   return config;
 };

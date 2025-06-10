@@ -252,6 +252,16 @@ export class EngineClient extends RealtimeEventHandler {
       );
     }
 
+    this.engine.setLocalVideoPlayer(
+      isScreenShareDevice(deviceId)
+        ? StreamIndex.STREAM_INDEX_SCREEN
+        : StreamIndex.STREAM_INDEX_MAIN,
+      {
+        renderDom: this._videoConfig?.renderDom || 'local-player',
+        userId: this._roomUserId,
+      },
+    );
+
     await this.changeVideoState(false);
     if (isScreenShareDevice(deviceId)) {
       if (this._streamIndex === StreamIndex.STREAM_INDEX_MAIN) {
@@ -276,11 +286,6 @@ export class EngineClient extends RealtimeEventHandler {
       }
       this._streamIndex = StreamIndex.STREAM_INDEX_MAIN;
     }
-
-    this.engine.setLocalVideoPlayer(this._streamIndex, {
-      renderDom: this._videoConfig?.renderDom || 'local-player',
-      userId: this._roomUserId,
-    });
   }
 
   async createLocalStream(userId?: string, videoConfig?: VideoConfig) {

@@ -237,6 +237,8 @@ export interface ChatUpdateEvent extends BaseEvent {
     event_subscriptions?: string[];
     /** Whether to play the prologue, default is false. */
     need_play_prologue?: boolean;
+    /** Voice print configuration */
+    voice_print_config?: VoicePrintConfig;
   };
 }
 
@@ -505,13 +507,19 @@ interface OutputAudio {
   voice_id?: string;
 }
 
-interface TurnDetection {
+export interface TurnDetection {
   /** 判停类型, client_interrupt/server_vad, 默认为 client_interrupt */
   type?: TurnDetectionType;
   /** server_vad模式下，VAD检测到语音之前要包含的音频量，单位ms，默认600ms */
   prefix_padding_ms?: number;
   /** server_vad模式下，检测语音停止的静音持续时间，单位ms，默认500ms */
   silence_duration_ms?: number;
+}
+
+export interface VoicePrintConfig {
+  group_id: string;
+  score?: number;
+  reuse_voice_info?: boolean;
 }
 
 /** 判停类型, client_interrupt/server_vad, 默认为 client_interrupt */
