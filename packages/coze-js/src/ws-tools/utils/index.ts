@@ -310,6 +310,10 @@ export function setValueByPath<T extends Record<string, any>, V>(
   // Navigate to the last-but-one key
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
+    // Skip dangerous keys to prevent prototype pollution
+    if (key === '__proto__' || key === 'constructor') {
+      throw new Error(`Invalid key detected: ${key}`);
+    }
     // Create empty object if the key doesn't exist or is not an object
     if (!current[key] || typeof current[key] !== 'object') {
       current[key] = {};
@@ -319,6 +323,9 @@ export function setValueByPath<T extends Record<string, any>, V>(
 
   // Set the value at the final key
   const lastKey = keys[keys.length - 1];
+  if (lastKey === '__proto__' || lastKey === 'constructor') {
+    throw new Error(`Invalid key detected: ${lastKey}`);
+  }
   current[lastKey] = value;
 
   return obj;

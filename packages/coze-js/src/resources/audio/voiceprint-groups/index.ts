@@ -7,7 +7,7 @@ export class VoiceprintGroups extends APIResource {
   features: VoiceprintFeature = new VoiceprintFeature(this._client);
 
   /**
-   * 创建声纹组
+   * Create voiceprint group
    */
   async create(
     params: CreateVoiceprintGroupReq,
@@ -22,7 +22,7 @@ export class VoiceprintGroups extends APIResource {
   }
 
   /**
-   * 获取声纹组列表
+   * Get voiceprint group list
    */
   async list(
     params?: ListVoiceprintGroupReq,
@@ -37,7 +37,7 @@ export class VoiceprintGroups extends APIResource {
   }
 
   /**
-   * 更新声纹组
+   * Update voiceprint group
    */
   async update(
     groupId: string,
@@ -53,7 +53,7 @@ export class VoiceprintGroups extends APIResource {
   }
 
   /**
-   * 删除声纹组
+   * Delete voiceprint group
    */
   async delete(groupId: string, options?: RequestOptions): Promise<undefined> {
     const apiUrl = `/v1/audio/voiceprint_groups/${groupId}`;
@@ -81,15 +81,15 @@ export interface ListVoiceprintGroupReq {
   page_num?: number;
   page_size?: number;
   /**
-   *模糊前缀匹配
+   * Fuzzy prefix matching
    */
   name?: string;
   /**
-   *匹配用户ID
+   * Match user ID
    */
   user_id?: string;
   /**
-   *声纹组ID
+   * Voiceprint group ID
    */
   group_id?: string;
 }

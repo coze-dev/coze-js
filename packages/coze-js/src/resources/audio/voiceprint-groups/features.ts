@@ -2,10 +2,11 @@ import { toFormData, type GenericFormData } from 'axios';
 
 import { APIResource } from '../../resource';
 import { type RequestOptions } from '../../../core';
+import { type UserInfo } from '..';
 
 export class VoiceprintFeature extends APIResource {
   /**
-   * 创建声纹特征
+   * Create voiceprint feature
    */
   async create(
     groupId: string,
@@ -21,7 +22,7 @@ export class VoiceprintFeature extends APIResource {
   }
 
   /**
-   * 更新声纹特征
+   * Update voiceprint feature
    */
   // eslint-disable-next-line max-params
   async update(
@@ -39,7 +40,7 @@ export class VoiceprintFeature extends APIResource {
   }
 
   /**
-   * 删除声纹特征
+   * Delete voiceprint feature
    */
   async delete(
     groupId: string,
@@ -56,7 +57,7 @@ export class VoiceprintFeature extends APIResource {
   }
 
   /**
-   * 获取声纹特征列表
+   * Get voiceprint feature list
    */
   async list(
     groupId: string,
@@ -72,7 +73,7 @@ export class VoiceprintFeature extends APIResource {
   }
 
   /**
-   * 声纹识别
+   * Speaker identification
    */
   async speakerIdentify(
     groupId: string,
@@ -93,9 +94,9 @@ export interface CreateVoiceprintFeatureReq {
   file: File | any;
   name: string;
   desc?: string;
-  // pcm文件才需要传入
+  // Only required for PCM files
   sample_rate?: number;
-  // pcm文件才需要传入，0 / 1
+  // Only required for PCM files, 0 / 1
   channel?: number;
 }
 
@@ -104,9 +105,9 @@ export interface UpdateVoiceprintFeatureReq {
   file?: File | any;
   name?: string;
   desc?: string;
-  // pcm文件才需要传入
+  // Only required for PCM files
   sample_rate?: number;
-  // pcm文件才需要传入，0 / 1
+  // Only required for PCM files, 0 / 1
   channel?: number;
 }
 
@@ -122,12 +123,6 @@ export interface ListVoiceprintFeatureReq {
 export interface ListVoiceprintFeatureData {
   items?: VoiceprintFeature[];
   total?: number;
-}
-export interface UserInfo {
-  id?: string;
-  name?: string;
-  nickname?: string;
-  avatar_url?: string;
 }
 export interface VoiceprintFeature {
   id?: string;
