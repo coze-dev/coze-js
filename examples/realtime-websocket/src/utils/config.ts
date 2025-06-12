@@ -9,6 +9,8 @@ const getConfig = (prefix: string) => {
     getVoiceId: () => localStorage.getItem(`${prefix}_voice_id`) || '',
     getWorkflowId: () => localStorage.getItem(`${prefix}_workflow_id`) || '',
     getChatUpdate: () => JSON.parse(localStorage.getItem('chatUpdate') || '{}'),
+    getAppId: () => localStorage.getItem(`${prefix}_app_id`) || '',
+    getStreamId: () => localStorage.getItem(`${prefix}_stream_id`) || '',
   };
   return config;
 };
