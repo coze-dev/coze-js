@@ -71,7 +71,10 @@ class StreamProcessor extends AudioWorkletProcessor {
       this.port.postMessage({ event: 'stop' });
       return false;
     } else if (outputBuffers.length) {
-      this.hasStarted = true;
+      if(!this.hasStarted){
+        this.hasStarted = true;
+        this.port.postMessage({ event: 'first_frame' });
+      }
       const { buffer, trackId } = outputBuffers.shift();
       for (let i = 0; i < outputChannelData.length; i++) {
         outputChannelData[i] = (buffer[i] || 0) * this.volume;

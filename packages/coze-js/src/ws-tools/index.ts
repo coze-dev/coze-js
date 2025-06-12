@@ -11,6 +11,9 @@ export {
   type WsChatCallbackHandler,
   type AudioRecordEvent,
   type WsToolsOptions,
+  type AudioSentencePlaybackStartEvent,
+  type AudioSentencePlaybackEndEvent,
+  ClientEventType,
 } from './types';
 export {
   default as PcmRecorder,

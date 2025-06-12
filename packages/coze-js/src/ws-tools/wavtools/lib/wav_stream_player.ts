@@ -31,17 +31,19 @@ export class WavStreamPlayer {
   defaultFormat: AudioFormat;
   localLoopbackStream: MediaStream | undefined;
   private volume: number = 1.0;
+  private firstFrameCallback?: (timestamp: number) => void;
 
   /**
    * Creates a new WavStreamPlayer instance
    * @param {{sampleRate?: number, enableLocalLoopback?: boolean, defaultFormat?: AudioFormat, volume?: number}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm', volume = 1.0 }: {
+  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm', volume = 1.0, firstFrameCallback }: {
     sampleRate?: number,
     enableLocalLoopback?: boolean,
     defaultFormat?: AudioFormat,
-    volume?: number
+    volume?: number,
+    firstFrameCallback?: (timestamp: number) => void
   } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
@@ -56,7 +58,9 @@ export class WavStreamPlayer {
     if(this.enableLocalLoopback) {
       this.localLoopback = new LocalLoopback(true);
     }
-    
+
+    this.firstFrameCallback = firstFrameCallback;
+
     // Initialize volume (0 = muted, 1 = full volume)
     this.volume = volume;
   }
@@ -149,6 +153,8 @@ export class WavStreamPlayer {
         const { requestId, trackId, offset } = e.data;
         const currentTime = offset / this.sampleRate;
         this.trackSampleOffsets[requestId] = { trackId, offset, currentTime };
+      } else if (event === 'first_frame') {
+         this.firstFrameCallback?.(Date.now());
       }
     };
 

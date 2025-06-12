@@ -34,7 +34,12 @@ const ReceiveMessage = ({
     if (!clientRef.current) {
       return;
     }
-    const handleMessageEvent = (_: string, event: WsChatEventData) => {
+    const handleMessageEvent = (eventName: string, event: WsChatEventData) => {
+      if (eventName === WsChatEventNames.CONNECTED) {
+        setMessageList([]);
+        setAudioList([]);
+        return;
+      }
       if (!event) {
         return;
       }

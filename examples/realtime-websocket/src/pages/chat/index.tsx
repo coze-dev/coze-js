@@ -22,6 +22,7 @@ import {
 } from '@coze/api/ws-tools';
 import SendMessage from './send-message';
 import ReceiveMessage from './receive-message';
+import SentenceMessage, { SentenceMessageRef } from './sentence-message';
 import {
   CommonErrorEvent,
   ConversationAudioTranscriptUpdateEvent,
@@ -57,14 +58,27 @@ const getChatUpdateConfig = (turnDetectionType: string) => ({
     need_play_prologue: true,
   },
 });
+
+// 获取回复模式配置
+const getReplyMode = (): 'stream' | 'sentence' => {
+  return localStorage.getItem('replyMode') === 'sentence'
+    ? 'sentence'
+    : 'stream';
+};
+
 function Chat() {
   const clientRef = useRef<WsChatClient>();
   const audioConfigRef = useRef<AudioConfigRef>(null);
+  const sentenceMessageRef = useRef<SentenceMessageRef>(null);
   // 是否正在连接
   const [isConnecting, setIsConnecting] = useState(false);
   // 是否已连接
   const [isConnected, setIsConnected] = useState(false);
   const [transcript, setTranscript] = useState('');
+
+  const [replyMode, setReplyMode] = useState<'stream' | 'sentence'>(
+    getReplyMode(),
+  );
 
   const [inputDevices, setInputDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
@@ -189,6 +203,8 @@ function Chat() {
             ' logid: ' +
             (event as CommonErrorEvent)?.detail.logid,
         );
+        clientRef.current?.disconnect();
+        setIsConnected(false);
       },
     );
   };
@@ -205,6 +221,7 @@ function Chat() {
       setTurnDetectionType(
         chatUpdate?.data?.turn_detection?.type || 'server_vad',
       );
+      setReplyMode(getReplyMode());
 
       await clientRef.current?.connect({ chatUpdate });
       setIsConnected(true);
@@ -494,7 +511,13 @@ function Chat() {
             </span>
           </Col>
         </Row>
-        <SendMessage isConnected={isConnected} clientRef={clientRef} />
+        <SendMessage
+          isConnected={isConnected}
+          clientRef={clientRef}
+          onSendText={(text: string) => {
+            sentenceMessageRef.current?.addMessage(text);
+          }}
+        />
 
         <Row style={{ margin: '16px 0' }}>
           <Col span={24} style={{ textAlign: 'left' }}>
@@ -568,7 +591,12 @@ function Chat() {
           </Row>
         )}
 
-        <ReceiveMessage clientRef={clientRef} />
+        {/* 根据回复模式选择对应的消息组件 */}
+        {replyMode === 'stream' ? (
+          <ReceiveMessage clientRef={clientRef} />
+        ) : (
+          <SentenceMessage ref={sentenceMessageRef} clientRef={clientRef} />
+        )}
         {isMobile && <ConsoleLog />}
 
         {/* 配置弹窗 */}
