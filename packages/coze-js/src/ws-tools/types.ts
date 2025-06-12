@@ -20,6 +20,11 @@ export interface WsToolsOptions {
   websocketOptions?: WebsocketOptions;
 }
 
+export interface WsSpeechClientOptions extends WsToolsOptions {
+  entityType?: 'bot' | 'workflow';
+  entityId?: string;
+}
+
 export interface SentenceItem {
   /** 事件 ID */
   id: string;
@@ -419,6 +424,8 @@ export interface WsTranscriptionClientOptions extends WsToolsOptions {
    * zh: 音频录制配置，仅在 debug = true 时有效
    */
   wavRecordConfig?: WavRecordConfig;
+  entityType?: 'bot' | 'workflow';
+  entityId?: string;
 }
 
 export type WsSimultInterpretationClientOptions = WsTranscriptionClientOptions;

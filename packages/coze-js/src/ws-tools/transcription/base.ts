@@ -47,6 +47,10 @@ class BaseWsTranscriptionClient {
       return this.ws;
     }
     const ws = await this.api.websockets.audio.transcriptions.create(
+      {
+        entity_type: this.config.entityType,
+        entity_id: this.config.entityId,
+      },
       this.config.websocketOptions,
     );
     let isResolved = false;

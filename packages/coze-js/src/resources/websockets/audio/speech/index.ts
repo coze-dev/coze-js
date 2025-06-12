@@ -10,16 +10,22 @@ import {
   type SpeechUpdateEvent,
 } from '../../types';
 import { APIResource } from '../../../resource';
+import { buildWebsocketUrl } from '../../../../utils';
 import { type WebsocketOptions } from '../../../../core';
 
 export class Speech extends APIResource {
-  async create(options?: WebsocketOptions) {
-    const apiUrl = '/v1/audio/speech';
+  async create(req?: CreateSpeechReq, options?: WebsocketOptions) {
+    const apiUrl = buildWebsocketUrl('/v1/audio/speech', req);
     return await this._client.makeWebsocket<
       CreateSpeechWsReq,
       CreateSpeechWsRes
     >(apiUrl, options);
   }
+}
+
+export interface CreateSpeechReq {
+  entity_type?: 'bot' | 'workflow';
+  entity_id?: string;
 }
 
 export type CreateSpeechWsReq =
