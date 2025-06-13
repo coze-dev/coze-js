@@ -34,6 +34,7 @@ class WsSpeechClient {
   private elapsedBeforePause = 0;
   private audioDeltaList: string[] = [];
   private sampleRate = PcmStreamPlayer.getSampleRate();
+  private config: WsToolsOptions;
 
   /**
    * Creates a new WsSpeechClient instance
@@ -47,6 +48,7 @@ class WsSpeechClient {
     this.pcmStreamPlayer = new PcmStreamPlayer({
       sampleRate: this.sampleRate,
     });
+    this.config = config;
   }
 
   /**
@@ -57,7 +59,10 @@ class WsSpeechClient {
     if (this.ws) {
       return this.ws;
     }
-    const ws = await this.api.websockets.audio.speech.create();
+    const ws = await this.api.websockets.audio.speech.create(
+      undefined,
+      this.config.websocketOptions,
+    );
     this.ws = ws;
 
     let isResolved = false;
