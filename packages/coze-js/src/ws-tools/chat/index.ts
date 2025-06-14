@@ -1,7 +1,12 @@
 import { v4 as uuid } from 'uuid';
 
 import { WavStreamPlayer, type AudioFormat } from '../wavtools';
-import { type WsChatClientOptions, WsChatEventNames } from '../types';
+import {
+  type AudioRecordEvent,
+  ClientEventType,
+  type WsChatClientOptions,
+  WsChatEventNames,
+} from '../types';
 import {
   PcmRecorder,
   type AIDenoiserProcessorLevel,
@@ -37,6 +42,15 @@ class WsChatClient extends BaseWsChatClient {
       sampleRate: 24000,
       enableLocalLoopback: isMobile,
       volume: config.playbackVolumeDefault ?? 1,
+      // firstFrameCallback: timestamp => {
+      //   // this.ws?.send({
+      //   //   id: uuid(),
+      //   //   event_type: 'client.event',
+      //   //   data: {
+      //   //     first_audio_timestamp: timestamp,
+      //   //   },
+      //   // } as any);
+      // },
     });
 
     this.recorder = new PcmRecorder({
@@ -98,8 +112,8 @@ class WsChatClient extends BaseWsChatClient {
         // startTime = performance.now();
       },
       wavAudioCallback: (blob, name) => {
-        const event = {
-          event_type: 'audio.input.dump' as const,
+        const event: AudioRecordEvent = {
+          event_type: ClientEventType.AUDIO_INPUT_DUMP,
           data: {
             name,
             wav: blob,
@@ -108,8 +122,8 @@ class WsChatClient extends BaseWsChatClient {
         this.emit(WsChatEventNames.AUDIO_INPUT_DUMP, event);
       },
       dumpAudioCallback: (blob, name) => {
-        const event = {
-          event_type: 'audio.input.dump' as const,
+        const event: AudioRecordEvent = {
+          event_type: ClientEventType.AUDIO_INPUT_DUMP,
           data: {
             name,
             wav: blob,
@@ -177,6 +191,9 @@ class WsChatClient extends BaseWsChatClient {
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
     this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
+    this.outputAudioCodec = event.data?.output_audio?.codec || 'pcm';
+    this.outputAudioSampleRate =
+      event.data?.output_audio?.pcm_config?.sample_rate || 24000;
 
     // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';

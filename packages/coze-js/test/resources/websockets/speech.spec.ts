@@ -22,7 +22,7 @@ describe('Speech', () => {
   describe('create', () => {
     it('should create a websocket connection for speech', async () => {
       const options = { connectionTimeout: 5000 };
-      const result = await speech.create(options);
+      const result = await speech.create(undefined, options);
 
       expect(client.makeWebsocket).toHaveBeenCalledWith(
         '/v1/audio/speech',

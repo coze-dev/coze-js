@@ -27,6 +27,7 @@ import {
   type ConversationAudioTranscriptUpdateEvent,
   type ConversationAudioTranscriptCompletedEvent,
   type AudioDumpEvent,
+  type ConversationAudioSentenceStartEvent,
 } from '../types';
 import { APIResource } from '../../resource';
 import { buildWebsocketUrl } from '../../../utils';
@@ -77,4 +78,5 @@ export type CreateChatWsRes =
   | ConversationChatCanceledEvent
   | ConversationAudioTranscriptUpdateEvent
   | ConversationAudioTranscriptCompletedEvent
+  | ConversationAudioSentenceStartEvent
   | AudioDumpEvent;

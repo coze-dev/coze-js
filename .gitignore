@@ -171,3 +171,5 @@ examples/coze-js-node/src/config/config.ts
 
 !examples/coze-js-web/src/lib/wavtools/dist
 packages/chat-sdk/.env.development
+
+/tmp

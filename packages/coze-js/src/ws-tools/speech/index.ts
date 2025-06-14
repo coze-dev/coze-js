@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { WavStreamPlayer } from '../wavtools';
-import { type WsToolsOptions } from '../types';
+import { type WsSpeechClientOptions } from '../types';
 import {
   APIError,
   COZE_CN_BASE_WS_URL,
@@ -28,20 +28,28 @@ class WsSpeechClient {
   private playbackTimeout: NodeJS.Timeout | null = null;
   private elapsedBeforePause = 0;
   private audioDeltaList: string[] = [];
+  private config: WsSpeechClientOptions;
 
-  constructor(config: WsToolsOptions) {
+  constructor(config: WsSpeechClientOptions) {
     this.api = new CozeAPI({
       baseWsURL: COZE_CN_BASE_WS_URL,
       ...config,
     });
     this.wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
+    this.config = config;
   }
 
   async init() {
     if (this.ws) {
       return this.ws;
     }
-    const ws = await this.api.websockets.audio.speech.create();
+    const ws = await this.api.websockets.audio.speech.create(
+      {
+        entity_type: this.config.entityType,
+        entity_id: this.config.entityId,
+      },
+      this.config.websocketOptions,
+    );
     this.ws = ws;
 
     let isResolved = false;

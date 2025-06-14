@@ -152,6 +152,61 @@ enum EventNames {
    * zh: 会话更新
    */
   SESSION_UPDATED = 'server.session.updated',
+  /**
+   * en: Conversation created
+   * zh: 会话创建
+   */
+  CONVERSATION_CREATED = 'server.conversation.created',
+  /**
+   * en: Conversation chat created
+   * zh: 会话对话创建
+   */
+  CONVERSATION_CHAT_CREATED = 'server.conversation.chat.created',
+  /**
+   * en: Conversation chat in progress
+   * zh: 对话正在处理中
+   */
+  CONVERSATION_CHAT_IN_PROGRESS = 'server.conversation.chat.in_progress',
+  /**
+   * en: Conversation message delta received
+   * zh: 文本消息增量返回
+   */
+  CONVERSATION_MESSAGE_DELTA = 'server.conversation.message.delta',
+  /**
+   * en: Conversation message completed
+   * zh: 文本消息完成
+   */
+  CONVERSATION_MESSAGE_COMPLETED = 'server.conversation.message.completed',
+  /**
+   * en: Conversation chat completed
+   * zh: 对话完成
+   */
+  CONVERSATION_CHAT_COMPLETED = 'server.conversation.chat.completed',
+  /**
+   * en: Conversation chat requires action
+   * zh: 对话需要插件
+   */
+  CONVERSATION_CHAT_REQUIRES_ACTION = 'server.conversation.chat.requires_action',
+  /**
+   * en: Conversation chat failed
+   * zh: 对话失败
+   */
+  CONVERSATION_CHAT_FAILED = 'server.conversation.chat.failed',
+  /**
+   * en: Session pre answer updated
+   * zh: 安抚配置更新成功
+   */
+  SESSION_PRE_ANSWER_UPDATED = 'server.session.pre_answer.updated',
+  /**
+   * en: Conversation audio transcript delta
+   * zh: 用户语音识别字幕
+   */
+  CONVERSATION_AUDIO_TRANSCRIPT_DELTA = 'server.conversation.audio_transcript.delta',
+  /**
+   * en: Mode updated
+   * zh: 更新房间模式成功
+   */
+  MODE_UPDATED = 'server.mode.updated',
 }
 
 export default EventNames;

@@ -76,6 +76,7 @@ export class BaseWsTranscriptionClient {
     }
 
     const ws = await this.api.websockets.audio.transcriptions.create(
+      undefined,
       this.config.websocketOptions,
     );
     let isResolved = false;

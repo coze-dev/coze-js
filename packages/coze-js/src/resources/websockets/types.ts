@@ -164,6 +164,8 @@ export enum WebsocketsEventType {
   CONVERSATION_AUDIO_TRANSCRIPT_UPDATE = 'conversation.audio_transcript.update',
   /** Audio transcript completed */
   CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED = 'conversation.audio_transcript.completed',
+  /** Audio sentence start */
+  CONVERSATION_AUDIO_SENTENCE_START = 'conversation.audio.sentence_start',
   /** Audio dump */
   DUMP_AUDIO = 'dump.audio',
 
@@ -180,6 +182,7 @@ export enum WebsocketsEventType {
 export interface EventDetail {
   /** Log ID for this request. If you encounter errors and repeated retries fail, you can contact the Coze team with this logid and error code for assistance. */
   logid: string;
+  respond_at?: string;
 }
 
 export interface CommonErrorEvent extends BaseEventWithDetail {
@@ -440,6 +443,14 @@ export interface ConversationAudioTranscriptCompletedEvent extends BaseEvent {
   event_type: WebsocketsEventType.CONVERSATION_AUDIO_TRANSCRIPT_COMPLETED;
   data: {
     content: string;
+  };
+}
+
+export interface ConversationAudioSentenceStartEvent
+  extends BaseEventWithDetail {
+  event_type: WebsocketsEventType.CONVERSATION_AUDIO_SENTENCE_START;
+  data: {
+    text: string;
   };
 }
 

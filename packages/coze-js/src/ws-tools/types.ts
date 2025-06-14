@@ -20,18 +20,52 @@ export interface WsToolsOptions {
   websocketOptions?: WebsocketOptions;
 }
 
+export interface WsSpeechClientOptions extends WsToolsOptions {
+  entityType?: 'bot' | 'workflow';
+  entityId?: string;
+}
+
+export interface SentenceItem {
+  /** 事件 ID */
+  id: string;
+  /** 句子文本 */
+  content: string;
+  /** 该句子的音频时长（毫秒） */
+  audioDuration: number;
+  /** 是否是最后一个句子 */
+  isLastSentence: boolean;
+}
+
 export interface AudioRecordEvent {
-  event_type: 'audio.input.dump';
+  event_type: ClientEventType.AUDIO_INPUT_DUMP;
   data: {
     name: string;
     wav: Blob;
   };
 }
+
+export interface AudioSentencePlaybackStartEvent {
+  event_type: ClientEventType.AUDIO_SENTENCE_PLAYBACK_START;
+  data: {
+    /** 句子对应的事件 ID */
+    id: string;
+    /** 句子文本 */
+    content: string;
+  };
+}
+
+export interface AudioSentencePlaybackEndEvent {
+  event_type: ClientEventType.AUDIO_SENTENCE_PLAYBACK_ENDED;
+}
+
 export type WsChatEventData =
   | CreateChatWsRes
   | AudioRecordEvent
   | undefined
-  | ChatUpdateEvent;
+  | ChatUpdateEvent
+  | AudioSentencePlaybackStartEvent
+  | AudioSentencePlaybackEndEvent;
+
 export type WsChatCallbackHandler = (
   eventName: string,
   event: WsChatEventData,
@@ -153,6 +187,25 @@ export interface WsChatClientOptions extends WsToolsOptions {
   playbackVolumeDefault?: number;
 }
 
+export enum ClientEventType {
+  /**
+   * en: Audio input dump
+   * zh: 音频输入 dump
+   */
+  AUDIO_INPUT_DUMP = 'audio.input.dump',
+  /**
+   * en: Audio sentence playback start
+   * zh: 句子开始播放
+   */
+  AUDIO_SENTENCE_PLAYBACK_START = 'audio.sentence.playback_start',
+
+  /**
+   * en: Audio sentence playback ended
+   * zh: 句子播放结束
+   */
+  AUDIO_SENTENCE_PLAYBACK_ENDED = 'audio.sentence.playback_ended',
+}
+
 export enum WsChatEventNames {
   /**
    * en: All events
@@ -220,6 +273,18 @@ export enum WsChatEventNames {
    * zh: 音频 dump
    */
   AUDIO_INPUT_DUMP = 'client.audio.input.dump',
+
+  /**
+   * en: Audio sentence playback start
+   * zh: 句子开始播放
+   */
+  AUDIO_SENTENCE_PLAYBACK_START = 'client.audio.sentence.playback_start',
+
+  /**
+   * en: Audio sentence playback ended
+   * zh: 句子播放结束
+   */
+  AUDIO_SENTENCE_PLAYBACK_ENDED = 'client.audio.sentence.playback_ended',
 
   /**
    * en: Chat created
@@ -326,6 +391,11 @@ export enum WsChatEventNames {
    * zh: 音频 dump
    */
   DUMP_AUDIO = 'server.dump.audio',
+  /**
+   * en: Audio sentence start
+   * zh: 音频句子开始
+   */
+  CONVERSATION_AUDIO_SENTENCE_START = 'server.conversation.audio.sentence_start',
 }
 
 export interface WsTranscriptionClientOptions extends WsToolsOptions {
@@ -354,6 +424,8 @@ export interface WsTranscriptionClientOptions extends WsToolsOptions {
    * zh: 音频录制配置，仅在 debug = true 时有效
    */
   wavRecordConfig?: WavRecordConfig;
+  entityType?: 'bot' | 'workflow';
+  entityId?: string;
 }
 
 export type WsSimultInterpretationClientOptions = WsTranscriptionClientOptions;
