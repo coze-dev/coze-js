@@ -12,11 +12,22 @@ const config = getConfig(localStorageKey);
 export interface EventInputProps {
   defaultValue?: string;
 }
+// 从 JSON 中获取当前配置的回复模式
+function getReplyModeFromJson(): 'stream' | 'sentence' {
+  return localStorage.getItem('replyMode') === 'sentence'
+    ? 'sentence'
+    : 'stream';
+}
 
 const EventInput = ({ defaultValue }: EventInputProps) => {
   const [inputValue, setInputValue] = useState(defaultValue || '');
   const [isValidJson, setIsValidJson] = useState(true);
   const turnDetection = config.getChatUpdate()?.data?.turn_detection?.type;
+
+  // 添加回复模式配置，默认为流式模式（stream）
+  const [replyMode, setReplyMode] = useState<'stream' | 'sentence'>(
+    getReplyModeFromJson(),
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target;
@@ -50,6 +61,12 @@ const EventInput = ({ defaultValue }: EventInputProps) => {
     }
   };
 
+  // 处理回复模式变更
+  const handleReplyModeChange = (value: 'stream' | 'sentence') => {
+    setReplyMode(value);
+    localStorage.setItem('replyMode', value);
+  };
+
   return (
     <div style={{ padding: '24px' }}>
       <Form.Item name="turn_detection" label="对话模式">
@@ -59,6 +76,16 @@ const EventInput = ({ defaultValue }: EventInputProps) => {
           options={[
             { label: '自由对话模式', value: 'server_vad' },
             { label: '按键说话模式', value: 'client_interrupt' },
+          ]}
+        />
+      </Form.Item>
+      <Form.Item name="reply_mode" label="回复模式">
+        <Select
+          defaultValue={replyMode}
+          onChange={handleReplyModeChange}
+          options={[
+            { label: '流式模式', value: 'stream' },
+            { label: '字幕同步', value: 'sentence' },
           ]}
         />
       </Form.Item>

@@ -6,9 +6,11 @@ import { type WsChatClient } from '@coze/api/ws-tools';
 const SendMessage = ({
   isConnected,
   clientRef,
+  onSendText,
 }: {
   isConnected: boolean;
   clientRef: MutableRefObject<WsChatClient | undefined>;
+  onSendText: (text: string) => void;
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [inputText, setInputText] = useState('');
@@ -18,6 +20,7 @@ const SendMessage = ({
 
   const handleSendText = (text: string) => {
     clientRef.current?.sendTextMessage(text);
+    onSendText(text);
   };
 
   const showModal = () => {

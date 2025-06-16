@@ -66,14 +66,14 @@ export function isPersonalAccessToken(token?: string) {
   return !!token?.startsWith('pat_');
 }
 
-export function buildWebsocketUrl(path: string, params: Record<string, any>) {
-  const queryString = Object.entries(params)
+export function buildWebsocketUrl(path: string, params?: Record<string, any>) {
+  const queryString = Object.entries(params || {})
     .filter(
       ([_, value]) => value !== undefined && value !== null && value !== '',
     )
     .map(([key, value]) => `${key}=${value}`)
     .join('&');
-  return `${path}?${queryString}`;
+  return `${path}${queryString ? `?${queryString}` : ''}`;
 }
 
 export const isBrowserExtension = (): boolean =>
