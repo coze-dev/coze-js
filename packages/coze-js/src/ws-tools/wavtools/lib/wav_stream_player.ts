@@ -31,19 +31,17 @@ export class WavStreamPlayer {
   defaultFormat: AudioFormat;
   localLoopbackStream: MediaStream | undefined;
   private volume: number = 1.0;
-  private firstFrameCallback?: (timestamp: number) => void;
 
   /**
    * Creates a new WavStreamPlayer instance
    * @param {{sampleRate?: number, enableLocalLoopback?: boolean, defaultFormat?: AudioFormat, volume?: number}} options
    * @returns {WavStreamPlayer}
    */
-  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm', volume = 1.0, firstFrameCallback }: {
+  constructor({ sampleRate = 44100, enableLocalLoopback = false, defaultFormat = 'pcm', volume = 1.0 }: {
     sampleRate?: number,
     enableLocalLoopback?: boolean,
     defaultFormat?: AudioFormat,
     volume?: number,
-    firstFrameCallback?: (timestamp: number) => void
   } = {}) {
     this.scriptSrc = StreamProcessorSrc;
     this.sampleRate = sampleRate;
@@ -59,7 +57,6 @@ export class WavStreamPlayer {
       this.localLoopback = new LocalLoopback(true);
     }
 
-    this.firstFrameCallback = firstFrameCallback;
 
     // Initialize volume (0 = muted, 1 = full volume)
     this.volume = volume;
@@ -153,8 +150,6 @@ export class WavStreamPlayer {
         const { requestId, trackId, offset } = e.data;
         const currentTime = offset / this.sampleRate;
         this.trackSampleOffsets[requestId] = { trackId, offset, currentTime };
-      } else if (event === 'first_frame') {
-         this.firstFrameCallback?.(Date.now());
       }
     };
 
@@ -214,7 +209,14 @@ export class WavStreamPlayer {
     } else {
       throw new Error(`argument must be Int16Array, Uint8Array, or ArrayBuffer`);
     }
-    this.streamNode!.port.postMessage({ event: 'write', buffer, trackId });
+    // 使用 Transferable 对象传递 ArrayBuffer，避免数据复制
+    // 注意：只能传递 buffer.buffer，因为 buffer 是 Int16Array
+    const transferableBuffer = buffer.buffer;
+    this.streamNode!.port.postMessage({
+      event: 'write',
+      buffer,
+      trackId
+    }, [transferableBuffer]);
     return buffer;
   }
 

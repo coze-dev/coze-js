@@ -86,7 +86,6 @@ class WsChatClient extends BaseWsChatClient {
     // init stream player
     await this.wavStreamPlayer?.add16BitPCM(new ArrayBuffer(0), this.trackId);
 
-    // let startTime = performance.now();
     // 2. recording
     await this.recorder.record({
       pcmAudioCallback: data => {

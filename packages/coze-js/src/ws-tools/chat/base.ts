@@ -23,7 +23,7 @@ import {
   WebsocketsEventType,
 } from '../../index';
 
-class BaseWsChatClient {
+abstract class BaseWsChatClient {
   public ws: WebSocketAPI<CreateChatWsReq, CreateChatWsRes> | null = null;
   protected listeners: Map<string, Set<WsChatCallbackHandler>> = new Map();
   protected wavStreamPlayer?: WavStreamPlayer;
@@ -170,6 +170,7 @@ class BaseWsChatClient {
   }
 
   sendTextMessage(text: string) {
+    this.clear();
     this.sendMessage({
       id: uuid(),
       event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
