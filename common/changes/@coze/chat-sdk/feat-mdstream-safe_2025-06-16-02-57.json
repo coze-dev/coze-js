@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "解决html的xss问题",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "gaoding.devingao@bytedance.com"
+}

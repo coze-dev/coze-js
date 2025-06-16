@@ -1,6 +1,6 @@
 {
   "name": "@coze/chat-sdk",
-  "version": "0.1.11-beta.17",
+  "version": "0.1.11-beta.18",
   "description": "Coze chat components for taro",
   "license": "MIT",
   "author": "gaoding.devingao@bytedance.com",
@@ -84,6 +84,7 @@
     "micromark-extension-gfm-table": "^2.1.0",
     "micromark-extension-gfm-task-list-item": "^2.1.0",
     "micromark-extension-misc-radio-list-item": "^2.1.0",
+    "xss": "^1.0.15",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
