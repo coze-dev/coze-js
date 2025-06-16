@@ -19,7 +19,7 @@ export const Link: FC<{
   const { eventCallbacks } = useMdStreamContext();
   const isValidUrl = useMemo(() => {
     let isValid = node.url && node.url !== '#';
-    if (/^javascript/i.test(node.url.replace(/\s/, ''))) {
+    if (/^javascript/i.test(node.url.replace(/\s/g, ''))) {
       isValid = false;
     }
     return isValid;
