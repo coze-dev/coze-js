@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "Remove RTC_ACCESS_URLS in test env",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
