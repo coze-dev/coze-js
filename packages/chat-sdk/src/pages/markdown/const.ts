@@ -1,4 +1,82 @@
 export const markdown = `
+<a href="javas\x00cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x07cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x0Dcript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x0Acript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x08cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x02cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x03cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x04cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x01cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x05cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x0Bcript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x09cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x06cript:javascript:alert(1)" id="fuzzelement1">test</a>
+<a href="javas\x0Ccript:javascript:alert(1)" id="fuzzelement1">test</a>
+
+<a href="\x12javascript:javascript:alert(1)" id="fuzzelement1">test</a>
+<script type="text/javascript">alert(1)</script>
+"-prompt(8)-"
+'-prompt(8)-'
+";a=prompt,a()//
+';a=prompt,a()//
+'-eval("window['pro'%2B'mpt'](8)")-'
+"-eval("window['pro'%2B'mpt'](8)")-"
+"onclick=prompt(8)>"@x.y
+"onclick=prompt(8)><svg/onload=prompt(8)>"@x.y
+<image/src/onerror=prompt(8)>
+<img/src/onerror=prompt(8)>
+<image src/onerror=prompt(8)>
+<img src/onerror=prompt(8)>
+<image src =q onerror=prompt(8)>
+<img src =q onerror=prompt(8)>
+</scrip</script>t><img src =q onerror=prompt(8)>
+<script\x20type="text/javascript">javascript:alert(1);</script>
+<script\x3Etype="text/javascript">javascript:alert(1);</script>
+<script\x0Dtype="text/javascript">javascript:alert(1);</script>
+<script\x09type="text/javascript">javascript:alert(1);</script>
+<script\x0Ctype="text/javascript">javascript:alert(1);</script>
+<script\x2Ftype="text/javascript">javascript:alert(1);</script>
+<script\x0Atype="text/javascript">javascript:alert(1);</script>
+'"><\x3Cscript>javascript:alert(1)</script>
+'"><\x00script>javascript:alert(1)</script>
+<img src=1 href=1 onerror="javascript:alert(1)"></img>
+<audio src=1 href=1 onerror="javascript:alert(1)"></audio>
+<video src=1 href=1 onerror="javascript:alert(1)"></video>
+<body src=1 href=1 onerror="javascript:alert(1)"></body>
+<image src=1 href=1 onerror="javascript:alert(1)"></image>
+<object src=1 href=1 onerror="javascript:alert(1)"></object>
+<script src=1 href=1 onerror="javascript:alert(1)"></script>
+<svg onResize svg onResize="javascript:javascript:alert(1)"></svg onResize>
+<title onPropertyChange title onPropertyChange="javascript:javascript:alert(1)"></title onPropertyChange>
+<iframe onLoad iframe onLoad="javascript:javascript:alert(1)"></iframe onLoad>
+<body onMouseEnter body onMouseEnter="javascript:javascript:alert(1)"></body onMouseEnter>
+<body onFocus body onFocus="javascript:javascript:alert(1)"></body onFocus>
+<frameset onScroll frameset onScroll="javascript:javascript:alert(1)"></frameset onScroll>
+<script onReadyStateChange script onReadyStateChange="javascript:javascript:alert(1)"></script onReadyStateChange>
+<html onMouseUp html onMouseUp="javascript:javascript:alert(1)"></html onMouseUp>
+<body onPropertyChange body onPropertyChange="javascript:javascript:alert(1)"></body onPropertyChange>
+<svg onLoad svg onLoad="javascript:javascript:alert(1)"></svg onLoad>
+<body onPageHide body onPageHide="javascript:javascript:alert(1)"></body onPageHide>
+<body onMouseOver body onMouseOver="javascript:javascript:alert(1)"></body onMouseOver>
+<body onUnload body onUnload="javascript:javascript:alert(1)"></body onUnload>
+<body onLoad body onLoad="javascript:javascript:alert(1)"></body onLoad>
+<bgsound onPropertyChange bgsound onPropertyChange="javascript:javascript:alert(1)"></bgsound onPropertyChange>
+<html onMouseLeave html onMouseLeave="javascript:javascript:alert(1)"></html onMouseLeave>
+<html onMouseWheel html onMouseWheel="javascript:javascript:alert(1)"></html onMouseWheel>
+<style onLoad style onLoad="javascript:javascript:alert(1)"></style onLoad>
+<iframe onReadyStateChange iframe onReadyStateChange="javascript:javascript:alert(1)"></iframe onReadyStateChange>
+<body onPageShow body onPageShow="javascript:javascript:alert(1)"></body onPageShow>
+<style onReadyStateChange style onReadyStateChange="javascript:javascript:alert(1)"></style onReadyStateChange>
+<frameset onFocus frameset onFocus="javascript:javascript:alert(1)"></frameset onFocus>
+<applet onError applet onError="javascript:javascript:alert(1)"></applet onError>
+<marquee onStart marquee onStart="javascript:javascript:alert(1)"></marquee onStart>
+<script onLoad script onLoad="javascript:javascript:alert(1)"></script onLoad>
+<html onMouseOver html onMouseOver="javascript:javascript:alert(1)"></html onMouseOver>
+
+<img src='https://www.qq.com/sad' />
+<p>sadfadf</p>
+
 # Code
 as
 \`\`\`javascript
@@ -8,7 +86,7 @@ $(document).ready(function () {
 \`\`\`
 https://www.coze.com
 test@coze.com
-[coze](javascripdt://www.baidu.com)
+[coze](javascript:javascript:alert(1))
 ![Alt Text](https://pic1.zhimg.com/v2-b444070848d54baf536222b22a51fba4_b.jpg)
 
 ![Alt Text](https://s.coze.cn/t/cmdAkWul_g4/)

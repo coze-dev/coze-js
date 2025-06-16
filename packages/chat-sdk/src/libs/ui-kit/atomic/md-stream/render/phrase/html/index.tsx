@@ -1,5 +1,6 @@
 import { FC, memo } from 'react';
 
+import xss from 'xss';
 import type { Html as HtmlMdType, Text as TextMdType } from 'mdast';
 import { RichText } from '@tarojs/components';
 
@@ -13,7 +14,7 @@ export const Html: FC<{
   return (
     <>
       {enableHtmlTags ? (
-        <RichText nodes={`${node.value}`} />
+        <RichText nodes={`${xss(node.value)}`} />
       ) : (
         <Text node={node as unknown as TextMdType} />
       )}
