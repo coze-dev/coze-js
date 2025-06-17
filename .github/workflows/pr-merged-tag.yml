@@ -21,7 +21,7 @@ jobs:
             OS: ubuntu-latest
     name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
     runs-on: ubuntu-latest
-    if: github.repository == 'coze-dev/rush-arch'
+    if: github.repository == 'coze-dev/coze-js'
     steps:
       - uses: actions/checkout@v4
         with:
