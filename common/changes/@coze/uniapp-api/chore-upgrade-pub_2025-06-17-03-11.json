@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/uniapp-api",
+      "comment": "setup release config",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/uniapp-api",
+  "email": "tecvan.fe@gmail.com"
+}

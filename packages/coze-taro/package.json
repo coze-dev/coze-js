@@ -56,6 +56,10 @@
     "@tarojs/taro": ">=3",
     "axios": "^1.7.1"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "cozePublishConfig": {
     "main": "dist/index.js",
     "module": "dist/index.js",

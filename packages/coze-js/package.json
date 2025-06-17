@@ -90,6 +90,10 @@
   "peerDependencies": {
     "axios": "^1.7.1"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "cozePublishConfig": {
     "exports": {
       ".": {

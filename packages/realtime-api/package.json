@@ -63,6 +63,10 @@
     "typescript": "^5.5.3",
     "vitest": "~2.1.9"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "cozePublishConfig": {
     "exports": {
       ".": {
