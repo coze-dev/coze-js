@@ -1,5 +1,70 @@
 # @coze/api
 
+## 1.3.0 - 2025-06-17
+
+### New Features
+
+- improve LocalLookback implementation
+- Add unit test
+- Add Users API with me() method, support chat with files/images
+- improve authentication error handling for regional base URLs
+- add room mode configuration option
+- init project
+- chat websocket support opus coder
+- chat websocket support g711a&g711u coder
+- Add G.711a and G.711u codec support to WavStreamPlayer
+- Add prologue content support
+- optimize local audio loopback and chat client config
+- Add client_interrupt support
+- add sentence-level audio streaming support
+- Add query params
+- simult interpretation
+- add translation and audio playback controls
+- add simult example
+- add speech rate and opus config support
+- Add coze uniapp api support
+- Add Variables api
+- Add voiceprint API
+- Add onApiError callback option to ClientOptions and RequestOptions interfaces
+- add voice print group support and move turn detection to event input
+- Fix ci bug
+- Add voiceprint Readme
+- UI and websocket improvements
+- Add Websocket WebSocket implementation for better UniApp compatibility
+- Fix unit test error
+- Add PcmRecorder & Transcription API
+- Add WsChatClient  API
+- fix ci bug
+- Add screen sharing event support and downgrade RTC SDK
+- typo issue for chat api in @coze/api
+-  feat: Implement playback volume control
+
+### Bug Fixes
+
+- setup release config
+- convert JavaScript files to TypeScript
+- add test code
+- cr bug
+- test error
+- rename LocalLookback to LocalLoopback and fix typos
+- deviceId error
+- eslint bug
+- move
+- CR bug
+- Publish feat/voiceprint
+- Fix Websoket  bug in Uniapp
+- fix sample_rate error
+- Publish feat/weex-realtime
+- Fix microphone permission check in browsers without permissions API
+- Fix type error
+- security bug
+- Publish fix/bug
+- Upgrade vitest to version 2.1.9 for security bug
+- workflow resumt bug
+- implement audioDeltaList for sequential audio processing
+- Publish fix/uniapp-api
+
+
 ## 1.2.0 - 2025-04-16
 
 ### New Features

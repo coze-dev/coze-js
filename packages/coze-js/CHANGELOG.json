@@ -2,6 +2,185 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.3.0",
+      "tag": "HEAD",
+      "date": "2025-06-17T03:18:03.081Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "setup release config"
+          },
+          {
+            "comment": "convert JavaScript files to TypeScript"
+          },
+          {
+            "comment": "add test code"
+          },
+          {
+            "comment": "cr bug"
+          },
+          {
+            "comment": "test error"
+          },
+          {
+            "comment": "rename LocalLookback to LocalLoopback and fix typos"
+          },
+          {
+            "comment": "deviceId error"
+          },
+          {
+            "comment": "eslint bug"
+          },
+          {
+            "comment": "move"
+          },
+          {
+            "comment": "CR bug"
+          },
+          {
+            "comment": "Publish feat/voiceprint"
+          },
+          {
+            "comment": "Fix Websoket  bug in Uniapp"
+          },
+          {
+            "comment": "fix sample_rate error"
+          },
+          {
+            "comment": "Publish feat/weex-realtime"
+          },
+          {
+            "comment": "Fix microphone permission check in browsers without permissions API"
+          },
+          {
+            "comment": "Fix type error"
+          },
+          {
+            "comment": "security bug"
+          },
+          {
+            "comment": "Publish fix/bug"
+          },
+          {
+            "comment": "Upgrade vitest to version 2.1.9 for security bug"
+          },
+          {
+            "comment": "workflow resumt bug"
+          },
+          {
+            "comment": "implement audioDeltaList for sequential audio processing"
+          },
+          {
+            "comment": "Publish fix/uniapp-api"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "improve LocalLookback implementation"
+          },
+          {
+            "comment": "Add unit test"
+          },
+          {
+            "comment": "Add Users API with me() method, support chat with files/images"
+          },
+          {
+            "comment": "improve authentication error handling for regional base URLs"
+          },
+          {
+            "comment": "add room mode configuration option"
+          },
+          {
+            "comment": "init project"
+          },
+          {
+            "comment": "chat websocket support opus coder"
+          },
+          {
+            "comment": "chat websocket support g711a&g711u coder"
+          },
+          {
+            "comment": "Add G.711a and G.711u codec support to WavStreamPlayer"
+          },
+          {
+            "comment": "Add prologue content support"
+          },
+          {
+            "comment": "optimize local audio loopback and chat client config"
+          },
+          {
+            "comment": "Add client_interrupt support"
+          },
+          {
+            "comment": "add sentence-level audio streaming support"
+          },
+          {
+            "comment": "Add query params"
+          },
+          {
+            "comment": "simult interpretation"
+          },
+          {
+            "comment": "add translation and audio playback controls"
+          },
+          {
+            "comment": "add simult example"
+          },
+          {
+            "comment": "add speech rate and opus config support"
+          },
+          {
+            "comment": "Add coze uniapp api support"
+          },
+          {
+            "comment": "Add Variables api"
+          },
+          {
+            "comment": "Add voiceprint API"
+          },
+          {
+            "comment": "Add onApiError callback option to ClientOptions and RequestOptions interfaces"
+          },
+          {
+            "comment": "add voice print group support and move turn detection to event input"
+          },
+          {
+            "comment": "Fix ci bug"
+          },
+          {
+            "comment": "Add voiceprint Readme"
+          },
+          {
+            "comment": "UI and websocket improvements"
+          },
+          {
+            "comment": "Add Websocket WebSocket implementation for better UniApp compatibility"
+          },
+          {
+            "comment": "Fix unit test error"
+          },
+          {
+            "comment": "Add PcmRecorder & Transcription API"
+          },
+          {
+            "comment": "Add WsChatClient  API"
+          },
+          {
+            "comment": "fix ci bug"
+          },
+          {
+            "comment": "Add screen sharing event support and downgrade RTC SDK"
+          },
+          {
+            "comment": "typo issue for chat api in @coze/api"
+          },
+          {
+            "comment": " feat: Implement playback volume control"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.2.0",
       "tag": "HEAD",
       "date": "2025-04-16T08:04:59.915Z",

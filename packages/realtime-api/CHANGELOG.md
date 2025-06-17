@@ -1,5 +1,28 @@
 # @coze/realtime-api
 
+## 1.3.0 - 2025-06-17
+
+### New Features
+
+- Support mobile device front/back camera selection with friendly labels
+- add room mode configuration option
+- Add ROOM_INFO event to expose room connection details
+- Add prologue content support
+- Add some event names
+- Add screen sharing event support and downgrade RTC SDK
+
+### Bug Fixes
+
+- setup release config
+- Publish feat/device
+- add test code
+- Fix share screen bug
+- Upgrade vitest to version 2.1.9 for security bug
+- Add TrackEnded event
+- Added await for setVideoInputDevice to ensure proper async handling
+- enhance video state management and error handling
+
+
 ## 1.2.0 - 2025-04-16
 
 ### New Features
