@@ -1,3 +1,5 @@
+/// <reference types="vitest" />
+// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Mock } from 'vitest';
 import VERTC, { MediaType, NetworkQuality, StreamIndex } from '@volcengine/rtc';

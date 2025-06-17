@@ -42,6 +42,8 @@ export class EngineClient extends RealtimeEventHandler {
 
     if (isTestEnv) {
       VERTC.setParameter('ICE_CONFIG_REQUEST_URLS', ['rtc-test.bytedance.com']);
+    } else {
+      localStorage.removeItem('RTC_ACCESS_URLS-VolcEngine');
     }
 
     this.engine = VERTC.createEngine(appId);
