@@ -2,6 +2,77 @@
   "name": "@coze/uniapp-api",
   "entries": [
     {
+      "version": "0.3.0",
+      "tag": "HEAD",
+      "date": "2025-06-17T03:59:36.523Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "setup release config"
+          },
+          {
+            "comment": "package.json error"
+          },
+          {
+            "comment": "fix build error"
+          },
+          {
+            "comment": "Update documentation to reference new examples"
+          },
+          {
+            "comment": "Publish feat/weex-realtime"
+          },
+          {
+            "comment": "Upgrade vitest to version 2.1.9 for security bug"
+          },
+          {
+            "comment": "Publish fix/uniapp-api"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "optimize local audio loopback and chat client config"
+          },
+          {
+            "comment": "Add client_interrupt support"
+          },
+          {
+            "comment": "compile to ES5 for improved compatibility"
+          },
+          {
+            "comment": "Add coze uniapp api support"
+          },
+          {
+            "comment": "add composables and file upload functionality to uniapp example"
+          },
+          {
+            "comment": "Add Websocket WebSocket implementation for better UniApp compatibility"
+          },
+          {
+            "comment": "Add PcmStreamPlayer & WsSpeechClient"
+          },
+          {
+            "comment": "Add PcmRecorder & Transcription API"
+          },
+          {
+            "comment": "Add WsChatClient  API"
+          },
+          {
+            "comment": "enhance UniApp example project"
+          },
+          {
+            "comment": "fix ci bug"
+          },
+          {
+            "comment": " Add isPlaybackMuted state to track mute status"
+          },
+          {
+            "comment": " feat: Implement playback volume control"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.2.0",
       "tag": "HEAD",
       "date": "2025-04-16T08:04:59.910Z",
