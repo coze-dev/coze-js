@@ -7,6 +7,7 @@
     "fanwenjie.fe@bytedance.com"
   ],
   "dependencies": {
+    "@coze-arch/rush-publish-plugin": "alpha",
     "@coze-infra/rush-x": "link:../../../infra/rush-x",
     "typescript": "~5.7.2"
   },

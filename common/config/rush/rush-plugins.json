@@ -29,6 +29,11 @@
       "packageName": "@coze-infra/rush-x",
       "pluginName": "@coze-infra/rush-x",
       "autoinstallerName": "plugins"
+    },
+    {
+      "packageName": "@coze-arch/rush-publish-plugin",
+      "pluginName": "@coze-arch/rush-publish-plugin",
+      "autoinstallerName": "plugins"
     }
   ]
 }

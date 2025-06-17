@@ -3,14 +3,14 @@ name: Release Pipeline
 on:
   push:
     branches:
-      - '**/*'
+      - 'release/**'
 
 jobs:
   publish:
     strategy:
       matrix:
         include:
-          - NodeVersion: 20.9.x
+          - NodeVersion: 20.14.x
             NodeVersionDisplayName: 20
             OS: ubuntu-latest
     name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
@@ -21,33 +21,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check Release Tag
-        id: check_tag
-        run: |
-          HAS_VALID_TAG=$(git tag --points-at HEAD | grep -E "^v/.+/.+$" || true)
-          if [ ! -z "$HAS_VALID_TAG" ]; then
-            echo "has_valid_tag=true" >> $GITHUB_OUTPUT
-            echo "Found valid tag: $HAS_VALID_TAG"
-          else
-            echo "has_valid_tag=false" >> $GITHUB_OUTPUT
-            echo "No valid tag found"
-          fi
-
       - name: Config Git User
-        if: steps.check_tag.outputs.has_valid_tag == 'true'
         run: |
           git config --local user.name "tecvan"
-          git config --local user.email "fanwenjie.fe@bytedance.com"
+          git config --local user.email "tecvan.fe@gmail.com"
 
       - uses: actions/setup-node@v3
-        if: steps.check_tag.outputs.has_valid_tag == 'true'
         with:
           node-version: ${{ matrix.NodeVersion }}
           registry-url: 'https://registry.npmjs.org'
           node-version-file: '.nvmrc'
 
       - name: Cache
-        if: steps.check_tag.outputs.has_valid_tag == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -60,15 +45,13 @@ jobs:
             ${{ runner.os }}-rush-store
 
       - name: Install Dependencies
-        if: steps.check_tag.outputs.has_valid_tag == 'true'
         run: |
-          npm i -g @microsoft/rush@5.140.0
+          npm i -g @microsoft/rush@5.150.0
           sudo apt-get update
           sudo apt-get install -y libasound2-dev
           node common/scripts/install-run-rush.js install
 
       - name: Run Release
-        if: steps.check_tag.outputs.has_valid_tag == 'true'
-        run: node infra/rush-x/bin/run release --commit ${{ github.event.head_commit.id }}
+        run: node common/scripts/install-run-rush.js release --commit ${{ github.event.head_commit.id }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

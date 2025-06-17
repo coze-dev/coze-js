@@ -156,6 +156,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "miniprogram": "dist/lib-weapp",
   "templateInfo": {
     "name": "default",

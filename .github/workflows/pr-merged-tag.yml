@@ -1,0 +1,132 @@
+name: Auto Tag on PR Merge
+
+on:
+  push:
+    branches:
+      - main
+      - chore/upgrade-pub
+    paths:
+      - '**/package.json'
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    strategy:
+      matrix:
+        include:
+          - NodeVersion: 20.14.x
+            NodeVersionDisplayName: 20
+            OS: ubuntu-latest
+    name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
+    runs-on: ubuntu-latest
+    if: github.repository == 'coze-dev/coze-js'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Config Git User
+        run: |
+          git config --local user.name "flow_bot"
+          git config --local user.email "flow_bot@bytedance.com"
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Check Version Change and Create Tag
+        id: check_version
+        run: |
+          # 初始化变量
+          TAGS_JSON="[]"
+          HAS_CHANGES=false
+
+          echo "初始化 TAGS_JSON: $TAGS_JSON"
+
+          # 找出所有修改过的package.json文件
+          CHANGED_PACKAGES=$(git diff --name-only HEAD^ HEAD | grep package.json || true)
+
+          echo "变更的 package.json 文件: $CHANGED_PACKAGES"
+
+          # 对每个修改的package.json文件检查版本是否变更
+          for PKG_FILE in $CHANGED_PACKAGES; do
+            echo "检查文件: $PKG_FILE"
+
+            # 获取当前版本
+            CURRENT_VERSION=$(cat $PKG_FILE | jq -r '.version')
+            echo "当前版本: $CURRENT_VERSION"
+
+            # 获取之前的版本
+            PREVIOUS_VERSION=$(git show HEAD^:$PKG_FILE 2>/dev/null | jq -r '.version' 2>/dev/null || echo "unknown")
+            echo "之前版本: $PREVIOUS_VERSION"
+
+            # 如果版本发生变化，则创建标签
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ] && [ "$PREVIOUS_VERSION" != "unknown" ]; then
+              PKG_NAME=$(cat $PKG_FILE | jq -r '.name')
+              TAG_NAME="v/${PKG_NAME}@${CURRENT_VERSION}"
+
+              echo "版本发生变化: $PREVIOUS_VERSION -> $CURRENT_VERSION"
+              echo "包名: $PKG_NAME"
+              echo "创建标签: $TAG_NAME"
+
+              git tag -a "$TAG_NAME" -m "Release $PKG_NAME@$CURRENT_VERSION"
+
+              # 将此标签添加到输出数组
+              TAGS_JSON=$(echo "$TAGS_JSON" | jq -c --arg tag "$TAG_NAME" '. += [$tag]')
+              HAS_CHANGES=true
+
+              echo "更新后的 TAGS_JSON: $TAGS_JSON"
+            else
+              echo "版本未变化或无法获取之前版本，跳过"
+            fi
+          done
+
+          # 调试输出
+          echo "最终 TAGS_JSON: $TAGS_JSON"
+          echo "HAS_CHANGES: $HAS_CHANGES"
+
+          # 输出标签JSON和变更状态
+          echo "tags_json=$TAGS_JSON" >> $GITHUB_OUTPUT
+          echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.NodeVersion }}
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
+
+      - name: Cache
+        if: steps.check_version.outputs.has_changes == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            common/temp/pnpm-local
+            common/temp/pnpm-store
+            common/temp/install-run
+          key: ${{ runner.os }}-rush-store-${{ hashFiles('common/config/subspaces/**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-store-main
+            ${{ runner.os }}-rush-store
+
+      - name: Install Dependencies
+        if: steps.check_version.outputs.has_changes == 'true'
+        run: |
+          npm i -g @microsoft/rush@5.150.0
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
+          node common/scripts/install-run-rush.js install
+
+      - name: Run Release
+        if: steps.check_version.outputs.has_changes == 'true'
+        run: |
+          git tag --points-at ${{ github.event.head_commit.id }}
+          node common/scripts/install-run-rush.js release --commit ${{ github.event.head_commit.id }}
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Push Tags
+        if: steps.check_version.outputs.has_changes == 'true'
+        run: |
+          git push origin --tags --no-verify
