@@ -7,8 +7,14 @@ declare global {
 }
 declare const chrome: any;
 
+import { logger } from 'agora-rte-extension';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
+
+// 禁用日志上传与打印日志
+AgoraRTC.disableLogUpload();
+AgoraRTC.setLogLevel(3);
+logger.setLogLevel(3);
 
 /**
  * Check audio device permissions
@@ -150,6 +156,8 @@ export const isMobile = () =>
     navigator.userAgent,
   );
 
+export const isHarmonOS = () =>
+  /harmonyos|hmos|huawei/i.test(navigator.userAgent);
 /**
  * Check if AI denoising is supported
  * @param assetsPath - Public path for denoising plugin

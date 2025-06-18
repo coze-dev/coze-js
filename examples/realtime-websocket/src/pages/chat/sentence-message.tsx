@@ -124,6 +124,7 @@ const SentenceMessage = forwardRef(
           case ClientEventType.AUDIO_SENTENCE_PLAYBACK_START: {
             // 处理句子开始事件
             const { content } = (event as AudioSentencePlaybackStartEvent).data;
+            console.log('handleAudioSentencePlaybackStart', event);
             if (isFirstSentenceRef.current) {
               // 首个句子，创建新消息
               setMessageList(prev => [
