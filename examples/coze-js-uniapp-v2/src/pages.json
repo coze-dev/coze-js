@@ -1,0 +1,33 @@
+{
+  "pages": [
+    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "uni-app"
+      }
+    },
+    // #ifdef H5
+    {
+      "path": "pages/chat-h5/index",
+      "style": {
+        "navigationBarTitleText": "实时语音聊天 WebSocket",
+        "navigationStyle": "default"
+      }
+    },
+    // #endif
+    {
+      "path": "pages/webview-test/index",
+      "style": {
+        "navigationBarTitleText": "Webview 测试",
+        "navigationStyle": "default"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}
