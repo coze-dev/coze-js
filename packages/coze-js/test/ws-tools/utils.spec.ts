@@ -19,6 +19,8 @@ import AgoraRTC from 'agora-rtc-sdk-ng';
 vi.mock('agora-rtc-sdk-ng', () => ({
   default: {
     registerExtensions: vi.fn(),
+    disableLogUpload: vi.fn(),
+    setLogLevel: vi.fn(),
   },
 }));
 
@@ -129,16 +131,16 @@ describe('WS Tools Utils', () => {
       expect(result).toBeInstanceOf(Int16Array);
       expect(result.length).toBe(input.length);
       expect(result[0]).toBe(0); // Zero remains zero
-      
+
       // Instead of checking exact values with toBeCloseTo, check the values are proportionally correct
       // For positive values, check they're between 0 and 0x7fff (32767)
       expect(result[1]).toBeGreaterThan(0);
       expect(result[1]).toBeLessThanOrEqual(0x7fff);
-      
+
       // For negative values, check they're between -0x8000 (-32768) and 0
       expect(result[2]).toBeLessThan(0);
       expect(result[2]).toBeGreaterThanOrEqual(-0x8000);
-      
+
       // Check that max values map to extremes
       expect(result[3]).toBe(0x7fff); // 1.0 maps to max positive
       expect(result[4]).toBe(-0x8000); // -1.0 maps to max negative
@@ -226,10 +228,13 @@ describe('WS Tools Utils', () => {
     it('should use cached denoiser support value when available', () => {
       // Set the support value before calling the function
       window.__denoiserSupported = true;
-      const checkCompatibilitySpy = vi.spyOn(mockDenoiser, 'checkCompatibility');
-      
+      const checkCompatibilitySpy = vi.spyOn(
+        mockDenoiser,
+        'checkCompatibility',
+      );
+
       const result = checkDenoiserSupport();
-      
+
       expect(result).toBe(true);
       // Should not check compatibility again
       expect(checkCompatibilitySpy).not.toHaveBeenCalled();
@@ -238,8 +243,10 @@ describe('WS Tools Utils', () => {
 
   describe('isBrowserExtension', () => {
     // Save original chrome reference and ensure TypeScript is happy
-    const originalChrome = typeof window !== 'undefined' ? (window as any).chrome : undefined;
-    const originalGlobalChrome = typeof global !== 'undefined' ? (global as any).chrome : undefined;
+    const originalChrome =
+      typeof window !== 'undefined' ? (window as any).chrome : undefined;
+    const originalGlobalChrome =
+      typeof global !== 'undefined' ? (global as any).chrome : undefined;
 
     afterEach(() => {
       // Restore original chrome references
@@ -251,8 +258,8 @@ describe('WS Tools Utils', () => {
       // Mock both window.chrome and global chrome
       const mockChrome = {
         runtime: {
-          id: 'test-extension-id'
-        }
+          id: 'test-extension-id',
+        },
       };
       (window as any).chrome = mockChrome;
       // In jsdom, we need to set the global chrome object as well
