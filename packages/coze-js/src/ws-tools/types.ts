@@ -34,6 +34,8 @@ export interface SentenceItem {
   audioDuration: number;
   /** 是否是最后一个句子 */
   isLastSentence: boolean;
+  /** 句子音频时长是否已更新完成 */
+  isDurationFinish: boolean;
 }
 
 export interface AudioRecordEvent {

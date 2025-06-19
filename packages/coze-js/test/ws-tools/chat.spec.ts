@@ -38,7 +38,7 @@ vi.mock('@ws-tools/index', () => ({
     setDenoiserLevel: vi.fn(),
     setDenoiserMode: vi.fn(),
     getRawMediaStream: vi.fn().mockReturnValue(new MediaStream()),
-    audioTrack: true
+    audioTrack: true,
   })),
 }));
 
@@ -109,6 +109,7 @@ vi.mock('@ws-tools/utils', () => ({
   }),
   isBrowserExtension: vi.fn().mockReturnValue(false),
   setValueByPath: vi.fn(),
+  isHarmonOS: vi.fn().mockReturnValue(false),
 }));
 
 describe('WebSocket Chat Tools', () => {
@@ -192,22 +193,22 @@ describe('WebSocket Chat Tools', () => {
       // mock
       const mockWebsocket = new WebSocketAPI('wss://coze.ai/test-url');
       vi.spyOn(client as any, 'init').mockResolvedValue(mockWebsocket);
-      
+
       // Prepare recorder mocks
       const getStatusSpy = vi.spyOn(client['recorder'], 'getStatus');
       getStatusSpy.mockReturnValue('ended');
-      
+
       // The implementation now calls startRecord() in setAudioEnable when audioTrack is not available
       // So we need to mock startRecord as a method on the client
       const mockStartRecord = vi.fn().mockResolvedValue(undefined);
       client['startRecord'] = mockStartRecord;
-      
+
       // Set audioTrack to undefined to force startRecord path
       Object.defineProperty(client['recorder'], 'audioTrack', {
         get: vi.fn(() => undefined),
-        configurable: true
+        configurable: true,
       });
-      
+
       client['isMuted'] = true;
 
       // act

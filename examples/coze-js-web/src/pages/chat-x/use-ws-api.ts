@@ -216,7 +216,7 @@ const useWsAPI = (
 
     transcriptionClientRef.current = transcriptionClient;
 
-    transcriptionClient.on('data', data => {
+    transcriptionClient.on(WebsocketsEventType.ALL, data => {
       console.log('[transcriptions] ws data', data);
 
       if (
@@ -237,8 +237,7 @@ const useWsAPI = (
   }, []);
 
   const stopTranscriptions = useCallback(async () => {
-    const finalAudio = await transcriptionClientRef.current?.stop();
-    console.log('[transcriptions] finalAudio:', finalAudio);
+    await transcriptionClientRef.current?.stop();
   }, []);
 
   const interruptAudio = useCallback(() => {

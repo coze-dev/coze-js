@@ -19,12 +19,8 @@ import {
   WebsocketsEventType,
 } from '../../index';
 import BaseWsChatClient from './base';
-import { getAudioDevices, setValueByPath } from '../utils';
+import { getAudioDevices, setValueByPath, isHarmonOS } from '../utils';
 export { WsChatEventNames };
-
-function isMobileView() {
-  return window.innerWidth <= 768; // 通常移动端宽度 <= 768px
-}
 
 class WsChatClient extends BaseWsChatClient {
   public recorder: PcmRecorder;
@@ -36,11 +32,11 @@ class WsChatClient extends BaseWsChatClient {
   constructor(config: WsChatClientOptions) {
     super(config);
 
-    const isMobile = config.enableLocalLoopback ?? isMobileView();
+    const isMobilePlayer = config.enableLocalLoopback ?? isHarmonOS();
 
     this.wavStreamPlayer = new WavStreamPlayer({
       sampleRate: 24000,
-      enableLocalLoopback: isMobile,
+      enableLocalLoopback: isMobilePlayer,
       volume: config.playbackVolumeDefault ?? 1,
       // firstFrameCallback: timestamp => {
       //   // this.ws?.send({
@@ -194,14 +190,19 @@ class WsChatClient extends BaseWsChatClient {
     this.outputAudioSampleRate =
       event.data?.output_audio?.pcm_config?.sample_rate || 24000;
 
+    this.sentenceSynchronizer.setOutputAudioConfig(
+      this.outputAudioSampleRate,
+      this.outputAudioCodec,
+    );
+
     // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
+
+    this.ws.send(event);
 
     if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
       await this.startRecord();
     }
-
-    this.ws.send(event);
 
     this.emit(WsChatEventNames.CONNECTED, event);
   }
