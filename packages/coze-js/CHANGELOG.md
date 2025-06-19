@@ -1,5 +1,19 @@
 # @coze/api
 
+## 1.3.1 - 2025-06-19
+
+### New Features
+
+- Use transferable objects when posting audio buffers to avoid data copying
+- refactor and fix aec bug on HarmonyOS
+
+### Bug Fixes
+
+- Publish feat/refactor
+- Fix sentence bug
+- Publish feat/rtc-test
+
+
 ## 1.3.0 - 2025-06-17
 
 ### New Features
