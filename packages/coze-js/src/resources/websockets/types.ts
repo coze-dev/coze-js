@@ -506,6 +506,8 @@ interface OutputAudio {
     sample_rate?: number;
   };
   opus_config?: {
+    /**输出 opus 的采样率，默认 24000。 */
+    sample_rate?: number;
     /**输出 opus 的码率，默认 48000。 */
     bitrate?: number;
     /**输出 opus 是否使用 CBR 编码，默认为 false。 */

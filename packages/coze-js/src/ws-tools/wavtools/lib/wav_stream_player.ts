@@ -169,13 +169,11 @@ export class WavStreamPlayer {
    * @param {ArrayBuffer|Int16Array|Uint8Array} arrayBuffer
    * @param {string} [trackId]
    * @param {AudioFormat} [format] - Audio format: 'pcm', 'g711a', or 'g711u'
-   * @returns {Int16Array}
    */
   async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array | Uint8Array, trackId: string = 'default', format?: AudioFormat): Promise<Int16Array> {
     if (typeof trackId !== 'string') {
       throw new Error(`trackId must be a string`);
     } else if (this.interruptedTrackIds[trackId]) {
-      return new Int16Array();
     }
     if (!this.streamNode) {
       await this._start();
@@ -217,7 +215,6 @@ export class WavStreamPlayer {
       buffer,
       trackId
     }, [transferableBuffer]);
-    return buffer;
   }
 
   /**
