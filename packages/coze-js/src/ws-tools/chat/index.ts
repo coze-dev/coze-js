@@ -190,6 +190,11 @@ class WsChatClient extends BaseWsChatClient {
     this.outputAudioSampleRate =
       event.data?.output_audio?.pcm_config?.sample_rate || 24000;
 
+    this.sentenceSynchronizer.setOutputAudioConfig(
+      this.outputAudioSampleRate,
+      this.outputAudioCodec,
+    );
+
     // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
 

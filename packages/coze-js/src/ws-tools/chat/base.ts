@@ -26,7 +26,6 @@ abstract class BaseWsChatClient {
   protected listeners: Map<string, Set<WsChatCallbackHandler>> = new Map();
   protected wavStreamPlayer?: WavStreamPlayer;
   protected trackId = 'default';
-  protected lastTrackId = 'last_id';
   protected api: CozeAPI;
   protected audioDeltaList: string[] = [];
   public config: WsChatClientOptions;
@@ -47,7 +46,6 @@ abstract class BaseWsChatClient {
     // 初始化音字同步器，传入事件发射器
     this.sentenceSynchronizer = new SentenceSynchronizer({
       eventEmitter: (eventName, eventData) => this.emit(eventName, eventData),
-      debug: true,
     });
   }
 
@@ -113,11 +111,6 @@ abstract class BaseWsChatClient {
               break;
 
             case WebsocketsEventType.CONVERSATION_AUDIO_SENTENCE_START:
-              if (this.trackId !== this.lastTrackId) {
-                // 每次回复结束或被打断之后，重置音字同步状态
-                this.lastTrackId = this.trackId;
-                this.sentenceSynchronizer.resetSentenceSyncState();
-              }
               this.sentenceSynchronizer.handleSentenceStart(data);
               break;
 
@@ -170,7 +163,7 @@ abstract class BaseWsChatClient {
     this.log('sendMessage', data);
   }
 
-  async sendTextMessage(text: string) {
+  sendTextMessage(text: string) {
     this.sendMessage({
       id: uuid(),
       event_type: WebsocketsEventType.CONVERSATION_MESSAGE_CREATE,
@@ -221,13 +214,12 @@ abstract class BaseWsChatClient {
 
   async clear() {
     this.audioDeltaList = [];
-
     // 打断当前播放
     this.trackId = `my-track-id-${uuid()}`;
     await this.wavStreamPlayer?.interrupt();
 
     // 重置音字同步状态
-    // this.sentenceSynchronizer.resetSentenceSyncState();
+    this.sentenceSynchronizer.resetSentenceSyncState();
   }
 
   protected emit(eventName: string, event: WsChatEventData) {
@@ -250,16 +242,11 @@ abstract class BaseWsChatClient {
     }
 
     // 设置首个音频 Delta 时间
-    this.sentenceSynchronizer.setFirstAudioDeltaTime(performance.now());
-
-    // 计算音频时长
-    // 例如：PCM 16bit 采样率为24000的计算公式: (字节数 / 2) / 24000 * 1000 毫秒
-    const audioDurationMs =
-      (decodedContent.length / 2 / this.outputAudioSampleRate) * 1000;
+    this.sentenceSynchronizer.setFirstAudioDeltaTime();
 
     // 更新最后一个句子的音频时长
     this.sentenceSynchronizer.updateLatestSentenceAudioDuration(
-      audioDurationMs,
+      decodedContent.length,
     );
 
     try {

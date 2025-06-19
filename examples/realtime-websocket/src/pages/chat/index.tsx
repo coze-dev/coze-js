@@ -158,7 +158,6 @@ function Chat() {
       deviceId: selectedInputDevice || undefined,
       // 如果是按键说话模式，默认关闭麦克风
       audioMutedDefault: false,
-      enableLocalLoopback: true,
     });
 
     if (

@@ -157,7 +157,7 @@ export const isMobile = () =>
   );
 
 export const isHarmonOS = () =>
-  /harmonyos|hmos|huawei/i.test(navigator.userAgent);
+  /harmony|hmos|huawei/i.test(navigator.userAgent);
 /**
  * Check if AI denoising is supported
  * @param assetsPath - Public path for denoising plugin
