@@ -123,7 +123,16 @@ export class WavStreamPlayer {
   isPlaying(): boolean {
     return Boolean(this.context && this.streamNode && !this.isPaused && this.context.state === 'running');
   }
-
+  /**
+   * 如果使用了本地回环，需要确保音频上下文已经准备好
+   * @returns {Promise<void>}
+   */
+  async checkForReady() {
+    if (this.localLoopback && !this.context) {
+      await this._start();
+      await this.localLoopback.checkForReady();
+    }
+  }
   /**
    * Starts audio streaming
    * @private
@@ -170,7 +179,7 @@ export class WavStreamPlayer {
    * @param {string} [trackId]
    * @param {AudioFormat} [format] - Audio format: 'pcm', 'g711a', or 'g711u'
    */
-  async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array | Uint8Array, trackId: string = 'default', format?: AudioFormat): Promise<Int16Array> {
+  async add16BitPCM(arrayBuffer: ArrayBuffer | Int16Array | Uint8Array, trackId: string = 'default', format?: AudioFormat) {
     if (typeof trackId !== 'string') {
       throw new Error(`trackId must be a string`);
     } else if (this.interruptedTrackIds[trackId]) {
@@ -272,18 +281,17 @@ export class WavStreamPlayer {
    * @param {string} [trackId]
    * @returns {Int16Array}
    */
-  async addG711a(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default'): Promise<Int16Array> {
-    return this.add16BitPCM(arrayBuffer, trackId, 'g711a');
+  async addG711a(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default') {
+    await this.add16BitPCM(arrayBuffer, trackId, 'g711a');
   }
 
   /**
    * Adds G.711 μ-law encoded audio data to the currently playing audio stream
    * @param {ArrayBuffer|Uint8Array} arrayBuffer - G.711 μ-law encoded data
    * @param {string} [trackId]
-   * @returns {Int16Array}
    */
-  async addG711u(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default'): Promise<Int16Array> {
-    return this.add16BitPCM(arrayBuffer, trackId, 'g711u');
+  async addG711u(arrayBuffer: ArrayBuffer | Uint8Array, trackId: string = 'default') {
+    await this.add16BitPCM(arrayBuffer, trackId, 'g711u');
   }
 
   setSampleRate(sampleRate: number) {

@@ -80,6 +80,51 @@ class LocalLoopback {
     this.pc1 = pc1;
     this.pc2 = pc2;
   }
+  /**
+   * 检查WebRTC连接状态，确保 ICE State 处于 connected 状态
+   * @returns
+   */
+  async checkForReady() {
+     // 检查ICE连接状态
+    // WebRTC连接状态可能是: new, checking, connected, completed, failed, disconnected, closed
+    const validStates = ['connected', 'completed'];
+    if (!validStates.includes(this.pc1?.iceConnectionState ?? '')) {
+      this._debug(`WebRTC connection not ready, current state: ${this.pc1?.iceConnectionState}`);
+    } else {
+      return true;
+    }
+
+    await this.sleep(300);
+    await new Promise((resolve, reject) => {
+      if (!this.pc1 || !this.pc2) {
+        this._error('WebRTC peer connections not initialized');
+        reject(new Error('WebRTC peer connections not initialized'));
+        return;
+      }
+      let retryCount = 0;
+      const handleReconnect = async () => {
+        retryCount++;
+        // 重试 5 次
+        if (retryCount >= 5) {
+          this._error('WebRTC connection not ready');
+          reject(new Error('WebRTC connection not ready'));
+          return;
+        }
+        const result = await this.reconnect();
+        if (result) {
+          this._debug('WebRTC connection reestablished');
+          resolve(true);
+        } else {
+          setTimeout(() => {
+            handleReconnect();
+          }, 2000);
+        }
+      }
+      setTimeout(() => {
+        handleReconnect();
+      }, 500);
+    });
+  }
 
   /**
    * Starts the audio loopback by connecting the provided AudioWorkletNode
@@ -100,14 +145,6 @@ class LocalLoopback {
     if (!this.pc1 || !this.pc2) {
       this._error('WebRTC peer connections not initialized');
       return;
-    }
-
-    // 检查ICE连接状态
-    // WebRTC连接状态可能是: new, checking, connected, completed, failed, disconnected, closed
-    const validStates = ['connected', 'completed'];
-    if (!validStates.includes(this.pc1.iceConnectionState)) {
-      this._debug(`WebRTC connection not ready, current state: ${this.pc1.iceConnectionState}`);
-      // return;
     }
 
     this.currentStreamNode = streamNode;
@@ -137,6 +174,87 @@ class LocalLoopback {
     }
   }
 
+  /**
+   * Reconnects the WebRTC peer connections
+   * This method closes existing connections and establishes new ones
+   * while preserving the audio context and stream configuration
+   */
+  async reconnect() {
+    this._debug('Reconnecting WebRTC peer connections');
+
+    // Save current context and stream
+    const currentContext = this.context;
+    const currentStream = this.mediaStream;
+    const currentStreamNode = this.currentStreamNode;
+
+    // Close existing peer connections but don't fully clean up
+    if (this.pc1) {
+      this.pc1.onicecandidate = null;
+      this.pc1.oniceconnectionstatechange = null;
+      this.pc1.close();
+      this.pc1 = undefined;
+    }
+
+    if (this.pc2) {
+      this.pc2.onicecandidate = null;
+      this.pc2.oniceconnectionstatechange = null;
+      this.pc2.ontrack = null;
+      this.pc2.close();
+      this.pc2 = undefined;
+    }
+
+    // Wait a short time to ensure connections are properly closed
+    await this.sleep(500);
+
+    // Reestablish connection if we have the necessary context
+    if (currentContext) {
+      await this.connect(currentContext, currentStream);
+
+      // If we were previously streaming, reconnect the stream node
+      if (currentStreamNode && this.peer) {
+        this._debug('Reestablishing audio connection');
+        // Wait for ICE connection to establish
+        const maxAttempts = 10;
+        let attempts = 0;
+
+        while (attempts < maxAttempts) {
+          if (this.pc1) {
+            const pc1 = this.pc1 as RTCPeerConnection;
+            const state = pc1.iceConnectionState;
+            if (state === 'connected' || state === 'completed') {
+              break;
+            }
+          }
+          await this.sleep(500);
+          attempts++;
+          this._debug(`Waiting for ICE connection (${attempts}/${maxAttempts})`);
+        }
+
+        // Reconnect the stream node
+        if (this.pc1) {
+          const pc1 = this.pc1 as RTCPeerConnection;
+          const state = pc1.iceConnectionState;
+          if (state === 'connected' || state === 'completed') {
+            currentStreamNode.connect(this.peer);
+            this.currentStreamNode = currentStreamNode;
+            this._debug('Audio connection reestablished');
+            return true;
+          }
+        }
+        this._warn('Failed to establish ICE connection after multiple attempts');
+        return false;
+      }
+      return true;
+    } else {
+      this._error('Cannot reconnect - no audio context available');
+      return false;
+    }
+  }
+
+
+  private sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   /**
    * Creates and connects audio processing nodes for the media stream
    * @param context - The AudioContext to use for creating audio nodes
@@ -290,6 +408,15 @@ class LocalLoopback {
    */
   private _error(...args: any[]) {
     console.error(...args);
+  }
+
+  /**
+   * Logs warning messages to the console
+   * @param args - Arguments to pass to console.warn
+   * @private
+   */
+  private _warn(...args: any[]) {
+    console.warn(...args);
   }
 
   /**

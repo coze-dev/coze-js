@@ -201,6 +201,7 @@ class WsChatClient extends BaseWsChatClient {
     }
 
     this.emit(WsChatEventNames.CONNECTED, event);
+    this.isConnected = true;
   }
 
   async disconnect() {
@@ -216,6 +217,7 @@ class WsChatClient extends BaseWsChatClient {
     await new Promise(resolve => setTimeout(resolve, 500));
     this.listeners.clear();
     this.closeWs();
+    this.isConnected = false;
   }
 
   /**

@@ -36,6 +36,7 @@ abstract class BaseWsChatClient {
   protected sentenceSynchronizer: SentenceSynchronizer;
   // Opus decoder instance
   protected opusDecoder?: OpusDecoder;
+  protected isConnected = false;
 
   constructor(config: WsChatClientOptions) {
     this.api = new CozeAPI({
@@ -244,6 +245,14 @@ abstract class BaseWsChatClient {
   }
 
   private handleAudioMessage = async () => {
+    if (!this.isConnected) {
+      // 确保初始化已完成
+      setTimeout(() => {
+        this.warn('WsChatClient is not connected');
+        this.handleAudioMessage();
+      }, 100);
+      return;
+    }
     const message = this.audioDeltaList[0];
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);
@@ -276,7 +285,7 @@ abstract class BaseWsChatClient {
 
       this.audioDeltaList.shift();
       if (this.audioDeltaList.length > 0) {
-        this.handleAudioMessage();
+        await this.handleAudioMessage();
       }
     } catch (error) {
       this.warn('wavStreamPlayer error', error);
