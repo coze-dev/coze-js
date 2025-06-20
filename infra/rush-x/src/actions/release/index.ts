@@ -21,8 +21,8 @@ export const installAction: InstallAction = (program: Command) => {
         if (!options.commit) {
           throw new Error('请提供需要发布的 commit id');
         }
-        if (!process.env.NODE_AUTH_TOKEN) {
-          throw new Error('请设置 NODE_AUTH_TOKEN 环境变量');
+        if (!process.env.NPM_AUTH_TOKEN) {
+          throw new Error('请设置 NPM_AUTH_TOKEN 环境变量');
         }
         await release(options);
       } catch (error) {
