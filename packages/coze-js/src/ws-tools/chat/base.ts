@@ -2,10 +2,11 @@ import { v4 as uuid } from 'uuid';
 
 import { type WavStreamPlayer } from '../wavtools';
 import SentenceSynchronizer from './sentence-synchronizer';
+import OpusDecoder from './opus-decoder';
 import {
-  type WsChatClientOptions,
   WsChatEventNames,
   type WsChatCallbackHandler,
+  type WsChatClientOptions,
   type WsChatEventData,
 } from '../types';
 import {
@@ -33,6 +34,9 @@ abstract class BaseWsChatClient {
   protected outputAudioSampleRate = 24000;
   // 音字同步器实例
   protected sentenceSynchronizer: SentenceSynchronizer;
+  // Opus decoder instance
+  protected opusDecoder?: OpusDecoder;
+  protected isConnected = false;
 
   constructor(config: WsChatClientOptions) {
     this.api = new CozeAPI({
@@ -205,6 +209,14 @@ abstract class BaseWsChatClient {
     });
   }
 
+  protected async initOpusDecoder() {
+    this.opusDecoder = new OpusDecoder({
+      inputSampleRate: this.outputAudioSampleRate,
+      outputSampleRate: this.outputAudioSampleRate,
+    });
+    await this.opusDecoder.waitForReady();
+  }
+
   protected closeWs() {
     if (this.ws?.readyState === 1) {
       this.ws?.close();
@@ -233,6 +245,14 @@ abstract class BaseWsChatClient {
   }
 
   private handleAudioMessage = async () => {
+    if (!this.isConnected) {
+      // 确保初始化已完成
+      setTimeout(() => {
+        this.warn('WsChatClient is not connected');
+        this.handleAudioMessage();
+      }, 100);
+      return;
+    }
     const message = this.audioDeltaList[0];
     const decodedContent = atob(message);
     const arrayBuffer = new ArrayBuffer(decodedContent.length);
@@ -241,20 +261,31 @@ abstract class BaseWsChatClient {
       view[i] = decodedContent.charCodeAt(i);
     }
 
-    // 设置首个音频 Delta 时间
-    this.sentenceSynchronizer.setFirstAudioDeltaTime();
-
-    // 更新最后一个句子的音频时长
-    this.sentenceSynchronizer.updateLatestSentenceAudioDuration(
-      decodedContent.length,
-    );
-
     try {
-      await this.wavStreamPlayer?.add16BitPCM(arrayBuffer, this.trackId);
+      let int16Array;
+      if (this.opusDecoder) {
+        // Decode the Opus data to PCM audio
+        int16Array = this.opusDecoder.decode(view);
+        if (!int16Array) {
+          throw new Error('Failed to decode Opus data');
+        }
+      }
+
+      // 设置首个音频 Delta 时间
+      this.sentenceSynchronizer.setFirstAudioDeltaTime();
+      // 更新最后一个句子的音频时长
+      this.sentenceSynchronizer.updateLatestSentenceAudioDuration(
+        int16Array ? int16Array.length : decodedContent.length,
+      );
+
+      await this.wavStreamPlayer?.add16BitPCM(
+        int16Array || arrayBuffer,
+        this.trackId,
+      );
 
       this.audioDeltaList.shift();
       if (this.audioDeltaList.length > 0) {
-        this.handleAudioMessage();
+        await this.handleAudioMessage();
       }
     } catch (error) {
       this.warn('wavStreamPlayer error', error);

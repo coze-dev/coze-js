@@ -46,8 +46,9 @@ export const AudioConfig = forwardRef<
     AIDenoiserProcessorLevel.SOFT,
   );
   const isDenoiserSupported = WsToolsUtils.checkDenoiserSupport();
-  const [noiseSuppression, setNoiseSuppression] =
-    useState(!isDenoiserSupported);
+  const [noiseSuppression, setNoiseSuppression] = useState(
+    !isDenoiserSupported || WsToolsUtils.isMobile(),
+  );
   const [echoCancellation, setEchoCancellation] = useState(true);
   const [autoGainControl, setAutoGainControl] = useState(true);
   const [debug, setDebug] = useState(false);

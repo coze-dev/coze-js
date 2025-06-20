@@ -38,15 +38,6 @@ class WsChatClient extends BaseWsChatClient {
       sampleRate: 24000,
       enableLocalLoopback: isMobilePlayer,
       volume: config.playbackVolumeDefault ?? 1,
-      // firstFrameCallback: timestamp => {
-      //   // this.ws?.send({
-      //   //   id: uuid(),
-      //   //   event_type: 'client.event',
-      //   //   data: {
-      //   //     first_audio_timestamp: timestamp,
-      //   //   },
-      //   // } as any);
-      // },
     });
 
     this.recorder = new PcmRecorder({
@@ -179,16 +170,21 @@ class WsChatClient extends BaseWsChatClient {
     // 强制设置输入音频的采样率为系统默认的采样率
     setValueByPath(event, 'data.input_audio.sample_rate', sampleRate);
 
-    this.wavStreamPlayer?.setSampleRate(
-      event.data?.output_audio?.pcm_config?.sample_rate || 24000,
-    );
+    this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
+    this.outputAudioCodec = event.data?.output_audio?.codec || 'pcm';
+    if (this.outputAudioCodec === 'opus') {
+      this.outputAudioSampleRate =
+        event.data?.output_audio?.opus_config?.sample_rate || 24000;
+      await this.initOpusDecoder();
+    } else {
+      this.outputAudioSampleRate =
+        event.data?.output_audio?.pcm_config?.sample_rate || 24000;
+    }
+
     this.wavStreamPlayer?.setDefaultFormat(
       (event.data?.output_audio?.codec as AudioFormat) || 'pcm',
     );
-    this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
-    this.outputAudioCodec = event.data?.output_audio?.codec || 'pcm';
-    this.outputAudioSampleRate =
-      event.data?.output_audio?.pcm_config?.sample_rate || 24000;
+    this.wavStreamPlayer?.setSampleRate(this.outputAudioSampleRate);
 
     this.sentenceSynchronizer.setOutputAudioConfig(
       this.outputAudioSampleRate,
@@ -205,6 +201,7 @@ class WsChatClient extends BaseWsChatClient {
     }
 
     this.emit(WsChatEventNames.CONNECTED, event);
+    this.isConnected = true;
   }
 
   async disconnect() {
@@ -214,11 +211,13 @@ class WsChatClient extends BaseWsChatClient {
     });
     await this.recorder?.destroy();
     await this.wavStreamPlayer?.destroy();
+    await this.opusDecoder?.destroy();
     this.emit(WsChatEventNames.DISCONNECTED, undefined);
 
     await new Promise(resolve => setTimeout(resolve, 500));
     this.listeners.clear();
     this.closeWs();
+    this.isConnected = false;
   }
 
   /**
