@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "add null check for uni.getSystemInfoSync in UniApp user agent",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "shenxiaojie.316@bytedance.com"
+}
