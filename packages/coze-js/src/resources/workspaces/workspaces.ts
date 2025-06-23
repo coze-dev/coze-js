@@ -30,6 +30,9 @@ export class WorkSpaces extends APIResource {
 export interface ListWorkSpacesReq {
   page_num?: number;
   page_size?: number;
+  enterprise_id?: string;
+  user_id?: string;
+  coze_account_id?: string;
 }
 export interface OpenSpaceData {
   workspaces: WorkSpace[];

@@ -1,5 +1,6 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any, max-lines */
 import { useRef, useState, useEffect } from 'react';
+
 import './index.css';
 import {
   Button,
@@ -14,25 +15,30 @@ import {
   Slider,
   Tooltip,
 } from 'antd';
-import getConfig from '../../utils/config';
 import {
   WsChatClient,
   WsChatEventNames,
   WsToolsUtils,
 } from '@coze/api/ws-tools';
+import {
+  type CommonErrorEvent,
+  type ConversationAudioTranscriptUpdateEvent,
+} from '@coze/api';
+import { AudioOutlined, SoundOutlined, SoundFilled } from '@ant-design/icons';
+
+import getConfig from '../../utils/config';
+import Settings from '../../components/settings2';
+import EventInput from '../../components/event-input';
+import { ConsoleLog } from '../../components/console-log';
+import {
+  AudioConfig,
+  type AudioConfigRef,
+} from '../../components/audio-config';
+import SentenceMessage, { type SentenceMessageRef } from './sentence-message';
 import SendMessage from './send-message';
 import ReceiveMessage from './receive-message';
-import SentenceMessage, { SentenceMessageRef } from './sentence-message';
-import {
-  CommonErrorEvent,
-  ConversationAudioTranscriptUpdateEvent,
-} from '@coze/api';
 import Operation from './operation';
-import { AudioConfig, AudioConfigRef } from '../../components/audio-config';
-import { ConsoleLog } from '../../components/console-log';
-import EventInput from '../../components/event-input';
-import Settings from '../../components/settings';
-import { AudioOutlined, SoundOutlined, SoundFilled } from '@ant-design/icons';
+
 const { Paragraph, Text } = Typography;
 const localStorageKey = 'realtime-quickstart-ws';
 const config = getConfig(localStorageKey);
@@ -60,11 +66,8 @@ const getChatUpdateConfig = (turnDetectionType: string) => ({
 });
 
 // 获取回复模式配置
-const getReplyMode = (): 'stream' | 'sentence' => {
-  return localStorage.getItem('replyMode') === 'sentence'
-    ? 'sentence'
-    : 'stream';
-};
+const getReplyMode = (): 'stream' | 'sentence' =>
+  localStorage.getItem('replyMode') === 'sentence' ? 'sentence' : 'stream';
 
 function Chat() {
   const clientRef = useRef<WsChatClient>();
@@ -158,6 +161,8 @@ function Chat() {
       deviceId: selectedInputDevice || undefined,
       // 如果是按键说话模式，默认关闭麦克风
       audioMutedDefault: false,
+      // 可不填，SDK 会根据是否为鸿蒙手机自动设置
+      enableLocalLoopback: audioConfig?.isHuaweiMobile,
     });
 
     if (
@@ -172,7 +177,7 @@ function Chat() {
     handleMessageEvent();
   }
 
-  const handleMessageEvent = async () => {
+  const handleMessageEvent = () => {
     clientRef.current?.on(
       WsChatEventNames.CONVERSATION_AUDIO_TRANSCRIPT_UPDATE,
       (_, data) => {
@@ -198,12 +203,12 @@ function Chat() {
       (_: string, event: unknown) => {
         console.log('[chat] error', event);
         message.error(
-          '发生错误：' +
-            (event as CommonErrorEvent)?.data?.msg +
-            ' logid: ' +
-            (event as CommonErrorEvent)?.detail.logid,
+          `发生错误：${(event as CommonErrorEvent)?.data?.msg} logid: ${
+            (event as CommonErrorEvent)?.detail.logid
+          }`,
         );
         clientRef.current?.disconnect();
+        clientRef.current = undefined;
         setIsConnected(false);
       },
     );
@@ -232,7 +237,7 @@ function Chat() {
       }
     } catch (error) {
       console.error(error);
-      message.error('连接错误：' + (error as Error).message);
+      message.error(`连接错误：${(error as Error).message}`);
     }
   };
 
@@ -241,7 +246,7 @@ function Chat() {
       await clientRef.current?.setAudioInputDevice(deviceId);
       setSelectedInputDevice(deviceId);
     } catch (error) {
-      message.error('设置音频输入设备失败：' + error);
+      message.error(`设置音频输入设备失败：${error}`);
     }
   };
 
@@ -403,15 +408,10 @@ function Chat() {
 
   // 清理资源
   useEffect(() => {
-    return () => {
+    () => {
       if (recordTimer.current) {
         clearInterval(recordTimer.current);
       }
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
       if (clientRef.current) {
         clientRef.current.disconnect();
       }

@@ -10,7 +10,7 @@ const filename = fileURLToPath(import.meta.url);
 const filePath = join(dirname(filename), '../../tmp/pcm.txt');
 
 async function main() {
-  const ws = await client.websockets.audio.transcriptions.create({
+  const ws = await client.websockets.audio.transcriptions.create(undefined, {
     maxRetries: 3,
   });
 

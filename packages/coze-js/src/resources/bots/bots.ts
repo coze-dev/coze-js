@@ -65,6 +65,7 @@ export class Bots extends APIResource {
    * @param params.page_size - Optional Pagination size. | 分页大小。
    * @param params.page_index - Optional Page number for paginated queries. | 分页查询时的页码。
    * @returns List of published bots. | 已发布的 Bot 列表。
+   * @deprecated Use listNew instead.
    */
   async list(
     params: ListBotReq,
@@ -77,6 +78,21 @@ export class Bots extends APIResource {
       false,
       options,
     );
+    return result.data;
+  }
+
+  /**
+   * Get bots list. | 查看智能体列表
+   */
+  async listNew(
+    params: ListBotNewReq,
+    options?: RequestOptions,
+  ): Promise<ListBotNewData> {
+    const apiUrl = '/v1/bots';
+    const result = await this._client.get<
+      ListBotNewReq,
+      { data: ListBotNewData }
+    >(apiUrl, params, false, options);
     return result.data;
   }
 
@@ -110,6 +126,7 @@ export class Bots extends APIResource {
    * @param params - Required The parameters for retrieving a bot. | 获取 Bot 的参数。
    * @param params.bot_id - Required The ID of the agent that the API interacts with. | 要查看的智能体ID。
    * @returns Information about the bot. | Bot 的配置信息。
+   * @deprecated Use retrieveNew instead.
    */
   async retrieve(
     params: RetrieveBotReq,
@@ -117,6 +134,27 @@ export class Bots extends APIResource {
   ): Promise<BotInfo> {
     const apiUrl = '/v1/bot/get_online_info';
     const result = await this._client.get<RetrieveBotReq, { data: BotInfo }>(
+      apiUrl,
+      params,
+      false,
+      options,
+    );
+    return result.data;
+  }
+  /**
+   * Get the configuration information of the agent. | 获取指定智能体的配置信息。
+   * @param botId - Required The ID of the agent that the API interacts with. | 要查看的智能体ID。
+   * @param params
+   * @param options
+   * @returns
+   */
+  async retrieveNew(
+    botId: string,
+    params?: RetrieveBotNewReq,
+    options?: RequestOptions,
+  ): Promise<BotInfo> {
+    const apiUrl = `/v1/bots/${botId}`;
+    const result = await this._client.get<RetrieveBotNewReq, { data: BotInfo }>(
       apiUrl,
       params,
       false,
@@ -287,6 +325,82 @@ export interface ListBotReq {
   page_index?: number;
 }
 
+export interface ListBotNewReq {
+  /**
+   * 工作空间 ID。
+   */
+  workspace_id?: string;
+  /**
+   * all：所有状态。
+   * published_online：（默认值）已发布的正式版。
+   * published_draft：已发布但当前为草稿状态。
+   * unpublished_draft：从未发布过。
+   */
+  publish_status?: string;
+  /**
+   * 渠道 ID，仅在 publish_status 为 published_online 或 published_draft 时需要设置。
+   */
+  connector_id?: string;
+  /**
+   * 分页大小。默认为 20，即每页返回 20 条数据。
+   */
+  page_size?: number;
+  /**
+   * 页码。默认为 1。
+   */
+  page_num?: number;
+}
+
+export interface ListBotNewData {
+  total: number;
+  items: ListBotInfo[];
+}
+
+export interface ListBotInfo {
+  /**
+   * The ID of the agent.
+   */
+  id: string;
+
+  /**
+   * The name of the agent.
+   */
+  name: string;
+
+  /**
+   * The URL of the agent's icon.
+   */
+  icon_url: string;
+
+  /**
+   * The last update time of the agent in Unix timestamp format (seconds).
+   */
+  updated_at: number;
+
+  /**
+   * The description of the agent.
+   */
+  description: string;
+
+  /**
+   * Whether the agent is published.
+   * true indicates published.
+   * false indicates unpublished.
+   */
+  is_published: boolean;
+
+  /**
+   * The last publish time of the agent in Unix timestamp format (seconds).
+   * Only returned when the agent is published. If the agent is an unpublished draft version, this value will be empty.
+   */
+  published_at?: number;
+
+  /**
+   * The Coze user ID of the agent creator.
+   */
+  owner_user_id: string;
+}
+
 export interface ListBotData {
   total: number;
   space_bots: SimpleBot[];
@@ -294,6 +408,15 @@ export interface ListBotData {
 
 export interface RetrieveBotReq {
   bot_id: string;
+}
+
+export interface RetrieveBotNewReq {
+  /**
+   * Whether the agent is published.
+   * true indicates published.
+   * false indicates unpublished.
+   */
+  is_published?: boolean;
 }
 
 export interface CreateBotData {

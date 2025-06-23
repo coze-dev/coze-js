@@ -26,6 +26,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
       <Settings
         onSettingsChange={onSettingsChange}
         localStorageKey={localStorageKey}
+        fields={[]}
       />
     </div>
   </Header>

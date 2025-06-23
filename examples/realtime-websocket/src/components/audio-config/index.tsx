@@ -27,6 +27,7 @@ export interface AudioConfigRef {
     autoGainControl: boolean;
     debug: boolean;
     audioMutedDefault: boolean;
+    isHuaweiMobile: boolean;
   };
 }
 
@@ -53,6 +54,9 @@ export const AudioConfig = forwardRef<
   const [autoGainControl, setAutoGainControl] = useState(true);
   const [debug, setDebug] = useState(false);
   const [audioMutedDefault, setAudioMutedDefault] = useState(false);
+  const [isHuaweiMobile, setIsHuaweiMobile] = useState(
+    WsToolsUtils.isHarmonOS(),
+  );
 
   useEffect(() => {
     if (!clientRef.current) {
@@ -93,6 +97,7 @@ export const AudioConfig = forwardRef<
       autoGainControl,
       debug,
       audioMutedDefault,
+      isHuaweiMobile,
     }),
   }));
 
@@ -145,6 +150,20 @@ export const AudioConfig = forwardRef<
               >
                 默认静音
                 <Tooltip title="启用默认静音">
+                  <InfoCircleOutlined
+                    style={{ marginLeft: 4, color: '#999' }}
+                  />
+                </Tooltip>
+              </Checkbox>
+            </Col>
+            <Col>
+              <Checkbox
+                checked={isHuaweiMobile}
+                disabled={isRecording}
+                onChange={e => setIsHuaweiMobile(e.target.checked)}
+              >
+                鸿蒙手机
+                <Tooltip title="解决回音无法消除的问题">
                   <InfoCircleOutlined
                     style={{ marginLeft: 4, color: '#999' }}
                   />

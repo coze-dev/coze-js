@@ -36,16 +36,14 @@ async function main() {
   console.log('client.bots.publish', publishedBot);
 
   await sleep(1000);
-  const list = await client.bots.list({
-    space_id: spaceId,
-    page_index: 1,
+  const list = await client.bots.listNew({
+    workspace_id: spaceId,
+    page_num: 1,
     page_size: 10,
   });
   console.log('client.bots.list', list);
 
-  const info = await client.bots.retrieve({
-    bot_id: bot.bot_id,
-  });
+  const info = await client.bots.retrieveNew(bot.bot_id);
   console.log('client.bots.retrieve', info);
 }
 
