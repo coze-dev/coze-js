@@ -118,7 +118,9 @@ const getBrowserClientUserAgent = (): string => {
 // Get UniApp client user agent
 const getUniAppClientUserAgent = (): string => {
   // Get system info
-
+  if (!uni?.getSystemInfoSync) {
+    return JSON.stringify({});
+  }
   const systemInfo = uni.getSystemInfoSync();
 
   const platformInfo = {
