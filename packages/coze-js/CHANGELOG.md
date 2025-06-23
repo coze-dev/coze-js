@@ -1,5 +1,17 @@
 # @coze/api
 
+## 1.3.2 - 2025-06-23
+
+### New Features
+
+- feat: add Opus codec support for WebSocket audio streaming
+
+### Bug Fixes
+
+- Added  method to ensure the  and  local loopback are ready before processing audio
+- add null check for uni.getSystemInfoSync in UniApp user agent
+
+
 ## 1.3.1 - 2025-06-19
 
 ### New Features
