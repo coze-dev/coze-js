@@ -23,6 +23,8 @@ Find usage examples for each package in the [examples](./examples) directory:
 - [coze-js-web](./examples/coze-js-web) - React Web Demo for @coze/api, [Preview](https://coze-js-web-example.surge.sh/)
 - [coze-js-taro](./examples/coze-js-taro) - Taro4 Mini Program Demo for @coze/taro-api
 - [coze-js-taro3](./examples/coze-js-taro3) - Taro3 Mini Program Demo for @coze/taro-api
+- [coze-js-uniapp](./examples/coze-js-uniapp) - UniApp(V3) Mini Program Demo for @coze/uniapp-api
+- [coze-js-uniapp-v2](./examples/coze-js-uniapp-v2) - UniApp(V2) Mini Program Demo for @coze/api
 - [realtime-console](./examples/realtime-console) - Full Console Demo for @coze/realtime-api, [Preview](https://coze.cn/open-platform/realtime/playground)
 - [realtime-call-up](./examples/realtime-call-up) - Sample Call Up Demo for @coze/realtime-api
 - [realtime-quickstart-react](./examples/realtime-quickstart-react) - Quickstart React Demo for @coze/realtime-api
