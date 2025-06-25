@@ -85,6 +85,21 @@ export class WavStreamPlayer {
     return true;
   }
 
+  setLocalLoopbackEnable(enable: boolean) {
+    this.enableLocalLoopback = enable;
+    if(this.enableLocalLoopback) {
+      if (this.localLoopback) {
+        this.localLoopback.cleanup();
+      }
+      this.localLoopback = new LocalLoopback(true);
+    } else {
+      if (this.localLoopback) {
+        this.localLoopback.cleanup();
+        this.localLoopback = undefined;
+      }
+    }
+  }
+
   /**
    * Pauses audio playback
    */

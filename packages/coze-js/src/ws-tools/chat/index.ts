@@ -194,6 +194,11 @@ class WsChatClient extends BaseWsChatClient {
     // Turn detection mode: server_vad (server-side detection) or client_interrupt (client-side detection; requires manual startRecord/stopRecord)
     this.turnDetection = event.data?.turn_detection?.type || 'server_vad';
 
+    if (this.turnDetection === 'client_interrupt') {
+      // 如果是按键模式，则强制关闭本地回环
+      this.wavStreamPlayer?.setLocalLoopbackEnable(false);
+    }
+
     this.ws.send(event);
 
     if (!this.isMuted && this.turnDetection !== 'client_interrupt') {
