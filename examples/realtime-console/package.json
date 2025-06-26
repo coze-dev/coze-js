@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
-    "deploy": "npm run build && surge --project ./build --domain $SURGE_DOMAIN --token $SURGE_TOKEN",
+    "postbuild": "cp build/index.html build/200.html",
     "lint": "eslint --cache --quiet",
     "run-preinstall": "node scripts/preinstall.js",
     "start": "node scripts/start.js",
@@ -107,6 +107,7 @@
     "postcss-normalize": "^10.0.1",
     "postcss-preset-env": "^7.0.1",
     "prompts": "^2.4.2",
+    "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-app-polyfill": "^3.0.0",
     "react-dev-utils": "^12.0.1",

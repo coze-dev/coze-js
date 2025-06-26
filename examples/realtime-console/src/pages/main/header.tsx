@@ -18,6 +18,7 @@ import { DISCONNECT_TIME } from '../../utils/constants';
 import useIsMobile from '../../hooks/use-is-mobile';
 import useCozeAPI from '../../hooks/use-coze-api';
 import MessageForm, { type MessageFormRef } from './message-form';
+import LiveInfo from './live-info';
 import ComfortStrategyForm from './comfort-strategy-form';
 
 const { Text, Link } = Typography;
@@ -44,8 +45,8 @@ const Header: React.FC<HeaderProps> = ({
   const [microphoneStatus, setMicrophoneStatus] = useState<'normal' | 'error'>(
     'normal',
   );
-  const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
-    useState(false);
+  // const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
+  //   useState(false);
   const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
     const savedValue = localManager.get(LocalStorageKey.NOISE_SUPPRESSION);
     return savedValue ? JSON.parse(savedValue) : [];
@@ -71,6 +72,7 @@ const Header: React.FC<HeaderProps> = ({
   const { uploadFile } = useCozeAPI();
   const isMobile = useIsMobile();
   const [isSampleMode, setIsSampleMode] = useState(isMobile);
+  const [liveId, setLiveId] = useState('');
 
   const checkMicrophonePermission = () => {
     RealtimeUtils.checkDevicePermission(true).then(result => {
@@ -183,6 +185,13 @@ const Header: React.FC<HeaderProps> = ({
       onToggleMicrophone(true);
     });
 
+    // 订阅 LIVE_CREATED 事件,获取 live_id
+    clientRef.current.on(EventNames.LIVE_CREATED, (_: string, event: any) => {
+      if (event?.data?.live_id) {
+        setLiveId(event.data.live_id);
+      }
+    });
+
     return () => {
       try {
         clientRef.current?.off(eventName, onMessage);
@@ -253,45 +262,45 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const handleEnableAudioPropertiesReport = () => {
-    if (!clientRef?.current) {
-      message.error('Please click Settings to set configuration first');
-      return;
-    }
-    try {
-      clientRef?.current?.enableAudioPropertiesReport({ interval: 1000 });
-      message.success('Audio properties reporting enabled');
-    } catch (error) {
-      message.error('Failed to enable audio properties reporting');
-      console.error(error);
-    }
-  };
+  // const handleEnableAudioPropertiesReport = () => {
+  //   if (!clientRef?.current) {
+  //     message.error('Please click Settings to set configuration first');
+  //     return;
+  //   }
+  //   try {
+  //     clientRef?.current?.enableAudioPropertiesReport({ interval: 1000 });
+  //     message.success('Audio properties reporting enabled');
+  //   } catch (error) {
+  //     message.error('Failed to enable audio properties reporting');
+  //     console.error(error);
+  //   }
+  // };
 
-  const handleAudioPlaybackDeviceTest = () => {
-    if (!clientRef?.current) {
-      message.error('Please click Settings to set configuration first');
-      return;
-    }
-    if (isAudioPlaybackDeviceTest) {
-      try {
-        clientRef.current.stopAudioPlaybackDeviceTest();
-        setIsAudioPlaybackDeviceTest(false);
-        message.success('Audio playback device test stopped');
-      } catch (error) {
-        message.error('Failed to stop audio playback device test');
-        console.error(error);
-      }
-    } else {
-      try {
-        clientRef.current.startAudioPlaybackDeviceTest();
-        setIsAudioPlaybackDeviceTest(true);
-        message.success('Audio playback device test started');
-      } catch (error) {
-        message.error('Failed to start audio playback device test');
-        console.error(error);
-      }
-    }
-  };
+  // const handleAudioPlaybackDeviceTest = () => {
+  //   if (!clientRef?.current) {
+  //     message.error('Please click Settings to set configuration first');
+  //     return;
+  //   }
+  //   if (isAudioPlaybackDeviceTest) {
+  //     try {
+  //       clientRef.current.stopAudioPlaybackDeviceTest();
+  //       setIsAudioPlaybackDeviceTest(false);
+  //       message.success('Audio playback device test stopped');
+  //     } catch (error) {
+  //       message.error('Failed to stop audio playback device test');
+  //       console.error(error);
+  //     }
+  //   } else {
+  //     try {
+  //       clientRef.current.startAudioPlaybackDeviceTest();
+  //       setIsAudioPlaybackDeviceTest(true);
+  //       message.success('Audio playback device test started');
+  //     } catch (error) {
+  //       message.error('Failed to start audio playback device test');
+  //       console.error(error);
+  //     }
+  //   }
+  // };
 
   const handleAudioCaptureChange = (value: string) => {
     setAudioCapture(value);
@@ -418,7 +427,7 @@ const Header: React.FC<HeaderProps> = ({
           <>
             <div style={{ marginTop: '10px' }}></div>
             <MessageForm onSubmit={handleSendMessage} ref={formRef} />
-            <Button
+            {/* <Button
               type="primary"
               style={{ marginRight: '10px', marginLeft: '10px' }}
               onClick={handleEnableAudioPropertiesReport}
@@ -431,14 +440,15 @@ const Header: React.FC<HeaderProps> = ({
               onClick={handleAudioPlaybackDeviceTest}
             >
               {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
-            </Button>
+            </Button> */}
             <Button
               type="primary"
-              style={{ marginRight: '10px' }}
+              style={{ marginRight: '10px', marginLeft: '10px' }}
               onClick={() => setComfortStrategyVisible(true)}
             >
               Comfort Strategy
             </Button>
+            <LiveInfo liveId={liveId} />
             <Row gutter={[16, 16]} justify="center" align="middle">
               <Col xs={24} sm={12} md={8}>
                 <div>

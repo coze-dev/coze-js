@@ -23,7 +23,8 @@
   "author": "jackshen <jackshen310@gmail.com>",
   "exports": {
     ".": "./src/index.ts",
-    "./event-names": "./src/event-names.ts"
+    "./event-names": "./src/event-names.ts",
+    "./live": "./src/live/index.ts"
   },
   "main": "src/index.ts",
   "unpkg": "dist/umd/index.js",
@@ -78,6 +79,11 @@
         "require": "./dist/cjs/event-names/index.js",
         "import": "./dist/esm/event-names/index.js",
         "types": "./dist/types/event-names/event-names.d.ts"
+      },
+      "./live": {
+        "require": "./dist/cjs/live/index.js",
+        "import": "./dist/esm/live/index.js",
+        "types": "./dist/types/live/live/index.d.ts"
       }
     },
     "main": "dist/cjs/index.js",

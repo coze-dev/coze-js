@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import React, { useState, useEffect } from 'react';
 
 import Link from 'antd/es/typography/Link';
@@ -110,9 +111,11 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
   const [loadingVoices, setLoadingVoices] = useState(false);
   const [loadingBots, setLoadingBots] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
-
   const { api, fetchAllVoices, fetchAllBots, fetchAllWorkspaces, cloneVoice } =
     useCozeAPI();
+  const [showTranslateConfig, setShowTranslateConfig] = useState(
+    localManager.get(LocalStorageKey.ROOM_MODE) === RoomMode.Translate,
+  );
 
   /* eslint-disable max-params */
   const loadData = async (
@@ -244,6 +247,10 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.ROOM_MODE]: localManager.get(
           LocalStorageKey.ROOM_MODE,
         ),
+        [LocalStorageKey.TRANSLATE_CONFIG]: localManager.get(
+          LocalStorageKey.TRANSLATE_CONFIG,
+          'zh-en',
+        ),
       });
     })().catch(err => {
       console.error(err);
@@ -262,6 +269,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       room_mode,
       interrupt_text,
       interrupt_bot_id,
+      translate_config,
     } = form.getFieldsValue();
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
@@ -273,6 +281,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.ROOM_MODE, room_mode);
     localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
     localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
+    localManager.set(LocalStorageKey.TRANSLATE_CONFIG, translate_config);
   };
 
   const handleOk = () => {
@@ -299,6 +308,10 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       .catch(info => {
         console.log('Validate Failed:', info);
       });
+  };
+
+  const handleRoomModeChange = (value: string) => {
+    setShowTranslateConfig(value === RoomMode.Translate);
   };
 
   return (
@@ -500,27 +513,29 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             label="Room Mode"
             tooltip="Optional: Specify the room mode for the conversation"
           >
-            <Select placeholder="Select room mode">
+            <Select
+              placeholder="Select room mode"
+              onChange={handleRoomModeChange}
+            >
               <Select.Option value={RoomMode.Default}>Default</Select.Option>
               <Select.Option value={RoomMode.S2S}>End-to-End</Select.Option>
               <Select.Option value={RoomMode.Podcast}>Podcast</Select.Option>
+              <Select.Option value={RoomMode.Translate}>
+                Translate
+              </Select.Option>
             </Select>
           </Form.Item>
-
-          {/* <Form.Item
-            name={LocalStorageKey.INTERRUPT_TEXT}
-            label="Interrupt Text"
-            tooltip="Optional: Specify a custom interrupt text"
-          >
-            <Input placeholder="Enter interrupt text" />
-          </Form.Item>
           <Form.Item
-            name={LocalStorageKey.INTERRUPT_BOT_ID}
-            label="Interrupt Bot ID"
-            tooltip="Optional: Specify a custom interrupt bot ID"
+            name={LocalStorageKey.TRANSLATE_CONFIG}
+            hidden={!showTranslateConfig}
+            label="Translate Config"
+            tooltip="Optional: Specify the translate config for the conversation"
           >
-            <Input placeholder="Enter interrupt bot ID" />
-          </Form.Item> */}
+            <Select placeholder="Select translate config">
+              <Select.Option value="zh-en">ZH &gt; EN</Select.Option>
+              <Select.Option value="en-zh">EN &gt; ZH</Select.Option>
+            </Select>
+          </Form.Item>
         </div>
 
         <Form.Item>

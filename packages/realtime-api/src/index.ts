@@ -5,10 +5,12 @@ import {
 } from '@volcengine/rtc';
 import {
   CozeAPI,
+  RoomMode,
   type RoomConfig,
   type CreateRoomData,
   type GetToken,
-  type RoomMode,
+  type CreateRoomReq,
+  type TranslateConfig,
 } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -47,6 +49,7 @@ export interface RealtimeClientConfig {
   isAutoSubscribeAudio?: boolean /** optional, Whether to automatically subscribe to bot reply audio streams, defaults to true */;
   prologueContent?: string /** optional, Prologue content */;
   roomMode?: RoomMode /** optional, Room mode */;
+  translateConfig?: TranslateConfig /** optional, Translation configuration */;
 }
 
 // Only use for test
@@ -144,7 +147,7 @@ class RealtimeClient extends RealtimeEventHandler {
           this._config.roomMode !== undefined &&
           this._config.roomMode !== null
         ) {
-          config.room_mode = this._config.roomMode;
+          config.room_mode = this._config.roomMode || RoomMode.Default;
         }
         if (this._config.videoConfig) {
           if (
@@ -159,7 +162,10 @@ class RealtimeClient extends RealtimeEventHandler {
             };
           }
         }
-        roomInfo = await this._api.audio.rooms.create({
+        if (this._config.translateConfig) {
+          config.translate_config = this._config.translateConfig;
+        }
+        const params: CreateRoomReq = {
           bot_id: botId,
           conversation_id: conversationId || undefined,
           voice_id: voiceId && voiceId.length > 0 ? voiceId : undefined,
@@ -167,7 +173,8 @@ class RealtimeClient extends RealtimeEventHandler {
           uid: this._config.userId || undefined,
           workflow_id: this._config.workflowId || undefined,
           config,
-        });
+        };
+        roomInfo = await this._api.audio.rooms.create(params);
       }
     } catch (error) {
       this.dispatch(EventNames.ERROR, error);

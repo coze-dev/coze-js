@@ -113,3 +113,6 @@ function setupEventListeners() {
 
 ## 示例
 查看完整的示例，请参考我们的[实时语音控制台DEMO](../../examples/realtime-console)。
+
+## 同声传译
+[使用文档](./live.md)
