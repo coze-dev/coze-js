@@ -19,6 +19,7 @@ import { type RoomMode, type APIError } from '@coze/api';
 
 import {
   getBaseUrl,
+  getTranslateConfig,
   isShowVideo,
   isTeamWorkspace,
   redirectToLogin,
@@ -106,6 +107,7 @@ const RealtimeConsole: React.FC = () => {
         LocalStorageKey.ROOM_MODE,
         'default',
       ) as RoomMode,
+      translateConfig: getTranslateConfig(),
       videoConfig: isShowVideo()
         ? {
             renderDom: 'local-player',
@@ -188,6 +190,7 @@ const RealtimeConsole: React.FC = () => {
         data?.event_type === 'conversation.created' ||
         data?.event_type === 'conversation.chat.failed' ||
         data?.event_type === 'conversation.audio_transcript.delta' ||
+        data?.event_type === 'conversation.audio_translation.delta' ||
         data?.event_type === 'error')
     ) {
       setServerEvents(prevEvents => {
@@ -230,12 +233,58 @@ const RealtimeConsole: React.FC = () => {
       };
     }
 
-    if (
-      lastEvent.event === 'conversation.audio_transcript.delta' &&
-      event.event === 'conversation.audio_transcript.delta'
-    ) {
-      return event;
+    const roomType = localManager.get(LocalStorageKey.ROOM_MODE, 'default');
+    if (roomType !== 'translate') {
+      if (
+        lastEvent.event === 'conversation.audio_transcript.delta' &&
+        event.event === 'conversation.audio_transcript.delta'
+      ) {
+        return event;
+      }
+      return null;
     }
+
+    // Handle transcript and translation events - we want to combine them
+    if (
+      // If the last event was a transcript or translation
+      (lastEvent.event === 'conversation.audio_transcript.delta' ||
+        lastEvent.event === 'conversation.audio_translation.delta') &&
+      // And the current event is either a transcript or translation
+      (event.event === 'conversation.audio_transcript.delta' ||
+        event.event === 'conversation.audio_translation.delta')
+    ) {
+      // Create a combined event that holds both transcript and translation
+      const combinedEvent = {
+        time: event.time,
+        event: 'conversation.audio_combined', // Custom event type for combined display
+        data: {
+          ...event.data,
+          // Store both transcript and translation data
+          transcriptData:
+            lastEvent.event === 'conversation.audio_transcript.delta'
+              ? lastEvent.data.data.content
+              : lastEvent.data?.transcriptData || '',
+          translationData:
+            lastEvent.event === 'conversation.audio_translation.delta'
+              ? lastEvent.data.data.content
+              : lastEvent.data?.translationData || '',
+          data: {
+            role: 'assistant',
+            content: '', // This will be displayed differently
+          },
+        },
+      };
+
+      // Update the appropriate field based on current event type
+      if (event.event === 'conversation.audio_transcript.delta') {
+        combinedEvent.data.transcriptData = event.data.data.content;
+      } else if (event.event === 'conversation.audio_translation.delta') {
+        combinedEvent.data.translationData = event.data.data.content;
+      }
+
+      return combinedEvent;
+    }
+
     return null;
   };
 
@@ -257,16 +306,6 @@ const RealtimeConsole: React.FC = () => {
       return;
     }
   };
-
-  // useEffect(() => {
-  //   if (!accessToken) {
-  //     return;
-  //   }
-  //   handleInitClient();
-  //   return () => {
-  //     handleDisconnect();
-  //   };
-  // }, [accessToken]);
 
   const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -378,7 +417,24 @@ const RealtimeConsole: React.FC = () => {
                         >
                           {item.time}&nbsp;&nbsp;
                           {item.event}&nbsp;[{item.data?.data?.role}]&nbsp;
-                          {item.data?.data?.content}
+                          {item.event === 'conversation.audio_combined' ? (
+                            <div>
+                              <div
+                                style={{ display: 'flex', marginTop: '4px' }}
+                              >
+                                <div style={{ flex: 1 }}>
+                                  <strong>Transcript:</strong>{' '}
+                                  {item.data?.transcriptData || ''}
+                                </div>
+                                <div style={{ flex: 1, marginLeft: '20px' }}>
+                                  <strong>Translation:</strong>{' '}
+                                  {item.data?.translationData || ''}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            item.data?.data?.content
+                          )}
                         </Typography.Paragraph>
                       </List.Item>
                     )

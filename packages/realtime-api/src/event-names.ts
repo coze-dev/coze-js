@@ -207,6 +207,11 @@ enum EventNames {
    * zh: 更新房间模式成功
    */
   MODE_UPDATED = 'server.mode.updated',
+  /**
+   * en: Live created
+   * zh: 直播创建
+   */
+  LIVE_CREATED = 'server.live.created',
 }
 
 export default EventNames;

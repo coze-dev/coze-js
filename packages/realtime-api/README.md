@@ -117,3 +117,6 @@ function setupEventListeners() {
 
 ## Example
 For a complete working example, check out our [realtime console demo](../../examples/realtime-console).
+
+## Simultaneous Interpretation
+[Documentation](./live.md)

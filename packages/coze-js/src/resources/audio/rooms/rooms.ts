@@ -26,13 +26,20 @@ export interface RoomConfig {
     stream_video_type: 'main' | 'screen';
   };
   prologue_content?: string;
+  translate_config?: TranslateConfig;
   room_mode?: RoomMode;
+}
+
+export interface TranslateConfig {
+  from: string;
+  to: string;
 }
 
 export enum RoomMode {
   Default = 'default', // 普通模式
   S2S = 's2s', // 端到端模式
   Podcast = 'podcast', // 博客模式
+  Translate = 'translate', // 同声传译模式
 }
 
 export interface CreateRoomData {

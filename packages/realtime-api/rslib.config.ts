@@ -39,5 +39,7 @@ export default defineConfig({
     getLibShared('esm', false),
     getLibShared('cjs', true, 'event-names'),
     getLibShared('esm', false, 'event-names'),
+    getLibShared('cjs', true, 'live'),
+    getLibShared('esm', false, 'live'),
   ],
 });

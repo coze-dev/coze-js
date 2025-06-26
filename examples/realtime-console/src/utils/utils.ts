@@ -159,3 +159,19 @@ export const isTeamWorkspace = (workspaceId?: string) => {
   const id = workspaceId || localStorage.getItem(LocalStorageKey.WORKSPACE_ID);
   return id?.startsWith('team_');
 };
+
+export const getTranslateConfig = () => {
+  const localManager = new LocalManager();
+  const translateConfig = localManager.get(LocalStorageKey.TRANSLATE_CONFIG);
+  if (!translateConfig) {
+    return {
+      from: 'zh',
+      to: 'en',
+    };
+  }
+  const arr = translateConfig.split('-');
+  return {
+    from: arr[0],
+    to: arr[1],
+  };
+};
