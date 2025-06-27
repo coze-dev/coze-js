@@ -1,5 +1,18 @@
 # @coze/realtime-api
 
+## 1.3.1 - 2025-06-26
+
+### New Features
+
+- Add WebRTC demo
+- Coze Simultaneous Interpretation
+
+### Bug Fixes
+
+- Remove RTC_ACCESS_URLS in test env
+- Publish feat/rtc-test
+
+
 ## 1.3.0 - 2025-06-17
 
 ### New Features

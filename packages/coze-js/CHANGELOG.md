@@ -1,5 +1,13 @@
 # @coze/api
 
+## 1.3.3 - 2025-06-26
+
+### New Features
+
+- implement settings component and API integration
+- Add WebRTC demo
+
+
 ## 1.3.2 - 2025-06-23
 
 ### New Features
