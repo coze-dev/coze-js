@@ -13,14 +13,14 @@ const publishPackage = async (
   releaseOptions: ReleaseOptions,
 ): Promise<void> => {
   const { dryRun, registry } = releaseOptions;
-  const token = process.env.NODE_AUTH_TOKEN;
+  const token = process.env.NPM_AUTH_TOKEN;
   const { version } = project.packageJson;
   const tag = version.includes('alpha')
     ? 'alpha'
     : version.includes('beta')
       ? 'beta'
       : 'latest';
-  const args = [`NODE_AUTH_TOKEN=${token}`, 'npm', 'publish', `--tag ${tag}`];
+  const args = [`NPM_AUTH_TOKEN=${token}`, 'npm', 'publish', `--tag ${tag}`];
   if (dryRun) {
     args.push('--dry-run');
   }
