@@ -340,7 +340,7 @@ function Chat() {
         }, 1000);
       } catch (error: any) {
         message.error(`开始录音错误: ${error.message || '未知错误'}`);
-        console.error('开始录音错误:', error);
+        console.trace('开始录音错误:', error);
         // Clean up timer if it was set
         if (recordTimer.current) {
           clearInterval(recordTimer.current);
