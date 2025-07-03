@@ -71,7 +71,7 @@ class WsChatClient extends BaseWsChatClient {
     this.wavStreamPlayer?.setMediaStream(rawMediaStream);
 
     // init stream player
-    await this.wavStreamPlayer?.add16BitPCM(new ArrayBuffer(0), this.trackId);
+    // await this.wavStreamPlayer?.add16BitPCM(new ArrayBuffer(0), this.trackId);
 
     // 2. recording
     await this.recorder.record({
@@ -140,8 +140,6 @@ class WsChatClient extends BaseWsChatClient {
     const ws = await this.init();
     this.ws = ws;
 
-    const sampleRate = await this.recorder?.getSampleRate();
-
     const event: ChatUpdateEvent = {
       id: chatUpdate?.id || uuid(),
       event_type: WebsocketsEventType.CHAT_UPDATE,
@@ -167,8 +165,12 @@ class WsChatClient extends BaseWsChatClient {
     if (this.config.voiceId) {
       setValueByPath(event, 'data.output_audio.voice_id', this.config.voiceId);
     }
-    // 强制设置输入音频的采样率为系统默认的采样率
-    setValueByPath(event, 'data.input_audio.sample_rate', sampleRate);
+
+    setValueByPath(
+      event,
+      'data.input_audio.sample_rate',
+      event.data?.input_audio?.sample_rate || 48000,
+    );
 
     this.inputAudioCodec = event.data?.input_audio?.codec || 'pcm';
     this.outputAudioCodec = event.data?.output_audio?.codec || 'pcm';
