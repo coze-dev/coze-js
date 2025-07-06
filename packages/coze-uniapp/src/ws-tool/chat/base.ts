@@ -6,7 +6,6 @@ import {
 import {
   APIError,
   COZE_CN_BASE_WS_URL,
-  CozeAPI,
   type CreateChatWsReq,
   type CreateChatWsRes,
   type ErrorRes,
@@ -16,6 +15,7 @@ import {
 } from '@coze/api';
 
 import PcmStreamPlayer from '../pcm-stream-player';
+import { CozeAPI } from '../../api';
 import { WsChatEventNames } from './event-names';
 
 export interface WsChatClientOptions extends WsToolsOptions {

@@ -2,7 +2,6 @@ import { type WsToolsOptions } from '@coze/api/ws-tools';
 import {
   APIError,
   COZE_CN_BASE_WS_URL,
-  CozeAPI,
   type CreateTranscriptionsWsReq,
   type CreateTranscriptionsWsRes,
   type ErrorRes,
@@ -11,6 +10,7 @@ import {
 } from '@coze/api';
 
 import { PcmRecorder } from '../pcm-recorder';
+import { CozeAPI } from '../../api';
 
 /**
  * Base WebSocket transcription client for UniApp/WeChat Mini Program
