@@ -1,5 +1,12 @@
 # @coze/api
 
+## 1.3.4 - 2025-07-03
+
+### Bug Fixes
+
+- Fix No ScriptProcessor was register with this name
+
+
 ## 1.3.3 - 2025-06-26
 
 ### New Features
