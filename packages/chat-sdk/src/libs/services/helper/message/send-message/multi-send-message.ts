@@ -61,7 +61,8 @@ export class MultiSendMessage extends RawSendMessage {
     message.content = JSON.stringify(
       fileList.map(item => ({
         type: item.type,
-        file_id: item.file_id,
+        file_id: item.file_id || undefined,
+        file_url: item.file_url || undefined,
       })),
     );
     this.sendMessage(message, historyMessages);
@@ -134,6 +135,8 @@ export class MultiSendMessage extends RawSendMessage {
               file: item.file,
             });
             packResult.file_id = res.id;
+            // @ts-expect-error -- linter-disable-autofix
+            packResult.file_url = res.url;
             fileList.push(packResult);
           }
         }),
