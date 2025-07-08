@@ -1,5 +1,12 @@
 # @coze/uniapp-api
 
+## 0.3.1 - 2025-07-08
+
+### Bug Fixes
+
+- fix Websocket undefined
+
+
 ## 0.3.0 - 2025-06-17
 
 ### New Features

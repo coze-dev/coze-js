@@ -2,6 +2,18 @@
   "name": "@coze/uniapp-api",
   "entries": [
     {
+      "version": "0.3.1",
+      "tag": "HEAD",
+      "date": "2025-07-08T03:18:23.630Z",
+      "comments": {
+        "patch": [
+          {
+            "comment": "fix Websocket undefined"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.3.0",
       "tag": "HEAD",
       "date": "2025-06-17T03:59:36.523Z",

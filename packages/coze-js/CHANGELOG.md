@@ -1,5 +1,12 @@
 # @coze/api
 
+## 1.3.5 - 2025-07-08
+
+### Other Changes
+
+- Publish for noop
+
+
 ## 1.3.4 - 2025-07-03
 
 ### Bug Fixes
