@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "修复小程序输入框输入超过 4 行是失去焦点的问题",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "yangyu.1@bytedance.com"
+}

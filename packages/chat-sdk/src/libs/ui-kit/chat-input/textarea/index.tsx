@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import { FC, useEffect, useRef } from 'react';
 
 import {
   Textarea as TaroTextarea,
@@ -16,22 +16,15 @@ export const Textarea: FC<
     onInputChange: (val: string) => void;
   } & TextareaProps
 > = ({ onSendTextMessage, onInputChange, placeholder, ...rest }) => {
-  const [lineNum, setLineNum] = useState(0);
-  const { value, id = '' } = rest;
+  const { id = '' } = rest;
 
-  const getHeight = usePersistCallback(
-    (lineNumTemp: number) => `${Math.max(1, lineNumTemp) * 20}px`,
-  );
   const handleInputChange = usePersistCallback((val: string) => {
     onInputChange(val);
     if (isWeb) {
       const el = getInputElInWeb();
       if (el) {
         el.style.height = '0px';
-        const scrollHeight = Number(el?.scrollHeight) || 0;
-        const lineNumTemp = Math.floor(scrollHeight / 20);
         el.style.height = 'inherit';
-        setLineNum(lineNumTemp);
       }
     }
   });
@@ -40,11 +33,6 @@ export const Textarea: FC<
     onSendTextMessage,
     handleInputChange,
   });
-  useEffect(() => {
-    if (!value) {
-      setLineNum(0);
-    }
-  }, [value]);
 
   return (
     <View className={styles['input-padding-container']}>
@@ -56,12 +44,10 @@ export const Textarea: FC<
           showConfirmBar={true}
           controlled
           cursorSpacing={20}
+          autoHeight
           placeholder={placeholder}
           placeholderClass={styles.placeholder}
           disableDefaultPadding={true}
-          style={{
-            height: getHeight(lineNum),
-          }}
           onConfirm={() => {
             if (isMini) {
               onSendTextMessage();
@@ -70,10 +56,6 @@ export const Textarea: FC<
           onInput={event => {
             logger.debug('onInputKeyDown: onInput ', event.detail.value);
             handleInputChange(event.detail.value);
-          }}
-          onLineChange={event => {
-            logger.debug('ChatInput onLineChange:', event);
-            !isWeb && setLineNum(event.detail.lineCount);
           }}
           {...rest}
         />
