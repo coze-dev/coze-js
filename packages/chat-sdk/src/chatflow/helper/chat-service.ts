@@ -262,6 +262,7 @@ export class ChatFlowService extends ChatService {
     bodyData.ext = {
       _caller: this.chatFlowProps?.project?.caller,
       user_id: params.user_id,
+      enable_card: 'true',
     };
     bodyData.suggest_reply_info = params.suggestPromoteInfo
       ? {
