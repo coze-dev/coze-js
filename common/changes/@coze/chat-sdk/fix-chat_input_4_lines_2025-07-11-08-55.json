@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "taro chat 增加 card 节点",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "yangyu.1@bytedance.com"
+}
