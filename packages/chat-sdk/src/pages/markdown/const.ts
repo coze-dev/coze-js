@@ -104,6 +104,9 @@ as s \`node\`
 
 <div>
  <strong>asdfasdf</strong>
+  <audio controls>
+    <source src="https://lf-bot-studio-plugin-resource.coze.cn/obj/bot-studio-platform-plugin-tos/sami_podcast/tts/6919958702e6450bbac82bd6dfb17b85.mp3">
+  </audio>
   <video controls="" width="250">
     <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm">
     <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">
