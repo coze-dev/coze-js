@@ -14,7 +14,31 @@ export const Html: FC<{
   return (
     <>
       {enableHtmlTags ? (
-        <RichText nodes={`${xss(node.value)}`} />
+        <RichText
+          nodes={`${xss(node.value, {
+            whiteList: {
+              video: [
+                'width',
+                'height',
+                'controls',
+                'autoplay',
+                'loop',
+                'muted',
+                'poster',
+                'preload',
+              ],
+              audio: [
+                'controls',
+                'autoplay',
+                'loop',
+                'muted',
+                'poster',
+                'preload',
+              ],
+              source: ['src', 'type'],
+            },
+          })}`}
+        />
       ) : (
         <Text node={node as unknown as TextMdType} />
       )}
