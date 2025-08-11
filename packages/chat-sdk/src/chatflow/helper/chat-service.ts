@@ -3,7 +3,6 @@ import {
   RequestOptions,
   StreamChatData,
   type ChatWorkflowReq,
-  CreateConversationReq,
 } from '@coze/api';
 
 import {
@@ -220,15 +219,24 @@ export class ChatFlowService extends ChatService {
         });
       return { conversationId, sectionId };
     } else {
-      const { id: conversationId, last_section_id: sectionId = '' } =
-        await this.apiClient.conversations.create({
+      // 这里是给开源临时上的接口，开源的这里请求的接口不一样
+      const { data } = (await this.apiClient.post(
+        '/v1/workflow/conversation/create',
+        {
           app_id: this.appId,
           conversation_name: this.chatFlowProps?.project?.conversationName,
           get_or_create: isCreateNew,
           workflow_id: this.chatFlowProps?.workflow?.id,
           draft_mode: this.chatFlowProps?.project?.mode === 'draft',
           connector_id: getConnectorId(this.chatFlowProps),
-        } as unknown as CreateConversationReq);
+        },
+      )) as {
+        data: {
+          id: string;
+          last_section_id: string;
+        };
+      };
+      const { id: conversationId, last_section_id: sectionId } = data || {};
       return { conversationId, sectionId };
     }
   }

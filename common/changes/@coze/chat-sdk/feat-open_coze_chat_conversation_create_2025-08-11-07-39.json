@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "开源 coze 现在用的这个 chat，其中一个接口需要替换，临时先发一个 alpha 版本给他们用，后续会切到内部 chat",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "yangyu.1@bytedance.com"
+}
