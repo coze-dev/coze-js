@@ -1,0 +1,46 @@
+{
+  "package": "com.coze.transcription",
+  "name": "语音转写",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/common/logo.png",
+  "features": [
+    { "name": "system.prompt" },
+    { "name": "system.router" },
+    { "name": "system.webview" },
+    { "name": "system.network" },
+    { "name": "system.record" },
+    { "name": "system.audio" },
+    { "name": "system.file" },
+    { "name": "system.websocketfactory" }
+  ],
+  "permissions": [{ "origin": "*" }],
+  "config": {
+    "logLevel": "debug"
+  },
+  "router": {
+    "entry": "pages/index",
+    "pages": {
+      "pages/index": {
+        "component": "index"
+      },
+      "pages/transcription": {
+        "component": "index"
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#f8f8f8",
+    "titleBarTextColor": "#333333",
+    "menu": true,
+    "pages": {
+      "index": {
+        "titleBarText": "Coze.js 快应用示例"
+      },
+      "pages/transcription": {
+        "titleBarText": "实时语音转写"
+      }
+    }
+  }
+}

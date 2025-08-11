@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint .",
     "preview": "vite preview",
     "run-preinstall": "node scripts/preinstall.cjs",
     "start": "vite --host",

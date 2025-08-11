@@ -1,0 +1,21 @@
+<script>
+  /**
+   * 快应用入口文件
+   */
+  export default {
+    /**
+     * 应用onCreate时触发
+     */
+    onCreate() {
+      console.info('Application onCreate');
+
+    },
+
+    /**
+     * 应用onDestroy时触发
+     */
+    onDestroy() {
+      console.info('Application onDestroy');
+    }
+  }
+</script>
