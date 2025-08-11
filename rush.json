@@ -420,6 +420,10 @@
       "projectFolder": "examples/realtime-quickstart-vue"
     },
     {
+      "packageName": "@coze/api-quickapp-example",
+      "projectFolder": "examples/coze-js-quickapp"
+    },
+    {
       "packageName": "@coze/realtime-quickstart-react",
       "projectFolder": "examples/realtime-quickstart-react"
     },
@@ -475,6 +479,11 @@
     {
       "packageName": "@coze/fact-check-extension",
       "projectFolder": "examples/fact-check-extension"
+    },
+    {
+      "packageName": "@coze/quickapp-api",
+      "projectFolder": "packages/quickapp-api",
+      "shouldPublish": true
     }
   ]
 }

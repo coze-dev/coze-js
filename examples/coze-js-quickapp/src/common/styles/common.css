@@ -1,0 +1,125 @@
+/**
+ * 公共样式文件
+ */
+
+.page-container {
+  flex-direction: column;
+  padding: 20px;
+  background-color: #ffffff;
+  flex: 1;
+}
+
+.header {
+  margin-bottom: 20px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.back-button {
+  font-size: 14px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.transcription-box {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 200px;
+  margin-bottom: 20px;
+}
+
+.placeholder {
+  color: #999999;
+  font-style: italic;
+}
+
+.transcription-text {
+  color: #333333;
+}
+
+.status-indicator {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+
+.inactive {
+  background-color: #cccccc;
+}
+
+.recording {
+  background-color: #ff0000;
+  animation-name: pulse;
+  animation-duration: 1500ms;
+  animation-iteration-count: infinite;
+}
+
+.paused {
+  background-color: #ff9900;
+}
+
+@keyframes pulse {
+  from { opacity: 1; }
+  50% { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+.button-row {
+  margin: 10px 30px;
+  width: 100%;
+}
+
+.primary-button {
+  background-color: #2196f3;
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+.default-button {
+  background-color: #f0f0f0;
+  color: #333333;
+  border-radius: 4px;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+.warn-button {
+  background-color: #f44336;
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.error-message {
+  padding: 10px;
+  background-color: #ffe0e0;
+  border-radius: 4px;
+  color: #c00000;
+  margin-top: 20px;
+}
