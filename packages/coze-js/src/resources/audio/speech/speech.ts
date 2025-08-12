@@ -43,4 +43,8 @@ export interface CreateSpeechReq {
   /** Sample rate, default is 24000, supports 8000, 16000, 24000, 32000, 44100, 48000
    * | 采样率，默认是24000，支持8000, 16000, 24000, 32000, 44100, 48000 */
   sample_rate?: number;
+  /** 情感，默认为空 */
+  emotion?: string;
+  /** 情感强度，[1,5]，默认为4，通常保留一位小数即可 */
+  emotion_scale?: number;
 }

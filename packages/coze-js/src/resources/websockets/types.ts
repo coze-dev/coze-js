@@ -518,6 +518,13 @@ interface OutputAudio {
   /**输出音频的语速，取值范围 [-50, 100]，默认为 0。-50 表示 0.5 倍速，100 表示 2 倍速。 */
   speech_rate?: number;
   voice_id?: string;
+  /** 输出语音的情感配置 */
+  emotion_config?: {
+    /** 情感 */
+    emotion?: string;
+    /** 情绪值 */
+    emotion_scale?: number;
+  };
 }
 
 export interface TurnDetection {
