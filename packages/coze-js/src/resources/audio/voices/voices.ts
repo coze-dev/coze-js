@@ -103,6 +103,18 @@ export interface ListVoicesData {
   has_more: boolean;
 }
 
+export interface Interval {
+  min?: number;
+  max?: number;
+  default?: number;
+}
+
+export interface EmotionInfo {
+  emotion?: string;
+  display_name?: string;
+  emotion_scale_interval?: Interval;
+}
+
 export interface Voice {
   /** Whether it is a system voice | 是否为系统音色 */
   is_system_voice: boolean;
@@ -125,4 +137,6 @@ export interface Voice {
   available_training_times: number;
   /** Preview audio | 预览音频 */
   preview_audio: string;
+  /** 支持的情感列表 */
+  support_emotions?: EmotionInfo[];
 }

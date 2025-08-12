@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "support voice emotions",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "duwenhan@bytedance.com"
+}
