@@ -710,6 +710,19 @@ export interface ChatV3Message {
    * Message type.
    */
   type: MessageType;
+
+  /**
+   * The ID of the section that contains this message.
+   */
+  section_id: string;
+
+  /**
+   * Chain of Thought (CoT) reasoning content from the model.
+   * This field contains the step-by-step reasoning process showing how the model
+   * breaks down complex problems into multiple simple steps to derive the final answer.
+   * Only returned when the model supports deep thinking and the agent has enabled deep thinking.
+   */
+  reasoning_content: string;
 }
 
 export interface ToolCallType {

@@ -1,6 +1,7 @@
 import { StreamProcessorSrc } from './worklets/stream_processor';
 import LocalLoopback from './local-loopback';
 import { decodeAlaw, decodeUlaw } from './codecs/g711';
+import { isMobile } from '../../utils';
 
 /**
  * Audio format types supported by WavStreamPlayer
@@ -60,6 +61,38 @@ export class WavStreamPlayer {
 
     // Initialize volume (0 = muted, 1 = full volume)
     this.volume = volume;
+
+    // 在构造函数中就开始准备音频解锁，这样用户交互时就能立即解锁
+    if (isMobile()) {
+      this.prepareAudioUnlock();
+    }
+  }
+
+  /**
+   * 预先准备音频解锁，在构造函数中调用
+   * 这样当用户交互时就能立即解锁音频
+   * @private
+   */
+  private prepareAudioUnlock(): void {
+    // 立即开始监听交互事件，但不等待
+    const silentSound = document.createElement('audio');
+    silentSound.setAttribute('src', 'data:audio/mp3;base64,//MkxAAHiAICWABElBeKPL/RANb2w+yiT1g/gTok//lP/W/l3h8QO/OCdCqCW2Cw//MkxAQHkAIWUAhEmAQXWUOFW2dxPu//9mr60ElY5sseQ+xxesmHKtZr7bsqqX2L//MkxAgFwAYiQAhEAC2hq22d3///9FTV6tA36JdgBJoOGgc+7qvqej5EPomQ+RMn/QmSACAv7mcADf//MkxBQHAAYi8AhEAO193vt9KGOq+6qcT7hhfN5FTInmwk8RkqKImTM55pRQHQSq//MkxBsGkgoIAABHhTACIJLf99nVI///yuW1uBqWfEu7CgNPWGpUadBmZ////4sL//MkxCMHMAH9iABEmAsKioqKigsLCwtVTEFNRTMuOTkuNVVVVVVVVVVVVVVVVVVV//MkxCkECAUYCAAAAFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+    silentSound.volume = 0.001;
+
+    const pageEvents = ['touchstart', 'touchend', 'mousedown', 'keydown'];
+    const unlockAudio = async () => {
+        try {
+          await silentSound.play();
+          pageEvents.forEach(event => {
+            document.removeEventListener(event, unlockAudio);
+          });
+        } catch (e) {
+          console.warn('[WavStreamPlayer] Audio context unlock failed', e);
+        }
+      }
+    pageEvents.forEach(event => {
+      document.addEventListener(event, unlockAudio);
+    });
   }
 
   /**

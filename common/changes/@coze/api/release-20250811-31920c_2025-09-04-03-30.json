@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "Publish release/20250811-31920c",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "chenyuliang.12138@bytedance.com"
+}
