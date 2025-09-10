@@ -11,6 +11,7 @@ import {
   type GetToken,
   type CreateRoomReq,
   type TranslateConfig,
+  type CreateRoomTurnDetection,
 } from '@coze/api';
 
 import * as RealtimeUtils from './utils';
@@ -50,6 +51,7 @@ export interface RealtimeClientConfig {
   prologueContent?: string /** optional, Prologue content */;
   roomMode?: RoomMode /** optional, Room mode */;
   translateConfig?: TranslateConfig /** optional, Translation configuration */;
+  turnDetection?: CreateRoomTurnDetection /** optional, Turn detection */;
 }
 
 // Only use for test
@@ -164,6 +166,9 @@ class RealtimeClient extends RealtimeEventHandler {
         }
         if (this._config.translateConfig) {
           config.translate_config = this._config.translateConfig;
+        }
+        if (this._config.turnDetection) {
+          config.turn_detection = this._config.turnDetection;
         }
         const params: CreateRoomReq = {
           bot_id: botId,

@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "rpc demo add turn detection",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "chenyuliang.12138@bytedance.com"
+}

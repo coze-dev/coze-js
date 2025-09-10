@@ -15,7 +15,11 @@ import {
   RealtimeAPIError,
   EventNames,
 } from '@coze/realtime-api';
-import { type RoomMode, type APIError } from '@coze/api';
+import {
+  type RoomMode,
+  type APIError,
+  CreateRoomTurnDetectionType,
+} from '@coze/api';
 
 import {
   getBaseUrl,
@@ -59,6 +63,15 @@ const RealtimeConsole: React.FC = () => {
   // const { handleMessage } = useInterrupt({ clientRef });
   const isMobile = useIsMobile();
 
+  const [turnDetectionType, setTurnDetectionType] =
+    useState<CreateRoomTurnDetectionType>(() => {
+      const savedValue = localManager.get(LocalStorageKey.TURN_DETECTION_TYPE);
+      return (
+        (savedValue as CreateRoomTurnDetectionType) ??
+        CreateRoomTurnDetectionType.ServerVad
+      );
+    });
+
   const handleSaveSettings = async () => {
     if (clientRef.current) {
       clientRef.current.disconnect();
@@ -67,6 +80,15 @@ const RealtimeConsole: React.FC = () => {
     await initLocalManager();
     setTimeout(() => {
       handleInitClient();
+      setTurnDetectionType(() => {
+        const savedValue = localManager.get(
+          LocalStorageKey.TURN_DETECTION_TYPE,
+        );
+        return (
+          (savedValue as CreateRoomTurnDetectionType) ??
+          CreateRoomTurnDetectionType.ServerVad
+        );
+      });
     });
   };
 
@@ -117,6 +139,11 @@ const RealtimeConsole: React.FC = () => {
             ),
             videoOnDefault:
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true',
+          }
+        : undefined,
+      turnDetection: turnDetectionType
+        ? {
+            type: turnDetectionType as CreateRoomTurnDetectionType,
           }
         : undefined,
     });
@@ -347,6 +374,7 @@ const RealtimeConsole: React.FC = () => {
           clientRef={clientRef}
           onToggleMicrophone={setIsMicrophoneOn}
           isMicrophoneOn={isMicrophoneOn}
+          turnDetectionType={turnDetectionType}
         />
       </Footer>
       {isShowVideo() && <Player clientRef={clientRef} />}

@@ -28,6 +28,7 @@ export interface RoomConfig {
   prologue_content?: string;
   translate_config?: TranslateConfig;
   room_mode?: RoomMode;
+  turn_detection?: CreateRoomTurnDetection;
 }
 
 export interface TranslateConfig {
@@ -47,4 +48,14 @@ export interface CreateRoomData {
   uid: string;
   room_id: string;
   app_id: string;
+}
+
+export interface CreateRoomTurnDetection {
+  type?: CreateRoomTurnDetectionType;
+}
+
+export enum CreateRoomTurnDetectionType {
+  ServerVad = 'server_vad',
+  ClientVad = 'client_vad',
+  ClientInterrupt = 'client_interrupt',
 }

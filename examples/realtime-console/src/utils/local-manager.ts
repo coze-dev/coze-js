@@ -21,6 +21,7 @@ export enum LocalStorageKey {
   INTERRUPT_BOT_ID = 'interrupt_bot_id',
   ROOM_MODE = 'room_mode',
   TRANSLATE_CONFIG = 'translate_config',
+  TURN_DETECTION_TYPE = 'turn_detection_type',
 }
 
 export class LocalManager {
