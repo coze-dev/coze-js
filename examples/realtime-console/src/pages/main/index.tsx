@@ -141,9 +141,11 @@ const RealtimeConsole: React.FC = () => {
               localManager.get(LocalStorageKey.VIDEO_STATE) === 'true',
           }
         : undefined,
-      turnDetection: turnDetectionType
+      turnDetection: localManager.get(LocalStorageKey.TURN_DETECTION_TYPE)
         ? {
-            type: turnDetectionType as CreateRoomTurnDetectionType,
+            type: localManager.get(
+              LocalStorageKey.TURN_DETECTION_TYPE,
+            ) as CreateRoomTurnDetectionType,
           }
         : undefined,
     });
