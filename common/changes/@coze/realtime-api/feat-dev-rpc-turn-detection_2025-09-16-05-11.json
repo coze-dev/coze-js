@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "upgrade api version",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "chenyuliang.12138@bytedance.com"
+}
