@@ -15,7 +15,11 @@ import {
   Avatar,
   Input,
 } from 'antd';
-import { AuthenticationError, RoomMode } from '@coze/api';
+import {
+  AuthenticationError,
+  RoomMode,
+  CreateRoomTurnDetectionType,
+} from '@coze/api';
 import {
   RobotOutlined,
   InfoCircleOutlined,
@@ -247,6 +251,10 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
         [LocalStorageKey.ROOM_MODE]: localManager.get(
           LocalStorageKey.ROOM_MODE,
         ),
+        [LocalStorageKey.TURN_DETECTION_TYPE]: localManager.get(
+          LocalStorageKey.TURN_DETECTION_TYPE,
+          'server_vad',
+        ),
         [LocalStorageKey.TRANSLATE_CONFIG]: localManager.get(
           LocalStorageKey.TRANSLATE_CONFIG,
           'zh-en',
@@ -270,6 +278,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
       interrupt_text,
       interrupt_bot_id,
       translate_config,
+      turn_detection_type,
     } = form.getFieldsValue();
     localManager.set(LocalStorageKey.WORKSPACE_ID, workspace_id);
     localManager.set(LocalStorageKey.BOT_ID, bot_id);
@@ -282,6 +291,7 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
     localManager.set(LocalStorageKey.INTERRUPT_TEXT, interrupt_text);
     localManager.set(LocalStorageKey.INTERRUPT_BOT_ID, interrupt_bot_id);
     localManager.set(LocalStorageKey.TRANSLATE_CONFIG, translate_config);
+    localManager.set(LocalStorageKey.TURN_DETECTION_TYPE, turn_detection_type);
   };
 
   const handleOk = () => {
@@ -534,6 +544,22 @@ const SettingForm: React.FC<SettingsProps> = ({ onCancel, onOk }) => {
             <Select placeholder="Select translate config">
               <Select.Option value="zh-en">ZH &gt; EN</Select.Option>
               <Select.Option value="en-zh">EN &gt; ZH</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name={LocalStorageKey.TURN_DETECTION_TYPE}
+            label="Turn Detection"
+            tooltip="Optional: Specify the turn detection for the conversation"
+          >
+            <Select placeholder="Select turn detection">
+              <Select.Option value={CreateRoomTurnDetectionType.ServerVad}>
+                Server VAD
+              </Select.Option>
+              <Select.Option
+                value={CreateRoomTurnDetectionType.ClientInterrupt}
+              >
+                Client Interrupt
+              </Select.Option>
             </Select>
           </Form.Item>
         </div>

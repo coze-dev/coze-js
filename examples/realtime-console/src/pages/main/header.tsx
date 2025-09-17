@@ -10,7 +10,7 @@ import {
 import { AudioOutlined, AudioMutedOutlined } from '@ant-design/icons';
 
 import '../../App.css';
-import { ChatEventType } from '@coze/api';
+import { ChatEventType, CreateRoomTurnDetectionType } from '@coze/api';
 
 import { isShowVideo } from '../../utils/utils';
 import { LocalManager, LocalStorageKey } from '../../utils/local-manager';
@@ -19,6 +19,7 @@ import useIsMobile from '../../hooks/use-is-mobile';
 import useCozeAPI from '../../hooks/use-coze-api';
 import MessageForm, { type MessageFormRef } from './message-form';
 import LiveInfo from './live-info';
+import HoldToTalk from './hold-to-talk';
 import ComfortStrategyForm from './comfort-strategy-form';
 
 const { Text, Link } = Typography;
@@ -30,6 +31,7 @@ interface HeaderProps {
   isMicrophoneOn: boolean;
   isConnected?: boolean;
   clientRef: React.MutableRefObject<RealtimeClient | null>;
+  turnDetectionType?: CreateRoomTurnDetectionType;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -39,18 +41,18 @@ const Header: React.FC<HeaderProps> = ({
   isConnected,
   clientRef,
   isMicrophoneOn,
+  turnDetectionType,
 }) => {
   const localManager = new LocalManager();
   const [isConnecting, setIsConnecting] = useState(false);
   const [microphoneStatus, setMicrophoneStatus] = useState<'normal' | 'error'>(
     'normal',
   );
-  // const [isAudioPlaybackDeviceTest, setIsAudioPlaybackDeviceTest] =
-  //   useState(false);
   const [noiseSuppression, setNoiseSuppression] = useState<string[]>(() => {
     const savedValue = localManager.get(LocalStorageKey.NOISE_SUPPRESSION);
     return savedValue ? JSON.parse(savedValue) : [];
   });
+
   const [connectLeftTime, setConnectLeftTime] = useState(DISCONNECT_TIME);
   const [audioCapture, setAudioCapture] = useState<string>('default');
   const [audioPlayback, setAudioPlayback] = useState<string>('default');
@@ -92,6 +94,7 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     checkMicrophonePermission();
   }, []);
+
   useEffect(() => {
     if (isConnected && connectLeftTime > 0) {
       const timer = setInterval(() => {
@@ -262,46 +265,6 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  // const handleEnableAudioPropertiesReport = () => {
-  //   if (!clientRef?.current) {
-  //     message.error('Please click Settings to set configuration first');
-  //     return;
-  //   }
-  //   try {
-  //     clientRef?.current?.enableAudioPropertiesReport({ interval: 1000 });
-  //     message.success('Audio properties reporting enabled');
-  //   } catch (error) {
-  //     message.error('Failed to enable audio properties reporting');
-  //     console.error(error);
-  //   }
-  // };
-
-  // const handleAudioPlaybackDeviceTest = () => {
-  //   if (!clientRef?.current) {
-  //     message.error('Please click Settings to set configuration first');
-  //     return;
-  //   }
-  //   if (isAudioPlaybackDeviceTest) {
-  //     try {
-  //       clientRef.current.stopAudioPlaybackDeviceTest();
-  //       setIsAudioPlaybackDeviceTest(false);
-  //       message.success('Audio playback device test stopped');
-  //     } catch (error) {
-  //       message.error('Failed to stop audio playback device test');
-  //       console.error(error);
-  //     }
-  //   } else {
-  //     try {
-  //       clientRef.current.startAudioPlaybackDeviceTest();
-  //       setIsAudioPlaybackDeviceTest(true);
-  //       message.success('Audio playback device test started');
-  //     } catch (error) {
-  //       message.error('Failed to start audio playback device test');
-  //       console.error(error);
-  //     }
-  //   }
-  // };
-
   const handleAudioCaptureChange = (value: string) => {
     setAudioCapture(value);
     clientRef.current?.setAudioInputDevice(value);
@@ -384,6 +347,7 @@ const Header: React.FC<HeaderProps> = ({
       </>
     );
   }
+
   if (isConnected) {
     return (
       <>
@@ -427,20 +391,6 @@ const Header: React.FC<HeaderProps> = ({
           <>
             <div style={{ marginTop: '10px' }}></div>
             <MessageForm onSubmit={handleSendMessage} ref={formRef} />
-            {/* <Button
-              type="primary"
-              style={{ marginRight: '10px', marginLeft: '10px' }}
-              onClick={handleEnableAudioPropertiesReport}
-            >
-              Enable Audio Report
-            </Button>
-            <Button
-              type="primary"
-              className="button-margin-right"
-              onClick={handleAudioPlaybackDeviceTest}
-            >
-              {isAudioPlaybackDeviceTest ? 'Stop' : 'Start'} Audio Device Test
-            </Button> */}
             <Button
               type="primary"
               style={{ marginRight: '10px', marginLeft: '10px' }}
@@ -449,6 +399,10 @@ const Header: React.FC<HeaderProps> = ({
               Comfort Strategy
             </Button>
             <LiveInfo liveId={liveId} />
+            {turnDetectionType ===
+              CreateRoomTurnDetectionType.ClientInterrupt && (
+              <HoldToTalk clientRef={clientRef} isConnected={isConnected} />
+            )}
             <Row gutter={[16, 16]} justify="center" align="middle">
               <Col xs={24} sm={12} md={8}>
                 <div>
@@ -496,6 +450,7 @@ const Header: React.FC<HeaderProps> = ({
       </>
     );
   }
+
   return (
     <>
       <Text style={{ marginRight: 8 }}>Audio Noise Suppression:</Text>
