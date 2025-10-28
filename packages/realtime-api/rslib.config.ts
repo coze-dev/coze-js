@@ -16,6 +16,7 @@ function getLibShared(format: LibConfig['format'], dts = false, subpath = '') {
         }
       : false,
     syntax: 'es6',
+    bundle: format === 'esm' ? false : true,
     source: {
       entry: { index: subpath ? `./src/${subpath}` : './src' },
     },
@@ -31,15 +32,15 @@ export default defineConfig({
     target: 'web',
   },
   lib: [
-    {
-      ...getLibShared('umd'),
-      umdName: 'CozeRealtimeApi',
-    },
-    getLibShared('cjs', true),
+    // {
+    //   ...getLibShared('umd'),
+    //   umdName: 'CozeRealtimeApi',
+    // },
+    // getLibShared('cjs', true),
     getLibShared('esm', false),
-    getLibShared('cjs', true, 'event-names'),
-    getLibShared('esm', false, 'event-names'),
-    getLibShared('cjs', true, 'live'),
-    getLibShared('esm', false, 'live'),
+    // getLibShared('cjs', true, 'event-names'),
+    // getLibShared('esm', false, 'event-names'),
+    // getLibShared('cjs', true, 'live'),
+    // getLibShared('esm', false, 'live'),
   ],
 });
