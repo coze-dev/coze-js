@@ -7,11 +7,10 @@ import {
   type WsChatClientOptions,
   WsChatEventNames,
 } from '../types';
-import {
-  PcmRecorder,
+import PcmRecorder, {
   type AIDenoiserProcessorLevel,
   type AIDenoiserProcessorMode,
-} from '../index';
+} from '../recorder/pcm-recorder';
 import {
   type AudioCodec,
   type ChatUpdateEvent,

@@ -17,6 +17,7 @@ import { config } from './config';
 const wavRecorder = new WavRecorder({ sampleRate: 24000 });
 const wavStreamPlayer = new WavStreamPlayer({ sampleRate: 24000 });
 
+// eslint-disable-next-line max-lines-per-function
 const useWsAPI = (
   clientRef: MutableRefObject<CozeAPI | null>,
   onTranscription: (data: CreateTranscriptionsWsRes) => void,

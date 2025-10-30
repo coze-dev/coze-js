@@ -34,5 +34,7 @@ export default defineConfig({
     getLibShared('esm', false),
     getLibShared('cjs', true, 'ws-tools'),
     getLibShared('esm', false, 'ws-tools'),
+    getLibShared('cjs', true, 'ws-tools/speech'),
+    getLibShared('esm', false, 'ws-tools/speech'),
   ],
 });
