@@ -15,7 +15,9 @@ function getLibShared(format: LibConfig['format'], dts = false, subpath = '') {
       : false,
     syntax: 'es6',
     source: {
-      entry: { index: subpath ? `./src/${subpath}` : './src' },
+      entry: {
+        index: subpath ? `./src/${subpath}/index.ts` : './src/index.ts',
+      },
     },
   };
   return shared;
