@@ -56,7 +56,7 @@
     "README.zh-CN.md"
   ],
   "scripts": {
-    "build:rslib": "rslib build",
+    "build": "rslib build",
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
     "start": "rollup -c -w",
