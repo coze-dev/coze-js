@@ -36,7 +36,14 @@ export default defineConfig({
     getLibShared('esm', false),
     getLibShared('cjs', true, 'ws-tools'),
     getLibShared('esm', false, 'ws-tools'),
-    getLibShared('cjs', true, 'ws-tools/speech'),
+    getLibShared('cjs', false, 'ws-tools/speech'),
     getLibShared('esm', false, 'ws-tools/speech'),
   ],
+  output: {
+    externals: {
+      // Optional ws dependencies - these are native modules for performance optimization
+      bufferutil: 'bufferutil',
+      'utf-8-validate': 'utf-8-validate',
+    },
+  },
 });
