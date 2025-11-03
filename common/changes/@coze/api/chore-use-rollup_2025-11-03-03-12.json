@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "fix build warning",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "tecvan.fe@gmail.com"
+}
