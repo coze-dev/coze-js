@@ -64,6 +64,7 @@ class PcmRecorder {
 
     if (checkDenoiserSupport(config.aiDenoisingConfig?.assetsPath)) {
       PcmRecorder.aiDenoiserSupport = true;
+      // @ts-expect-error skip
       PcmRecorder.denoiser = window.__denoiser;
     }
 

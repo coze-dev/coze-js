@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/realtime-api",
+      "comment": "upgrade rslib version",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/realtime-api",
+  "email": "tecvan.fe@gmail.com"
+}

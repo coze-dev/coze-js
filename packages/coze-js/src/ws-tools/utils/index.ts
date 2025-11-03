@@ -1,19 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-declare global {
-  interface Window {
-    __denoiser: AIDenoiserExtension;
-    __denoiserSupported: boolean;
-  }
-}
+// declare global {
+//   interface Window {
+//     __denoiser: AIDenoiserExtension;
+//     __denoiserSupported: boolean;
+//   }
+// }
 declare const chrome: any;
 
 import { logger } from 'agora-rte-extension';
-import AgoraRTC from 'agora-rtc-sdk-ng';
+import {
+  disableLogUpload,
+  setLogLevel,
+  registerExtensions,
+} from 'agora-rtc-sdk-ng/esm';
 import { AIDenoiserExtension } from 'agora-extension-ai-denoiser';
 
 // 禁用日志上传与打印日志
-AgoraRTC.disableLogUpload();
-AgoraRTC.setLogLevel(3);
+disableLogUpload();
+setLogLevel(3);
 logger.setLogLevel(3);
 
 /**
@@ -164,37 +168,38 @@ export const isHarmonOS = () =>
  * @returns {boolean} Whether AI denoising is supported
  */
 export const checkDenoiserSupport = (assetsPath?: string) => {
-  if (window.__denoiserSupported !== undefined) {
-    return window.__denoiserSupported;
+  if ((window as any).__denoiserSupported !== undefined) {
+    return (window as any).__denoiserSupported;
   }
   // Pass in the public path where the Wasm file is located to create an AIDenoiserExtension instance, path does not end with / "
   const external =
-    window.__denoiser ||
+    (window as any).__denoiser ||
     new AIDenoiserExtension({
       assetsPath:
         assetsPath ??
         'https://lf3-static.bytednsdoc.com/obj/eden-cn/613eh7lpqvhpeuloz/websocket',
     });
 
-  window.__denoiser = external;
+  (window as any).__denoiser = external;
 
+  // @ts-expect-error skip
   external.onloaderror = e => {
     // If the Wasm file fails to load, you can disable the plugin, for example:
     console.error('Denoiser load error', e);
-    window.__denoiserSupported = false;
+    (window as any).__denoiserSupported = false;
   };
 
   // Check compatibility
   if (!external.checkCompatibility()) {
     // The current browser may not support the AI denoising plugin, you can stop executing subsequent logic
     console.error('Does not support AI Denoiser!');
-    window.__denoiserSupported = false;
+    (window as any).__denoiserSupported = false;
     return false;
   } else {
     // Register the plugin
     // see https://github.com/AgoraIO/API-Examples-Web/blob/main/src/example/extension/aiDenoiser/agora-extension-ai-denoiser/README.md
-    AgoraRTC.registerExtensions([external]);
-    window.__denoiserSupported = true;
+    registerExtensions([external]);
+    (window as any).__denoiserSupported = true;
     return true;
   }
 };
