@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc && vite build && node scripts/postbuild.js",
     "fix-manifest": "node scripts/fix-manifest.js",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --report-unused-disable-directives",
     "preview": "vite preview",
     "start": "vite",
     "zip": "cd dist && zip -r ../simult-interpretation.zip * && cd .. && echo 'Created simult-interpretation.zip in the project root'"

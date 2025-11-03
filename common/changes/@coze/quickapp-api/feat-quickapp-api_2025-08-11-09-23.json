@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/quickapp-api",
+      "comment": "add quickapp-api for websocket and asr and quickapp-examples",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/quickapp-api",
+  "email": "tianqin@xiaomi.com"
+}
