@@ -2,6 +2,38 @@
   "name": "@coze/api",
   "entries": [
     {
+      "version": "1.3.9",
+      "tag": "HEAD",
+      "date": "2025-11-27T04:06:15.838Z",
+      "comments": {
+        "minor": [
+          {
+            "comment": "rpc demo add turn detection"
+          },
+          {
+            "comment": "upgrade api version"
+          },
+          {
+            "comment": "support voice emotions"
+          },
+          {
+            "comment": "音播报提供释放播放器功能并支持语音识别自定义配置"
+          }
+        ],
+        "patch": [
+          {
+            "comment": "fix ChatV3Message Type and ws  no voice in mobile"
+          },
+          {
+            "comment": "Clear timeout and close WebSocket before destroying player"
+          },
+          {
+            "comment": "Publish release/20250811-31920c"
+          }
+        ]
+      }
+    },
+    {
       "version": "1.3.5",
       "tag": "HEAD",
       "date": "2025-07-08T03:18:23.623Z",
