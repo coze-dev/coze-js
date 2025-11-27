@@ -1,5 +1,21 @@
 # @coze/api
 
+## 1.3.9 - 2025-11-27
+
+### New Features
+
+- rpc demo add turn detection
+- upgrade api version
+- support voice emotions
+- 音播报提供释放播放器功能并支持语音识别自定义配置
+
+### Bug Fixes
+
+- fix ChatV3Message Type and ws  no voice in mobile
+- Clear timeout and close WebSocket before destroying player
+- Publish release/20250811-31920c
+
+
 ## 1.3.5 - 2025-07-08
 
 ### Other Changes
