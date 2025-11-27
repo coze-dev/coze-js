@@ -193,7 +193,7 @@ export interface CommonErrorEvent extends BaseEventWithDetail {
   };
 }
 
-interface AudioConfig {
+export interface AudioConfig {
   /** Input audio format, supports pcm/wav/ogg */
   format?: 'pcm' | 'wav' | 'ogg';
   /** Input audio codec, supports pcm/opus/g711a/g711u */

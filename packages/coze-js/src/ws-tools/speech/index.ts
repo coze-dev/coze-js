@@ -186,6 +186,30 @@ class WsSpeechClient {
     this.closeWs();
   }
 
+  /**
+   * Releases wavStreamPlayer resources so callers can dispose the instance.
+   * In a mobile browser environment, if the WsSpeechClient is instantiated multiple times,
+   * you can additionally call the destroyPlayer method to release resources and prevent issues with speech playback.
+   */
+  async destroyPlayer() {
+    // Clear any pending timeout first
+    if (this.playbackTimeout) {
+      clearTimeout(this.playbackTimeout);
+      this.playbackTimeout = null;
+    }
+
+    // Ensure WebSocket is closed
+    this.closeWs();
+
+    // Now safe to destroy player and reset state
+    await this.wavStreamPlayer.destroy();
+    this.totalDuration = 0;
+    this.playbackStartTime = null;
+    this.playbackPauseTime = null;
+    this.elapsedBeforePause = 0;
+    this.audioDeltaList.length = 0;
+  }
+
   append(message: string) {
     this.ws?.send({
       id: uuid(),

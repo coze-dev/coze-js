@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/api",
+      "comment": "Clear timeout and close WebSocket before destroying player",
+      "type": "patch"
+    }
+  ],
+  "packageName": "@coze/api",
+  "email": "447258925@qq.com"
+}

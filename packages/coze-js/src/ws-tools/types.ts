@@ -1,3 +1,4 @@
+import { type TranscriptionsUpdateEvent } from '../resources/websockets/types';
 import {
   type AIDenoiserProcessorLevel,
   type AIDenoiserProcessorMode,
@@ -428,6 +429,11 @@ export interface WsTranscriptionClientOptions extends WsToolsOptions {
   wavRecordConfig?: WavRecordConfig;
   entityType?: 'bot' | 'workflow';
   entityId?: string;
+  /**
+   * en: Custom data payload for initial transcription update
+   * zh: 初始语音识别更新的接口配置数据
+   */
+  transcriptionUpdateData?: TranscriptionsUpdateEvent['data'];
 }
 
 export type WsSimultInterpretationClientOptions = WsTranscriptionClientOptions;
