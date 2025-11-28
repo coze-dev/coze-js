@@ -1,0 +1,86 @@
+<template>
+  <div class="page-container">
+    <div class="header">
+      <text class="title">Coze.js 快应用示例</text>
+    </div>
+
+    <div class="logo-container">
+      <image src="/common/logo.png" class="logo"></image>
+    </div>
+
+    <div class="content">
+      <text class="subtitle">功能演示</text>
+
+      <div class="feature-list">
+        <div class="feature-item" onclick="navigateToTranscription">
+          <text class="feature-title">实时语音转写</text>
+          <text class="feature-desc">使用WebSocket实现实时语音转写功能</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  import router from '@system.router';
+  export default {
+    /**
+     * 导航到语音转写页面
+     */
+    navigateToTranscription() {
+      router.push({
+        uri: '/pages/transcription'
+      });
+    }
+  }
+</script>
+
+<style>
+  @import '../../common/styles/common.css';
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+  }
+
+  .logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .feature-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2196F3;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 14px;
+    color: #666666;
+  }
+</style>

@@ -5,7 +5,7 @@
   "description": "Coze Realtime Quickstart(Vue)",
   "scripts": {
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "lint": "eslint .",
     "run-preinstall": "node scripts/preinstall.js",
     "start": "vue-cli-service serve --port 3000",
     "test": "exit 0"
