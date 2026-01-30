@@ -16,6 +16,17 @@ const Player: React.FC<{
   };
   const videoState = localManager.get(LocalStorageKey.VIDEO_STATE);
 
+  const handleToggleVideoMirror = (e: CheckboxChangeEvent) => {
+    clientRef.current
+      ?.getRtcEngine()
+      ?.setLocalVideoMirrorType(e.target.checked ? 1 : 0);
+
+    localManager.set(
+      LocalStorageKey.VIDEO_MIRROR_STATE,
+      e.target.checked.toString(),
+    );
+  };
+
   return (
     <div className="player-container">
       <div
@@ -34,6 +45,15 @@ const Player: React.FC<{
             onChange={handleToggleVideo}
           />{' '}
           Video
+        </label>
+        <label>
+          <Checkbox
+            defaultChecked={
+              localManager.get(LocalStorageKey.VIDEO_MIRROR_STATE) === 'true'
+            }
+            onChange={handleToggleVideoMirror}
+          />{' '}
+          镜像
         </label>
         <a
           href="https://bytedance.larkoffice.com/docx/BdIxdfjraoarXIx2Pszc7Yx5nre"
