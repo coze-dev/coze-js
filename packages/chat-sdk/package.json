@@ -6,6 +6,10 @@
   "author": "gaoding.devingao@bytedance.com",
   "exports": {
     ".": "./dist/lib-source/src/exports/index.js",
+    "./markdown": {
+      "import": "./dist/lib-source/src/exports/markdown/index.js",
+      "types": "./dist/lib-source/src/exports/markdown/index.d.ts"
+    },
     "./webJs": {
       "import": "./dist/lib-h5/exports/index.js",
       "types": "./dist/lib-source/src/exports/index.d.ts"
@@ -24,6 +28,9 @@
     "*": {
       "webJs": [
         "./dist/lib-source/src/exports/index.d.ts"
+      ],
+      "markdown": [
+        "./dist/lib-source/src/exports/markdown/index.d.ts"
       ]
     }
   },

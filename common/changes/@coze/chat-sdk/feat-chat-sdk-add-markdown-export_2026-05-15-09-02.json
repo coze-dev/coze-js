@@ -1,0 +1,11 @@
+{
+  "changes": [
+    {
+      "packageName": "@coze/chat-sdk",
+      "comment": "添加单独 markdown 导出支持",
+      "type": "minor"
+    }
+  ],
+  "packageName": "@coze/chat-sdk",
+  "email": "fengkun@bytedance.com"
+}
