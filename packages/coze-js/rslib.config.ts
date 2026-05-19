@@ -15,7 +15,9 @@ function getLibShared(format: LibConfig['format'], dts = false, subpath = '') {
       : false,
     syntax: 'es6',
     source: {
-      entry: { index: subpath ? `./src/${subpath}` : './src' },
+      entry: {
+        index: subpath ? `./src/${subpath}/index.ts` : './src/index.ts',
+      },
     },
   };
   return shared;
@@ -34,5 +36,14 @@ export default defineConfig({
     getLibShared('esm', false),
     getLibShared('cjs', true, 'ws-tools'),
     getLibShared('esm', false, 'ws-tools'),
+    getLibShared('cjs', false, 'ws-tools/speech'),
+    getLibShared('esm', false, 'ws-tools/speech'),
   ],
+  output: {
+    externals: {
+      // Optional ws dependencies - these are native modules for performance optimization
+      bufferutil: 'bufferutil',
+      'utf-8-validate': 'utf-8-validate',
+    },
+  },
 });

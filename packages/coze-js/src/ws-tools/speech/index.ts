@@ -343,3 +343,5 @@ class WsSpeechClient {
 }
 
 export default WsSpeechClient;
+
+export { WsSpeechClient };
