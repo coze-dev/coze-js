@@ -22,6 +22,7 @@ export enum LocalStorageKey {
   ROOM_MODE = 'room_mode',
   TRANSLATE_CONFIG = 'translate_config',
   TURN_DETECTION_TYPE = 'turn_detection_type',
+  VIDEO_MIRROR_STATE = 'VIDEO_MIRROR_STATE',
 }
 
 export class LocalManager {
