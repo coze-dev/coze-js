@@ -1,0 +1,71 @@
+{
+  "name": "@coze/quickapp-api",
+  "version": "1.0.0",
+  "description": "Official Coze Quick App SDK for seamless AI integration into your applications | 扣子官方 Quick App SDK，助您轻松集成 AI 能力到应用中",
+  "keywords": [
+    "coze",
+    "ai",
+    "quickapp",
+    "quickapp-api",
+    "coze-quickapp",
+    "coze-api",
+    "sdk",
+    "chatbot",
+    "typescript"
+  ],
+  "homepage": "https://github.com/coze-dev/coze-js/tree/main/packages/quickapp-api",
+  "bugs": {
+    "url": "https://github.com/coze-dev/coze-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coze-dev/coze-js.git",
+    "directory": "packages/quickapp-api"
+  },
+  "license": "MIT",
+  "author": "",
+  "exports": {
+    ".": "./dist/index.js",
+    "./ws-tools": "./dist/ws-tools/index.js"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/index.d.ts"
+      ],
+      "ws-tools": [
+        "dist/ws-tools/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json -f",
+    "clean": "rimraf dist",
+    "dev": "tsc -b tsconfig.build.json -w",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@coze/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze-infra/ts-config": "workspace:*",
+    "@coze-infra/vitest-config": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "9.14.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^5.2.2",
+    "vitest": "~2.1.9"
+  }
+}

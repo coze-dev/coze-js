@@ -1,0 +1,160 @@
+<template>
+  <div class="page-container">
+    <div class="header">
+      <text class="title">实时语音转写 WebSocket 演示</text>
+      <div class="back-button" onclick="goBackToHome">
+        <text>返回首页</text>
+      </div>
+    </div>
+
+    <div class="transcription-box">
+      <text if="{{!transcriptionText}}" class="placeholder">语音转写内容将显示在这里...</text>
+      <text if="{{transcriptionText}}" class="transcription-text">{{transcriptionText}}</text>
+    </div>
+
+    <div class="status-indicator">
+      <div class="{{isRecording ? (isPaused ? 'status-dot paused' : 'status-dot recording') : 'status-dot inactive'}}"></div>
+      <text>{{getStatusText()}}</text>
+    </div>
+
+    <div class="button-row">
+      <div class="{{isRecording && !isPaused ? 'primary-button disabled' : 'primary-button'}}" onclick="handleStartRecording">
+        <text>开始转写</text>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <div class="{{!isRecording ? 'default-button disabled' : 'default-button'}}" onclick="handlePauseResume">
+        <text>{{isPaused ? '继续录音' : '暂停录音'}}</text>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <div class="{{!isRecording ? 'warn-button disabled' : 'warn-button'}}" onclick="handleStopRecording">
+        <text>结束录音</text>
+      </div>
+    </div>
+
+    <div if="{{errorMessage}}" class="error-message">
+      <text>{{errorMessage}}</text>
+    </div>
+  </div>
+</template>
+
+<script>
+  import router from '@system.router';
+  import { useTranscription } from '../../common/js/use-transcription';
+  import config from '../../config.js';
+
+
+  export default {
+    /**
+     * 页面私有数据
+     */
+    private: {
+      transcription: null,
+      isRecording: false,
+      isPaused: false,
+      transcriptionText: '',
+      errorMessage: ''
+    },
+
+    /**
+     * 页面onInit时触发
+     */
+    onInit() {
+      // 初始化语音转写功能
+      this.transcription = useTranscription({
+        token: config.transcriptionToken,
+        debug: config.debug
+      });
+
+      // 设置状态变化回调
+      this.transcription.onStatusChange(status => {
+        this.isRecording = status.isRecording;
+        this.isPaused = status.isPaused;
+      });
+
+      // 设置转写文本更新回调
+      this.transcription.onTranscriptionUpdate(text => {
+        this.transcriptionText = text;
+      });
+
+      // 设置错误回调
+      this.transcription.onError(error => {
+        this.errorMessage = error;
+      });
+    },
+
+    /**
+     * 页面onDestroy时触发，清理资源
+     */
+    onDestroy() {
+      if (this.transcription) {
+        this.transcription.destroy();
+        this.transcription = null;
+      }
+    },
+
+    /**
+     * 处理开始录音
+     */
+    handleStartRecording() {
+      if (this.isRecording && !this.isPaused) {
+        return; // 已经在录音中
+      }
+
+      this.transcription.startRecording();
+    },
+
+    /**
+     * 处理结束录音
+     */
+    handleStopRecording() {
+      if (!this.isRecording) {
+        return; // 没有在录音
+      }
+
+      this.transcription.stopRecording();
+    },
+
+    /**
+     * 处理暂停/继续录音
+     */
+    handlePauseResume() {
+      if (!this.isRecording) {
+        return; // 没有在录音
+      }
+
+      if (this.isPaused) {
+        this.transcription.resumeRecording();
+      } else {
+        this.transcription.pauseRecording();
+      }
+    },
+
+    /**
+     * 获取当前状态文本
+     */
+    getStatusText() {
+      if (this.isRecording) {
+        return this.isPaused ? '已暂停' : '正在录音';
+      }
+      return '等待开始';
+    },
+
+    /**
+     * 返回首页
+     */
+    goBackToHome() {
+      // 快应用中返回首页的逻辑
+      router.push({
+        uri: '/'
+      });
+    }
+  }
+</script>
+
+<style>
+  @import '../../common/styles/common.css';
+</style>

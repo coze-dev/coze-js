@@ -1,0 +1,36 @@
+{
+  "name": "@coze/api-quickapp-example",
+  "version": "1.0.0",
+  "description": "Coze.js Quick App Example - Speech to Text Transcription",
+  "keywords": [
+    "coze",
+    "quickapp",
+    "speech-to-text",
+    "transcription"
+  ],
+  "license": "MIT",
+  "author": "Coze.js Team",
+  "main": "index.js",
+  "scripts": {
+    "build": "aiot build",
+    "lint": "eslint --fix src/",
+    "release": "aiot release",
+    "server": "aiot server",
+    "start": "aiot server --watch",
+    "watch": "aiot watch"
+  },
+  "browserslist": [
+    "chrome 65"
+  ],
+  "dependencies": {
+    "@coze-infra/eslint-config": "workspace:*",
+    "@coze/api": "workspace:*",
+    "@coze/quickapp-api": "workspace:*"
+  },
+  "devDependencies": {
+    "aiot-toolkit": "^1.2.0-alpha.5",
+    "babel-eslint": "^10.0.1",
+    "eslint": "9.14.0",
+    "eslint-plugin-ux": "^0.0.4"
+  }
+}
