@@ -59,11 +59,11 @@ describe('release', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.NODE_AUTH_TOKEN = mockToken;
+    process.env.NPM_AUTH_TOKEN = mockToken;
   });
 
   afterEach(() => {
-    delete process.env.NODE_AUTH_TOKEN;
+    delete process.env.NPM_AUTH_TOKEN;
   });
 
   describe('releasePackages', () => {
@@ -99,13 +99,13 @@ describe('release', () => {
       expect(applyPublishConfig).toHaveBeenCalledWith(mockProject2);
 
       expect(exec).toHaveBeenCalledWith(
-        `NODE_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
+        `NPM_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
         {
           cwd: mockProject1.projectFolder,
         },
       );
       expect(exec).toHaveBeenCalledWith(
-        `NODE_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
+        `NPM_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
         {
           cwd: mockProject2.projectFolder,
         },
@@ -141,7 +141,7 @@ describe('release', () => {
       });
 
       expect(exec).toHaveBeenCalledWith(
-        `NODE_AUTH_TOKEN=${mockToken} npm publish --tag alpha --registry=${mockRegistry}`,
+        `NPM_AUTH_TOKEN=${mockToken} npm publish --tag alpha --registry=${mockRegistry}`,
         {
           cwd: mockProject.projectFolder,
         },
@@ -163,7 +163,7 @@ describe('release', () => {
       });
 
       expect(exec).toHaveBeenCalledWith(
-        `NODE_AUTH_TOKEN=${mockToken} npm publish --tag beta --registry=${mockRegistry}`,
+        `NPM_AUTH_TOKEN=${mockToken} npm publish --tag beta --registry=${mockRegistry}`,
         {
           cwd: mockProject.projectFolder,
         },
@@ -186,7 +186,7 @@ describe('release', () => {
       });
 
       expect(exec).toHaveBeenCalledWith(
-        `NODE_AUTH_TOKEN=${mockToken} npm publish --tag latest --dry-run --registry=${mockRegistry}`,
+        `NPM_AUTH_TOKEN=${mockToken} npm publish --tag latest --dry-run --registry=${mockRegistry}`,
         {
           cwd: mockProject.projectFolder,
         },
@@ -247,7 +247,7 @@ describe('release', () => {
         },
       ];
 
-      delete process.env.NODE_AUTH_TOKEN;
+      delete process.env.NPM_AUTH_TOKEN;
 
       await releasePackages(releaseManifests, {
         commit: 'abc123',
@@ -255,7 +255,7 @@ describe('release', () => {
       });
 
       expect(exec).toHaveBeenCalledWith(
-        'NODE_AUTH_TOKEN=undefined npm publish --tag latest --registry=https://registry.npmjs.org/',
+        'NPM_AUTH_TOKEN=undefined npm publish --tag latest --registry=https://registry.npmjs.org/',
         {
           cwd: mockProject.projectFolder,
         },
@@ -283,7 +283,7 @@ describe('release', () => {
       // 验证所有包都被构建和发布
       projects.forEach(project => {
         expect(exec).toHaveBeenCalledWith(
-          `NODE_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
+          `NPM_AUTH_TOKEN=${mockToken} npm publish --tag latest --registry=${mockRegistry}`,
           {
             cwd: project.projectFolder,
           },
