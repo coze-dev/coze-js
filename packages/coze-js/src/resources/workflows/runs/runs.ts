@@ -16,6 +16,18 @@ export class Runs extends APIResource {
    * @param params.app_id - Optional The ID of the app.  | 可选 要进行会话聊天的 App ID
    * @returns RunWorkflowData | 工作流运行数据
    */
+  async create(
+    params: RunWorkflowReq & { is_async: true },
+    options?: RequestOptions,
+  ): Promise<RunWorkflowAsyncData>;
+  async create(
+    params: RunWorkflowReq & { is_async?: false },
+    options?: RequestOptions,
+  ): Promise<RunWorkflowSyncData>;
+  async create(
+    params: RunWorkflowReq,
+    options?: RequestOptions,
+  ): Promise<RunWorkflowData>;
   async create(params: RunWorkflowReq, options?: RequestOptions) {
     const apiUrl = '/v1/workflow/run';
     const response = await this._client.post<RunWorkflowReq, RunWorkflowData>(
@@ -134,14 +146,153 @@ export interface RunWorkflowReq {
   is_async?: boolean;
 }
 
-export interface RunWorkflowData {
-  data: string;
-  cost: string;
-  token: number;
-  msg: string;
-  debug_url: string;
-  execute_id: string;
+// Token usage of a workflow run.
+// 工作流运行的 Token 消耗。
+export interface RunWorkflowUsage {
+  // Tokens consumed by the input, including context, system prompts, and the current user input.
+  // 输入内容所消耗的 Token 数，包含对话上下文、系统提示词、用户当前输入等所有输入类的 Token 消耗。
+  input_count: number;
+
+  // Tokens consumed by the model output.
+  // 大模型输出的内容所消耗的 Token 数。
+  output_count: number;
+
+  // Total tokens consumed by this API call, including input and output.
+  // 本次 API 调用消耗的 Token 总量，包括输入和输出两部分的消耗。
+  token_count: number;
 }
+
+// Request detail returned by the workflow run API.
+// 工作流运行请求的详细信息，主要用于记录日志 ID。
+export interface RunWorkflowDetail {
+  // Log ID of this request.
+  // 本次请求的日志 ID。
+  logid: string;
+}
+
+// Parameter definition required when a workflow run is interrupted.
+// 工作流中断时需要补充的参数定义。
+export interface RunWorkflowInterruptParameter {
+  // Parameter type, such as string, number, image, object, or array.
+  // 参数类型，例如 string、number、image、object、array。
+  type?: string;
+
+  // Element schema when type is array.
+  // 参数类型为 array 时，数组元素的子类型。
+  items?: RunWorkflowInterruptParameter;
+
+  // Whether the parameter is required.
+  // 该参数是否必填。
+  required?: boolean;
+
+  // Nested properties when type is object.
+  // 参数类型为 object 时的子参数定义。
+  properties?: Record<string, RunWorkflowInterruptParameter>;
+
+  // Parameter description.
+  // 参数描述。
+  description?: string;
+
+  // Configured default value.
+  // 参数配置的默认值。
+  default_value?: string;
+}
+
+// Interrupt payload returned by a non-streaming workflow run.
+// 非流式执行工作流时返回的中断信息。
+export interface RunWorkflowInterrupt {
+  // Interrupt control content.
+  // 中断控制内容。
+  data: string;
+
+  // Interrupt type. Pass this back when resuming the workflow.
+  // 工作流中断类型，恢复运行时应回传此字段。
+  // 2: question node, 5: input node, 6: client plugin, 7: OAuth plugin.
+  // 2：问答节点，5：输入节点，6：端插件，7：OAuth 插件。
+  type: number;
+
+  // Interrupt event ID. Pass this back when resuming the workflow.
+  // 工作流中断事件 ID，恢复运行时应回传此字段。
+  event_id: string;
+
+  // Parameters that must be supplied to resume the interrupted workflow.
+  // 工作流中断时需要补充的参数信息。
+  required_parameters?: Record<string, RunWorkflowInterruptParameter>;
+}
+
+// Synchronous workflow run response. | 同步执行工作流的响应。
+export interface RunWorkflowSyncData {
+  // Status code. 0 means the call succeeded.
+  // 调用状态码。0 表示调用成功。
+  code: number;
+
+  // Status message. Empty when code is 0.
+  // 状态信息。API 调用失败时可通过此字段查看详细错误信息。
+  msg: string;
+
+  // Workflow execution result, usually a JSON serialized string.
+  // 工作流执行结果，通常为 JSON 序列化字符串，部分场景下可能返回非 JSON 结构的字符串。
+  data: string;
+
+  // Debug page for this run. The link expires after 7 days.
+  // 工作流试运行调试页面。访问有效期为 7 天。
+  debug_url: string;
+
+  // Token usage of this API call.
+  // 资源使用情况，包含本次 API 调用消耗的 Token 数量等信息。
+  usage?: RunWorkflowUsage;
+
+  // Request detail, mainly the log ID for troubleshooting.
+  // 请求详细信息，主要用于记录日志 ID 以便排查问题。
+  detail?: RunWorkflowDetail;
+
+  // Event ID. Present when the run is asynchronous.
+  // 异步执行的事件 ID。
+  execute_id?: string;
+
+  // Interrupt details when the workflow pauses for user input or a plugin.
+  // 中断事件的详细信息。
+  interrupt_data?: RunWorkflowInterrupt;
+}
+
+// Asynchronous workflow run response. | 异步执行工作流的响应。
+export interface RunWorkflowAsyncData {
+  // Event ID of the asynchronous execution.
+  // 异步执行的事件 ID。
+  execute_id: string;
+
+  // Debug page for this run. The link expires after 7 days.
+  // 工作流试运行调试页面。访问有效期为 7 天。
+  debug_url?: string;
+
+  // Status message. Empty when the call succeeded.
+  // 状态信息。API 调用失败时可通过此字段查看详细错误信息。
+  msg?: string;
+
+  // Status code. 0 means the call succeeded.
+  // 调用状态码。0 表示调用成功。
+  code?: number;
+
+  // Request detail, mainly the log ID for troubleshooting.
+  // 请求详细信息，主要用于记录日志 ID 以便排查问题。
+  detail?: RunWorkflowDetail;
+
+  // Not returned until the asynchronous run is queried via history.
+  // 异步运行的执行结果需通过查询异步执行结果接口获取。
+  data?: string;
+
+  // Token usage of this API call, when the service includes it.
+  // 资源使用情况。异步运行时通常不返回。
+  usage?: RunWorkflowUsage;
+
+  // Interrupt details when the workflow pauses for user input or a plugin.
+  // 中断事件的详细信息。
+  interrupt_data?: RunWorkflowInterrupt;
+}
+
+// Response of POST /v1/workflow/run.
+// 执行工作流接口的响应。同步与异步返回的字段不同，因此取二者的并集。
+export type RunWorkflowData = RunWorkflowSyncData | RunWorkflowAsyncData;
 
 export interface ResumeWorkflowReq {
   workflow_id: string;

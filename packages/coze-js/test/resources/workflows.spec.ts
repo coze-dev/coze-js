@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import {
+  type RunWorkflowAsyncData,
   type RunWorkflowReq,
+  type RunWorkflowSyncData,
   WorkflowEventType,
 } from '../../src/resources/workflows/runs/runs';
 import { WorkflowEvent } from '../../src/resources/workflows/runs/runs';
@@ -21,7 +23,20 @@ describe('Workflows', () => {
   describe('Runs', () => {
     describe('create', () => {
       it('should create a workflow run', async () => {
-        const mockResponse = { data: { run_id: 'run-id' } };
+        const mockResponse = {
+          code: 0,
+          msg: '',
+          data: '{"output":"ok"}',
+          debug_url: 'https://www.coze.cn/work_flow?execute_id=741364789030728',
+          usage: {
+            input_count: 50,
+            token_count: 150,
+            output_count: 100,
+          },
+          detail: {
+            logid: '20241210152726467C48D89D6DB2****',
+          },
+        } satisfies RunWorkflowSyncData;
         vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
         const params: RunWorkflowReq = {
@@ -40,6 +55,47 @@ describe('Workflows', () => {
           undefined,
         );
         expect(result).toEqual(mockResponse);
+        expect(result.data).toBe('{"output":"ok"}');
+        expect(result.usage?.token_count).toBe(150);
+        expect(result.detail?.logid).toBe('20241210152726467C48D89D6DB2****');
+      });
+
+      it('should return execute_id when the workflow runs asynchronously', async () => {
+        const mockResponse = {
+          debug_url: 'https://www.coze.cn/work_flow?execute_id=742482313128840',
+          execute_id: '74248231312884',
+          msg: '',
+        } satisfies RunWorkflowAsyncData;
+        vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
+
+        const result = await workflows.runs.create({
+          workflow_id: 'workflow-id',
+          is_async: true,
+        });
+
+        expect(client.post).toHaveBeenCalledWith(
+          '/v1/workflow/run',
+          {
+            workflow_id: 'workflow-id',
+            is_async: true,
+          },
+          false,
+          undefined,
+        );
+        expect(result.execute_id).toBe('74248231312884');
+      });
+
+      it('should not type the legacy cost and token fields as the run response', () => {
+        const legacyResponse: RunWorkflowSyncData = {
+          code: 0,
+          msg: 'Success',
+          data: '{"output":"ok"}',
+          debug_url: 'https://www.coze.cn/work_flow',
+          // @ts-expect-error cost and token are not part of the workflow run response
+          cost: '0',
+          token: 98,
+        };
+        expect(legacyResponse.code).toBe(0);
       });
     });
 
