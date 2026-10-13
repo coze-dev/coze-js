@@ -85,14 +85,25 @@ describe('Workflows', () => {
         expect(result.execute_id).toBe('74248231312884');
       });
 
-      it('should not type the legacy cost and token fields as the run response', () => {
+      it('should not type the legacy cost field as the run response', () => {
         const legacyResponse: RunWorkflowSyncData = {
           code: 0,
           msg: 'Success',
           data: '{"output":"ok"}',
           debug_url: 'https://www.coze.cn/work_flow',
-          // @ts-expect-error cost and token are not part of the workflow run response
+          // @ts-expect-error cost is not part of the workflow run response
           cost: '0',
+        };
+        expect(legacyResponse.code).toBe(0);
+      });
+
+      it('should not type a top-level token field as the run response', () => {
+        const legacyResponse: RunWorkflowSyncData = {
+          code: 0,
+          msg: 'Success',
+          data: '{"output":"ok"}',
+          debug_url: 'https://www.coze.cn/work_flow',
+          // @ts-expect-error token counts belong under usage, not as a top-level field
           token: 98,
         };
         expect(legacyResponse.code).toBe(0);
