@@ -39,14 +39,14 @@ describe('Workflows', () => {
         } satisfies RunWorkflowSyncData;
         vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
-        const params: RunWorkflowReq = {
+        const params = {
           workflow_id: 'workflow-id',
           bot_id: 'bot-id',
           parameters: { key: 'value' },
           ext: { extra: 'info' },
-        };
+        } satisfies RunWorkflowReq & { is_async?: false };
 
-        const result = await workflows.runs.create(params);
+        const result: RunWorkflowSyncData = await workflows.runs.create(params);
 
         expect(client.post).toHaveBeenCalledWith(
           '/v1/workflow/run',
@@ -68,7 +68,7 @@ describe('Workflows', () => {
         } satisfies RunWorkflowAsyncData;
         vi.spyOn(client, 'post').mockResolvedValue(mockResponse);
 
-        const result = await workflows.runs.create({
+        const result: RunWorkflowAsyncData = await workflows.runs.create({
           workflow_id: 'workflow-id',
           is_async: true,
         });

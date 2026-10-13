@@ -56,8 +56,8 @@
     "format": "prettier --write .",
     "lint": "eslint ./ --cache --quiet",
     "start": "rslib build -w",
-    "test": "vitest",
-    "test:cov": "vitest --coverage --run"
+    "test": "tsc --noEmit -p tsconfig.misc.json && vitest",
+    "test:cov": "tsc --noEmit -p tsconfig.misc.json && vitest --coverage --run"
   },
   "dependencies": {
     "agora-extension-ai-denoiser": "^1.0.0",
